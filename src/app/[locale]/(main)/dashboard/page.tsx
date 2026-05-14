@@ -21,6 +21,7 @@ interface UserProgress {
   totalXp: number;
   streakDays: number;
   quizzesCompleted: number;
+  scores: Record<number, number>;
 }
 
 const DEMO_ACHIEVEMENTS = [
@@ -32,27 +33,18 @@ const DEMO_ACHIEVEMENTS = [
   { id: 6, emoji: '💎', nameAr: 'خبير ذكاوي', nameEn: 'Zkawi Expert', earned: false },
 ];
 
-function getStoredProgress(): UserProgress {
-  if (typeof window === 'undefined') return { completedLessons: [], totalXp: 0, streakDays: 1, quizzesCompleted: 0 };
-  try {
-    const stored = localStorage.getItem('zkawi_progress');
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return { completedLessons: [], totalXp: 0, streakDays: 1, quizzesCompleted: 0 };
-}
-
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const locale = useLocale();
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], totalXp: 0, streakDays: 1, quizzesCompleted: 0 });
+  const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {} });
+  const [lessonOrder, setLessonOrder] = useState<number[] | null>(null);
   const [mounted, setMounted] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
   useEffect(() => {
     setMounted(true);
-    setProgress(getStoredProgress());
   }, []);
 
   useEffect(() => {
@@ -61,17 +53,20 @@ export default function DashboardPage() {
       return;
     }
     if (!isPending && session) {
-      // Check if user completed onboarding
-      fetch('/api/user/preferences')
-        .then(r => r.json())
-        .then(data => {
-          if (!data.onboardingCompleted) {
-            router.push('/onboarding');
-          } else {
-            setCheckingOnboarding(false);
-          }
-        })
-        .catch(() => setCheckingOnboarding(false));
+      // Check onboarding + load progress in parallel
+      Promise.all([
+        fetch('/api/user/preferences').then(r => r.json()),
+        fetch('/api/progress').then(r => r.json()),
+        fetch('/api/user/learning-path').then(r => r.json()).catch(() => ({ lessonOrder: null })),
+      ]).then(([prefs, prog, path]) => {
+        if (!prefs.onboardingCompleted) {
+          router.push('/onboarding');
+          return;
+        }
+        if (prog.completedLessons) setProgress(prog);
+        if (path.lessonOrder) setLessonOrder(path.lessonOrder);
+        setCheckingOnboarding(false);
+      }).catch(() => setCheckingOnboarding(false));
     }
   }, [session, isPending, router]);
 
@@ -88,8 +83,12 @@ export default function DashboardPage() {
 
   if (!session) return null;
 
-  const claudeLessons = getLessonsByAgent('claude');
-  const agentProgress = (progress.completedLessons.length / claudeLessons.length) * 100;
+  const allClaudeLessons = getLessonsByAgent('claude');
+  // Show personalized order if available, else default order
+  const claudeLessons = lessonOrder
+    ? lessonOrder.map(id => allClaudeLessons.find(l => l.id === id)).filter(Boolean) as typeof allClaudeLessons
+    : allClaudeLessons;
+  const agentProgress = (progress.completedLessons.length / allClaudeLessons.length) * 100;
   const userName = session.user?.name || 'صديقي';
 
   return (
@@ -206,7 +205,7 @@ export default function DashboardPage() {
                           <Badge variant="default">متاح الآن</Badge>
                         </div>
                         <p className="text-sm text-[var(--text-muted)] mb-3">
-                          {progress.completedLessons.length} / {claudeLessons.length} دروس اتكملت
+                          {progress.completedLessons.length} / {allClaudeLessons.length} دروس اتكملت
                         </p>
                         <Progress value={agentProgress} colorScheme="purple" className="mb-3 h-2" />
                         <Link href="/agents/claude">
@@ -268,7 +267,7 @@ export default function DashboardPage() {
                     <Link href="/agents/claude">
                       <div className="text-center pt-2">
                         <span className="text-sm text-[var(--zkawi-purple)] font-bold hover:opacity-80">
-                          شوف كل الدروس ({claudeLessons.length}) →
+                          شوف كل الدروس ({allClaudeLessons.length}) →
                         </span>
                       </div>
                     </Link>

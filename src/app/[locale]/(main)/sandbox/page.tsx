@@ -1,0 +1,281 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { useLocale } from 'next-intl';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from '@/lib/auth-client';
+import { useRouter } from '@/lib/i18n/navigation';
+import Header from '@/components/layout/header';
+import Footer from '@/components/layout/footer';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Send, Key, Trash2, Bot, User, Loader2, AlertCircle } from 'lucide-react';
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export default function SandboxPage() {
+  const locale = useLocale();
+  const isAr = locale === 'ar';
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [streaming, setStreaming] = useState(false);
+  const [hint, setHint] = useState<string | null>(null);
+  const [keyInput, setKeyInput] = useState('');
+  const [keyError, setKeyError] = useState('');
+  const [keySaving, setKeySaving] = useState(false);
+  const [showKeyForm, setShowKeyForm] = useState(false);
+  const [error, setError] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isPending && !session) router.push('/login');
+  }, [session, isPending, router]);
+
+  useEffect(() => {
+    fetch('/api/keys/hint')
+      .then(r => r.json())
+      .then(d => setHint(d.hint ?? null));
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, streaming]);
+
+  async function saveKey() {
+    setKeyError('');
+    setKeySaving(true);
+    try {
+      const res = await fetch('/api/keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: keyInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setKeyError(data.error ?? 'خطأ'); return; }
+      setHint(data.hint);
+      setKeyInput('');
+      setShowKeyForm(false);
+    } finally {
+      setKeySaving(false);
+    }
+  }
+
+  async function deleteKey() {
+    await fetch('/api/keys', { method: 'DELETE' });
+    setHint(null);
+  }
+
+  async function sendMessage() {
+    if (!input.trim() || streaming) return;
+    if (!hint) { setError(isAr ? 'أضف مفتاح API أولاً' : 'Add your API key first'); return; }
+
+    setError('');
+    const userMsg: Message = { role: 'user', content: input.trim() };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput('');
+    setStreaming(true);
+
+    const assistantMsg: Message = { role: 'assistant', content: '' };
+    setMessages(prev => [...prev, assistantMsg]);
+
+    try {
+      const res = await fetch('/api/sandbox/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setMessages(prev => prev.slice(0, -1));
+        setError(data.error ?? 'خطأ في الاتصال');
+        return;
+      }
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        accumulated += decoder.decode(value, { stream: true });
+        setMessages(prev => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { role: 'assistant', content: accumulated };
+          return updated;
+        });
+      }
+    } catch {
+      setMessages(prev => prev.slice(0, -1));
+      setError(isAr ? 'فشل الاتصال بالخادم' : 'Connection failed');
+    } finally {
+      setStreaming(false);
+    }
+  }
+
+  if (isPending) return null;
+
+  return (
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+      <Header />
+
+      <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl flex flex-col gap-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
+              {isAr ? 'ساندبوكس ذكاوي' : 'Zkawi Sandbox'}
+            </h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+              {isAr ? 'تحدث مع Claude باستخدام مفتاحك الخاص' : 'Chat with Claude using your own key'}
+            </p>
+          </div>
+
+          {/* Key management */}
+          <div className="flex items-center gap-2">
+            {hint ? (
+              <>
+                <span className="text-xs px-2 py-1 rounded-full font-mono" style={{ background: 'var(--surface)', color: 'var(--text-muted)' }}>
+                  {hint}
+                </span>
+                <Button variant="ghost" size="sm" onClick={() => setShowKeyForm(true)}>
+                  <Key size={14} />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={deleteKey}>
+                  <Trash2 size={14} />
+                </Button>
+              </>
+            ) : (
+              <Button size="sm" onClick={() => setShowKeyForm(true)} style={{ background: 'var(--zkawi-purple)', color: '#fff' }}>
+                <Key size={14} className="me-1" />
+                {isAr ? 'أضف مفتاح API' : 'Add API Key'}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Key form */}
+        <AnimatePresence>
+          {showKeyForm && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <Card className="p-4 flex flex-col gap-3" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+                <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>
+                  {isAr ? 'مفتاح Anthropic API (يبدأ بـ sk-ant-)' : 'Anthropic API Key (starts with sk-ant-)'}
+                </p>
+                <input
+                  type="password"
+                  value={keyInput}
+                  onChange={e => setKeyInput(e.target.value)}
+                  placeholder="sk-ant-..."
+                  className="w-full rounded-lg px-3 py-2 text-sm font-mono outline-none"
+                  style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}
+                  onKeyDown={e => e.key === 'Enter' && saveKey()}
+                />
+                {keyError && <p className="text-xs text-red-500">{keyError}</p>}
+                <div className="flex gap-2 justify-end">
+                  <Button variant="ghost" size="sm" onClick={() => { setShowKeyForm(false); setKeyError(''); }}>
+                    {isAr ? 'إلغاء' : 'Cancel'}
+                  </Button>
+                  <Button size="sm" onClick={saveKey} disabled={keySaving} style={{ background: 'var(--zkawi-purple)', color: '#fff' }}>
+                    {keySaving ? <Loader2 size={14} className="animate-spin" /> : (isAr ? 'حفظ' : 'Save')}
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Chat area */}
+        <Card className="flex-1 flex flex-col" style={{ background: 'var(--surface)', border: '1px solid var(--border)', minHeight: '400px' }}>
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4" style={{ maxHeight: '60vh' }}>
+            {messages.length === 0 && (
+              <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center py-12">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl" style={{ background: 'var(--bg)' }}>
+                  🤖
+                </div>
+                <p className="font-medium" style={{ color: 'var(--text)' }}>
+                  {isAr ? 'مرحباً! أنا ذكاوي' : "Hi! I'm Zkawi"}
+                </p>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  {isAr ? 'اسألني أي سؤال عن الذكاء الاصطناعي' : 'Ask me anything about AI'}
+                </p>
+              </div>
+            )}
+
+            {messages.map((msg, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+              >
+                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: msg.role === 'user' ? 'var(--zkawi-purple)' : 'var(--bg)' }}>
+                  {msg.role === 'user' ? <User size={14} color="#fff" /> : <Bot size={14} style={{ color: 'var(--zkawi-purple)' }} />}
+                </div>
+                <div
+                  className="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap"
+                  style={{
+                    background: msg.role === 'user' ? 'var(--zkawi-purple)' : 'var(--bg)',
+                    color: msg.role === 'user' ? '#fff' : 'var(--text)',
+                  }}
+                >
+                  {msg.content}
+                  {msg.role === 'assistant' && streaming && i === messages.length - 1 && (
+                    <span className="inline-block w-1.5 h-4 ms-0.5 align-text-bottom animate-pulse" style={{ background: 'var(--zkawi-purple)' }} />
+                  )}
+                </div>
+              </motion.div>
+            ))}
+
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="mx-4 mb-2 flex items-center gap-2 text-xs text-red-500">
+              <AlertCircle size={12} />
+              {error}
+            </div>
+          )}
+
+          {/* Input bar */}
+          <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
+            <div className="flex gap-2">
+              <input
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                placeholder={isAr ? 'اكتب رسالتك...' : 'Type your message...'}
+                disabled={streaming}
+                className="flex-1 rounded-xl px-4 py-2.5 text-sm outline-none"
+                style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}
+              />
+              <Button
+                onClick={sendMessage}
+                disabled={streaming || !input.trim()}
+                className="rounded-xl px-4"
+                style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
+              >
+                {streaming ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

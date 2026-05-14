@@ -22,32 +22,6 @@ interface UserProgress {
   scores: Record<number, number>;
 }
 
-function getStoredProgress(): UserProgress {
-  if (typeof window === 'undefined') return {
-    completedLessons: [], totalXp: 0, streakDays: 1, quizzesCompleted: 0, scores: {}
-  };
-  try {
-    const stored = localStorage.getItem('zkawi_progress');
-    if (stored) {
-      const p = JSON.parse(stored);
-      return {
-        completedLessons: p.completedLessons || [],
-        totalXp: p.totalXp || 0,
-        streakDays: p.streakDays || 1,
-        quizzesCompleted: p.quizzesCompleted || 0,
-        scores: p.scores || {},
-      };
-    }
-  } catch {}
-  return { completedLessons: [], totalXp: 0, streakDays: 1, quizzesCompleted: 0, scores: {} };
-}
-
-function saveProgress(updated: UserProgress) {
-  try {
-    localStorage.setItem('zkawi_progress', JSON.stringify(updated));
-  } catch {}
-}
-
 type LessonView = 'content' | 'quiz' | 'completed';
 
 export default function LessonPage({
@@ -70,14 +44,19 @@ export default function LessonPage({
   const [view, setView] = useState<LessonView>('content');
   const [quizKey, setQuizKey] = useState(0);
   const [progress, setProgress] = useState<UserProgress>({
-    completedLessons: [], totalXp: 0, streakDays: 1, quizzesCompleted: 0, scores: {}
+    completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {}
   });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [xpPopup, setXpPopup] = useState<number | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setProgress(getStoredProgress());
+    fetch('/api/progress')
+      .then(r => r.json())
+      .then(data => {
+        if (data.completedLessons) setProgress(data);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -97,22 +76,26 @@ export default function LessonPage({
 
   const isAlreadyCompleted = progress.completedLessons.includes(lesson.id);
 
-  const handleQuizComplete = (score: number, xpEarned: number) => {
-    const updated = { ...progress };
+  const handleQuizComplete = async (score: number, xpEarned: number) => {
+    // Optimistic UI update
+    const isNew = !progress.completedLessons.includes(lesson.id);
+    setProgress(prev => ({
+      ...prev,
+      completedLessons: isNew ? [...prev.completedLessons, lesson.id] : prev.completedLessons,
+      totalXp: isNew ? prev.totalXp + xpEarned : prev.totalXp,
+      quizzesCompleted: isNew ? prev.quizzesCompleted + 1 : prev.quizzesCompleted,
+      scores: { ...prev.scores, [lesson.id]: score },
+    }));
 
-    if (!updated.completedLessons.includes(lesson.id)) {
-      updated.completedLessons = [...updated.completedLessons, lesson.id];
-      updated.totalXp += xpEarned;
-      updated.quizzesCompleted += 1;
-    }
-
-    updated.scores = { ...updated.scores, [lesson.id]: score };
-    setProgress(updated);
-    saveProgress(updated);
+    // Persist to DB
+    await fetch(`/api/progress/lesson/${lesson.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ score, xpEarned }),
+    }).catch(() => {});
 
     setXpPopup(xpEarned);
     setTimeout(() => setXpPopup(null), 2500);
-
     setView('completed');
   };
 

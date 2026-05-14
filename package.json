@@ -17,6 +17,7 @@
     "db:all": "bun run db:reset && bun run db:generate && bun run db:migrate && bun run db:seed"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",

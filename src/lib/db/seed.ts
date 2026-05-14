@@ -1,10 +1,11 @@
 /**
- * db:seed — inserts all base data: agents, lessons, quiz questions/options, achievements.
- * Safe to run on an empty DB after db:migrate.
+ * db:seed — inserts all base data using the translations table pattern.
+ * All text content lives in `translations`; base tables hold only non-i18n data.
  */
 import { config } from 'dotenv';
 config({ path: '.env.local' });
 config({ path: '.env' });
+
 import { db } from './index';
 import {
   agents as agentsTable,
@@ -12,100 +13,95 @@ import {
   quizQuestions,
   quizOptions,
   achievements as achievementsTable,
+  translations,
 } from './schema';
 import { agents as agentContent, claudeLessons } from '../content/claude-lessons';
 
-// ─── Achievements seed data ───────────────────────────────────────────────────
+// ─── helper: bulk insert translations for one entity ─────────────────────────
+async function insertTranslations(
+  entityType: string,
+  entityId: number,
+  rows: Array<{ locale: string; field: string; value: string }>,
+) {
+  if (rows.length === 0) return;
+  await db.insert(translations).values(
+    rows.map((r) => ({ entityType, entityId, ...r })),
+  );
+}
+
+// ─── Achievements data ────────────────────────────────────────────────────────
 const ACHIEVEMENTS = [
   {
-    nameAr: 'أول خطوة',
-    nameEn: 'First Step',
-    descriptionAr: 'كملت أول درس ليك!',
-    descriptionEn: 'You completed your first lesson!',
     emoji: '🎯',
     conditionType: 'lessons_completed',
     conditionValue: 1,
+    ar: { name: 'أول خطوة', description: 'كملت أول درس ليك!' },
+    en: { name: 'First Step', description: 'You completed your first lesson!' },
   },
   {
-    nameAr: 'على الطريق الصح',
-    nameEn: 'On the Right Track',
-    descriptionAr: 'كملت 3 دروس — انت بتتقدم!',
-    descriptionEn: 'Completed 3 lessons — you\'re progressing!',
     emoji: '🚀',
     conditionType: 'lessons_completed',
     conditionValue: 3,
+    ar: { name: 'على الطريق الصح', description: 'كملت 3 دروس — انت بتتقدم!' },
+    en: { name: 'On the Right Track', description: "Completed 3 lessons — you're progressing!" },
   },
   {
-    nameAr: 'متعلم نشيط',
-    nameEn: 'Active Learner',
-    descriptionAr: 'كملت كل دروس Claude — عظيم!',
-    descriptionEn: 'Completed all Claude lessons — amazing!',
     emoji: '🏆',
     conditionType: 'lessons_completed',
     conditionValue: 5,
+    ar: { name: 'متعلم نشيط', description: 'كملت كل دروس Claude — عظيم!' },
+    en: { name: 'Active Learner', description: 'Completed all Claude lessons — amazing!' },
   },
   {
-    nameAr: 'نجم الكويز',
-    nameEn: 'Quiz Star',
-    descriptionAr: 'جبت 100% في كويز — أنت نجم!',
-    descriptionEn: 'Scored 100% in a quiz — you\'re a star!',
     emoji: '⭐',
     conditionType: 'perfect_quiz',
     conditionValue: 1,
+    ar: { name: 'نجم الكويز', description: 'جبت 100% في كويز — أنت نجم!' },
+    en: { name: 'Quiz Star', description: "Scored 100% in a quiz — you're a star!" },
   },
   {
-    nameAr: 'سبع أيام',
-    nameEn: 'Seven Days',
-    descriptionAr: 'فتحت التطبيق 7 أيام متواصلة — رائع!',
-    descriptionEn: 'Opened the app 7 days in a row — amazing!',
     emoji: '🔥',
     conditionType: 'streak_days',
     conditionValue: 7,
+    ar: { name: 'سبع أيام', description: 'فتحت التطبيق 7 أيام متواصلة — رائع!' },
+    en: { name: 'Seven Days', description: 'Opened the app 7 days in a row — amazing!' },
   },
   {
-    nameAr: 'جامع النقاط',
-    nameEn: 'XP Collector',
-    descriptionAr: 'وصلت لـ 200 نقطة XP!',
-    descriptionEn: 'Reached 200 XP points!',
     emoji: '💎',
     conditionType: 'total_xp',
     conditionValue: 200,
+    ar: { name: 'جامع النقاط', description: 'وصلت لـ 200 نقطة XP!' },
+    en: { name: 'XP Collector', description: 'Reached 200 XP points!' },
   },
   {
-    nameAr: 'صاحب Claude',
-    nameEn: 'Claude\'s Friend',
-    descriptionAr: 'قضيت وقت كويس مع Claude — اتعلمت حاجات جميلة!',
-    descriptionEn: 'Spent good time with Claude — you learned great things!',
     emoji: '🤖',
     conditionType: 'agent_completed',
     conditionValue: 1,
+    ar: { name: 'صاحب Claude', description: 'قضيت وقت كويس مع Claude — اتعلمت حاجات جميلة!' },
+    en: { name: "Claude's Friend", description: 'Spent good time with Claude — you learned great things!' },
   },
   {
-    nameAr: 'صانع المستقبل',
-    nameEn: 'Future Maker',
-    descriptionAr: 'وصلت لـ 500 نقطة XP — انت من صانعي المستقبل!',
-    descriptionEn: 'Reached 500 XP — you are a future maker!',
     emoji: '🌟',
     conditionType: 'total_xp',
     conditionValue: 500,
+    ar: { name: 'صانع المستقبل', description: 'وصلت لـ 500 نقطة XP — انت من صانعي المستقبل!' },
+    en: { name: 'Future Maker', description: 'Reached 500 XP — you are a future maker!' },
   },
 ];
 
-// ─── Main seed function ───────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 async function seed() {
-  console.log('🌱 Starting seed...\n');
+  console.log('🌱 Starting seed (translations-based schema)...\n');
 
-  // 1. Agents
+  let totalTranslations = 0;
+
+  // ── 1. Agents ──────────────────────────────────────────────────────────────
   console.log('📦 Inserting agents...');
   const insertedAgents = await db
     .insert(agentsTable)
     .values(
       agentContent.map((a) => ({
         slug: a.slug,
-        nameAr: a.nameAr,
-        nameEn: a.nameEn,
-        descriptionAr: a.descriptionAr,
-        descriptionEn: a.descriptionEn,
         color: a.color,
         emoji: a.emoji,
         isActive: a.isActive,
@@ -115,86 +111,120 @@ async function seed() {
     .returning();
 
   for (const agent of insertedAgents) {
-    console.log(`   ✓ ${agent.nameEn} (id=${agent.id}, active=${agent.isActive})`);
+    const src = agentContent.find((a) => a.slug === agent.slug)!;
+    await insertTranslations('agent', agent.id, [
+      { locale: 'ar', field: 'name',             value: src.nameAr },
+      { locale: 'ar', field: 'description',      value: src.descriptionAr },
+      { locale: 'ar', field: 'full_description', value: src.fullDescriptionAr },
+      { locale: 'en', field: 'name',             value: src.nameEn },
+      { locale: 'en', field: 'description',      value: src.descriptionEn },
+      { locale: 'en', field: 'full_description', value: src.fullDescriptionEn },
+    ]);
+    totalTranslations += 6;
+    console.log(`   ✓ ${src.nameEn} (id=${agent.id}, active=${agent.isActive})`);
   }
 
-  // 2. Claude lessons + quiz
-  const claudeAgent = insertedAgents.find((a) => a.slug === 'claude');
-  if (!claudeAgent) throw new Error('Claude agent not found after insert');
-
+  // ── 2. Claude lessons ──────────────────────────────────────────────────────
+  const claudeAgent = insertedAgents.find((a) => a.slug === 'claude')!;
   console.log('\n📚 Inserting Claude lessons...');
 
+  let totalQuizQ = 0;
+  let totalQuizOpts = 0;
+
   for (const lesson of claudeLessons) {
-    const [insertedLesson] = await db
+    // Insert lesson (no text columns)
+    const [dbLesson] = await db
       .insert(lessonsTable)
       .values({
         agentId: claudeAgent.id,
-        titleAr: lesson.titleAr,
-        titleEn: lesson.titleEn,
-        descriptionAr: lesson.descriptionAr,
-        descriptionEn: lesson.descriptionEn,
-        contentAr: lesson.contentAr,
-        contentEn: lesson.contentEn,
         order: lesson.order,
         xpReward: lesson.xpReward,
         estimatedMinutes: lesson.estimatedMinutes,
       })
       .returning();
 
-    console.log(`   ✓ Lesson ${insertedLesson.id}: ${insertedLesson.titleEn}`);
+    // Insert lesson translations
+    await insertTranslations('lesson', dbLesson.id, [
+      { locale: 'ar', field: 'title',       value: lesson.titleAr },
+      { locale: 'ar', field: 'description', value: lesson.descriptionAr },
+      { locale: 'ar', field: 'content',     value: lesson.contentAr },
+      { locale: 'en', field: 'title',       value: lesson.titleEn },
+      { locale: 'en', field: 'description', value: lesson.descriptionEn },
+      { locale: 'en', field: 'content',     value: lesson.contentEn },
+    ]);
+    totalTranslations += 6;
 
-    // Quiz questions for this lesson
-    for (const q of lesson.quiz) {
-      const [insertedQ] = await db
+    console.log(`   ✓ Lesson ${dbLesson.id}: ${lesson.titleEn}`);
+
+    // ── Quiz questions ────────────────────────────────────────────────────────
+    for (let qi = 0; qi < lesson.quiz.length; qi++) {
+      const q = lesson.quiz[qi];
+
+      const [dbQ] = await db
         .insert(quizQuestions)
-        .values({
-          lessonId: insertedLesson.id,
-          questionAr: q.questionAr,
-          questionEn: q.questionEn,
-          type: q.type,
-        })
+        .values({ lessonId: dbLesson.id, type: q.type, order: qi })
         .returning();
 
-      // Options for this question
-      await db.insert(quizOptions).values(
-        q.options.map((opt) => ({
-          questionId: insertedQ.id,
-          textAr: opt.textAr,
-          textEn: opt.textEn,
-          isCorrect: opt.isCorrect,
-        })),
-      );
+      await insertTranslations('quiz_question', dbQ.id, [
+        { locale: 'ar', field: 'question', value: q.questionAr },
+        { locale: 'en', field: 'question', value: q.questionEn },
+      ]);
+      totalTranslations += 2;
+      totalQuizQ++;
 
-      console.log(
-        `     ↳ Q: "${q.questionAr.slice(0, 40)}..." (${q.options.length} options)`,
-      );
+      // ── Quiz options ────────────────────────────────────────────────────────
+      for (let oi = 0; oi < q.options.length; oi++) {
+        const opt = q.options[oi];
+
+        const [dbOpt] = await db
+          .insert(quizOptions)
+          .values({ questionId: dbQ.id, isCorrect: opt.isCorrect, order: oi })
+          .returning();
+
+        await insertTranslations('quiz_option', dbOpt.id, [
+          { locale: 'ar', field: 'text', value: opt.textAr },
+          { locale: 'en', field: 'text', value: opt.textEn },
+        ]);
+        totalTranslations += 2;
+        totalQuizOpts++;
+      }
     }
   }
 
-  // 3. Achievements
+  // ── 3. Achievements ────────────────────────────────────────────────────────
   console.log('\n🏆 Inserting achievements...');
-  const insertedAchievements = await db
-    .insert(achievementsTable)
-    .values(ACHIEVEMENTS)
-    .returning();
+  for (const ach of ACHIEVEMENTS) {
+    const [dbAch] = await db
+      .insert(achievementsTable)
+      .values({
+        emoji: ach.emoji,
+        conditionType: ach.conditionType,
+        conditionValue: ach.conditionValue,
+      })
+      .returning();
 
-  for (const ach of insertedAchievements) {
-    console.log(`   ✓ ${ach.emoji} ${ach.nameAr}`);
+    await insertTranslations('achievement', dbAch.id, [
+      { locale: 'ar', field: 'name',        value: ach.ar.name },
+      { locale: 'ar', field: 'description', value: ach.ar.description },
+      { locale: 'en', field: 'name',        value: ach.en.name },
+      { locale: 'en', field: 'description', value: ach.en.description },
+    ]);
+    totalTranslations += 4;
+    console.log(`   ✓ ${ach.emoji} ${ach.ar.name}`);
   }
 
-  // ── Summary ──
-  console.log('\n──────────────────────────────────────');
-  console.log(`✅ Seed complete!`);
-  console.log(`   Agents:       ${insertedAgents.length}`);
-  console.log(`   Lessons:      ${claudeLessons.length}`);
-  console.log(
-    `   Quiz Qs:      ${claudeLessons.reduce((s, l) => s + l.quiz.length, 0)}`,
-  );
-  console.log(
-    `   Quiz opts:    ${claudeLessons.reduce((s, l) => s + l.quiz.reduce((ss, q) => ss + q.options.length, 0), 0)}`,
-  );
-  console.log(`   Achievements: ${insertedAchievements.length}`);
-  console.log('──────────────────────────────────────\n');
+  // ── Summary ────────────────────────────────────────────────────────────────
+  console.log('\n──────────────────────────────────────────────');
+  console.log('✅ Seed complete!');
+  console.log(`   Agents:        ${insertedAgents.length}`);
+  console.log(`   Lessons:       ${claudeLessons.length}`);
+  console.log(`   Quiz Qs:       ${totalQuizQ}`);
+  console.log(`   Quiz options:  ${totalQuizOpts}`);
+  console.log(`   Achievements:  ${ACHIEVEMENTS.length}`);
+  console.log(`   Translations:  ${totalTranslations} rows`);
+  console.log('──────────────────────────────────────────────\n');
+  console.log('💡 To add a new language, just run upsertTranslations()');
+  console.log('   from src/lib/db/i18n.ts — no schema changes needed.\n');
 
   process.exit(0);
 }

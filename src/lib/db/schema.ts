@@ -6,9 +6,12 @@ import {
   integer,
   serial,
   uuid,
+  unique,
+  index,
 } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 
-// ---- Auth tables (better-auth compatible) ----
+// ─── Auth tables (better-auth compatible) ─────────────────────────────────────
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -53,45 +56,69 @@ export const verificationTokens = pgTable('verification_tokens', {
   expiresAt: timestamp('expires_at').notNull(),
 });
 
-// ---- App tables ----
+// ─── Translations table ────────────────────────────────────────────────────────
+//
+//  Single table for ALL translatable strings across the entire app.
+//  Adding a new language = INSERT rows with new locale. Zero schema changes.
+//
+//  entity_type: 'agent' | 'lesson' | 'quiz_question' | 'quiz_option' | 'achievement'
+//  field:       e.g. 'name' | 'description' | 'full_description' | 'content' | 'question' | 'text'
+//  locale:      BCP-47 code e.g. 'ar' | 'en' | 'fr' | 'de' | 'ur' ...
+
+export const translations = pgTable(
+  'translations',
+  {
+    id: serial('id').primaryKey(),
+    entityType: text('entity_type').notNull(),
+    entityId: integer('entity_id').notNull(),
+    locale: text('locale').notNull(),
+    field: text('field').notNull(),
+    value: text('value').notNull(),
+  },
+  (t) => [
+    // One value per (entity, locale, field) — no duplicates
+    unique('uq_translations').on(t.entityType, t.entityId, t.locale, t.field),
+    // Fast lookup by locale
+    index('idx_translations_locale').on(t.locale),
+    // Fast lookup by entity
+    index('idx_translations_entity').on(t.entityType, t.entityId),
+  ],
+);
+
+// ─── Agents ───────────────────────────────────────────────────────────────────
+//  Non-translatable columns only. All text lives in translations.
 
 export const agents = pgTable('agents', {
   id: serial('id').primaryKey(),
   slug: text('slug').notNull().unique(),
-  nameAr: text('name_ar').notNull(),
-  nameEn: text('name_en').notNull(),
-  descriptionAr: text('description_ar').notNull(),
-  descriptionEn: text('description_en').notNull(),
   color: text('color').notNull(),
   emoji: text('emoji').notNull(),
-  isActive: boolean('is_active').default(true),
-  order: integer('order').default(0),
+  isActive: boolean('is_active').default(true).notNull(),
+  order: integer('order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// ─── Lessons ─────────────────────────────────────────────────────────────────
 
 export const lessons = pgTable('lessons', {
   id: serial('id').primaryKey(),
   agentId: integer('agent_id')
     .notNull()
     .references(() => agents.id, { onDelete: 'cascade' }),
-  titleAr: text('title_ar').notNull(),
-  titleEn: text('title_en').notNull(),
-  descriptionAr: text('description_ar').notNull(),
-  descriptionEn: text('description_en').notNull(),
-  contentAr: text('content_ar').notNull(),
-  contentEn: text('content_en').notNull(),
-  order: integer('order').default(0),
-  xpReward: integer('xp_reward').default(50),
-  estimatedMinutes: integer('estimated_minutes').default(5),
+  order: integer('order').default(0).notNull(),
+  xpReward: integer('xp_reward').default(50).notNull(),
+  estimatedMinutes: integer('estimated_minutes').default(5).notNull(),
 });
+
+// ─── Quiz ─────────────────────────────────────────────────────────────────────
 
 export const quizQuestions = pgTable('quiz_questions', {
   id: serial('id').primaryKey(),
   lessonId: integer('lesson_id')
     .notNull()
     .references(() => lessons.id, { onDelete: 'cascade' }),
-  questionAr: text('question_ar').notNull(),
-  questionEn: text('question_en').notNull(),
   type: text('type', { enum: ['multiple_choice', 'true_false'] }).notNull(),
+  order: integer('order').default(0).notNull(),
 });
 
 export const quizOptions = pgTable('quiz_options', {
@@ -99,10 +126,20 @@ export const quizOptions = pgTable('quiz_options', {
   questionId: integer('question_id')
     .notNull()
     .references(() => quizQuestions.id, { onDelete: 'cascade' }),
-  textAr: text('text_ar').notNull(),
-  textEn: text('text_en').notNull(),
-  isCorrect: boolean('is_correct').default(false),
+  isCorrect: boolean('is_correct').default(false).notNull(),
+  order: integer('order').default(0).notNull(),
 });
+
+// ─── Achievements ─────────────────────────────────────────────────────────────
+
+export const achievements = pgTable('achievements', {
+  id: serial('id').primaryKey(),
+  emoji: text('emoji').notNull(),
+  conditionType: text('condition_type').notNull(),
+  conditionValue: integer('condition_value').notNull(),
+});
+
+// ─── User data ────────────────────────────────────────────────────────────────
 
 export const userProgress = pgTable('user_progress', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -112,8 +149,8 @@ export const userProgress = pgTable('user_progress', {
   lessonId: integer('lesson_id')
     .notNull()
     .references(() => lessons.id, { onDelete: 'cascade' }),
-  completed: boolean('completed').default(false),
-  score: integer('score').default(0),
+  completed: boolean('completed').default(false).notNull(),
+  score: integer('score').default(0).notNull(),
   completedAt: timestamp('completed_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -125,22 +162,11 @@ export const userStats = pgTable('user_stats', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' })
     .unique(),
-  totalXp: integer('total_xp').default(0),
-  streakDays: integer('streak_days').default(0),
+  totalXp: integer('total_xp').default(0).notNull(),
+  streakDays: integer('streak_days').default(0).notNull(),
   lastActivityDate: timestamp('last_activity_date'),
-  lessonsCompleted: integer('lessons_completed').default(0),
-  quizzesCompleted: integer('quizzes_completed').default(0),
-});
-
-export const achievements = pgTable('achievements', {
-  id: serial('id').primaryKey(),
-  nameAr: text('name_ar').notNull(),
-  nameEn: text('name_en').notNull(),
-  descriptionAr: text('description_ar').notNull(),
-  descriptionEn: text('description_en').notNull(),
-  emoji: text('emoji').notNull(),
-  conditionType: text('condition_type').notNull(),
-  conditionValue: integer('condition_value').notNull(),
+  lessonsCompleted: integer('lessons_completed').default(0).notNull(),
+  quizzesCompleted: integer('quizzes_completed').default(0).notNull(),
 });
 
 export const userAchievements = pgTable('user_achievements', {
@@ -154,13 +180,57 @@ export const userAchievements = pgTable('user_achievements', {
   earnedAt: timestamp('earned_at').defaultNow().notNull(),
 });
 
+// ─── Relations (for Drizzle relational queries) ───────────────────────────────
+
+export const agentsRelations = relations(agents, ({ many }) => ({
+  lessons: many(lessons),
+  translations: many(translations),
+}));
+
+export const lessonsRelations = relations(lessons, ({ one, many }) => ({
+  agent: one(agents, { fields: [lessons.agentId], references: [agents.id] }),
+  questions: many(quizQuestions),
+  translations: many(translations),
+  userProgress: many(userProgress),
+}));
+
+export const quizQuestionsRelations = relations(quizQuestions, ({ one, many }) => ({
+  lesson: one(lessons, { fields: [quizQuestions.lessonId], references: [lessons.id] }),
+  options: many(quizOptions),
+  translations: many(translations),
+}));
+
+export const quizOptionsRelations = relations(quizOptions, ({ one, many }) => ({
+  question: one(quizQuestions, { fields: [quizOptions.questionId], references: [quizQuestions.id] }),
+  translations: many(translations),
+}));
+
+export const achievementsRelations = relations(achievements, ({ many }) => ({
+  translations: many(translations),
+  userAchievements: many(userAchievements),
+}));
+
+export const usersRelations = relations(users, ({ many, one }) => ({
+  sessions: many(sessions),
+  accounts: many(accounts),
+  progress: many(userProgress),
+  stats: one(userStats),
+  achievements: many(userAchievements),
+}));
+
+// ─── TypeScript types ─────────────────────────────────────────────────────────
+
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type Agent = typeof agents.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
 export type QuizQuestion = typeof quizQuestions.$inferSelect;
 export type QuizOption = typeof quizOptions.$inferSelect;
+export type Achievement = typeof achievements.$inferSelect;
+export type Translation = typeof translations.$inferSelect;
 export type UserProgress = typeof userProgress.$inferSelect;
 export type UserStats = typeof userStats.$inferSelect;
-export type Achievement = typeof achievements.$inferSelect;
 export type UserAchievement = typeof userAchievements.$inferSelect;
+
+// Useful type for a row returned from translations
+export type TranslationMap = Record<string, string>;

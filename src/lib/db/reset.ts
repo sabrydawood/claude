@@ -19,6 +19,7 @@ const TABLES_IN_DROP_ORDER = [
   'lessons',
   'agents',
   'achievements',
+  'translations',         // ← central i18n table
   'verification_tokens',
   'accounts',
   'sessions',

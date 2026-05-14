@@ -7,12 +7,12 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-purple-100 text-purple-700 border border-purple-200',
-        secondary: 'bg-amber-100 text-amber-700 border border-amber-200',
-        success: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
-        danger: 'bg-red-100 text-red-700 border border-red-200',
-        info: 'bg-blue-100 text-blue-700 border border-blue-200',
-        xp: 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-sm',
+        default: 'bg-[var(--zkawi-purple)]/15 text-[var(--zkawi-purple)] border border-[var(--zkawi-purple)]/30',
+        secondary: 'bg-[var(--zkawi-gold)]/15 text-[var(--zkawi-gold)] border border-[var(--zkawi-gold)]/30',
+        success: 'bg-[var(--zkawi-green)]/15 text-[var(--zkawi-green)] border border-[var(--zkawi-green)]/30',
+        danger: 'bg-[var(--zkawi-red)]/15 text-[var(--zkawi-red)] border border-[var(--zkawi-red)]/30',
+        info: 'bg-blue-500/15 text-blue-500 border border-blue-500/30',
+        xp: 'bg-gradient-to-r from-[var(--zkawi-purple)] to-[var(--zkawi-purple-light)] text-white shadow-sm',
         achievement: 'bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm',
         outline: 'border-2 border-current bg-transparent',
       },

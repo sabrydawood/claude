@@ -6,9 +6,9 @@ const Card = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & { variant?: 'default' | 'gradient' | 'glass' }
 >(({ className, variant = 'default', ...props }, ref) => {
   const variants = {
-    default: 'bg-white border border-gray-100 shadow-sm',
-    gradient: 'bg-gradient-to-br from-purple-50 to-amber-50 border border-purple-100',
-    glass: 'bg-white/70 backdrop-blur-md border border-white/50 shadow-lg',
+    default: 'bg-[var(--surface)] border border-[var(--border)] shadow-sm',
+    gradient: 'bg-[var(--bg-secondary)] border border-[var(--border)]',
+    glass: 'bg-[var(--surface)]/70 backdrop-blur-md border border-[var(--border)] shadow-lg',
   };
   return (
     <div
@@ -33,14 +33,14 @@ CardHeader.displayName = 'CardHeader';
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn('text-xl font-bold leading-none tracking-tight', className)} {...props} />
+    <h3 ref={ref} className={cn('text-xl font-bold leading-none tracking-tight text-[var(--text)]', className)} {...props} />
   )
 );
 CardTitle.displayName = 'CardTitle';
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn('text-sm text-gray-500', className)} {...props} />
+    <p ref={ref} className={cn('text-sm text-[var(--text-muted)]', className)} {...props} />
   )
 );
 CardDescription.displayName = 'CardDescription';
@@ -54,7 +54,7 @@ CardContent.displayName = 'CardContent';
 
 const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex items-center pt-4 mt-4 border-t border-gray-100', className)} {...props} />
+    <div ref={ref} className={cn('flex items-center pt-4 mt-4 border-t border-[var(--border)]', className)} {...props} />
   )
 );
 CardFooter.displayName = 'CardFooter';

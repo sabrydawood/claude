@@ -37,30 +37,30 @@ export default function HomeStats({ locale }: { locale: string }) {
       icon: <Users size={28} />,
       value: 1200,
       label: t('studentsLabel'),
-      color: 'text-purple-600',
-      bg: 'bg-purple-100',
+      color: 'text-[var(--zkawi-purple)]',
+      bg: 'bg-[var(--zkawi-purple)]/15',
       suffix: '+',
     },
     {
       icon: <BookOpen size={28} />,
       value: 25,
       label: t('lessonsLabel'),
-      color: 'text-amber-600',
-      bg: 'bg-amber-100',
+      color: 'text-[var(--zkawi-gold)]',
+      bg: 'bg-[var(--zkawi-gold)]/15',
       suffix: '+',
     },
     {
       icon: <Gamepad2 size={28} />,
       value: 50,
       label: t('activitiesLabel'),
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-100',
+      color: 'text-[var(--zkawi-green)]',
+      bg: 'bg-[var(--zkawi-green)]/15',
       suffix: '+',
     },
   ];
 
   return (
-    <section className="py-16 bg-[#FFF9F0]">
+    <section className="py-16 bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -68,7 +68,7 @@ export default function HomeStats({ locale }: { locale: string }) {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <h2 className="text-2xl md:text-3xl font-black text-gray-800">
+          <h2 className="text-2xl md:text-3xl font-black text-[var(--text)]">
             {t('title')} 📊
           </h2>
         </motion.div>
@@ -81,7 +81,7 @@ export default function HomeStats({ locale }: { locale: string }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white rounded-3xl p-6 md:p-8 text-center shadow-sm border border-gray-100 card-hover"
+              className="bg-[var(--surface)] rounded-3xl p-6 md:p-8 text-center shadow-sm border border-[var(--border)] card-hover"
             >
               <div className={`${stat.bg} ${stat.color} w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                 {stat.icon}
@@ -90,7 +90,7 @@ export default function HomeStats({ locale }: { locale: string }) {
                 <CountUp end={stat.value} />
                 <span>{stat.suffix}</span>
               </div>
-              <p className="text-sm md:text-base text-gray-500 font-medium">{stat.label}</p>
+              <p className="text-sm md:text-base text-[var(--text-muted)] font-medium">{stat.label}</p>
             </motion.div>
           ))}
         </div>

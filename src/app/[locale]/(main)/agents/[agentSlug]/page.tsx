@@ -54,7 +54,7 @@ export default function AgentPage({ params }: { params: Promise<{ agentSlug: str
   const progressPercent = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFF9F0]">
+    <div className="min-h-screen flex flex-col bg-[var(--bg)]">
       <Header />
       <main className="flex-1">
         {/* Hero */}
@@ -148,7 +148,7 @@ export default function AgentPage({ params }: { params: Promise<{ agentSlug: str
         {/* Lessons list */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-black text-gray-800">
+            <h2 className="text-xl font-black text-[var(--text)]">
               📚 {locale === 'ar' ? 'الدروس' : 'Lessons'}
             </h2>
             {mounted && completedCount === lessons.length && lessons.length > 0 && (
@@ -175,7 +175,7 @@ export default function AgentPage({ params }: { params: Promise<{ agentSlug: str
           {lessons.length === 0 && (
             <div className="text-center py-16">
               <div className="text-5xl mb-4">🚧</div>
-              <p className="text-gray-500">{locale === 'ar' ? 'الدروس قادمة قريباً!' : 'Lessons coming soon!'}</p>
+              <p className="text-[var(--text-muted)]">{locale === 'ar' ? 'الدروس قادمة قريباً!' : 'Lessons coming soon!'}</p>
             </div>
           )}
         </div>

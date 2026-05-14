@@ -13,7 +13,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Flame, BookOpen, Trophy, Target, ChevronRight, Lock, CheckCircle2, Clock } from 'lucide-react';
-import { agents, getLessonsByAgent } from '@/lib/content/claude-lessons';
+import { getLessonsByAgent } from '@/lib/content/claude-lessons';
 import { useRouter } from '@/lib/i18n/navigation';
 
 interface UserProgress {
@@ -62,10 +62,10 @@ export default function DashboardPage() {
 
   if (isPending || !mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFF9F0]">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <div className="text-center">
           <div className="text-5xl mb-4 animate-bounce">⚡</div>
-          <p className="text-purple-600 font-bold">جاري التحميل...</p>
+          <p className="text-[var(--zkawi-purple)] font-bold">جاري التحميل...</p>
         </div>
       </div>
     );
@@ -75,11 +75,10 @@ export default function DashboardPage() {
 
   const claudeLessons = getLessonsByAgent('claude');
   const agentProgress = (progress.completedLessons.length / claudeLessons.length) * 100;
-
   const userName = session.user?.name || 'صديقي';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFF9F0]">
+    <div className="min-h-screen flex flex-col bg-[var(--bg)]">
       <Header />
       <main className="flex-1 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,7 +88,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden">
+            <div className="bg-gradient-to-r from-[var(--zkawi-purple)] to-indigo-700 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden">
               <div className="absolute top-0 end-0 text-8xl opacity-20 translate-x-4 -translate-y-4">🤖</div>
               <div className="relative">
                 <p className="text-purple-200 text-sm font-medium mb-1">
@@ -130,43 +129,39 @@ export default function DashboardPage() {
                     value: progress.streakDays,
                     label: t('stats.streak'),
                     suffix: locale === 'ar' ? ' يوم 🔥' : ' days 🔥',
-                    bg: 'bg-orange-50',
-                    border: 'border-orange-200',
+                    border: 'border-orange-500/30',
                   },
                   {
-                    icon: <BookOpen className="text-purple-500" size={20} />,
+                    icon: <BookOpen className="text-[var(--zkawi-purple)]" size={20} />,
                     value: progress.completedLessons.length,
                     label: t('stats.lessonsCompleted'),
                     suffix: '',
-                    bg: 'bg-purple-50',
-                    border: 'border-purple-200',
+                    border: 'border-[var(--zkawi-purple)]/30',
                   },
                   {
-                    icon: <Target className="text-emerald-500" size={20} />,
+                    icon: <Target className="text-[var(--zkawi-green)]" size={20} />,
                     value: progress.quizzesCompleted,
                     label: t('stats.quizzesCompleted'),
                     suffix: '',
-                    bg: 'bg-emerald-50',
-                    border: 'border-emerald-200',
+                    border: 'border-[var(--zkawi-green)]/30',
                   },
                   {
-                    icon: <Trophy className="text-amber-500" size={20} />,
+                    icon: <Trophy className="text-[var(--zkawi-gold)]" size={20} />,
                     value: DEMO_ACHIEVEMENTS.filter(a => a.earned).length,
                     label: 'إنجازات',
                     suffix: '',
-                    bg: 'bg-amber-50',
-                    border: 'border-amber-200',
+                    border: 'border-[var(--zkawi-gold)]/30',
                   },
                 ].map((stat, i) => (
                   <div
                     key={i}
-                    className={`${stat.bg} border ${stat.border} rounded-2xl p-4 text-center`}
+                    className={`bg-[var(--surface)] border ${stat.border} rounded-2xl p-4 text-center`}
                   >
                     <div className="flex justify-center mb-2">{stat.icon}</div>
-                    <div className="text-2xl font-black text-gray-800">
+                    <div className="text-2xl font-black text-[var(--text)]">
                       {stat.value}{stat.suffix}
                     </div>
-                    <div className="text-xs text-gray-500 font-medium mt-1">{stat.label}</div>
+                    <div className="text-xs text-[var(--text-muted)] font-medium mt-1">{stat.label}</div>
                   </div>
                 ))}
               </motion.div>
@@ -179,23 +174,23 @@ export default function DashboardPage() {
               >
                 <Card className="p-6">
                   <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-lg font-black text-gray-800">
+                    <h2 className="text-lg font-black text-[var(--text)]">
                       {t('agents.title')} 🎓
                     </h2>
                   </div>
 
                   {/* Claude agent card */}
-                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-5">
+                  <div className="bg-[var(--bg-secondary)] border border-[var(--zkawi-purple)]/25 rounded-2xl p-5">
                     <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-purple-200">
+                      <div className="w-14 h-14 bg-gradient-to-br from-[var(--zkawi-purple)] to-[var(--zkawi-purple-dark)] rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-[var(--zkawi-purple)]/20">
                         🤖
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-black text-gray-800">Claude</h3>
+                          <h3 className="font-black text-[var(--text)]">Claude</h3>
                           <Badge variant="default">متاح الآن</Badge>
                         </div>
-                        <p className="text-sm text-gray-500 mb-3">
+                        <p className="text-sm text-[var(--text-muted)] mb-3">
                           {progress.completedLessons.length} / {claudeLessons.length} دروس اتكملت
                         </p>
                         <Progress value={agentProgress} colorScheme="purple" className="mb-3 h-2" />
@@ -218,7 +213,7 @@ export default function DashboardPage() {
                 transition={{ delay: 0.4 }}
               >
                 <Card className="p-6">
-                  <h2 className="text-lg font-black text-gray-800 mb-4">
+                  <h2 className="text-lg font-black text-[var(--text)] mb-4">
                     دروس Claude 📚
                   </h2>
                   <div className="space-y-3">
@@ -228,27 +223,27 @@ export default function DashboardPage() {
                         <Link key={lesson.id} href={`/agents/claude/lessons/${lesson.id}`}>
                           <div className={`flex items-center gap-3 p-3 rounded-2xl transition-all hover:scale-[1.01] cursor-pointer ${
                             isCompleted
-                              ? 'bg-emerald-50 border border-emerald-200'
-                              : 'bg-gray-50 border border-gray-200 hover:border-purple-200 hover:bg-purple-50'
+                              ? 'bg-[var(--zkawi-green)]/10 border border-[var(--zkawi-green)]/30'
+                              : 'bg-[var(--surface-2)] border border-[var(--border)] hover:border-[var(--zkawi-purple-light)] hover:bg-[var(--bg-secondary)]'
                           }`}>
-                            <div className="text-2xl w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm">
+                            <div className="text-2xl w-10 h-10 flex items-center justify-center bg-[var(--surface)] rounded-xl shadow-sm">
                               {lesson.emoji}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="font-bold text-sm text-gray-800 truncate">
+                              <div className="font-bold text-sm text-[var(--text)] truncate">
                                 {locale === 'ar' ? lesson.titleAr : lesson.titleEn}
                               </div>
                               <div className="flex items-center gap-2 mt-0.5">
-                                <Clock size={11} className="text-gray-400" />
-                                <span className="text-xs text-gray-400">{lesson.estimatedMinutes} دقيقة</span>
-                                <span className="text-xs text-purple-500 font-bold">+{lesson.xpReward} XP</span>
+                                <Clock size={11} className="text-[var(--text-muted)]" />
+                                <span className="text-xs text-[var(--text-muted)]">{lesson.estimatedMinutes} دقيقة</span>
+                                <span className="text-xs text-[var(--zkawi-purple)] font-bold">+{lesson.xpReward} XP</span>
                               </div>
                             </div>
                             <div>
                               {isCompleted ? (
-                                <CheckCircle2 size={20} className="text-emerald-500" />
+                                <CheckCircle2 size={20} className="text-[var(--zkawi-green)]" />
                               ) : (
-                                <ChevronRight size={16} className="text-gray-400 flip-rtl" />
+                                <ChevronRight size={16} className="text-[var(--text-muted)] flip-rtl" />
                               )}
                             </div>
                           </div>
@@ -257,7 +252,7 @@ export default function DashboardPage() {
                     })}
                     <Link href="/agents/claude">
                       <div className="text-center pt-2">
-                        <span className="text-sm text-purple-600 font-bold hover:text-purple-800">
+                        <span className="text-sm text-[var(--zkawi-purple)] font-bold hover:opacity-80">
                           شوف كل الدروس ({claudeLessons.length}) →
                         </span>
                       </div>
@@ -275,7 +270,7 @@ export default function DashboardPage() {
                 transition={{ delay: 0.3 }}
               >
                 <Card className="p-6">
-                  <h2 className="text-lg font-black text-gray-800 mb-4">
+                  <h2 className="text-lg font-black text-[var(--text)] mb-4">
                     {t('achievements.title')} 🏆
                   </h2>
                   <div className="grid grid-cols-3 gap-3">
@@ -285,22 +280,22 @@ export default function DashboardPage() {
                         whileHover={{ scale: 1.1 }}
                         className={`aspect-square rounded-2xl flex flex-col items-center justify-center p-2 text-center cursor-default transition-all ${
                           achievement.earned
-                            ? 'bg-gradient-to-br from-amber-100 to-orange-100 border-2 border-amber-300 shadow-sm achievement-glow'
-                            : 'bg-gray-100 border-2 border-gray-200 opacity-50'
+                            ? 'bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-2 border-amber-500/40 shadow-sm achievement-glow'
+                            : 'bg-[var(--surface-2)] border-2 border-[var(--border)] opacity-50'
                         }`}
                         title={locale === 'ar' ? achievement.nameAr : achievement.nameEn}
                       >
                         <span className="text-2xl">{achievement.emoji}</span>
-                        <span className="text-[9px] font-bold text-gray-600 mt-1 leading-tight">
+                        <span className="text-[9px] font-bold text-[var(--text-muted)] mt-1 leading-tight">
                           {locale === 'ar' ? achievement.nameAr : achievement.nameEn}
                         </span>
                         {!achievement.earned && (
-                          <Lock size={10} className="text-gray-400 mt-0.5" />
+                          <Lock size={10} className="text-[var(--text-muted)] mt-0.5" />
                         )}
                       </motion.div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-400 text-center mt-3">
+                  <p className="text-xs text-[var(--text-muted)] text-center mt-3">
                     {DEMO_ACHIEVEMENTS.filter(a => a.earned).length} / {DEMO_ACHIEVEMENTS.length} إنجازات
                   </p>
                 </Card>
@@ -312,16 +307,16 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <Card className="p-6 bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200">
+                <Card className="p-6 border-orange-500/30">
                   <div className="text-center">
                     <div className="text-4xl mb-2">🔥</div>
                     <div className="text-3xl font-black text-orange-500 mb-1">
                       {progress.streakDays}
                     </div>
-                    <div className="text-sm font-bold text-gray-600 mb-2">
+                    <div className="text-sm font-bold text-[var(--text)] mb-2">
                       {t('streak.current')}
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--text-muted)]">
                       {t('streak.keepGoing')}
                     </p>
                     {/* Streak calendar */}
@@ -332,7 +327,7 @@ export default function DashboardPage() {
                           className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs ${
                             i < progress.streakDays
                               ? 'bg-orange-400 text-white font-bold'
-                              : 'bg-gray-100 text-gray-400'
+                              : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
                           }`}
                         >
                           {i < progress.streakDays ? '🔥' : '○'}
@@ -349,11 +344,11 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <Card className="p-6 bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+                <Card className="p-6 border-[var(--zkawi-purple)]/25">
                   <div className="text-center">
                     <div className="text-3xl mb-2">💡</div>
-                    <h3 className="font-black text-gray-800 mb-2 text-sm">نصيحة اليوم</h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
+                    <h3 className="font-black text-[var(--text)] mb-2 text-sm">نصيحة اليوم</h3>
+                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                       اتعلم لو 15 دقيقة بس كل يوم وهتشوف نتايج مذهلة خلال أسبوع! 🌟
                     </p>
                   </div>

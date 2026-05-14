@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Zap, Trophy, RotateCcw, ChevronRight, CheckCircle2, XCircle } from 'lucide-react';
+import { Zap, RotateCcw, ChevronRight, CheckCircle2, XCircle } from 'lucide-react';
 import type { QuizQuestion } from '@/lib/content/claude-lessons';
 import confetti from './confetti-util';
 
@@ -34,10 +34,8 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
   const checkAnswer = (optionId: string) => {
     if (selectedOption) return;
     setSelectedOption(optionId);
-
     const option = currentQuestion.options.find(o => o.id === optionId);
     const isCorrect = option?.isCorrect || false;
-
     setAnswers(prev => [...prev, isCorrect]);
     setQuizState('feedback');
   };
@@ -48,26 +46,19 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
       setSelectedOption(null);
       setQuizState('answering');
     } else {
-      // Quiz done
-      const correctCount = answers.filter(Boolean).length + (answers.length < questions.length ? 0 : 0);
       const finalAnswers = [...answers];
       const finalCorrect = finalAnswers.filter(Boolean).length;
       const score = Math.round((finalCorrect / questions.length) * 100);
       const earned = Math.round((finalCorrect / questions.length) * xpReward);
       setXpEarned(earned);
       setQuizState('results');
-
-      if (score >= 80) {
-        setTimeout(() => confetti(), 300);
-      }
-
+      if (score >= 80) setTimeout(() => confetti(), 300);
       onComplete(score, earned);
     }
   };
 
   const correctCount = answers.filter(Boolean).length;
-  const totalAnswered = answers.length;
-  const finalScore = totalAnswered > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
+  const finalScore = answers.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
 
   if (quizState === 'results') {
     const isPerfect = finalScore === 100;
@@ -89,7 +80,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
           {isPerfect ? '🌟' : isGreat ? '🎉' : isGood ? '👍' : '💪'}
         </motion.div>
 
-        <h2 className="text-2xl font-black text-gray-800 mb-2">
+        <h2 className="text-2xl font-black text-[var(--text)] mb-2">
           {isPerfect ? t('results.perfect') : isGreat ? t('results.great') : isGood ? t('results.good') : t('results.tryAgain')}
         </h2>
 
@@ -101,7 +92,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
           className="relative w-32 h-32 mx-auto my-6"
         >
           <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" strokeWidth="8" />
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" strokeWidth="8" />
             <circle
               cx="50" cy="50" r="42"
               fill="none"
@@ -114,13 +105,13 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-black text-gray-800">{finalScore}%</span>
-            <span className="text-xs text-gray-500">{t('results.score')}</span>
+            <span className="text-2xl font-black text-[var(--text)]">{finalScore}%</span>
+            <span className="text-xs text-[var(--text-muted)]">{t('results.score')}</span>
           </div>
         </motion.div>
 
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-[var(--text-muted)]">
             {correctCount} / {questions.length} {locale === 'ar' ? 'إجابات صح' : 'correct answers'}
           </div>
         </div>
@@ -130,13 +121,13 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-purple-50 border border-purple-200 rounded-2xl px-5 py-3 mb-6"
+          className="inline-flex items-center gap-2 bg-[var(--zkawi-purple)]/10 border border-[var(--zkawi-purple)]/30 rounded-2xl px-5 py-3 mb-6"
         >
-          <Zap size={18} className="text-purple-600" fill="currentColor" />
-          <span className="font-black text-purple-700 text-lg">
+          <Zap size={18} className="text-[var(--zkawi-purple)]" fill="currentColor" />
+          <span className="font-black text-[var(--zkawi-purple)] text-lg">
             +{xpEarned} XP
           </span>
-          <span className="text-purple-500 text-sm">{t('results.xpEarned')}</span>
+          <span className="text-[var(--text-muted)] text-sm">{t('results.xpEarned')}</span>
         </motion.div>
 
         <div className="flex gap-3 justify-center">
@@ -159,13 +150,13 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-xl font-black text-gray-800 mb-1">{t('title')}</h2>
-        <p className="text-sm text-gray-500">{t('subtitle')}</p>
+        <h2 className="text-xl font-black text-[var(--text)] mb-1">{t('title')}</h2>
+        <p className="text-sm text-[var(--text-muted)]">{t('subtitle')}</p>
       </div>
 
       {/* Progress */}
       <div className="space-y-2">
-        <div className="flex justify-between text-xs font-bold text-gray-500">
+        <div className="flex justify-between text-xs font-bold text-[var(--text-muted)]">
           <span>{t('question')} {currentIndex + 1} {t('of')} {questions.length}</span>
           <div className="flex gap-1">
             {questions.map((_, i) => (
@@ -173,10 +164,10 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                 key={i}
                 className={`w-2 h-2 rounded-full transition-all ${
                   i < answers.length
-                    ? answers[i] ? 'bg-emerald-400' : 'bg-red-400'
+                    ? answers[i] ? 'bg-[var(--zkawi-green)]' : 'bg-[var(--zkawi-red)]'
                     : i === currentIndex
-                    ? 'bg-purple-400'
-                    : 'bg-gray-200'
+                    ? 'bg-[var(--zkawi-purple)]'
+                    : 'bg-[var(--border)]'
                 }`}
               />
             ))}
@@ -194,8 +185,8 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
           exit={{ opacity: 0, x: -30 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-5 border border-purple-100 mb-4">
-            <p className="font-black text-gray-800 text-lg leading-relaxed">
+          <div className="bg-[var(--bg-secondary)] rounded-2xl p-5 border border-[var(--zkawi-purple)]/20 mb-4">
+            <p className="font-black text-[var(--text)] text-lg leading-relaxed">
               {locale === 'ar' ? currentQuestion.questionAr : currentQuestion.questionEn}
             </p>
           </div>
@@ -207,18 +198,18 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
               const isCorrect = option.isCorrect;
               const showFeedback = quizState === 'feedback';
 
-              let optionStyle = 'bg-white border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50';
+              let optionStyle = 'bg-[var(--surface)] border-2 border-[var(--border)] hover:border-[var(--zkawi-purple)] hover:bg-[var(--bg-secondary)]';
 
               if (showFeedback) {
                 if (isCorrect) {
-                  optionStyle = 'bg-emerald-50 border-2 border-emerald-400';
+                  optionStyle = 'bg-[var(--zkawi-green)]/10 border-2 border-[var(--zkawi-green)]/50';
                 } else if (isSelected && !isCorrect) {
-                  optionStyle = 'bg-red-50 border-2 border-red-400';
+                  optionStyle = 'bg-[var(--zkawi-red)]/10 border-2 border-[var(--zkawi-red)]/50';
                 } else {
-                  optionStyle = 'bg-white border-2 border-gray-200 opacity-60';
+                  optionStyle = 'bg-[var(--surface)] border-2 border-[var(--border)] opacity-60';
                 }
               } else if (isSelected) {
-                optionStyle = 'bg-purple-100 border-2 border-purple-500';
+                optionStyle = 'bg-[var(--zkawi-purple)]/10 border-2 border-[var(--zkawi-purple)]';
               }
 
               return (
@@ -233,12 +224,12 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0 ${
                       showFeedback && isCorrect
-                        ? 'bg-emerald-500 text-white'
+                        ? 'bg-[var(--zkawi-green)] text-white'
                         : showFeedback && isSelected && !isCorrect
-                        ? 'bg-red-500 text-white'
+                        ? 'bg-[var(--zkawi-red)] text-white'
                         : isSelected
-                        ? 'bg-purple-500 text-white'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'bg-[var(--zkawi-purple)] text-white'
+                        : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
                     }`}>
                       {showFeedback ? (
                         isCorrect ? <CheckCircle2 size={16} /> : isSelected ? <XCircle size={16} /> : option.id.slice(-1).toUpperCase()
@@ -247,9 +238,9 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                       )}
                     </div>
                     <span className={`font-semibold ${
-                      showFeedback && isCorrect ? 'text-emerald-700' :
-                      showFeedback && isSelected && !isCorrect ? 'text-red-700' :
-                      'text-gray-700'
+                      showFeedback && isCorrect ? 'text-[var(--zkawi-green)]' :
+                      showFeedback && isSelected && !isCorrect ? 'text-[var(--zkawi-red)]' :
+                      'text-[var(--text)]'
                     }`}>
                       {locale === 'ar' ? option.textAr : option.textEn}
                     </span>
@@ -268,18 +259,18 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                 className="mt-4"
               >
                 {answers[answers.length - 1] ? (
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3">
+                  <div className="bg-[var(--zkawi-green)]/10 border border-[var(--zkawi-green)]/30 rounded-2xl p-4 flex items-center gap-3">
                     <div className="text-2xl">🎉</div>
                     <div>
-                      <p className="font-black text-emerald-700">{t('correct')}</p>
+                      <p className="font-black text-[var(--zkawi-green)]">{t('correct')}</p>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-                    <p className="font-bold text-red-600 mb-1">
+                  <div className="bg-[var(--zkawi-red)]/10 border border-[var(--zkawi-red)]/30 rounded-2xl p-4">
+                    <p className="font-bold text-[var(--zkawi-red)] mb-1">
                       {t('incorrect')} 😕
                     </p>
-                    <p className="text-sm text-red-500">
+                    <p className="text-sm text-[var(--text-muted)]">
                       {t('correctAnswer')}: {locale === 'ar'
                         ? currentQuestion.options.find(o => o.isCorrect)?.textAr
                         : currentQuestion.options.find(o => o.isCorrect)?.textEn}

@@ -6,8 +6,9 @@ import { Link, useRouter } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Logo } from '@/components/ui/logo';
 import { signIn } from '@/lib/auth-client';
-import { Mail, Lock, Zap } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const t = useTranslations('auth.login');
@@ -41,18 +42,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const result = await signIn.email({
-        email,
-        password,
-      });
-
+      const result = await signIn.email({ email, password });
       if (result.error) {
         setApiError(tErr('invalidCredentials'));
       } else {
         router.push('/dashboard');
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setApiError(tErr('generic'));
     } finally {
       setLoading(false);
@@ -60,13 +57,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 start-10 text-6xl opacity-20 animate-float">🌟</div>
-        <div className="absolute top-1/3 end-20 text-5xl opacity-20 animate-float" style={{ animationDelay: '1s' }}>✨</div>
-        <div className="absolute bottom-20 start-1/4 text-4xl opacity-20 animate-float" style={{ animationDelay: '2s' }}>🎓</div>
-        <div className="absolute top-2/3 end-1/3 text-5xl opacity-20 animate-float" style={{ animationDelay: '0.5s' }}>🚀</div>
+        <div className="absolute top-20 start-10 text-6xl opacity-10 animate-float">🌟</div>
+        <div className="absolute top-1/3 end-20 text-5xl opacity-10 animate-float" style={{ animationDelay: '1s' }}>✨</div>
+        <div className="absolute bottom-20 start-1/4 text-4xl opacity-10 animate-float" style={{ animationDelay: '2s' }}>🎓</div>
+        <div className="absolute top-2/3 end-1/3 text-5xl opacity-10 animate-float" style={{ animationDelay: '0.5s' }}>🚀</div>
       </div>
 
       <motion.div
@@ -76,14 +73,11 @@ export default function LoginPage() {
         className="relative w-full max-w-md"
       >
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-2xl shadow-purple-100 border border-purple-100 overflow-hidden">
+        <div className="bg-[var(--surface)] rounded-3xl shadow-2xl shadow-[var(--zkawi-purple)]/10 border border-[var(--border)] overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-8 text-center text-white">
-            <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <Zap size={20} className="text-white" fill="white" />
-              </div>
-              <span className="text-xl font-black">ذكاوي</span>
+          <div className="bg-gradient-to-r from-[var(--zkawi-purple)] to-indigo-600 p-8 text-center text-white">
+            <Link href="/" className="inline-block mb-4">
+              <Logo size={40} showText textClassName="text-xl text-white" />
             </Link>
             <h1 className="text-2xl font-black mb-1">{t('title')}</h1>
             <p className="text-purple-200 text-sm">{t('subtitle')}</p>
@@ -95,14 +89,14 @@ export default function LoginPage() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-red-50 border border-red-200 text-red-600 rounded-2xl px-4 py-3 text-sm font-medium"
+                className="bg-[var(--zkawi-red)]/10 border border-[var(--zkawi-red)]/30 text-[var(--zkawi-red)] rounded-2xl px-4 py-3 text-sm font-medium"
               >
                 ⚠️ {apiError}
               </motion.div>
             )}
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">{t('email')}</label>
+              <label className="block text-sm font-bold text-[var(--text)] mb-2">{t('email')}</label>
               <Input
                 type="email"
                 placeholder={t('emailPlaceholder')}
@@ -116,8 +110,8 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-bold text-gray-700">{t('password')}</label>
-                <button type="button" className="text-xs text-purple-500 hover:text-purple-700 font-medium">
+                <label className="block text-sm font-bold text-[var(--text)]">{t('password')}</label>
+                <button type="button" className="text-xs text-[var(--zkawi-purple)] hover:opacity-80 font-medium">
                   {t('forgotPassword')}
                 </button>
               </div>
@@ -141,21 +135,20 @@ export default function LoginPage() {
               {loading ? t('loading') : t('submit')} 🚀
             </Button>
 
-            <p className="text-center text-sm text-gray-500">
+            <p className="text-center text-sm text-[var(--text-muted)]">
               {t('noAccount')}{' '}
-              <Link href="/register" className="text-purple-600 font-bold hover:text-purple-800">
+              <Link href="/register" className="text-[var(--zkawi-purple)] font-bold hover:opacity-80">
                 {t('register')}
               </Link>
             </p>
           </form>
         </div>
 
-        {/* Fun decoration at bottom */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-center mt-6 text-sm text-gray-400"
+          className="text-center mt-6 text-sm text-[var(--text-muted)]"
         >
           🔒 بياناتك محمية وآمنة معنا
         </motion.div>

@@ -10,7 +10,7 @@ export default function HomeCta({ locale }: { locale: string }) {
   const t = useTranslations('home.cta');
 
   return (
-    <section className="py-20 bg-[#FFF9F0]">
+    <section className="py-20 bg-[var(--bg)]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

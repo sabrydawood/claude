@@ -167,7 +167,7 @@ export default function HomeHero({ locale }: { locale: string }) {
                   ].map((item, i) => (
                     <div
                       key={i}
-                      className={`absolute ${item.size} bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg`}
+                      className={`absolute ${item.size} bg-[var(--surface)] rounded-full w-12 h-12 flex items-center justify-center shadow-lg`}
                       style={{ top: item.top, left: item.left }}
                     >
                       {item.emoji}
@@ -181,14 +181,14 @@ export default function HomeHero({ locale }: { locale: string }) {
                 initial={{ opacity: 0, y: 20, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: 1, duration: 0.5 }}
-                className="absolute -bottom-4 -start-4 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2"
+                className="absolute -bottom-4 -start-4 bg-[var(--surface)] rounded-2xl shadow-xl p-3 flex items-center gap-2"
               >
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-[var(--zkawi-purple)] to-[var(--zkawi-purple-dark)] rounded-xl flex items-center justify-center">
                   <Zap size={18} className="text-white" fill="white" />
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 font-medium">XP كسبت</div>
-                  <div className="text-sm font-black text-purple-600">+50 XP 🎉</div>
+                  <div className="text-xs text-[var(--text-muted)] font-medium">XP كسبت</div>
+                  <div className="text-sm font-black text-[var(--zkawi-purple)]">+50 XP 🎉</div>
                 </div>
               </motion.div>
             </div>
@@ -199,7 +199,7 @@ export default function HomeHero({ locale }: { locale: string }) {
       {/* Bottom wave */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 80L1440 80L1440 40C1200 80 960 0 720 20C480 40 240 80 0 40L0 80Z" fill="#FFF9F0" />
+          <path className="fill-[#FFF9F0] dark:fill-[#0D0D1A]" d="M0 80L1440 80L1440 40C1200 80 960 0 720 20C480 40 240 80 0 40L0 80Z" />
         </svg>
       </div>
     </section>

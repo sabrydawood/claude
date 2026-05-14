@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { Cairo, Inter } from 'next/font/google';
-import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/lib/i18n/routing';
+import { Providers } from '@/components/providers';
 import '../globals.css';
 
 const cairo = Cairo({
@@ -39,7 +39,7 @@ export async function generateMetadata({
       ? 'منصة تعليمية للأطفال والكبار لتعلم الذكاء الاصطناعي بطريقة سهلة وممتعة. كسب XP، افتح إنجازات، وبقى خبير AI!'
       : 'An interactive educational platform for kids and adults to learn AI in a fun way. Earn XP, unlock achievements, and become an AI expert!',
     keywords: isAr
-      ? ['ذكاء اصطناعي', 'تعلم', 'أطفال', 'Claude', 'AI', 'تعليم', 'ذكاوي', 'zkawi', 'برومبت', 'ChatGPT']
+      ? ['ذكاء اصطناعي', 'تعلم', 'أطفال', 'Claude', 'AI', 'تعليم', 'ذكاوي', 'zkawi', 'برومبت']
       : ['AI', 'artificial intelligence', 'learn AI', 'kids', 'Claude', 'education', 'zkawi'],
     metadataBase: new URL(APP_URL),
     authors: [{ name: 'ذكاوي' }],
@@ -68,16 +68,8 @@ export async function generateMetadata({
         : 'Zkawi — Learn AI the Easy and Fun Way',
       description: isAr
         ? 'منصة تعليمية تفاعلية للأطفال والكبار. كسب XP وافتح إنجازات!'
-        : 'Interactive AI learning platform for kids and adults. Earn XP and unlock achievements!',
-      images: [
-        {
-          url: '/og-image.svg',
-          width: 1200,
-          height: 630,
-          alt: isAr ? 'ذكاوي — منصة تعلم الذكاء الاصطناعي' : 'Zkawi — AI Learning Platform',
-          type: 'image/svg+xml',
-        },
-      ],
+        : 'Interactive AI learning platform. Earn XP and unlock achievements!',
+      images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: 'ذكاوي' }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -113,12 +105,16 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
-
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
-  const fontClass = locale === 'ar' ? cairo.variable : inter.variable;
+  const fontVars = `${cairo.variable} ${inter.variable}`;
 
   return (
-    <html lang={locale} dir={dir} className={`${fontClass} ${cairo.variable} h-full`}>
+    <html
+      lang={locale}
+      dir={dir}
+      className={`${fontVars} h-full`}
+      suppressHydrationWarning
+    >
       <body
         className="min-h-full flex flex-col antialiased"
         style={{
@@ -128,9 +124,9 @@ export default async function LocaleLayout({
               : 'var(--font-inter), sans-serif',
         }}
       >
-        <NextIntlClientProvider messages={messages}>
+        <Providers messages={messages} locale={locale}>
           {children}
-        </NextIntlClientProvider>
+        </Providers>
       </body>
     </html>
   );

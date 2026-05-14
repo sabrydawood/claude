@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, LogOut, LayoutDashboard, Home, User } from 'lucide-react';
-import { Logo } from '@/components/ui/logo';
+import { Menu, X, LogOut, LayoutDashboard, Home, User, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Logo } from '@/components/ui/logo';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { signOut, useSession } from '@/lib/auth-client';
 import { getInitials } from '@/lib/utils';
 
@@ -21,8 +22,7 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const switchLocale = () => {
-    const nextLocale = locale === 'ar' ? 'en' : 'ar';
-    router.push(pathname, { locale: nextLocale });
+    router.push(pathname, { locale: locale === 'ar' ? 'en' : 'ar' });
   };
 
   const handleSignOut = async () => {
@@ -32,29 +32,34 @@ export default function Header() {
   };
 
   const navLinks = session
-    ? [
-        { href: '/dashboard', label: t('nav.dashboard'), icon: <LayoutDashboard size={16} /> },
-      ]
-    : [
-        { href: '/', label: t('nav.home'), icon: <Home size={16} /> },
-      ];
+    ? [{ href: '/dashboard', label: t('nav.dashboard'), icon: <LayoutDashboard size={16} /> }]
+    : [{ href: '/', label: t('nav.home'), icon: <Home size={16} /> }];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-purple-100 shadow-sm">
+    <header className="
+      sticky top-0 z-50 backdrop-blur-md border-b
+      bg-[var(--header-bg)] border-[var(--border)]
+      transition-colors duration-300
+    ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
           <Link href="/" className="group hover:opacity-90 transition-opacity">
             <Logo size={40} showText textClassName="text-xl" />
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-2">
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-all"
+                className="
+                  flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold
+                  text-[var(--text-muted)] hover:text-[var(--zkawi-purple)]
+                  hover:bg-[var(--bg-secondary)] transition-all
+                "
               >
                 {link.icon}
                 {link.label}
@@ -62,28 +67,39 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Right side */}
+          {/* Right controls */}
           <div className="flex items-center gap-2">
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Language Switcher */}
             <button
               onClick={switchLocale}
-              className="px-3 py-1.5 rounded-xl text-sm font-bold text-purple-600 hover:bg-purple-50 border border-purple-200 transition-all hover:scale-105"
+              className="
+                flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold
+                text-[var(--zkawi-purple)] border border-[var(--border)]
+                hover:bg-[var(--bg-secondary)] hover:border-[var(--zkawi-purple-light)]
+                transition-all hover:scale-105
+              "
             >
+              <Globe size={14} />
               {t('nav.language')}
             </button>
 
+            {/* User menu or auth buttons */}
             {session ? (
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-purple-50 transition-all"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-[var(--bg-secondary)] transition-all"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">
-                      {getInitials(session.user?.name || 'U')}
+                    <AvatarFallback className="text-xs bg-[var(--zkawi-purple)] text-white">
+                      {getInitials(session.user?.name ?? 'U')}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden sm:block text-sm font-semibold text-gray-700 max-w-24 truncate">
+                  <span className="hidden sm:block text-sm font-semibold text-[var(--text)] max-w-24 truncate">
                     {session.user?.name}
                   </span>
                 </button>
@@ -91,29 +107,30 @@ export default function Header() {
                 <AnimatePresence>
                   {userMenuOpen && (
                     <>
-                      <div
-                        className="fixed inset-0 z-10"
-                        onClick={() => setUserMenuOpen(false)}
-                      />
+                      <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                        initial={{ opacity: 0, scale: 0.95, y: -8 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -8 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute end-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-20"
+                        className="
+                          absolute end-0 mt-2 w-48 rounded-2xl shadow-xl z-20 py-2
+                          bg-[var(--surface)] border border-[var(--border)]
+                        "
+                        style={{ boxShadow: 'var(--card-shadow)' }}
                       >
                         <Link
                           href="/dashboard"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--bg-secondary)] hover:text-[var(--zkawi-purple)] transition-colors"
                         >
                           <LayoutDashboard size={16} />
                           {t('nav.dashboard')}
                         </Link>
-                        <hr className="my-1 border-gray-100" />
+                        <hr className="my-1 border-[var(--border)]" />
                         <button
                           onClick={handleSignOut}
-                          className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors"
                         >
                           <LogOut size={16} />
                           {t('nav.logout')}
@@ -126,21 +143,17 @@ export default function Header() {
             ) : (
               <div className="hidden md:flex items-center gap-2">
                 <Link href="/login">
-                  <Button variant="outline" size="sm">
-                    {t('nav.login')}
-                  </Button>
+                  <Button variant="outline" size="sm">{t('nav.login')}</Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm">
-                    {t('nav.register')} 🚀
-                  </Button>
+                  <Button size="sm">{t('nav.register')} 🚀</Button>
                 </Link>
               </div>
             )}
 
-            {/* Mobile menu button */}
+            {/* Mobile menu toggle */}
             <button
-              className="md:hidden p-2 rounded-xl hover:bg-purple-50 transition-colors text-gray-600"
+              className="md:hidden p-2 rounded-xl hover:bg-[var(--bg-secondary)] transition-colors text-[var(--text-muted)]"
               onClick={() => setMobileOpen(!mobileOpen)}
             >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
@@ -155,14 +168,14 @@ export default function Header() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-purple-100 py-3 space-y-1"
+              className="md:hidden border-t border-[var(--border)] py-3 space-y-1"
             >
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-all"
+                  className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--zkawi-purple)] hover:bg-[var(--bg-secondary)] transition-all"
                 >
                   {link.icon}
                   {link.label}
@@ -171,13 +184,12 @@ export default function Header() {
               {!session && (
                 <>
                   <Link href="/login" onClick={() => setMobileOpen(false)}>
-                    <div className="px-4 py-3 rounded-xl text-sm font-semibold text-purple-600 hover:bg-purple-50 transition-all flex items-center gap-2">
-                      <User size={16} />
-                      {t('nav.login')}
+                    <div className="px-4 py-3 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:bg-[var(--bg-secondary)] flex items-center gap-2">
+                      <User size={16} />{t('nav.login')}
                     </div>
                   </Link>
                   <Link href="/register" onClick={() => setMobileOpen(false)}>
-                    <div className="mx-2 px-4 py-3 rounded-xl text-sm font-bold bg-purple-600 text-white text-center hover:bg-purple-700 transition-all">
+                    <div className="mx-2 px-4 py-3 rounded-xl text-sm font-bold bg-[var(--zkawi-purple)] text-white text-center hover:opacity-90 transition-all">
                       {t('nav.register')} 🚀
                     </div>
                   </Link>

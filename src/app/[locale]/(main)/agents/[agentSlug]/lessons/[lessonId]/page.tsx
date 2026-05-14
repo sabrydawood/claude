@@ -124,7 +124,7 @@ export default function LessonPage({
   const description = locale === 'ar' ? lesson.descriptionAr : lesson.descriptionEn;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFF9F0]">
+    <div className="min-h-screen flex flex-col bg-[var(--bg)]">
       <Header />
 
       {/* XP popup */}
@@ -144,7 +144,7 @@ export default function LessonPage({
 
       <main className="flex-1">
         {/* Top progress bar */}
-        <div className="h-1 bg-gray-100">
+        <div className="h-1 bg-[var(--border)]">
           <motion.div
             className="h-full bg-gradient-to-r from-purple-500 to-amber-400"
             style={{ width: `${view === 'content' ? scrollProgress : view === 'quiz' ? 70 : 100}%` }}
@@ -152,28 +152,28 @@ export default function LessonPage({
         </div>
 
         {/* Lesson header */}
-        <div className="bg-white border-b border-gray-100 sticky top-16 z-10">
+        <div className="bg-[var(--surface)] border-b border-[var(--border)] sticky top-16 z-10">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3">
             <div className="flex items-center gap-3">
               <Link href={`/agents/${agentSlug}`}>
-                <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-purple-600 transition-colors font-medium">
+                <button className="flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-[var(--zkawi-purple)] transition-colors font-medium">
                   <ChevronLeft size={16} className="flip-rtl" />
                   {t('backToAgent')}
                 </button>
               </Link>
 
               <div className="flex-1 text-center">
-                <span className="text-sm font-bold text-gray-600">
+                <span className="text-sm font-bold text-[var(--text-muted)]">
                   {t('lesson')} {currentIndex + 1} {t('of')} {allLessons.length}
                 </span>
               </div>
 
-              <div className="flex items-center gap-3 text-xs text-gray-500">
+              <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
                 <div className="flex items-center gap-1">
                   <Clock size={12} />
                   {lesson.estimatedMinutes} {t('minutes')}
                 </div>
-                <div className="flex items-center gap-1 text-purple-600 font-bold">
+                <div className="flex items-center gap-1 text-[var(--zkawi-purple)] font-bold">
                   <Zap size={12} fill="currentColor" />
                   {lesson.xpReward} XP
                 </div>
@@ -190,7 +190,7 @@ export default function LessonPage({
             className="mb-8"
           >
             <div className="flex items-center gap-4 mb-3">
-              <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-3xl">
+              <div className="w-14 h-14 bg-[var(--zkawi-purple)]/15 rounded-2xl flex items-center justify-center text-3xl">
                 {lesson.emoji}
               </div>
               <div>
@@ -205,21 +205,21 @@ export default function LessonPage({
                     {view === 'content' ? '📖 قراءة' : view === 'quiz' ? '🎯 كويز' : '✅ مكتمل'}
                   </Badge>
                 </div>
-                <h1 className="text-2xl md:text-3xl font-black text-gray-800">{title}</h1>
-                <p className="text-gray-500 text-sm mt-1">{description}</p>
+                <h1 className="text-2xl md:text-3xl font-black text-[var(--text)]">{title}</h1>
+                <p className="text-[var(--text-muted)] text-sm mt-1">{description}</p>
               </div>
             </div>
 
             {/* View tabs */}
-            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-2xl w-fit">
+            <div className="flex items-center gap-2 p-1 bg-[var(--surface-2)] rounded-2xl w-fit">
               {(['content', 'quiz'] as const).map((v) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
                   className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
                     view === v
-                      ? 'bg-white text-purple-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-[var(--surface)] text-[var(--zkawi-purple)] shadow-sm'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text)]'
                   }`}
                 >
                   {v === 'content' ? '📖 الدرس' : '🎯 الكويز'}
@@ -239,7 +239,7 @@ export default function LessonPage({
               >
                 <div
                   ref={contentRef}
-                  className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8 max-h-[60vh] overflow-y-auto"
+                  className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] shadow-sm p-6 md:p-8 max-h-[60vh] overflow-y-auto"
                 >
                   <div
                     className="prose prose-lg max-w-none lesson-content"
@@ -253,7 +253,7 @@ export default function LessonPage({
                 </div>
 
                 <div className="mt-6 flex items-center justify-between">
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-[var(--text-muted)]">
                     📖 {Math.round(scrollProgress)}% اتقرأ
                   </div>
                   <Button onClick={() => setView('quiz')} className="gap-2">
@@ -271,7 +271,7 @@ export default function LessonPage({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -30 }}
               >
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] shadow-sm p-6 md:p-8">
                   <QuizComponent
                     questions={lesson.quiz}
                     xpReward={lesson.xpReward}
@@ -288,7 +288,7 @@ export default function LessonPage({
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
-                <div className="bg-white rounded-3xl border border-emerald-200 shadow-sm p-8 text-center">
+                <div className="bg-[var(--surface)] rounded-3xl border border-[var(--zkawi-green)]/30 shadow-sm p-8 text-center">
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -297,27 +297,27 @@ export default function LessonPage({
                   >
                     🎉
                   </motion.div>
-                  <h2 className="text-2xl font-black text-gray-800 mb-2">
+                  <h2 className="text-2xl font-black text-[var(--text)] mb-2">
                     أحسنت! الدرس اتكمل! ⭐
                   </h2>
-                  <p className="text-gray-500 mb-6">
+                  <p className="text-[var(--text-muted)] mb-6">
                     كملت درس "{title}" وكسبت XP جديدة!
                   </p>
 
                   <div className="flex items-center justify-center gap-4 mb-8">
-                    <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4 text-center">
-                      <div className="flex items-center gap-1 justify-center text-purple-600 font-black text-xl">
+                    <div className="bg-[var(--zkawi-purple)]/10 border border-[var(--zkawi-purple)]/30 rounded-2xl p-4 text-center">
+                      <div className="flex items-center gap-1 justify-center text-[var(--zkawi-purple)] font-black text-xl">
                         <Zap size={18} fill="currentColor" />
                         +{progress.scores[lesson.id] >= 80 ? lesson.xpReward : Math.round(lesson.xpReward * (progress.scores[lesson.id] || 0) / 100)}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">XP كسبتها</div>
+                      <div className="text-xs text-[var(--text-muted)] mt-1">XP كسبتها</div>
                     </div>
                     {progress.scores[lesson.id] !== undefined && (
-                      <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center">
-                        <div className="text-emerald-600 font-black text-xl">
+                      <div className="bg-[var(--zkawi-green)]/10 border border-[var(--zkawi-green)]/30 rounded-2xl p-4 text-center">
+                        <div className="text-[var(--zkawi-green)] font-black text-xl">
                           {progress.scores[lesson.id]}%
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">نتيجة الكويز</div>
+                        <div className="text-xs text-[var(--text-muted)] mt-1">نتيجة الكويز</div>
                       </div>
                     )}
                   </div>
@@ -354,17 +354,17 @@ export default function LessonPage({
   );
 }
 
-// Simple markdown to HTML converter
+// Simple markdown to HTML converter — styles handled by .lesson-content in globals.css
 function markdownToHtml(markdown: string): string {
   return markdown
     .trim()
-    .replace(/^## (.+)$/gm, '<h2 class="text-xl font-black text-gray-800 mt-6 mb-3 flex items-center gap-2">$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold text-gray-700 mt-4 mb-2">$1</h3>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-black text-gray-900">$1</strong>')
-    .replace(/^> (.+)$/gm, '<blockquote class="border-s-4 border-purple-300 bg-purple-50 ps-4 py-2 my-3 rounded-e-xl text-gray-700 italic">$1</blockquote>')
-    .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 my-1.5"><span class="text-purple-400 mt-1">•</span><span>$1</span></li>')
-    .replace(/(<li.*<\/li>)/gs, '<ul class="space-y-1 my-3">$1</ul>')
-    .replace(/^(\d+)\. (.+)$/gm, '<li class="flex items-start gap-2 my-1.5"><span class="font-black text-purple-600 min-w-[1.5rem]">$1.</span><span>$2</span></li>')
-    .replace(/\n\n/g, '</p><p class="text-gray-600 leading-relaxed my-3">')
-    .replace(/^(?!<[h|u|b|l|p])(.+)$/gm, '<p class="text-gray-600 leading-relaxed my-3">$1</p>');
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^- (.+)$/gm, '<li><span class="bullet">•</span><span>$1</span></li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/^(\d+)\. (.+)$/gm, '<li><span class="num">$1.</span><span>$2</span></li>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[h|u|b|l|p])(.+)$/gm, '<p>$1</p>');
 }

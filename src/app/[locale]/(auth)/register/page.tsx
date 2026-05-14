@@ -6,8 +6,9 @@ import { Link, useRouter } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Logo } from '@/components/ui/logo';
 import { signUp } from '@/lib/auth-client';
-import { Mail, Lock, User, Zap } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
 
 export default function RegisterPage() {
   const t = useTranslations('auth.register');
@@ -44,12 +45,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const result = await signUp.email({
-        email,
-        password,
-        name,
-      });
-
+      const result = await signUp.email({ email, password, name });
       if (result.error) {
         if (result.error.message?.includes('already')) {
           setApiError(tErr('emailExists'));
@@ -60,7 +56,7 @@ export default function RegisterPage() {
         router.push('/dashboard');
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setApiError(tErr('generic'));
     } finally {
       setLoading(false);
@@ -68,13 +64,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 end-10 text-6xl opacity-20 animate-float">🎉</div>
-        <div className="absolute top-1/3 start-20 text-5xl opacity-20 animate-float" style={{ animationDelay: '1s' }}>🌟</div>
-        <div className="absolute bottom-20 end-1/4 text-4xl opacity-20 animate-float" style={{ animationDelay: '2s' }}>🏆</div>
-        <div className="absolute top-2/3 start-1/3 text-5xl opacity-20 animate-float" style={{ animationDelay: '0.5s' }}>🎓</div>
+        <div className="absolute top-20 end-10 text-6xl opacity-10 animate-float">🎉</div>
+        <div className="absolute top-1/3 start-20 text-5xl opacity-10 animate-float" style={{ animationDelay: '1s' }}>🌟</div>
+        <div className="absolute bottom-20 end-1/4 text-4xl opacity-10 animate-float" style={{ animationDelay: '2s' }}>🏆</div>
+        <div className="absolute top-2/3 start-1/3 text-5xl opacity-10 animate-float" style={{ animationDelay: '0.5s' }}>🎓</div>
       </div>
 
       <motion.div
@@ -84,14 +80,11 @@ export default function RegisterPage() {
         className="relative w-full max-w-md"
       >
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-2xl shadow-amber-100 border border-amber-100 overflow-hidden">
+        <div className="bg-[var(--surface)] rounded-3xl shadow-2xl shadow-amber-500/10 border border-[var(--border)] overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-8 text-center text-white">
-            <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <Zap size={20} className="text-white" fill="white" />
-              </div>
-              <span className="text-xl font-black">ذكاوي</span>
+            <Link href="/" className="inline-block mb-4">
+              <Logo size={40} showText textClassName="text-xl text-white" />
             </Link>
             <h1 className="text-2xl font-black mb-1">{t('title')}</h1>
             <p className="text-orange-100 text-sm">{t('subtitle')}</p>
@@ -103,14 +96,14 @@ export default function RegisterPage() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-red-50 border border-red-200 text-red-600 rounded-2xl px-4 py-3 text-sm font-medium"
+                className="bg-[var(--zkawi-red)]/10 border border-[var(--zkawi-red)]/30 text-[var(--zkawi-red)] rounded-2xl px-4 py-3 text-sm font-medium"
               >
                 ⚠️ {apiError}
               </motion.div>
             )}
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">{t('name')}</label>
+              <label className="block text-sm font-bold text-[var(--text)] mb-2">{t('name')}</label>
               <Input
                 type="text"
                 placeholder={t('namePlaceholder')}
@@ -122,7 +115,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">{t('email')}</label>
+              <label className="block text-sm font-bold text-[var(--text)] mb-2">{t('email')}</label>
               <Input
                 type="email"
                 placeholder={t('emailPlaceholder')}
@@ -135,7 +128,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">{t('password')}</label>
+              <label className="block text-sm font-bold text-[var(--text)] mb-2">{t('password')}</label>
               <Input
                 type="password"
                 placeholder={t('passwordPlaceholder')}
@@ -157,13 +150,13 @@ export default function RegisterPage() {
               {loading ? t('loading') : t('submit')} 🎉
             </Button>
 
-            <p className="text-center text-xs text-gray-400">
+            <p className="text-center text-xs text-[var(--text-muted)]">
               {t('terms')}
             </p>
 
-            <p className="text-center text-sm text-gray-500">
+            <p className="text-center text-sm text-[var(--text-muted)]">
               {t('hasAccount')}{' '}
-              <Link href="/login" className="text-purple-600 font-bold hover:text-purple-800">
+              <Link href="/login" className="text-[var(--zkawi-purple)] font-bold hover:opacity-80">
                 {t('login')}
               </Link>
             </p>
@@ -174,7 +167,7 @@ export default function RegisterPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-center mt-6 text-sm text-gray-400"
+          className="text-center mt-6 text-sm text-[var(--text-muted)]"
         >
           🎁 مجاني 100% - مش محتاج بطاقة بنكية
         </motion.div>

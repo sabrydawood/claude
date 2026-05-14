@@ -11,20 +11,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative w-full">
         {icon && (
-          <div className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-gray-400">
+          <div className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-[var(--text-muted)]">
             {icon}
           </div>
         )}
         <input
           type={type}
           className={cn(
-            'flex h-12 w-full rounded-2xl border-2 bg-white px-4 py-3 text-base transition-all duration-200',
-            'placeholder:text-gray-400',
-            'focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100',
-            'hover:border-purple-300',
+            'flex h-12 w-full rounded-2xl border-2 bg-[var(--input-bg)] px-4 py-3 text-base text-[var(--text)] transition-all duration-200',
+            'placeholder:text-[var(--text-muted)]',
+            'focus:outline-none focus:border-[var(--zkawi-purple)] focus:ring-2 focus:ring-[var(--zkawi-purple)]/10',
+            'hover:border-[var(--zkawi-purple-light)]',
             error
-              ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-              : 'border-gray-200',
+              ? 'border-[var(--zkawi-red)] focus:border-[var(--zkawi-red)] focus:ring-[var(--zkawi-red)]/10'
+              : 'border-[var(--border)]',
             icon && 'ps-10',
             className
           )}
@@ -32,7 +32,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p className="mt-1 text-sm text-red-500">{error}</p>
+          <p className="mt-1 text-sm text-[var(--zkawi-red)]">{error}</p>
         )}
       </div>
     );

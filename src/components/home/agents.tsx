@@ -12,7 +12,7 @@ export default function HomeAgents({ locale }: { locale: string }) {
   const t = useTranslations('home.agents');
 
   return (
-    <section className="py-20 bg-gradient-to-br from-purple-50 to-amber-50">
+    <section className="py-20 bg-[var(--bg-secondary)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -20,10 +20,10 @@ export default function HomeAgents({ locale }: { locale: string }) {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-black text-gray-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-black text-[var(--text)] mb-4">
             {t('title')} 🤖
           </h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="text-lg text-[var(--text-muted)] max-w-2xl mx-auto">
             {t('subtitle')}
           </p>
         </motion.div>
@@ -36,7 +36,7 @@ export default function HomeAgents({ locale }: { locale: string }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className={`relative bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 card-hover ${!agent.isActive ? 'opacity-70' : ''}`}
+              className={`relative bg-[var(--surface)] rounded-3xl overflow-hidden shadow-sm border border-[var(--border)] card-hover ${!agent.isActive ? 'opacity-70' : ''}`}
             >
               {/* Card header with gradient */}
               <div className={`bg-gradient-to-br ${agent.gradient} p-6 text-white text-center`}>
@@ -46,15 +46,15 @@ export default function HomeAgents({ locale }: { locale: string }) {
 
               {/* Card body */}
               <div className="p-6">
-                <p className="text-gray-500 text-sm leading-relaxed mb-4">
+                <p className="text-[var(--text-muted)] text-sm leading-relaxed mb-4">
                   {locale === 'ar' ? agent.descriptionAr : agent.descriptionEn}
                 </p>
 
                 {agent.isActive ? (
                   <>
                     <div className="flex items-center gap-2 mb-4">
-                      <BookOpen size={16} className="text-purple-500" />
-                      <span className="text-sm font-semibold text-gray-600">
+                      <BookOpen size={16} className="text-[var(--zkawi-purple)]" />
+                      <span className="text-sm font-semibold text-[var(--text-muted)]">
                         5 {t('lessonsCount')}
                       </span>
                     </div>
@@ -68,8 +68,8 @@ export default function HomeAgents({ locale }: { locale: string }) {
                 ) : (
                   <>
                     <div className="flex items-center gap-2 mb-4">
-                      <Lock size={16} className="text-gray-400" />
-                      <span className="text-sm text-gray-400">{t('comingSoon')}</span>
+                      <Lock size={16} className="text-[var(--text-muted)]" />
+                      <span className="text-sm text-[var(--text-muted)]">{t('comingSoon')}</span>
                     </div>
                     <Button variant="outline" className="w-full" size="sm" disabled>
                       {t('comingSoon')} 🔒

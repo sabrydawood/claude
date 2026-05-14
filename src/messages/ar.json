@@ -1,0 +1,273 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "dashboard": "لوحتي",
+    "login": "دخول",
+    "register": "تسجيل",
+    "logout": "خروج",
+    "language": "English"
+  },
+  "home": {
+    "hero": {
+      "title": "اتعلم الذكاء الاصطناعي",
+      "titleHighlight": "بطريقة مرحة!",
+      "subtitle": "مع ذكاوي هتتعلم كل حاجة عن الذكاء الاصطناعي بطريقة سهلة وممتعة. كسب نقاط، افتح إنجازات، وبقى خبير AI!",
+      "ctaPrimary": "ابدأ مجاناً",
+      "ctaSecondary": "اعرف أكتر",
+      "badge": "منصة التعلم الأولى للأطفال"
+    },
+    "stats": {
+      "title": "أرقام بتتكلم",
+      "students": "طالب",
+      "lessons": "درس",
+      "activities": "نشاط تفاعلي",
+      "studentsLabel": "طالب بيتعلموا دلوقتي",
+      "lessonsLabel": "درس متاح",
+      "activitiesLabel": "نشاط ممتع"
+    },
+    "features": {
+      "title": "ليه ذكاوي؟",
+      "subtitle": "صممنا المنصة دي خصيصاً عشان التعلم يبقى مغامرة!",
+      "forKids": {
+        "title": "مناسب للأطفال",
+        "description": "محتوى بسيط وممتع مناسب من عمر 8 سنين. توضيحات سهلة بالأمثلة الحلوة!"
+      },
+      "interactive": {
+        "title": "تفاعلي ومسلي",
+        "description": "ألعاب وكويزات وتحديات تخليك متعلق بالمحتوى ومش قادر تبطل!"
+      },
+      "progress": {
+        "title": "تتبع تقدمك",
+        "description": "كسب XP وافتح إنجازات وشوف مسيرتك في التعلم بتتقدم!"
+      },
+      "arabic": {
+        "title": "عربي أصيل",
+        "description": "كل المحتوى بالعربية العامية المصرية البسيطة - مش هتحتاج قاموس!"
+      }
+    },
+    "howItWorks": {
+      "title": "إزاي بتتعلم؟",
+      "subtitle": "3 خطوات بس وتبقى في طريقك للاحتراف!",
+      "step1": {
+        "title": "سجل مجاناً",
+        "description": "اعمل حساب في ثواني وابدأ رحلتك مع الذكاء الاصطناعي"
+      },
+      "step2": {
+        "title": "اختار موضوعك",
+        "description": "افتح دروس Claude أو أي مساعد ذكاء اصطناعي تاني"
+      },
+      "step3": {
+        "title": "اتعلم واكسب",
+        "description": "كمل دروس، حل كويزات، وكسب XP وإنجازات رائعة!"
+      }
+    },
+    "agents": {
+      "title": "المساعدات الذكية",
+      "subtitle": "اتعرف على أهم مساعدات الذكاء الاصطناعي في العالم",
+      "exploreButton": "استكشف",
+      "lessonsCount": "درس",
+      "comingSoon": "قريباً"
+    },
+    "cta": {
+      "title": "مستعد تبدأ رحلتك؟",
+      "subtitle": "انضم لآلاف الطلاب اللي بيتعلموا الذكاء الاصطناعي بطريقة ممتعة",
+      "button": "ابدأ مجاناً دلوقتي"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "أهلاً بيك تاني! 👋",
+      "subtitle": "دخل على حسابك وكمل مسيرتك في التعلم",
+      "email": "الإيميل",
+      "emailPlaceholder": "اكتب إيميلك هنا",
+      "password": "كلمة السر",
+      "passwordPlaceholder": "اكتب كلمة سرك",
+      "submit": "دخول",
+      "loading": "بتدخل...",
+      "noAccount": "معندكش حساب؟",
+      "register": "سجل دلوقتي",
+      "forgotPassword": "نسيت كلمة السر؟"
+    },
+    "register": {
+      "title": "انضم لذكاوي! 🚀",
+      "subtitle": "اعمل حساب وابدأ رحلة التعلم الممتعة",
+      "name": "الاسم",
+      "namePlaceholder": "اكتب اسمك هنا",
+      "email": "الإيميل",
+      "emailPlaceholder": "اكتب إيميلك هنا",
+      "password": "كلمة السر",
+      "passwordPlaceholder": "اكتب كلمة سر قوية",
+      "submit": "إنشاء الحساب",
+      "loading": "بنعمل حسابك...",
+      "hasAccount": "عندك حساب؟",
+      "login": "ادخل دلوقتي",
+      "terms": "بتسجل، بتوافق على شروط الاستخدام"
+    },
+    "validation": {
+      "nameRequired": "لازم تكتب اسمك",
+      "emailRequired": "لازم تكتب الإيميل",
+      "emailInvalid": "الإيميل مش صح",
+      "passwordRequired": "لازم تكتب كلمة السر",
+      "passwordMin": "كلمة السر لازم تكون 8 حروف على الأقل"
+    },
+    "errors": {
+      "invalidCredentials": "الإيميل أو كلمة السر غلط",
+      "emailExists": "الإيميل ده موجود خلاص",
+      "generic": "في مشكلة، حاول تاني"
+    }
+  },
+  "dashboard": {
+    "title": "لوحتي",
+    "welcome": "أهلاً",
+    "welcomeBack": "أهلاً بيك تاني",
+    "level": "مستوى",
+    "xpToNext": "XP للمستوى الجاي",
+    "stats": {
+      "totalXp": "إجمالي XP",
+      "streak": "أيام متتالية",
+      "lessonsCompleted": "دروس اتكملت",
+      "quizzesCompleted": "كويزات اتحلت"
+    },
+    "progress": {
+      "title": "تقدمك",
+      "overallProgress": "التقدم الكلي",
+      "continueLesson": "كمل من حيث وقفت"
+    },
+    "achievements": {
+      "title": "إنجازاتك",
+      "noAchievements": "لسه معندكش إنجازات. ابدأ التعلم دلوقتي!",
+      "viewAll": "شوف كل الإنجازات"
+    },
+    "agents": {
+      "title": "استكشف المساعدات",
+      "startLearning": "ابدأ التعلم",
+      "continueLearning": "كمل التعلم"
+    },
+    "streak": {
+      "days": "يوم",
+      "current": "السلسلة الحالية",
+      "keepGoing": "واصل عشان متكسرش السلسلة!"
+    }
+  },
+  "agents": {
+    "claude": {
+      "name": "كلود",
+      "description": "مساعد ذكي من شركة Anthropic. بيساعدك في الكتابة والكود والأسئلة الصعبة بطريقة واضحة ومحترمة.",
+      "fullDescription": "Claude هو مساعد ذكاء اصطناعي متطور من شركة Anthropic الأمريكية. بيتميز بإنه بيتكلم بطريقة طبيعية ومحترمة، وبيساعد في حاجات كتير زي الكتابة والبرمجة والرياضيات وشرح المواضيع الصعبة بطريقة سهلة.",
+      "lessons": "دروس",
+      "startLearning": "ابدأ التعلم",
+      "continueLearning": "كمل التعلم",
+      "completedLessons": "درس اتكمل",
+      "totalLessons": "درس"
+    },
+    "backToAgents": "رجوع للمساعدات",
+    "lessonNumber": "الدرس",
+    "minutes": "دقيقة",
+    "xpReward": "XP"
+  },
+  "lessons": {
+    "backToAgent": "رجوع",
+    "lesson": "الدرس",
+    "of": "من",
+    "minutes": "دقيقة",
+    "xpReward": "XP مكافأة",
+    "startQuiz": "ابدأ الكويز",
+    "nextLesson": "الدرس الجاي",
+    "complete": "خلصت!",
+    "progress": "تقدمك في الدرس",
+    "readingTime": "وقت القراءة",
+    "locked": "مقفول",
+    "completed": "اتكمل",
+    "current": "جاري",
+    "activity": {
+      "title": "نشاط تفاعلي",
+      "tryIt": "جرب بنفسك"
+    }
+  },
+  "quiz": {
+    "title": "وقت الكويز! 🎯",
+    "subtitle": "اختبر اللي اتعلمته",
+    "question": "سؤال",
+    "of": "من",
+    "correct": "صح! 🎉",
+    "incorrect": "غلط، حاول تاني",
+    "correctAnswer": "الإجابة الصح",
+    "next": "السؤال الجاي",
+    "finish": "خلص الكويز",
+    "results": {
+      "title": "النتيجة",
+      "perfect": "ممتاز! 🌟",
+      "great": "عظيم! 🎉",
+      "good": "كويس! 👍",
+      "tryAgain": "حاول تاني",
+      "score": "نتيجتك",
+      "xpEarned": "XP كسبتها",
+      "tryAgainButton": "حاول تاني",
+      "continueButton": "كمل التعلم"
+    },
+    "true": "صح",
+    "false": "غلط"
+  },
+  "achievements": {
+    "firstLesson": {
+      "name": "الخطوة الأولى",
+      "description": "كملت أول درس ليك"
+    },
+    "streak3": {
+      "name": "3 أيام ناري",
+      "description": "اتعلمت 3 أيام متتالية"
+    },
+    "streak7": {
+      "name": "أسبوع احتراف",
+      "description": "اتعلمت أسبوع كامل متواصل"
+    },
+    "quizMaster": {
+      "name": "ملك الكويز",
+      "description": "خدت 100% في كويز"
+    },
+    "explorer": {
+      "name": "المستكشف",
+      "description": "فتحت 5 دروس مختلفة"
+    },
+    "xp100": {
+      "name": "بداية قوية",
+      "description": "جمعت 100 XP"
+    },
+    "xp500": {
+      "name": "على الطريق",
+      "description": "جمعت 500 XP"
+    },
+    "xp1000": {
+      "name": "خبير ذكاوي",
+      "description": "جمعت 1000 XP"
+    }
+  },
+  "common": {
+    "loading": "بيتحمل...",
+    "error": "في غلطة",
+    "success": "تمام!",
+    "save": "احفظ",
+    "cancel": "إلغاء",
+    "next": "التالي",
+    "previous": "السابق",
+    "complete": "خلص",
+    "score": "النتيجة",
+    "xp": "XP",
+    "streak": "سلسلة",
+    "level": "مستوى",
+    "start": "ابدأ",
+    "continue": "كمل",
+    "back": "رجوع",
+    "close": "إغلاق",
+    "yes": "أيوه",
+    "no": "لأ",
+    "or": "أو",
+    "and": "و",
+    "of": "من",
+    "minutes": "دقيقة",
+    "days": "أيام",
+    "points": "نقطة",
+    "appName": "ذكاوي",
+    "tagline": "تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة"
+  }
+}

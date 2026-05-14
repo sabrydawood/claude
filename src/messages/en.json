@@ -1,0 +1,273 @@
+{
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "language": "عربي"
+  },
+  "home": {
+    "hero": {
+      "title": "Learn Artificial Intelligence",
+      "titleHighlight": "The Fun Way!",
+      "subtitle": "With Zkawi, you'll learn everything about AI easily and enjoyably. Earn points, unlock achievements, and become an AI expert!",
+      "ctaPrimary": "Start for Free",
+      "ctaSecondary": "Learn More",
+      "badge": "The #1 AI Learning Platform for Kids"
+    },
+    "stats": {
+      "title": "Numbers That Speak",
+      "students": "students",
+      "lessons": "lessons",
+      "activities": "activities",
+      "studentsLabel": "Students learning right now",
+      "lessonsLabel": "Available lessons",
+      "activitiesLabel": "Fun activities"
+    },
+    "features": {
+      "title": "Why Zkawi?",
+      "subtitle": "We designed this platform specially to make learning an adventure!",
+      "forKids": {
+        "title": "Kid-Friendly",
+        "description": "Simple and fun content suitable from age 8. Easy explanations with great examples!"
+      },
+      "interactive": {
+        "title": "Interactive & Fun",
+        "description": "Games, quizzes, and challenges that keep you hooked and coming back for more!"
+      },
+      "progress": {
+        "title": "Track Your Progress",
+        "description": "Earn XP, unlock achievements, and watch your learning journey grow!"
+      },
+      "arabic": {
+        "title": "Arabic First",
+        "description": "All content in simple Egyptian Arabic dialect - no dictionary needed!"
+      }
+    },
+    "howItWorks": {
+      "title": "How Do You Learn?",
+      "subtitle": "Just 3 steps and you're on your way to mastery!",
+      "step1": {
+        "title": "Register for Free",
+        "description": "Create an account in seconds and start your AI journey"
+      },
+      "step2": {
+        "title": "Choose Your Topic",
+        "description": "Open Claude lessons or any other AI assistant course"
+      },
+      "step3": {
+        "title": "Learn & Earn",
+        "description": "Complete lessons, solve quizzes, and earn XP and amazing achievements!"
+      }
+    },
+    "agents": {
+      "title": "Smart AI Assistants",
+      "subtitle": "Get to know the most important AI assistants in the world",
+      "exploreButton": "Explore",
+      "lessonsCount": "lessons",
+      "comingSoon": "Coming Soon"
+    },
+    "cta": {
+      "title": "Ready to Start Your Journey?",
+      "subtitle": "Join thousands of students learning AI the fun way",
+      "button": "Start for Free Now"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back! 👋",
+      "subtitle": "Login to your account and continue your learning journey",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Login",
+      "loading": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "register": "Register Now",
+      "forgotPassword": "Forgot Password?"
+    },
+    "register": {
+      "title": "Join Zkawi! 🚀",
+      "subtitle": "Create an account and start your fun learning journey",
+      "name": "Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter a strong password",
+      "submit": "Create Account",
+      "loading": "Creating your account...",
+      "hasAccount": "Already have an account?",
+      "login": "Login Now",
+      "terms": "By registering, you agree to the Terms of Service"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email address",
+      "passwordRequired": "Password is required",
+      "passwordMin": "Password must be at least 8 characters"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailExists": "This email is already registered",
+      "generic": "Something went wrong, please try again"
+    }
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "welcome": "Hello",
+    "welcomeBack": "Welcome Back",
+    "level": "Level",
+    "xpToNext": "XP to next level",
+    "stats": {
+      "totalXp": "Total XP",
+      "streak": "Day Streak",
+      "lessonsCompleted": "Lessons Completed",
+      "quizzesCompleted": "Quizzes Completed"
+    },
+    "progress": {
+      "title": "Your Progress",
+      "overallProgress": "Overall Progress",
+      "continueLesson": "Continue where you left off"
+    },
+    "achievements": {
+      "title": "Your Achievements",
+      "noAchievements": "No achievements yet. Start learning now!",
+      "viewAll": "View All Achievements"
+    },
+    "agents": {
+      "title": "Explore Assistants",
+      "startLearning": "Start Learning",
+      "continueLearning": "Continue Learning"
+    },
+    "streak": {
+      "days": "days",
+      "current": "Current Streak",
+      "keepGoing": "Keep going to maintain your streak!"
+    }
+  },
+  "agents": {
+    "claude": {
+      "name": "Claude",
+      "description": "A smart AI assistant from Anthropic. Helps with writing, coding, and tough questions in a clear and respectful way.",
+      "fullDescription": "Claude is an advanced AI assistant from Anthropic. It's known for its natural and respectful communication style, helping with many things like writing, coding, math, and explaining complex topics in a simple way.",
+      "lessons": "lessons",
+      "startLearning": "Start Learning",
+      "continueLearning": "Continue Learning",
+      "completedLessons": "lessons completed",
+      "totalLessons": "lessons"
+    },
+    "backToAgents": "Back to Assistants",
+    "lessonNumber": "Lesson",
+    "minutes": "min",
+    "xpReward": "XP"
+  },
+  "lessons": {
+    "backToAgent": "Back",
+    "lesson": "Lesson",
+    "of": "of",
+    "minutes": "min",
+    "xpReward": "XP Reward",
+    "startQuiz": "Start Quiz",
+    "nextLesson": "Next Lesson",
+    "complete": "Completed!",
+    "progress": "Lesson Progress",
+    "readingTime": "Reading Time",
+    "locked": "Locked",
+    "completed": "Completed",
+    "current": "Current",
+    "activity": {
+      "title": "Interactive Activity",
+      "tryIt": "Try It Yourself"
+    }
+  },
+  "quiz": {
+    "title": "Quiz Time! 🎯",
+    "subtitle": "Test what you've learned",
+    "question": "Question",
+    "of": "of",
+    "correct": "Correct! 🎉",
+    "incorrect": "Incorrect, try again",
+    "correctAnswer": "Correct Answer",
+    "next": "Next Question",
+    "finish": "Finish Quiz",
+    "results": {
+      "title": "Results",
+      "perfect": "Perfect! 🌟",
+      "great": "Great! 🎉",
+      "good": "Good! 👍",
+      "tryAgain": "Try Again",
+      "score": "Your Score",
+      "xpEarned": "XP Earned",
+      "tryAgainButton": "Try Again",
+      "continueButton": "Continue Learning"
+    },
+    "true": "True",
+    "false": "False"
+  },
+  "achievements": {
+    "firstLesson": {
+      "name": "First Step",
+      "description": "Completed your first lesson"
+    },
+    "streak3": {
+      "name": "3-Day Streak",
+      "description": "Learned for 3 consecutive days"
+    },
+    "streak7": {
+      "name": "Week of Mastery",
+      "description": "Learned for a full consecutive week"
+    },
+    "quizMaster": {
+      "name": "Quiz Master",
+      "description": "Got 100% on a quiz"
+    },
+    "explorer": {
+      "name": "Explorer",
+      "description": "Unlocked 5 different lessons"
+    },
+    "xp100": {
+      "name": "Strong Start",
+      "description": "Earned 100 XP"
+    },
+    "xp500": {
+      "name": "On the Way",
+      "description": "Earned 500 XP"
+    },
+    "xp1000": {
+      "name": "Zkawi Expert",
+      "description": "Earned 1000 XP"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Done!",
+    "save": "Save",
+    "cancel": "Cancel",
+    "next": "Next",
+    "previous": "Previous",
+    "complete": "Complete",
+    "score": "Score",
+    "xp": "XP",
+    "streak": "Streak",
+    "level": "Level",
+    "start": "Start",
+    "continue": "Continue",
+    "back": "Back",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "of": "of",
+    "minutes": "min",
+    "days": "days",
+    "points": "points",
+    "appName": "Zkawi",
+    "tagline": "Learn AI the easy and fun way"
+  }
+}

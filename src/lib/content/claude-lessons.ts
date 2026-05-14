@@ -2261,7 +2261,1579 @@ Try everything you've learned in the **Sandbox** and discover your true power! �
   },
 ];
 
-const allLessons: Lesson[] = [...claudeLessons, ...promptEngineeringLessons];
+export const claudeApiLessons: Lesson[] = [
+  {
+    id: 14,
+    slug: 'claude-api-intro',
+    agentSlug: 'claude',
+    titleAr: 'Claude API — المقدمة',
+    titleEn: 'Claude API — Introduction',
+    descriptionAr: 'ابدأ رحلتك كمطور مع Claude API — المفتاح، الـ SDK، وأول request.',
+    descriptionEn: 'Start your developer journey with Claude API — the key, SDK, and first request.',
+    order: 14,
+    xpReward: 90,
+    estimatedMinutes: 10,
+    emoji: '🔑',
+    contentAr: `## Claude API — المقدمة
+
+الـ **Claude API** هو الطريقة اللي بتخلي برنامجك يتكلم مع Claude مباشرة — من غير ما تفتح متصفح أو تكتب يدوياً.
+
+---
+
+## إيه اللي هتعمله؟
+
+\`\`\`
+برنامجك  →  Claude API  →  Claude  →  الرد
+\`\`\`
+
+بدل ما تفتح claude.ai وتكتب بإيدك، برنامجك بيبعت الطلب ويستقبل الرد تلقائياً.
+
+---
+
+## المتطلبات
+
+### 1. مفتاح API
+- روح على [console.anthropic.com](https://console.anthropic.com)
+- أنشئ حساب واطلع على الـ API Key
+- يبدأ بـ \`sk-ant-...\`
+- ⚠️ **متشاركوش المفتاح ده مع حد أبداً**
+
+### 2. تثبيت الـ SDK
+
+**Python:**
+\`\`\`bash
+pip install anthropic
+\`\`\`
+
+**JavaScript/TypeScript:**
+\`\`\`bash
+npm install @anthropic-ai/sdk
+\`\`\`
+
+---
+
+## أول Request
+
+**Python:**
+\`\`\`python
+import anthropic
+
+client = anthropic.Anthropic(api_key="sk-ant-...")
+
+message = client.messages.create(
+    model="claude-opus-4-7",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "مرحبا يا Claude!"}
+    ]
+)
+
+print(message.content[0].text)
+\`\`\`
+
+**JavaScript:**
+\`\`\`javascript
+import Anthropic from '@anthropic-ai/sdk';
+
+const client = new Anthropic({ apiKey: 'sk-ant-...' });
+
+const message = await client.messages.create({
+  model: 'claude-opus-4-7',
+  max_tokens: 1024,
+  messages: [{ role: 'user', content: 'مرحبا يا Claude!' }],
+});
+
+console.log(message.content[0].text);
+\`\`\`
+
+---
+
+## المعاملات الأساسية
+
+| المعامل | الوظيفة | مثال |
+|---|---|---|
+| \`model\` | أي نموذج تستخدم | \`"claude-opus-4-7"\` |
+| \`max_tokens\` | أقصى طول للرد | \`1024\` |
+| \`messages\` | تاريخ المحادثة | \`[{role, content}]\` |
+| \`system\` | System Prompt | \`"أنت مساعد..."\` |
+
+---
+
+## نصيحة الأمان 🔒
+
+**مش تحط المفتاح في الكود مباشرة!**
+
+\`\`\`python
+# ❌ غلط
+client = anthropic.Anthropic(api_key="sk-ant-abc123")
+
+# ✅ صح — استخدم متغير بيئة
+import os
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+\`\`\``,
+
+    contentEn: `## Claude API — Introduction
+
+The **Claude API** lets your program talk to Claude directly — without opening a browser or typing manually.
+
+---
+
+## What Will You Do?
+
+\`\`\`
+Your app  →  Claude API  →  Claude  →  Response
+\`\`\`
+
+Instead of opening claude.ai and typing by hand, your program sends the request and receives the response automatically.
+
+---
+
+## Requirements
+
+### 1. API Key
+- Go to [console.anthropic.com](https://console.anthropic.com)
+- Create an account and generate an API Key
+- Starts with \`sk-ant-...\`
+- ⚠️ **Never share this key with anyone**
+
+### 2. Install the SDK
+
+**Python:**
+\`\`\`bash
+pip install anthropic
+\`\`\`
+
+**JavaScript/TypeScript:**
+\`\`\`bash
+npm install @anthropic-ai/sdk
+\`\`\`
+
+---
+
+## First Request
+
+**Python:**
+\`\`\`python
+import anthropic
+
+client = anthropic.Anthropic(api_key="sk-ant-...")
+
+message = client.messages.create(
+    model="claude-opus-4-7",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "Hello Claude!"}
+    ]
+)
+
+print(message.content[0].text)
+\`\`\`
+
+**JavaScript:**
+\`\`\`javascript
+import Anthropic from '@anthropic-ai/sdk';
+
+const client = new Anthropic({ apiKey: 'sk-ant-...' });
+
+const message = await client.messages.create({
+  model: 'claude-opus-4-7',
+  max_tokens: 1024,
+  messages: [{ role: 'user', content: 'Hello Claude!' }],
+});
+
+console.log(message.content[0].text);
+\`\`\`
+
+---
+
+## Core Parameters
+
+| Parameter | Purpose | Example |
+|---|---|---|
+| \`model\` | Which model to use | \`"claude-opus-4-7"\` |
+| \`max_tokens\` | Max response length | \`1024\` |
+| \`messages\` | Conversation history | \`[{role, content}]\` |
+| \`system\` | System prompt | \`"You are..."\` |
+
+---
+
+## Security Tip 🔒
+
+**Don't put the key directly in code!**
+
+\`\`\`python
+# ❌ Wrong
+client = anthropic.Anthropic(api_key="sk-ant-abc123")
+
+# ✅ Right — use environment variable
+import os
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+\`\`\``,
+
+    quiz: [
+      {
+        id: 'q14-1',
+        questionAr: 'الـ Claude API بيعمل إيه؟',
+        questionEn: 'What does the Claude API do?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'بيخلي برامجك تتواصل مع Claude مباشرة', textEn: 'Lets your programs communicate with Claude directly', isCorrect: true },
+          { id: 'o2', textAr: 'بيفتح متصفح ويكتب تلقائياً', textEn: 'Opens a browser and types automatically', isCorrect: false },
+          { id: 'o3', textAr: 'بيتيح تحميل Claude على جهازك', textEn: 'Allows downloading Claude to your device', isCorrect: false },
+          { id: 'o4', textAr: 'بيعمل ترجمة فقط', textEn: 'Only does translation', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q14-2',
+        questionAr: 'الطريقة الصح لحفظ الـ API Key في الكود؟',
+        questionEn: 'The correct way to store the API Key in code?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'متغير بيئة (Environment Variable)', textEn: 'Environment Variable', isCorrect: true },
+          { id: 'o2', textAr: 'مباشرة في الكود كـ string', textEn: 'Directly in code as a string', isCorrect: false },
+          { id: 'o3', textAr: 'في ملف README', textEn: 'In a README file', isCorrect: false },
+          { id: 'o4', textAr: 'في اسم الـ variable', textEn: 'In the variable name', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q14-3',
+        questionAr: 'الـ max_tokens بيتحكم في؟',
+        questionEn: 'max_tokens controls?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'أقصى طول للرد', textEn: 'Maximum length of the response', isCorrect: true },
+          { id: 'o2', textAr: 'سرعة الاستجابة', textEn: 'Response speed', isCorrect: false },
+          { id: 'o3', textAr: 'عدد الطلبات في اليوم', textEn: 'Number of requests per day', isCorrect: false },
+          { id: 'o4', textAr: 'سعر الطلب', textEn: 'Request price', isCorrect: false },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 15,
+    slug: 'messages-api',
+    agentSlug: 'claude',
+    titleAr: 'Messages API — المحادثة',
+    titleEn: 'Messages API — Conversation',
+    descriptionAr: 'إزاي تبني محادثة متعددة الأدوار مع Claude في كودك.',
+    descriptionEn: 'How to build a multi-turn conversation with Claude in your code.',
+    order: 15,
+    xpReward: 90,
+    estimatedMinutes: 11,
+    emoji: '💬',
+    contentAr: `## Messages API
+
+الـ **Messages API** هو القلب النابض لـ Claude API. كل طلب بتبعته بيكون على شكل قائمة رسائل بـ \`role\` و \`content\`.
+
+---
+
+## هيكل الرسائل
+
+\`\`\`python
+messages = [
+    {"role": "user",      "content": "مرحبا"},
+    {"role": "assistant", "content": "أهلاً! كيف أساعدك؟"},
+    {"role": "user",      "content": "عايز أتعلم Python"},
+]
+\`\`\`
+
+**الـ roles المتاحة:**
+- \`"user"\` — رسائل المستخدم
+- \`"assistant"\` — ردود Claude
+
+---
+
+## محادثة متعددة الأدوار
+
+عشان Claude يتذكر المحادثة السابقة، بتبعت **كل التاريخ** في كل request:
+
+\`\`\`python
+import anthropic
+
+client = anthropic.Anthropic()
+conversation = []
+
+def chat(user_message):
+    conversation.append({
+        "role": "user",
+        "content": user_message
+    })
+
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=1024,
+        messages=conversation
+    )
+
+    assistant_reply = response.content[0].text
+    conversation.append({
+        "role": "assistant",
+        "content": assistant_reply
+    })
+
+    return assistant_reply
+
+# استخدام
+print(chat("اسمي أحمد"))
+print(chat("إيه اسمي؟"))  # هيقول: اسمك أحمد ✅
+\`\`\`
+
+---
+
+## بنية الـ Response
+
+\`\`\`python
+response = client.messages.create(...)
+
+# النص الرئيسي
+text = response.content[0].text
+
+# معلومات الاستخدام
+print(response.usage.input_tokens)   # tokens الـ input
+print(response.usage.output_tokens)  # tokens الـ output
+
+# سبب التوقف
+print(response.stop_reason)  # "end_turn" أو "max_tokens"
+\`\`\`
+
+---
+
+## Content Blocks
+
+الـ \`content\` ممكن يكون أكتر من نص:
+
+\`\`\`python
+# رسالة فيها نص وصورة
+messages = [{
+    "role": "user",
+    "content": [
+        {"type": "text", "text": "إيه اللي في الصورة دي؟"},
+        {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": "image/jpeg",
+                "data": "<base64_data>"
+            }
+        }
+    ]
+}]
+\`\`\`
+
+---
+
+## حدود مهمة 📊
+
+| النموذج | Context Window |
+|---|---|
+| claude-opus-4-7 | 1M token |
+| claude-haiku-4-5 | 200K token |
+
+لو المحادثة طويلة جداً، بتحتاج تعمل تلخيص أو truncation للرسائل القديمة.`,
+
+    contentEn: `## Messages API
+
+The **Messages API** is the core of Claude API. Every request you send is a list of messages with \`role\` and \`content\`.
+
+---
+
+## Message Structure
+
+\`\`\`python
+messages = [
+    {"role": "user",      "content": "Hello"},
+    {"role": "assistant", "content": "Hi! How can I help?"},
+    {"role": "user",      "content": "I want to learn Python"},
+]
+\`\`\`
+
+**Available roles:**
+- \`"user"\` — user messages
+- \`"assistant"\` — Claude's replies
+
+---
+
+## Multi-turn Conversation
+
+For Claude to remember previous conversation, you send **the entire history** in every request:
+
+\`\`\`python
+import anthropic
+
+client = anthropic.Anthropic()
+conversation = []
+
+def chat(user_message):
+    conversation.append({
+        "role": "user",
+        "content": user_message
+    })
+
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=1024,
+        messages=conversation
+    )
+
+    assistant_reply = response.content[0].text
+    conversation.append({
+        "role": "assistant",
+        "content": assistant_reply
+    })
+
+    return assistant_reply
+
+# Usage
+print(chat("My name is Ahmed"))
+print(chat("What's my name?"))  # Will say: Your name is Ahmed ✅
+\`\`\`
+
+---
+
+## Response Structure
+
+\`\`\`python
+response = client.messages.create(...)
+
+# Main text
+text = response.content[0].text
+
+# Usage info
+print(response.usage.input_tokens)   # input tokens
+print(response.usage.output_tokens)  # output tokens
+
+# Stop reason
+print(response.stop_reason)  # "end_turn" or "max_tokens"
+\`\`\`
+
+---
+
+## Content Blocks
+
+\`content\` can be more than just text:
+
+\`\`\`python
+# Message with text and image
+messages = [{
+    "role": "user",
+    "content": [
+        {"type": "text", "text": "What's in this image?"},
+        {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": "image/jpeg",
+                "data": "<base64_data>"
+            }
+        }
+    ]
+}]
+\`\`\`
+
+---
+
+## Important Limits 📊
+
+| Model | Context Window |
+|---|---|
+| claude-opus-4-7 | 1M tokens |
+| claude-haiku-4-5 | 200K tokens |
+
+If the conversation gets too long, you'll need to summarize or truncate old messages.`,
+
+    quiz: [
+      {
+        id: 'q15-1',
+        questionAr: 'ليه بنبعت كل تاريخ المحادثة في كل request؟',
+        questionEn: 'Why do we send the entire conversation history in every request?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'عشان Claude مش بيحتفظ بذاكرة بين الـ requests', textEn: 'Because Claude has no memory between requests', isCorrect: true },
+          { id: 'o2', textAr: 'عشان ده أسرع', textEn: 'Because it\'s faster', isCorrect: false },
+          { id: 'o3', textAr: 'متطلب من الـ API مش مهم', textEn: 'An API requirement that doesn\'t matter', isCorrect: false },
+          { id: 'o4', textAr: 'عشان نوفر tokens', textEn: 'To save tokens', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q15-2',
+        questionAr: 'الـ stop_reason بيوضح؟',
+        questionEn: 'The stop_reason indicates?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'ليه Claude وقف الرد', textEn: 'Why Claude stopped the response', isCorrect: true },
+          { id: 'o2', textAr: 'سرعة الرد', textEn: 'Response speed', isCorrect: false },
+          { id: 'o3', textAr: 'عدد الأخطاء', textEn: 'Number of errors', isCorrect: false },
+          { id: 'o4', textAr: 'حجم الملف', textEn: 'File size', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q15-3',
+        questionAr: 'صح ولا غلط: الـ content في الرسالة ممكن يحتوي على صورة ونص معاً',
+        questionEn: 'True or False: The content in a message can contain both image and text',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
+          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 16,
+    slug: 'streaming-api',
+    agentSlug: 'claude',
+    titleAr: 'Streaming — الرد الفوري',
+    titleEn: 'Streaming — Real-time Response',
+    descriptionAr: 'اعمل تجربة ChatGPT في تطبيقك — الكلام يظهر كلمة كلمة.',
+    descriptionEn: 'Build a ChatGPT-like experience in your app — words appear one by one.',
+    order: 16,
+    xpReward: 95,
+    estimatedMinutes: 11,
+    emoji: '⚡',
+    contentAr: `## Streaming
+
+الـ **Streaming** بيخلي الرد يظهر تدريجياً — كلمة كلمة — بدل ما تستنى الرد كله قبل ما يظهر.
+
+---
+
+## ليه Streaming؟
+
+| بدون Streaming | مع Streaming |
+|---|---|
+| تستنى 5-10 ثواني | أول كلمة تظهر في < 1 ثانية |
+| صفحة فاضية | المستخدم بيشوف الرد فوراً |
+| تجربة سيئة | تجربة ممتازة |
+
+---
+
+## Python — Streaming
+
+\`\`\`python
+import anthropic
+
+client = anthropic.Anthropic()
+
+with client.messages.stream(
+    model="claude-opus-4-7",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "اكتب قصيدة عن النيل"}]
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+
+print()  # سطر جديد في الآخر
+\`\`\`
+
+---
+
+## JavaScript — Streaming
+
+\`\`\`javascript
+import Anthropic from '@anthropic-ai/sdk';
+
+const client = new Anthropic();
+
+const stream = await client.messages.create({
+  model: 'claude-opus-4-7',
+  max_tokens: 1024,
+  messages: [{ role: 'user', content: 'اكتب قصيدة عن النيل' }],
+  stream: true,
+});
+
+for await (const event of stream) {
+  if (event.type === 'content_block_delta') {
+    process.stdout.write(event.delta.text);
+  }
+}
+\`\`\`
+
+---
+
+## الـ Events في الـ Stream
+
+\`\`\`
+message_start        → بداية الرسالة (فيها usage معلومات)
+content_block_start  → بداية block جديد
+content_block_delta  → جزء جديد من النص ← هنا بتطبع
+content_block_stop   → نهاية الـ block
+message_delta        → تحديث على مستوى الرسالة
+message_stop         → انتهى كل شيء
+\`\`\`
+
+---
+
+## في الـ Web (Next.js/React)
+
+\`\`\`typescript
+// API Route
+export async function POST(req: Request) {
+  const { message } = await req.json();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const response = await anthropic.messages.create({
+        model: 'claude-opus-4-7',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: message }],
+        stream: true,
+      });
+
+      for await (const event of response) {
+        if (event.type === 'content_block_delta') {
+          controller.enqueue(
+            new TextEncoder().encode(event.delta.text)
+          );
+        }
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(stream);
+}
+\`\`\`
+
+---
+
+## نصيحة الـ UX 💡
+
+دايماً استخدم Streaming في تطبيقاتك — المستخدمين بيكرهوا الانتظار. حتى لو الرد بطيء، لما يشوف الكلمات بتتكتب، بيحس إن الـ app سريع!`,
+
+    contentEn: `## Streaming
+
+**Streaming** makes the response appear progressively — word by word — instead of waiting for the entire response before it shows.
+
+---
+
+## Why Streaming?
+
+| Without Streaming | With Streaming |
+|---|---|
+| Wait 5-10 seconds | First word appears in < 1 second |
+| Blank page | User sees response immediately |
+| Bad experience | Excellent experience |
+
+---
+
+## Python — Streaming
+
+\`\`\`python
+import anthropic
+
+client = anthropic.Anthropic()
+
+with client.messages.stream(
+    model="claude-opus-4-7",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Write a poem about the Nile"}]
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+
+print()  # newline at the end
+\`\`\`
+
+---
+
+## JavaScript — Streaming
+
+\`\`\`javascript
+import Anthropic from '@anthropic-ai/sdk';
+
+const client = new Anthropic();
+
+const stream = await client.messages.create({
+  model: 'claude-opus-4-7',
+  max_tokens: 1024,
+  messages: [{ role: 'user', content: 'Write a poem about the Nile' }],
+  stream: true,
+});
+
+for await (const event of stream) {
+  if (event.type === 'content_block_delta') {
+    process.stdout.write(event.delta.text);
+  }
+}
+\`\`\`
+
+---
+
+## Events in the Stream
+
+\`\`\`
+message_start        → Message started (has usage info)
+content_block_start  → New block started
+content_block_delta  → New chunk of text ← print here
+content_block_stop   → Block ended
+message_delta        → Message-level update
+message_stop         → Everything done
+\`\`\`
+
+---
+
+## In the Web (Next.js/React)
+
+\`\`\`typescript
+// API Route
+export async function POST(req: Request) {
+  const { message } = await req.json();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const response = await anthropic.messages.create({
+        model: 'claude-opus-4-7',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: message }],
+        stream: true,
+      });
+
+      for await (const event of response) {
+        if (event.type === 'content_block_delta') {
+          controller.enqueue(
+            new TextEncoder().encode(event.delta.text)
+          );
+        }
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(stream);
+}
+\`\`\`
+
+---
+
+## UX Tip 💡
+
+Always use Streaming in your apps — users hate waiting. Even if the response is slow, seeing words appearing makes the app feel fast!`,
+
+    quiz: [
+      {
+        id: 'q16-1',
+        questionAr: 'الميزة الرئيسية للـ Streaming؟',
+        questionEn: 'The main benefit of Streaming?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'الرد يظهر تدريجياً فوراً بدل الانتظار', textEn: 'Response appears progressively instead of waiting', isCorrect: true },
+          { id: 'o2', textAr: 'يوفر تكلفة الـ API', textEn: 'Saves API cost', isCorrect: false },
+          { id: 'o3', textAr: 'يجعل Claude أذكى', textEn: 'Makes Claude smarter', isCorrect: false },
+          { id: 'o4', textAr: 'يزيد عدد الـ tokens', textEn: 'Increases token count', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q16-2',
+        questionAr: 'أنهي event فيه النص الجديد في الـ Stream؟',
+        questionEn: 'Which event contains the new text in the Stream?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'content_block_delta', textEn: 'content_block_delta', isCorrect: true },
+          { id: 'o2', textAr: 'message_start', textEn: 'message_start', isCorrect: false },
+          { id: 'o3', textAr: 'message_stop', textEn: 'message_stop', isCorrect: false },
+          { id: 'o4', textAr: 'content_block_stop', textEn: 'content_block_stop', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q16-3',
+        questionAr: 'صح ولا غلط: Streaming بيغير جودة الرد',
+        questionEn: 'True or False: Streaming changes the quality of the response',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
+          { id: 'o2', textAr: 'غلط — بس طريقة التسليم اللي بتتغير', textEn: 'False — only the delivery method changes', isCorrect: true },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 17,
+    slug: 'tool-use',
+    agentSlug: 'claude',
+    titleAr: 'Tool Use — اديه أدوات',
+    titleEn: 'Tool Use — Give It Tools',
+    descriptionAr: 'اربط Claude بدوال في كودك — كالك يجيب بيانات حقيقية.',
+    descriptionEn: 'Connect Claude to functions in your code — let it fetch real data.',
+    order: 17,
+    xpReward: 100,
+    estimatedMinutes: 13,
+    emoji: '🔧',
+    contentAr: `## Tool Use
+
+الـ **Tool Use** (أو Function Calling) بيخلي Claude يطلب من برنامجك ينفذ دالة معينة ويرجعله النتيجة.
+
+---
+
+## فكرة بسيطة
+
+\`\`\`
+المستخدم: "إيه درجة الحرارة دلوقتي في القاهرة؟"
+
+Claude: لا أعرف — بس ممكن أطلب من البرنامج
+
+البرنامج: [يستدعي get_weather("القاهرة")]
+
+الـ API: درجة الحرارة 28°C
+
+Claude: "درجة الحرارة دلوقتي في القاهرة 28°C ☀️"
+\`\`\`
+
+---
+
+## تعريف الـ Tool
+
+\`\`\`python
+tools = [
+    {
+        "name": "get_weather",
+        "description": "يجيب الطقس الحالي لمدينة معينة",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "اسم المدينة"
+                }
+            },
+            "required": ["city"]
+        }
+    }
+]
+\`\`\`
+
+---
+
+## الـ Loop الكامل
+
+\`\`\`python
+import anthropic, json
+
+client = anthropic.Anthropic()
+
+def get_weather(city: str) -> str:
+    # في الحقيقة هتستدعي API حقيقي
+    return f"درجة الحرارة في {city}: 28°C ☀️"
+
+messages = [{"role": "user", "content": "إيه الطقس في القاهرة؟"}]
+
+while True:
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+
+    # لو Claude طلب tool
+    if response.stop_reason == "tool_use":
+        tool_call = next(b for b in response.content if b.type == "tool_use")
+
+        # نفذ الـ function
+        result = get_weather(**tool_call.input)
+
+        # أضف النتيجة للمحادثة
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({
+            "role": "user",
+            "content": [{
+                "type": "tool_result",
+                "tool_use_id": tool_call.id,
+                "content": result
+            }]
+        })
+    else:
+        # Claude وصل للإجابة النهائية
+        print(response.content[0].text)
+        break
+\`\`\`
+
+---
+
+## أمثلة على Tools مفيدة
+
+| Tool | الوظيفة |
+|---|---|
+| \`search_web\` | البحث في الإنترنت |
+| \`get_current_time\` | الوقت الحالي |
+| \`query_database\` | استعلام من DB |
+| \`send_email\` | إرسال إيميل |
+| \`create_file\` | إنشاء ملف |
+| \`calculate\` | حسابات دقيقة |
+
+---
+
+## متى تستخدم Tool Use؟
+
+✅ لما Claude محتاج بيانات real-time (طقس، أسعار)
+✅ لما محتاج يتفاعل مع نظامك (DB، APIs)
+✅ لما محتاج يعمل حسابات دقيقة جداً
+❌ للمهام الإبداعية البحتة (كتابة، ترجمة)`,
+
+    contentEn: `## Tool Use
+
+**Tool Use** (or Function Calling) lets Claude ask your program to execute a specific function and return the result.
+
+---
+
+## Simple Concept
+
+\`\`\`
+User: "What's the current temperature in Cairo?"
+
+Claude: I don't know — but I can ask the program
+
+Program: [calls get_weather("Cairo")]
+
+API: Temperature is 28°C
+
+Claude: "The current temperature in Cairo is 28°C ☀️"
+\`\`\`
+
+---
+
+## Defining a Tool
+
+\`\`\`python
+tools = [
+    {
+        "name": "get_weather",
+        "description": "Gets the current weather for a given city",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "The city name"
+                }
+            },
+            "required": ["city"]
+        }
+    }
+]
+\`\`\`
+
+---
+
+## The Full Loop
+
+\`\`\`python
+import anthropic, json
+
+client = anthropic.Anthropic()
+
+def get_weather(city: str) -> str:
+    # In reality you'd call a real API
+    return f"Temperature in {city}: 28°C ☀️"
+
+messages = [{"role": "user", "content": "What's the weather in Cairo?"}]
+
+while True:
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+
+    # If Claude requested a tool
+    if response.stop_reason == "tool_use":
+        tool_call = next(b for b in response.content if b.type == "tool_use")
+
+        # Execute the function
+        result = get_weather(**tool_call.input)
+
+        # Add result to conversation
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({
+            "role": "user",
+            "content": [{
+                "type": "tool_result",
+                "tool_use_id": tool_call.id,
+                "content": result
+            }]
+        })
+    else:
+        # Claude reached the final answer
+        print(response.content[0].text)
+        break
+\`\`\`
+
+---
+
+## Useful Tool Examples
+
+| Tool | Purpose |
+|---|---|
+| \`search_web\` | Search the internet |
+| \`get_current_time\` | Current time |
+| \`query_database\` | Query a DB |
+| \`send_email\` | Send email |
+| \`create_file\` | Create a file |
+| \`calculate\` | Precise calculations |
+
+---
+
+## When to Use Tool Use?
+
+✅ When Claude needs real-time data (weather, prices)
+✅ When it needs to interact with your system (DB, APIs)
+✅ When it needs very precise calculations
+❌ For purely creative tasks (writing, translation)`,
+
+    quiz: [
+      {
+        id: 'q17-1',
+        questionAr: 'الـ Tool Use بيحل مشكلة إيه؟',
+        questionEn: 'What problem does Tool Use solve?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'يخلي Claude يوصل لبيانات خارجية ويتفاعل مع الأنظمة', textEn: 'Lets Claude access external data and interact with systems', isCorrect: true },
+          { id: 'o2', textAr: 'يجعل Claude أسرع', textEn: 'Makes Claude faster', isCorrect: false },
+          { id: 'o3', textAr: 'يقلل تكلفة الـ API', textEn: 'Reduces API cost', isCorrect: false },
+          { id: 'o4', textAr: 'يترجم بشكل أحسن', textEn: 'Translates better', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q17-2',
+        questionAr: 'لما الـ stop_reason يكون "tool_use"، معناه؟',
+        questionEn: 'When stop_reason is "tool_use", it means?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'Claude محتاج ينفذ tool قبل ما يكمل الإجابة', textEn: 'Claude needs to execute a tool before continuing the answer', isCorrect: true },
+          { id: 'o2', textAr: 'الإجابة اتكملت', textEn: 'The answer is complete', isCorrect: false },
+          { id: 'o3', textAr: 'في error في الـ API', textEn: 'There\'s an API error', isCorrect: false },
+          { id: 'o4', textAr: 'وصل لـ max_tokens', textEn: 'Reached max_tokens', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q17-3',
+        questionAr: 'صح ولا غلط: Tool Use مفيد لمهام الكتابة الإبداعية البحتة',
+        questionEn: 'True or False: Tool Use is useful for purely creative writing tasks',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
+          { id: 'o2', textAr: 'غلط — مفيش داعي للـ tools في المهام الإبداعية', textEn: 'False — no need for tools in creative tasks', isCorrect: true },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 18,
+    slug: 'prompt-caching',
+    agentSlug: 'claude',
+    titleAr: 'Prompt Caching — وفّر فلوس',
+    titleEn: 'Prompt Caching — Save Money',
+    descriptionAr: 'خلي Claude يحفظ الـ context الطويل ووفّر 90% من التكلفة.',
+    descriptionEn: 'Let Claude cache long context and save 90% of the cost.',
+    order: 18,
+    xpReward: 95,
+    estimatedMinutes: 10,
+    emoji: '💰',
+    contentAr: `## Prompt Caching
+
+الـ **Prompt Caching** بيخلي Claude يحتفظ بأجزاء من الـ prompt في الذاكرة — عشان متبعتش نفس المحتوى الطويل في كل request.
+
+---
+
+## المشكلة بدون Caching
+
+لو عندك System Prompt طويل (مثلاً 10,000 token):
+
+\`\`\`
+Request 1:  System (10K tokens) + Message (50 tokens) = 10,050 tokens
+Request 2:  System (10K tokens) + Message (50 tokens) = 10,050 tokens
+Request 3:  System (10K tokens) + Message (50 tokens) = 10,050 tokens
+
+التكلفة = 3 × 10,050 = 30,150 tokens 💸
+\`\`\`
+
+---
+
+## مع Caching
+
+\`\`\`
+Request 1:  System (10K — بيتحسب كامل) + Message = 10,050 tokens
+Request 2:  System (CACHED ✅) + Message = 50 tokens فقط
+Request 3:  System (CACHED ✅) + Message = 50 tokens فقط
+
+التكلفة = ~10,100 tokens بس! 💪
+\`\`\`
+
+---
+
+## إزاي تفعّله؟
+
+بتضيف \`cache_control\` على الجزء اللي عايزه يتحفظ:
+
+\`\`\`python
+response = client.messages.create(
+    model="claude-opus-4-7",
+    max_tokens=1024,
+    system=[
+        {
+            "type": "text",
+            "text": "أنت مساعد ذكاوي... [نص طويل جداً]",
+            "cache_control": {"type": "ephemeral"}
+        }
+    ],
+    messages=[{"role": "user", "content": "سؤالي هنا"}]
+)
+\`\`\`
+
+---
+
+## الـ Cache بيستمر قد إيه؟
+
+- الـ \`ephemeral\` cache بيعيش **5 دقايق** من آخر استخدام
+- لو بعت request قبل ما تنتهي الـ 5 دقايق، الـ cache بيتجدد تلقائياً
+
+---
+
+## متى تستخدم Caching؟
+
+✅ System Prompt طويل (> 1024 token)
+✅ وثائق أو PDF بتبعتها في كل request
+✅ Chatbot بيكرر نفس السياق
+✅ Few-shot examples طويلة
+
+---
+
+## التوفير الحقيقي 💰
+
+| | بدون Cache | مع Cache |
+|---|---|---|
+| **السعر** | كامل input price | 10% من input price |
+| **التوفير** | — | 90% على الـ cached tokens |
+
+لو عندك تطبيق بـ 1000 request/يوم مع system prompt طويل، الـ caching ممكن يوفر عليك آلاف الدولارات شهرياً!`,
+
+    contentEn: `## Prompt Caching
+
+**Prompt Caching** lets Claude keep parts of the prompt in memory — so you don't resend the same long content in every request.
+
+---
+
+## The Problem Without Caching
+
+If you have a long System Prompt (e.g., 10,000 tokens):
+
+\`\`\`
+Request 1:  System (10K tokens) + Message (50 tokens) = 10,050 tokens
+Request 2:  System (10K tokens) + Message (50 tokens) = 10,050 tokens
+Request 3:  System (10K tokens) + Message (50 tokens) = 10,050 tokens
+
+Cost = 3 × 10,050 = 30,150 tokens 💸
+\`\`\`
+
+---
+
+## With Caching
+
+\`\`\`
+Request 1:  System (10K — charged in full) + Message = 10,050 tokens
+Request 2:  System (CACHED ✅) + Message = 50 tokens only
+Request 3:  System (CACHED ✅) + Message = 50 tokens only
+
+Cost = ~10,100 tokens total! 💪
+\`\`\`
+
+---
+
+## How to Enable It?
+
+Add \`cache_control\` to the part you want cached:
+
+\`\`\`python
+response = client.messages.create(
+    model="claude-opus-4-7",
+    max_tokens=1024,
+    system=[
+        {
+            "type": "text",
+            "text": "You are a Zkawi assistant... [very long text]",
+            "cache_control": {"type": "ephemeral"}
+        }
+    ],
+    messages=[{"role": "user", "content": "My question here"}]
+)
+\`\`\`
+
+---
+
+## How Long Does Cache Last?
+
+- \`ephemeral\` cache lives for **5 minutes** from last use
+- If you send a request before the 5 minutes expire, the cache auto-renews
+
+---
+
+## When to Use Caching?
+
+✅ Long System Prompt (> 1024 tokens)
+✅ Documents or PDFs sent in every request
+✅ Chatbot repeating the same context
+✅ Long few-shot examples
+
+---
+
+## Real Savings 💰
+
+| | Without Cache | With Cache |
+|---|---|---|
+| **Price** | Full input price | 10% of input price |
+| **Savings** | — | 90% on cached tokens |
+
+If you have an app with 1000 requests/day with a long system prompt, caching can save you thousands of dollars monthly!`,
+
+    quiz: [
+      {
+        id: 'q18-1',
+        questionAr: 'الـ Prompt Caching بيوفر على التكلفة إزاي؟',
+        questionEn: 'How does Prompt Caching save on cost?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'بيحسب الـ cached tokens بـ 10% من سعرهم الأصلي', textEn: 'Charges cached tokens at 10% of their original price', isCorrect: true },
+          { id: 'o2', textAr: 'بيلغي فلوس الـ output tokens', textEn: 'Eliminates output token charges', isCorrect: false },
+          { id: 'o3', textAr: 'بيخلي الـ API مجاناً', textEn: 'Makes the API free', isCorrect: false },
+          { id: 'o4', textAr: 'بيقلل حجم الـ response', textEn: 'Reduces response size', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q18-2',
+        questionAr: 'الـ ephemeral cache بيعيش قد إيه؟',
+        questionEn: 'How long does the ephemeral cache last?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: '5 دقايق من آخر استخدام', textEn: '5 minutes from last use', isCorrect: true },
+          { id: 'o2', textAr: '24 ساعة', textEn: '24 hours', isCorrect: false },
+          { id: 'o3', textAr: '30 ثانية', textEn: '30 seconds', isCorrect: false },
+          { id: 'o4', textAr: 'للأبد', textEn: 'Forever', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q18-3',
+        questionAr: 'أنهي حالة من دول الأنسب للـ Caching؟',
+        questionEn: 'Which scenario is best suited for Caching?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'Chatbot بـ System Prompt طويل بيتكرر في كل request', textEn: 'Chatbot with long System Prompt repeated in every request', isCorrect: true },
+          { id: 'o2', textAr: 'سؤال واحد بسيط', textEn: 'A single simple question', isCorrect: false },
+          { id: 'o3', textAr: 'ترجمة كلمة', textEn: 'Translating a word', isCorrect: false },
+          { id: 'o4', textAr: 'توليد صورة', textEn: 'Generating an image', isCorrect: false },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 19,
+    slug: 'api-best-practices',
+    agentSlug: 'claude',
+    titleAr: 'أفضل الممارسات — API',
+    titleEn: 'Best Practices — API',
+    descriptionAr: 'نصائح الـ pro لبناء تطبيقات Claude محترفة وآمنة واقتصادية.',
+    descriptionEn: 'Pro tips for building professional, secure, and cost-efficient Claude apps.',
+    order: 19,
+    xpReward: 100,
+    estimatedMinutes: 12,
+    emoji: '🏅',
+    contentAr: `## أفضل الممارسات — Claude API
+
+وصلت لآخر درس في track الـ API! دي أهم النصائح اللي هتفرق بين مطور مبتدئ ومحترف.
+
+---
+
+## 1. الأمان أولاً 🔒
+
+\`\`\`python
+# ❌ غلط جداً
+api_key = "sk-ant-abc123"
+client = anthropic.Anthropic(api_key=api_key)
+
+# ✅ صح
+import os
+from dotenv import load_dotenv
+load_dotenv()
+client = anthropic.Anthropic()  # بياخد من ANTHROPIC_API_KEY تلقائياً
+\`\`\`
+
+**قواعد الأمان:**
+- مش تحط المفتاح في الكود أو الـ git
+- استخدم \`.env\` files واضفها لـ \`.gitignore\`
+- على السيرفر: استخدم Environment Variables
+- روتيت المفاتيح دورياً (كل شهر مثلاً)
+
+---
+
+## 2. اختار النموذج الصح 🤖
+
+| النموذج | الاستخدام | التكلفة |
+|---|---|---|
+| claude-opus-4-7 | المهام المعقدة، الكتابة، التحليل | عالية |
+| claude-haiku-4-5 | التصنيف، الترجمة، المهام البسيطة | منخفضة |
+
+**قاعدة:** ابدأ بـ Haiku وانتقل لـ Opus لو النتيجة مش كافية.
+
+---
+
+## 3. Error Handling ⚠️
+
+\`\`\`python
+from anthropic import APIError, RateLimitError, APIConnectionError
+import time
+
+def safe_request(messages, retries=3):
+    for attempt in range(retries):
+        try:
+            return client.messages.create(
+                model="claude-opus-4-7",
+                max_tokens=1024,
+                messages=messages
+            )
+        except RateLimitError:
+            wait = 2 ** attempt  # exponential backoff
+            time.sleep(wait)
+        except APIConnectionError:
+            time.sleep(1)
+        except APIError as e:
+            print(f"API Error: {e.status_code}")
+            raise
+    raise Exception("فشل بعد كل المحاولات")
+\`\`\`
+
+---
+
+## 4. التحكم في التكلفة 💰
+
+\`\`\`python
+# راقب الاستخدام
+response = client.messages.create(...)
+print(f"Input: {response.usage.input_tokens} tokens")
+print(f"Output: {response.usage.output_tokens} tokens")
+
+# حدد سقف للـ output
+response = client.messages.create(
+    max_tokens=500,  # مش أكتر من 500 token في الرد
+    ...
+)
+\`\`\`
+
+**استراتيجيات التوفير:**
+- استخدم Haiku للـ tasks البسيطة
+- فعّل Prompt Caching للـ system prompts الطويلة
+- حدد \`max_tokens\` بشكل معقول
+- لا تبعت سياق أكتر من اللازم
+
+---
+
+## 5. Validation قبل الإرسال ✅
+
+\`\`\`python
+def validate_message(content: str) -> bool:
+    if not content or not content.strip():
+        return False
+    if len(content) > 100_000:  # حد معقول
+        return False
+    return True
+
+if validate_message(user_input):
+    response = safe_request([{"role": "user", "content": user_input}])
+\`\`\`
+
+---
+
+## 6. Rate Limits 📊
+
+Anthropic عنده حدود على عدد الـ requests:
+- لو وصلت للـ limit، بتاخد error 429
+- الحل: Exponential Backoff (زي المثال فوق)
+- للإنتاج: راقب الاستخدام من [console.anthropic.com](https://console.anthropic.com)
+
+---
+
+## 🎉 مبروك — خلصت Claude API Track!
+
+دلوقتي عندك كل المهارات اللازمة تبني تطبيقات حقيقية بـ Claude:
+
+- ✅ API Key والـ SDK
+- ✅ Messages API والمحادثات
+- ✅ Streaming
+- ✅ Tool Use
+- ✅ Prompt Caching
+- ✅ Best Practices
+
+الخطوة الجاية؟ ابني تطبيقك الأول! 🚀`,
+
+    contentEn: `## Best Practices — Claude API
+
+You've reached the last lesson in the API track! These are the most important tips that separate a beginner from a pro developer.
+
+---
+
+## 1. Security First 🔒
+
+\`\`\`python
+# ❌ Very wrong
+api_key = "sk-ant-abc123"
+client = anthropic.Anthropic(api_key=api_key)
+
+# ✅ Correct
+import os
+from dotenv import load_dotenv
+load_dotenv()
+client = anthropic.Anthropic()  # Auto-reads from ANTHROPIC_API_KEY
+\`\`\`
+
+**Security rules:**
+- Never put the key in code or git
+- Use \`.env\` files and add to \`.gitignore\`
+- On servers: use Environment Variables
+- Rotate keys periodically (monthly for example)
+
+---
+
+## 2. Choose the Right Model 🤖
+
+| Model | Use case | Cost |
+|---|---|---|
+| claude-opus-4-7 | Complex tasks, writing, analysis | High |
+| claude-haiku-4-5 | Classification, translation, simple tasks | Low |
+
+**Rule:** Start with Haiku, switch to Opus if results aren't good enough.
+
+---
+
+## 3. Error Handling ⚠️
+
+\`\`\`python
+from anthropic import APIError, RateLimitError, APIConnectionError
+import time
+
+def safe_request(messages, retries=3):
+    for attempt in range(retries):
+        try:
+            return client.messages.create(
+                model="claude-opus-4-7",
+                max_tokens=1024,
+                messages=messages
+            )
+        except RateLimitError:
+            wait = 2 ** attempt  # exponential backoff
+            time.sleep(wait)
+        except APIConnectionError:
+            time.sleep(1)
+        except APIError as e:
+            print(f"API Error: {e.status_code}")
+            raise
+    raise Exception("Failed after all retries")
+\`\`\`
+
+---
+
+## 4. Cost Control 💰
+
+\`\`\`python
+# Monitor usage
+response = client.messages.create(...)
+print(f"Input: {response.usage.input_tokens} tokens")
+print(f"Output: {response.usage.output_tokens} tokens")
+
+# Set output cap
+response = client.messages.create(
+    max_tokens=500,  # No more than 500 tokens in response
+    ...
+)
+\`\`\`
+
+**Saving strategies:**
+- Use Haiku for simple tasks
+- Enable Prompt Caching for long system prompts
+- Set reasonable \`max_tokens\`
+- Don't send more context than needed
+
+---
+
+## 5. Validate Before Sending ✅
+
+\`\`\`python
+def validate_message(content: str) -> bool:
+    if not content or not content.strip():
+        return False
+    if len(content) > 100_000:  # reasonable limit
+        return False
+    return True
+
+if validate_message(user_input):
+    response = safe_request([{"role": "user", "content": user_input}])
+\`\`\`
+
+---
+
+## 6. Rate Limits 📊
+
+Anthropic has limits on request count:
+- If you hit the limit, you get a 429 error
+- Solution: Exponential Backoff (like the example above)
+- For production: Monitor usage from [console.anthropic.com](https://console.anthropic.com)
+
+---
+
+## 🎉 Congratulations — You Finished the Claude API Track!
+
+You now have all the skills needed to build real apps with Claude:
+
+- ✅ API Key and SDK
+- ✅ Messages API and conversations
+- ✅ Streaming
+- ✅ Tool Use
+- ✅ Prompt Caching
+- ✅ Best Practices
+
+Next step? Build your first real app! 🚀`,
+
+    quiz: [
+      {
+        id: 'q19-1',
+        questionAr: 'لو وصلت لـ Rate Limit، إيه أحسن حل؟',
+        questionEn: 'If you hit a Rate Limit, what\'s the best solution?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'Exponential Backoff — انتظر وجرب تاني', textEn: 'Exponential Backoff — wait and retry', isCorrect: true },
+          { id: 'o2', textAr: 'ابعت أكتر requests بسرعة', textEn: 'Send more requests faster', isCorrect: false },
+          { id: 'o3', textAr: 'غيّر الـ API Key', textEn: 'Change the API Key', isCorrect: false },
+          { id: 'o4', textAr: 'وقّف التطبيق', textEn: 'Stop the application', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q19-2',
+        questionAr: 'للمهام البسيطة زي التصنيف، أحسن نموذج؟',
+        questionEn: 'For simple tasks like classification, the best model is?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'claude-haiku-4-5 (أرخص وأسرع)', textEn: 'claude-haiku-4-5 (cheaper and faster)', isCorrect: true },
+          { id: 'o2', textAr: 'claude-opus-4-7 دايماً', textEn: 'claude-opus-4-7 always', isCorrect: false },
+          { id: 'o3', textAr: 'أي نموذج سواء', textEn: 'Any model is fine', isCorrect: false },
+          { id: 'o4', textAr: 'مفيش فرق في التكلفة', textEn: 'No difference in cost', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q19-3',
+        questionAr: 'صح ولا غلط: من الأفضل حفظ الـ API Key في ملف .env وإضافته لـ .gitignore',
+        questionEn: 'True or False: It\'s best to store the API Key in a .env file and add it to .gitignore',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح ✅', textEn: 'True ✅', isCorrect: true },
+          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+        ],
+      },
+    ],
+  },
+];
+
+const allLessons: Lesson[] = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons];
 
 export function getLessonsByAgent(agentSlug: string): Lesson[] {
   return allLessons.filter((l) => l.agentSlug === agentSlug).sort((a, b) => a.order - b.order);

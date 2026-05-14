@@ -18,11 +18,42 @@ const inter = Inter({
   display: 'swap',
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+
 export const metadata: Metadata = {
-  title: 'ذكاوي - تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة',
+  title: {
+    default: 'ذكاوي — تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة',
+    template: '%s | ذكاوي',
+  },
   description:
-    'منصة تعليمية للأطفال والكبار لتعلم الذكاء الاصطناعي بطريقة سهلة وممتعة. كسب XP وافتح إنجازات!',
-  keywords: ['ذكاء اصطناعي', 'تعلم', 'أطفال', 'Claude', 'AI', 'تعليم'],
+    'منصة تعليمية للأطفال والكبار لتعلم الذكاء الاصطناعي بطريقة سهلة وممتعة. كسب XP، افتح إنجازات، وبقى خبير AI!',
+  keywords: ['ذكاء اصطناعي', 'تعلم', 'أطفال', 'Claude', 'AI', 'تعليم', 'zkawi', 'ذكاوي'],
+  metadataBase: new URL(APP_URL),
+  authors: [{ name: 'ذكاوي' }],
+  creator: 'ذكاوي',
+  openGraph: {
+    type: 'website',
+    locale: 'ar_EG',
+    alternateLocale: 'en_US',
+    url: APP_URL,
+    siteName: 'ذكاوي',
+    title: 'ذكاوي — تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة',
+    description: 'منصة تعليمية تفاعلية للأطفال والكبار. كسب XP وافتح إنجازات!',
+    images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: 'ذكاوي' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ذكاوي — تعلم الذكاء الاصطناعي',
+    description: 'منصة تعليمية تفاعلية للأطفال والكبار',
+    images: ['/og-image.svg'],
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/logo-icon.svg',
+  },
+  manifest: '/manifest.json',
 };
 
 export function generateStaticParams() {

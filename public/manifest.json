@@ -1,0 +1,21 @@
+{
+  "name": "ذكاوي — تعلم الذكاء الاصطناعي",
+  "short_name": "ذكاوي",
+  "description": "منصة تعليمية تفاعلية للأطفال والكبار لتعلم الذكاء الاصطناعي",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF9F0",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/logo-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "kids"]
+}

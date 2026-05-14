@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#5B21B6"/>
+    </linearGradient>
+    <linearGradient id="eye-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#5B21B6" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="100" height="100" rx="24" fill="url(#bg-grad)"/>
+
+  <!-- Inner top highlight -->
+  <rect width="100" height="50" rx="24" fill="white" fill-opacity="0.06"/>
+
+  <!-- Antenna pole -->
+  <rect x="46" y="17" width="8" height="17" rx="4" fill="white" fill-opacity="0.9"/>
+
+  <!-- Gold star on antenna -->
+  <path d="M50 5 L52.4 12.6 L60 12.6 L54 17.2 L56.4 24.8 L50 20.2 L43.6 24.8 L46 17.2 L40 12.6 L47.6 12.6 Z" fill="#FCD34D"/>
+
+  <!-- Robot face (white rounded rect) -->
+  <rect x="16" y="33" width="68" height="52" rx="18" fill="white" fill-opacity="0.97" filter="url(#shadow)"/>
+
+  <!-- Left eye outer -->
+  <rect x="24" y="44" width="22" height="16" rx="8" fill="url(#eye-grad)"/>
+  <!-- Left eye pupil -->
+  <circle cx="35" cy="52" r="5" fill="#4C1D95"/>
+  <!-- Left eye highlight -->
+  <circle cx="38" cy="49" r="2.5" fill="white"/>
+  <circle cx="32" cy="55" r="1.5" fill="white" fill-opacity="0.5"/>
+
+  <!-- Right eye outer -->
+  <rect x="54" y="44" width="22" height="16" rx="8" fill="url(#eye-grad)"/>
+  <!-- Right eye pupil -->
+  <circle cx="65" cy="52" r="5" fill="#4C1D95"/>
+  <!-- Right eye highlight -->
+  <circle cx="68" cy="49" r="2.5" fill="white"/>
+  <circle cx="62" cy="55" r="1.5" fill="white" fill-opacity="0.5"/>
+
+  <!-- Smile -->
+  <path d="M30 68 Q50 80 70 68" stroke="#7C3AED" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Cheek blush left -->
+  <ellipse cx="22" cy="62" rx="6" ry="4" fill="#F472B6" fill-opacity="0.35"/>
+  <!-- Cheek blush right -->
+  <ellipse cx="78" cy="62" rx="6" ry="4" fill="#F472B6" fill-opacity="0.35"/>
+
+  <!-- Gold sparkle decorations -->
+  <circle cx="11" cy="18" r="4.5" fill="#FCD34D" fill-opacity="0.95"/>
+  <circle cx="88" cy="84" r="3.5" fill="#FCD34D" fill-opacity="0.85"/>
+  <circle cx="89" cy="14" r="2.5" fill="#FCD34D" fill-opacity="0.7"/>
+  <!-- Small diamond sparkle bottom-left -->
+  <path d="M10 76 L13 81 L16 76 L13 71 Z" fill="#FCD34D" fill-opacity="0.75"/>
+</svg>

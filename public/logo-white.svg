@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Same icon but with white/semi-transparent bg for dark backgrounds -->
+  <rect width="100" height="100" rx="24" fill="white" fill-opacity="0.15"/>
+  <rect width="100" height="100" rx="24" stroke="white" stroke-opacity="0.3" stroke-width="1.5"/>
+
+  <!-- Antenna pole -->
+  <rect x="46" y="17" width="8" height="17" rx="4" fill="white" fill-opacity="0.85"/>
+  <!-- Gold star -->
+  <path d="M50 5 L52.4 12.6 L60 12.6 L54 17.2 L56.4 24.8 L50 20.2 L43.6 24.8 L46 17.2 L40 12.6 L47.6 12.6 Z" fill="#FCD34D"/>
+
+  <!-- Robot face -->
+  <rect x="16" y="33" width="68" height="52" rx="18" fill="white" fill-opacity="0.2"/>
+
+  <!-- Eyes -->
+  <rect x="24" y="44" width="22" height="16" rx="8" fill="white" fill-opacity="0.9"/>
+  <rect x="54" y="44" width="22" height="16" rx="8" fill="white" fill-opacity="0.9"/>
+  <!-- Pupils -->
+  <circle cx="35" cy="52" r="5" fill="#7C3AED"/>
+  <circle cx="65" cy="52" r="5" fill="#7C3AED"/>
+  <!-- Highlights -->
+  <circle cx="38" cy="49" r="2" fill="white"/>
+  <circle cx="68" cy="49" r="2" fill="white"/>
+
+  <!-- Smile -->
+  <path d="M30 68 Q50 80 70 68" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Gold sparkles -->
+  <circle cx="11" cy="18" r="4" fill="#FCD34D" fill-opacity="0.9"/>
+  <circle cx="88" cy="84" r="3" fill="#FCD34D" fill-opacity="0.8"/>
+  <circle cx="89" cy="14" r="2" fill="#FCD34D" fill-opacity="0.7"/>
+</svg>

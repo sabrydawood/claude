@@ -4,3 +4,4 @@ export { Input } from './input';
 export { Badge, badgeVariants } from './badge';
 export { Progress } from './progress';
 export { Avatar, AvatarImage, AvatarFallback } from './avatar';
+export { Logo } from './logo';

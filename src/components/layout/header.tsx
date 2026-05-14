@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Zap, LogOut, LayoutDashboard, Home, User } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, Home, User } from 'lucide-react';
+import { Logo } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { signOut, useSession } from '@/lib/auth-client';
@@ -43,13 +44,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center shadow-lg shadow-purple-200 group-hover:scale-110 transition-transform">
-              <Zap size={20} className="text-white" fill="white" />
-            </div>
-            <span className="text-xl font-black text-purple-700 tracking-tight">
-              {t('common.appName')}
-            </span>
+          <Link href="/" className="group hover:opacity-90 transition-opacity">
+            <Logo size={40} showText textClassName="text-xl" />
           </Link>
 
           {/* Desktop Nav */}

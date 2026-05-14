@@ -1,15 +1,41 @@
 @import "tailwindcss";
 
+/* ─── ذكاوي Brand Tokens ─── */
 :root {
-  --background: #FFF9F0;
-  --foreground: #1a1a2e;
-  --primary: #7C3AED;
-  --primary-light: #A78BFA;
-  --secondary: #F59E0B;
-  --success: #10B981;
-  --danger: #EF4444;
-  --card-bg: #ffffff;
-  --border: #e5e7eb;
+  /* Colors */
+  --zkawi-primary:        #7C3AED;
+  --zkawi-primary-light:  #A855F7;
+  --zkawi-primary-faint:  #F5F3FF;
+  --zkawi-primary-dark:   #5B21B6;
+  --zkawi-accent:         #F59E0B;
+  --zkawi-accent-light:   #FCD34D;
+  --zkawi-success:        #10B981;
+  --zkawi-danger:         #EF4444;
+  --zkawi-warning:        #F59E0B;
+  --zkawi-bg:             #FFF9F0;
+  --zkawi-surface:        #FFFFFF;
+  --zkawi-text:           #1F2937;
+  --zkawi-muted:          #6B7280;
+  --zkawi-border:         #E5E7EB;
+
+  /* Typography */
+  --font-arabic:          'Cairo', sans-serif;
+  --font-latin:           'Inter', sans-serif;
+
+  /* Shadows */
+  --shadow-brand:         0 4px 24px -4px rgba(124,58,237,0.25);
+  --shadow-gold:          0 4px 16px -4px rgba(245,158,11,0.35);
+
+  /* Aliases for Tailwind compat */
+  --background:   var(--zkawi-bg);
+  --foreground:   var(--zkawi-text);
+  --primary:      var(--zkawi-primary);
+  --primary-light:var(--zkawi-primary-light);
+  --secondary:    var(--zkawi-accent);
+  --success:      var(--zkawi-success);
+  --danger:       var(--zkawi-danger);
+  --card-bg:      var(--zkawi-surface);
+  --border:       var(--zkawi-border);
 }
 
 @theme inline {

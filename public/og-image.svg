@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3B0764"/>
+      <stop offset="50%" stop-color="#4C1D95"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="icon-bg" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#5B21B6"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="blur-glow">
+      <feGaussianBlur stdDeviation="40" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Glow circles -->
+  <circle cx="200" cy="300" r="300" fill="#7C3AED" fill-opacity="0.12"/>
+  <circle cx="1000" cy="350" r="250" fill="#A855F7" fill-opacity="0.1"/>
+  <circle cx="600" cy="100" r="200" fill="#8B5CF6" fill-opacity="0.08"/>
+
+  <!-- Decorative dots grid -->
+  <g fill="white" fill-opacity="0.06">
+    <circle cx="100" cy="100" r="3"/><circle cx="200" cy="100" r="3"/><circle cx="300" cy="100" r="3"/><circle cx="400" cy="100" r="3"/>
+    <circle cx="100" cy="200" r="3"/><circle cx="200" cy="200" r="3"/><circle cx="300" cy="200" r="3"/><circle cx="400" cy="200" r="3"/>
+    <circle cx="800" cy="430" r="3"/><circle cx="900" cy="430" r="3"/><circle cx="1000" cy="430" r="3"/><circle cx="1100" cy="430" r="3"/>
+    <circle cx="800" cy="530" r="3"/><circle cx="900" cy="530" r="3"/><circle cx="1000" cy="530" r="3"/><circle cx="1100" cy="530" r="3"/>
+  </g>
+
+  <!-- Gold sparkles scattered -->
+  <circle cx="120" cy="500" r="8" fill="#FCD34D" fill-opacity="0.7"/>
+  <circle cx="1080" cy="120" r="10" fill="#FCD34D" fill-opacity="0.8"/>
+  <circle cx="980" cy="560" r="6" fill="#FCD34D" fill-opacity="0.6"/>
+  <circle cx="150" cy="150" r="5" fill="#FCD34D" fill-opacity="0.5"/>
+  <!-- Star shapes -->
+  <path d="M60 380 L63 390 L73 390 L65 396 L68 406 L60 400 L52 406 L55 396 L47 390 L57 390 Z" fill="#FCD34D" fill-opacity="0.5"/>
+  <path d="M1140 300 L1142 307 L1149 307 L1143 311 L1145 318 L1140 314 L1135 318 L1137 311 L1131 307 L1138 307 Z" fill="#FCD34D" fill-opacity="0.6"/>
+
+  <!-- Logo Icon (large, left side) -->
+  <g transform="translate(120, 165)">
+    <rect width="300" height="300" rx="72" fill="url(#icon-bg)"/>
+    <rect width="300" height="150" rx="72" fill="white" fill-opacity="0.07"/>
+    <!-- Antenna -->
+    <rect x="138" y="52" width="24" height="50" rx="12" fill="white" fill-opacity="0.9"/>
+    <!-- Star on antenna -->
+    <path d="M150 16 L157 39 L181 39 L162 52 L169 75 L150 62 L131 75 L138 52 L119 39 L143 39 Z" fill="#FCD34D"/>
+    <!-- Robot face -->
+    <rect x="48" y="100" width="204" height="155" rx="54" fill="white" fill-opacity="0.97"/>
+    <!-- Left eye -->
+    <rect x="72" y="132" width="66" height="48" rx="24" fill="#7C3AED"/>
+    <circle cx="105" cy="156" r="15" fill="#4C1D95"/>
+    <circle cx="114" cy="147" r="7" fill="white"/>
+    <!-- Right eye -->
+    <rect x="162" y="132" width="66" height="48" rx="24" fill="#7C3AED"/>
+    <circle cx="195" cy="156" r="15" fill="#4C1D95"/>
+    <circle cx="204" cy="147" r="7" fill="white"/>
+    <!-- Smile -->
+    <path d="M90 204 Q150 240 210 204" stroke="#7C3AED" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <!-- Blush -->
+    <ellipse cx="66" cy="186" rx="18" ry="12" fill="#F472B6" fill-opacity="0.3"/>
+    <ellipse cx="234" cy="186" rx="18" ry="12" fill="#F472B6" fill-opacity="0.3"/>
+  </g>
+
+  <!-- Brand Name (Arabic) -->
+  <text
+    x="520"
+    y="260"
+    font-family="Cairo, Arial, sans-serif"
+    font-weight="900"
+    font-size="120"
+    fill="white"
+    text-anchor="start"
+    direction="rtl"
+    letter-spacing="-2"
+  >ذكاوي</text>
+
+  <!-- Tagline Arabic -->
+  <text
+    x="520"
+    y="340"
+    font-family="Cairo, Arial, sans-serif"
+    font-weight="500"
+    font-size="36"
+    fill="white"
+    fill-opacity="0.75"
+    text-anchor="start"
+  >تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة</text>
+
+  <!-- English subtitle -->
+  <text
+    x="520"
+    y="395"
+    font-family="Arial, sans-serif"
+    font-weight="400"
+    font-size="28"
+    fill="white"
+    fill-opacity="0.45"
+    text-anchor="start"
+    letter-spacing="1"
+  >zkawi.app · Learn AI the fun way</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(520, 440)">
+    <!-- Pill 1 -->
+    <rect width="160" height="48" rx="24" fill="white" fill-opacity="0.12"/>
+    <text x="80" y="31" font-family="Cairo, Arial, sans-serif" font-size="20" fill="white" text-anchor="middle">🎮 تفاعلي</text>
+    <!-- Pill 2 -->
+    <rect x="176" width="160" height="48" rx="24" fill="white" fill-opacity="0.12"/>
+    <text x="256" y="31" font-family="Cairo, Arial, sans-serif" font-size="20" fill="white" text-anchor="middle">⭐ نقاط XP</text>
+    <!-- Pill 3 -->
+    <rect x="352" width="180" height="48" rx="24" fill="white" fill-opacity="0.12"/>
+    <text x="442" y="31" font-family="Cairo, Arial, sans-serif" font-size="20" fill="white" text-anchor="middle">📚 عربي أولاً</text>
+  </g>
+
+  <!-- Bottom border accent -->
+  <rect x="0" y="620" width="1200" height="10" fill="#FCD34D" fill-opacity="0.6"/>
+</svg>

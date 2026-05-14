@@ -16,7 +16,9 @@ import {
   tracks as tracksTable,
   translations,
 } from './schema';
-import { agents as agentContent, claudeLessons } from '../content/claude-lessons';
+import { agents as agentContent, claudeLessons, promptEngineeringLessons } from '../content/claude-lessons';
+
+const allLessonsToSeed = [...claudeLessons, ...promptEngineeringLessons];
 
 // ─── helper: bulk insert translations for one entity ─────────────────────────
 async function insertTranslations(
@@ -181,7 +183,7 @@ async function seed() {
   let totalQuizQ = 0;
   let totalQuizOpts = 0;
 
-  for (const lesson of claudeLessons) {
+  for (const lesson of allLessonsToSeed) {
     // Insert lesson (no text columns)
     const [dbLesson] = await db
       .insert(lessonsTable)

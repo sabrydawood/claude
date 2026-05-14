@@ -20,41 +20,80 @@ const inter = Inter({
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
-export const metadata: Metadata = {
-  title: {
-    default: 'ذكاوي — تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة',
-    template: '%s | ذكاوي',
-  },
-  description:
-    'منصة تعليمية للأطفال والكبار لتعلم الذكاء الاصطناعي بطريقة سهلة وممتعة. كسب XP، افتح إنجازات، وبقى خبير AI!',
-  keywords: ['ذكاء اصطناعي', 'تعلم', 'أطفال', 'Claude', 'AI', 'تعليم', 'zkawi', 'ذكاوي'],
-  metadataBase: new URL(APP_URL),
-  authors: [{ name: 'ذكاوي' }],
-  creator: 'ذكاوي',
-  openGraph: {
-    type: 'website',
-    locale: 'ar_EG',
-    alternateLocale: 'en_US',
-    url: APP_URL,
-    siteName: 'ذكاوي',
-    title: 'ذكاوي — تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة',
-    description: 'منصة تعليمية تفاعلية للأطفال والكبار. كسب XP وافتح إنجازات!',
-    images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: 'ذكاوي' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'ذكاوي — تعلم الذكاء الاصطناعي',
-    description: 'منصة تعليمية تفاعلية للأطفال والكبار',
-    images: ['/og-image.svg'],
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/logo-icon.svg',
-  },
-  manifest: '/manifest.json',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isAr = locale === 'ar';
+
+  return {
+    title: {
+      default: isAr
+        ? 'ذكاوي — تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة'
+        : 'Zkawi — Learn AI the Easy and Fun Way',
+      template: isAr ? '%s | ذكاوي' : '%s | Zkawi',
+    },
+    description: isAr
+      ? 'منصة تعليمية للأطفال والكبار لتعلم الذكاء الاصطناعي بطريقة سهلة وممتعة. كسب XP، افتح إنجازات، وبقى خبير AI!'
+      : 'An interactive educational platform for kids and adults to learn AI in a fun way. Earn XP, unlock achievements, and become an AI expert!',
+    keywords: isAr
+      ? ['ذكاء اصطناعي', 'تعلم', 'أطفال', 'Claude', 'AI', 'تعليم', 'ذكاوي', 'zkawi', 'برومبت', 'ChatGPT']
+      : ['AI', 'artificial intelligence', 'learn AI', 'kids', 'Claude', 'education', 'zkawi'],
+    metadataBase: new URL(APP_URL),
+    authors: [{ name: 'ذكاوي' }],
+    creator: 'ذكاوي',
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+    },
+    alternates: {
+      canonical: `${APP_URL}/${locale}`,
+      languages: {
+        ar: `${APP_URL}/ar`,
+        en: `${APP_URL}/en`,
+        'x-default': `${APP_URL}/ar`,
+      },
+    },
+    openGraph: {
+      type: 'website',
+      locale: isAr ? 'ar_EG' : 'en_US',
+      alternateLocale: isAr ? 'en_US' : 'ar_EG',
+      url: `${APP_URL}/${locale}`,
+      siteName: 'ذكاوي | Zkawi',
+      title: isAr
+        ? 'ذكاوي — تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة'
+        : 'Zkawi — Learn AI the Easy and Fun Way',
+      description: isAr
+        ? 'منصة تعليمية تفاعلية للأطفال والكبار. كسب XP وافتح إنجازات!'
+        : 'Interactive AI learning platform for kids and adults. Earn XP and unlock achievements!',
+      images: [
+        {
+          url: '/og-image.svg',
+          width: 1200,
+          height: 630,
+          alt: isAr ? 'ذكاوي — منصة تعلم الذكاء الاصطناعي' : 'Zkawi — AI Learning Platform',
+          type: 'image/svg+xml',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: isAr ? 'ذكاوي — تعلم الذكاء الاصطناعي' : 'Zkawi — Learn AI',
+      description: isAr
+        ? 'منصة تعليمية تفاعلية للأطفال والكبار'
+        : 'Interactive AI learning for kids and adults',
+      images: ['/og-image.svg'],
+    },
+    icons: {
+      icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+      apple: '/logo-icon.svg',
+    },
+    manifest: '/manifest.json',
+  };
+}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -80,7 +119,15 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dir} className={`${fontClass} ${cairo.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased" style={{ fontFamily: locale === 'ar' ? 'var(--font-cairo), sans-serif' : 'var(--font-inter), sans-serif' }}>
+      <body
+        className="min-h-full flex flex-col antialiased"
+        style={{
+          fontFamily:
+            locale === 'ar'
+              ? 'var(--font-cairo), sans-serif'
+              : 'var(--font-inter), sans-serif',
+        }}
+      >
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>

@@ -101,10 +101,44 @@ bun dev
 
 ## أوامر قاعدة البيانات
 
+| الأمر | الوظيفة |
+|---|---|
+| `bun run db:generate` | يولّد migration SQL files من الـ schema |
+| `bun run db:migrate` | يشغّل الـ migrations على قاعدة البيانات |
+| `bun run db:push` | يطبّق الـ schema مباشرة بدون migrations (للـ dev السريع) |
+| `bun run db:pull` | يسحب الـ schema الحالي من قاعدة البيانات |
+| `bun run db:seed` | يضيف البيانات الأساسية (agents, lessons, quiz, achievements) |
+| `bun run db:reset` | يحذف كل الجداول + migration files (clean slate) |
+| `bun run db:studio` | يفتح Drizzle Studio لاستعراض البيانات |
+| `bun run db:all` | **reset → generate → migrate → seed** (إعادة بناء كاملة) |
+
+### أول مرة تشغّل المشروع
+
 ```bash
-bun run db:push      # تطبيق التغييرات على قاعدة البيانات مباشرة
-bun run db:studio    # فتح Drizzle Studio (واجهة قاعدة البيانات)
-bun run db:generate  # توليد migration files
+bun run db:all
+```
+
+هذا الأمر يعمل تلقائياً:
+1. 🗑️ يحذف كل الجداول الموجودة + migration files القديمة
+2. ⚙️ يولّد migration files جديدة من الـ schema
+3. 🚀 يشغّل الـ migrations على قاعدة البيانات
+4. 🌱 يضيف البيانات الأساسية:
+   - 3 agents: Claude ✅ | ChatGPT 🔜 | Gemini 🔜
+   - 5 دروس كاملة عن Claude
+   - أسئلة الكويز + خياراتها
+   - 8 إنجازات (achievements)
+
+### تحديث الـ schema بدون حذف البيانات
+
+```bash
+bun run db:generate   # توليد migration جديد
+bun run db:migrate    # تطبيقه
+```
+
+### مشاهدة البيانات
+
+```bash
+bun run db:studio     # يفتح http://localhost:4983
 ```
 
 ---

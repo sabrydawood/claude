@@ -8,6 +8,7 @@ import {
   uuid,
   unique,
   index,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -130,6 +131,19 @@ export const quizOptions = pgTable('quiz_options', {
   order: integer('order').default(0).notNull(),
 });
 
+// ─── Learning Tracks ─────────────────────────────────────────────────────────
+//  A track = a persona/learning path profile. All text is in translations.
+//  Slugs: 'explorer' | 'creator' | 'engineer' | 'developer' | 'educator'
+
+export const tracks = pgTable('tracks', {
+  id: serial('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  emoji: text('emoji').notNull(),
+  order: integer('order').default(0).notNull(),
+  isDefault: boolean('is_default').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // ─── Achievements ─────────────────────────────────────────────────────────────
 
 export const achievements = pgTable('achievements', {
@@ -140,6 +154,65 @@ export const achievements = pgTable('achievements', {
 });
 
 // ─── User data ────────────────────────────────────────────────────────────────
+//
+// user_preferences: answers from the onboarding wizard
+// learning_paths:   generated personalized lesson order
+// encrypted_keys:   user's Anthropic API key (AES-256 encrypted at rest)
+// sandbox_sessions: history of sandbox interactions
+
+export const userPreferences = pgTable('user_preferences', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' })
+    .unique(),
+  ageGroup: text('age_group', { enum: ['child', 'teen', 'adult'] }).notNull().default('adult'),
+  goal: text('goal', { enum: ['chat', 'work', 'creative', 'developer', 'educator'] }).notNull().default('chat'),
+  experience: text('experience', { enum: ['none', 'some', 'advanced'] }).notNull().default('none'),
+  learningStyle: text('learning_style', { enum: ['visual', 'reading', 'practice', 'game'] }).notNull().default('practice'),
+  dailyMinutes: integer('daily_minutes').default(15).notNull(),
+  preferredLocale: text('preferred_locale').default('ar').notNull(),
+  onboardingCompleted: boolean('onboarding_completed').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const learningPaths = pgTable('learning_paths', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  trackId: integer('track_id')
+    .notNull()
+    .references(() => tracks.id, { onDelete: 'cascade' }),
+  lessonOrder: jsonb('lesson_order').notNull().default([]),
+  currentLessonId: integer('current_lesson_id').references(() => lessons.id, { onDelete: 'set null' }),
+  isActive: boolean('is_active').default(true).notNull(),
+  generatedAt: timestamp('generated_at').defaultNow().notNull(),
+});
+
+export const encryptedKeys = pgTable('encrypted_keys', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' })
+    .unique(),
+  encryptedKey: text('encrypted_key').notNull(),
+  keyHint: text('key_hint').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const sandboxSessions = pgTable('sandbox_sessions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  model: text('model').default('claude-haiku-4-5-20251001').notNull(),
+  messagesCount: integer('messages_count').default(0).notNull(),
+  tokensUsed: integer('tokens_used').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
 
 export const userProgress = pgTable('user_progress', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -210,12 +283,27 @@ export const achievementsRelations = relations(achievements, ({ many }) => ({
   userAchievements: many(userAchievements),
 }));
 
+export const tracksRelations = relations(tracks, ({ many }) => ({
+  learningPaths: many(learningPaths),
+  translations: many(translations),
+}));
+
 export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
   accounts: many(accounts),
   progress: many(userProgress),
   stats: one(userStats),
   achievements: many(userAchievements),
+  preferences: one(userPreferences),
+  learningPaths: many(learningPaths),
+  encryptedKey: one(encryptedKeys),
+  sandboxSessions: many(sandboxSessions),
+}));
+
+export const learningPathsRelations = relations(learningPaths, ({ one }) => ({
+  user: one(users, { fields: [learningPaths.userId], references: [users.id] }),
+  track: one(tracks, { fields: [learningPaths.trackId], references: [tracks.id] }),
+  currentLesson: one(lessons, { fields: [learningPaths.currentLessonId], references: [lessons.id] }),
 }));
 
 // ─── TypeScript types ─────────────────────────────────────────────────────────
@@ -231,6 +319,11 @@ export type Translation = typeof translations.$inferSelect;
 export type UserProgress = typeof userProgress.$inferSelect;
 export type UserStats = typeof userStats.$inferSelect;
 export type UserAchievement = typeof userAchievements.$inferSelect;
+export type Track = typeof tracks.$inferSelect;
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type LearningPath = typeof learningPaths.$inferSelect;
+export type EncryptedKey = typeof encryptedKeys.$inferSelect;
+export type SandboxSession = typeof sandboxSessions.$inferSelect;
 
 // Useful type for a row returned from translations
 export type TranslationMap = Record<string, string>;

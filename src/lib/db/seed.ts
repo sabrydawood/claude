@@ -13,6 +13,7 @@ import {
   quizQuestions,
   quizOptions,
   achievements as achievementsTable,
+  tracks as tracksTable,
   translations,
 } from './schema';
 import { agents as agentContent, claudeLessons } from '../content/claude-lessons';
@@ -94,6 +95,55 @@ async function seed() {
   console.log('🌱 Starting seed (translations-based schema)...\n');
 
   let totalTranslations = 0;
+
+  // ── 0. Tracks ──────────────────────────────────────────────────────────────
+  console.log('🎯 Inserting learning tracks...');
+  const TRACKS = [
+    {
+      slug: 'explorer', emoji: '🚀', order: 0, isDefault: true,
+      ar: { name: 'المستكشف', description: 'ابدأ رحلتك في الذكاء الاصطناعي من الصفر', personaDescription: 'مبتدئ فضولي يريد فهم الذكاء الاصطناعي' },
+      en: { name: 'Explorer', description: 'Start your AI journey from scratch', personaDescription: 'A curious beginner who wants to understand AI' },
+    },
+    {
+      slug: 'creator', emoji: '🎨', order: 1, isDefault: false,
+      ar: { name: 'المبدع', description: 'استخدم الذكاء الاصطناعي في الإبداع والكتابة', personaDescription: 'مبدع يريد توظيف AI في أعماله الإبداعية' },
+      en: { name: 'Creator', description: 'Use AI for creative work and writing', personaDescription: 'A creative who wants to leverage AI in their work' },
+    },
+    {
+      slug: 'engineer', emoji: '⚙️', order: 2, isDefault: false,
+      ar: { name: 'المهندس', description: 'أتقن الـ Prompt Engineering والاستخدام الاحترافي', personaDescription: 'محترف يريد إتقان هندسة المطالبات' },
+      en: { name: 'Engineer', description: 'Master Prompt Engineering and professional use', personaDescription: 'A professional who wants to master prompt engineering' },
+    },
+    {
+      slug: 'developer', emoji: '💻', order: 3, isDefault: false,
+      ar: { name: 'المطور', description: 'ابنِ تطبيقات باستخدام Claude API', personaDescription: 'مطور يريد بناء تطبيقات بالذكاء الاصطناعي' },
+      en: { name: 'Developer', description: 'Build applications using Claude API', personaDescription: 'A developer who wants to build AI-powered applications' },
+    },
+    {
+      slug: 'educator', emoji: '📚', order: 4, isDefault: false,
+      ar: { name: 'المعلم', description: 'وظّف الذكاء الاصطناعي في التعليم والتدريس', personaDescription: 'معلم يريد توظيف AI في الفصل الدراسي' },
+      en: { name: 'Educator', description: 'Use AI in teaching and education', personaDescription: 'An educator who wants to bring AI into the classroom' },
+    },
+  ];
+
+  const insertedTracks = await db.insert(tracksTable).values(
+    TRACKS.map(t => ({ slug: t.slug, emoji: t.emoji, order: t.order, isDefault: t.isDefault }))
+  ).returning();
+
+  for (const track of insertedTracks) {
+    const data = TRACKS.find(t => t.slug === track.slug)!;
+    const rows = [
+      { locale: 'ar', field: 'name', value: data.ar.name },
+      { locale: 'ar', field: 'description', value: data.ar.description },
+      { locale: 'ar', field: 'persona_description', value: data.ar.personaDescription },
+      { locale: 'en', field: 'name', value: data.en.name },
+      { locale: 'en', field: 'description', value: data.en.description },
+      { locale: 'en', field: 'persona_description', value: data.en.personaDescription },
+    ];
+    await insertTranslations('track', track.id, rows);
+    totalTranslations += rows.length;
+  }
+  console.log(`   ✓ ${insertedTracks.length} tracks (${insertedTracks.length * 6} translations)\n`);
 
   // ── 1. Agents ──────────────────────────────────────────────────────────────
   console.log('📦 Inserting agents...');

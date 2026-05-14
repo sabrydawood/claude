@@ -269,5 +269,74 @@
     "points": "points",
     "appName": "Zkawi",
     "tagline": "Learn AI the easy and fun way"
+  },
+  "onboarding": {
+    "title": "Tell us about yourself! 🤖",
+    "subtitle": "So we can create a personalized learning experience",
+    "step": "Step",
+    "of": "of",
+    "next": "Next",
+    "prev": "Back",
+    "finish": "Start your journey! 🚀",
+    "steps": {
+      "age": {
+        "title": "How old are you?",
+        "subtitle": "We won't judge! 😄",
+        "child": "Child (7-12)",
+        "childDesc": "Learn through games and activities",
+        "teen": "Teen (13-17)",
+        "teenDesc": "Challenges and achievements",
+        "adult": "Adult (18+)",
+        "adultDesc": "Comprehensive and in-depth content"
+      },
+      "goal": {
+        "title": "What do you want to do with AI?",
+        "subtitle": "Choose the closest goal",
+        "chat": "Chat & Creativity",
+        "chatDesc": "Talk to AI and use it in daily life",
+        "work": "Work & Productivity",
+        "workDesc": "Save time at work using AI",
+        "creative": "Writing & Creative",
+        "creativeDesc": "Stories, images, music with AI",
+        "developer": "Coding & Development",
+        "developerDesc": "Use APIs and build applications",
+        "educator": "Teaching & Training",
+        "educatorDesc": "Use AI in education"
+      },
+      "experience": {
+        "title": "How much do you know about AI?",
+        "subtitle": "Starting from zero is totally fine!",
+        "none": "Complete Beginner",
+        "noneDesc": "Heard of it but never tried",
+        "some": "Some Experience",
+        "someDesc": "I use ChatGPT or Claude occasionally",
+        "advanced": "Advanced",
+        "advancedDesc": "Know about APIs and Prompts"
+      },
+      "style": {
+        "title": "How do you learn best?",
+        "subtitle": "Let's match your learning style",
+        "visual": "Visual & Examples",
+        "visualDesc": "Real examples and visual explanations",
+        "reading": "Reading & Theory",
+        "readingDesc": "Detailed and in-depth explanations",
+        "practice": "Hands-on Practice",
+        "practiceDesc": "Practical experiments and exercises",
+        "game": "Games & Challenges",
+        "gameDesc": "Quizzes, challenges, and achievements"
+      },
+      "time": {
+        "title": "How much time can you spend?",
+        "subtitle": "Even 15 minutes makes a difference!",
+        "min5": "5 minutes",
+        "min5Desc": "Quick and focused",
+        "min15": "15 minutes",
+        "min15Desc": "Ideal for beginners",
+        "min30": "30 minutes",
+        "min30Desc": "Balanced learning",
+        "min60": "1 hour or more",
+        "min60Desc": "For the seriously enthusiastic"
+      }
+    }
   }
 }

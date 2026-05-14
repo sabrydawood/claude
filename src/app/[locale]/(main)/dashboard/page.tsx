@@ -48,6 +48,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], totalXp: 0, streakDays: 1, quizzesCompleted: 0 });
   const [mounted, setMounted] = useState(false);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -57,10 +58,24 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isPending && !session) {
       router.push('/login');
+      return;
+    }
+    if (!isPending && session) {
+      // Check if user completed onboarding
+      fetch('/api/user/preferences')
+        .then(r => r.json())
+        .then(data => {
+          if (!data.onboardingCompleted) {
+            router.push('/onboarding');
+          } else {
+            setCheckingOnboarding(false);
+          }
+        })
+        .catch(() => setCheckingOnboarding(false));
     }
   }, [session, isPending, router]);
 
-  if (isPending || !mounted) {
+  if (isPending || !mounted || checkingOnboarding) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <div className="text-center">

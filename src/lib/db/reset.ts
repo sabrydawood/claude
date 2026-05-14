@@ -11,15 +11,20 @@ import fs from 'fs';
 import path from 'path';
 
 const TABLES_IN_DROP_ORDER = [
+  'sandbox_sessions',
+  'encrypted_keys',
+  'learning_paths',
+  'user_preferences',
   'user_achievements',
   'user_stats',
   'user_progress',
   'quiz_options',
   'quiz_questions',
   'lessons',
+  'tracks',
   'agents',
   'achievements',
-  'translations',         // ← central i18n table
+  'translations',
   'verification_tokens',
   'accounts',
   'sessions',

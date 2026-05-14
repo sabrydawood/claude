@@ -3833,7 +3833,1459 @@ Next step? Build your first real app! 🚀`,
   },
 ];
 
-const allLessons: Lesson[] = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons];
+export const developerLessons: Lesson[] = [
+  {
+    id: 20,
+    slug: 'build-a-chatbot',
+    agentSlug: 'claude',
+    titleAr: 'ابني Chatbot من الصفر',
+    titleEn: 'Build a Chatbot from Scratch',
+    descriptionAr: 'خطوة بخطوة — ابني chatbot كامل بـ Python في أقل من 50 سطر.',
+    descriptionEn: 'Step by step — build a complete chatbot in Python in under 50 lines.',
+    order: 20,
+    xpReward: 100,
+    estimatedMinutes: 15,
+    emoji: '🤖',
+    contentAr: `## ابني Chatbot من الصفر
+
+في الدرس ده هتبني chatbot كامل يشتغل في الـ terminal بـ Python — محادثة حقيقية متعددة الأدوار!
+
+---
+
+## الكود الكامل (47 سطر)
+
+\`\`\`python
+import anthropic
+import os
+
+client = anthropic.Anthropic(
+    api_key=os.environ.get("ANTHROPIC_API_KEY")
+)
+
+SYSTEM_PROMPT = """أنت مساعد ذكي ومفيد.
+بتتكلم بالعربية دايماً.
+بتكون موجز وواضح في إجاباتك."""
+
+def chat():
+    print("🤖 Chatbot جاهز! اكتب 'خروج' للإنهاء\\n")
+    conversation = []
+
+    while True:
+        # استقبال input من المستخدم
+        user_input = input("أنت: ").strip()
+
+        if not user_input:
+            continue
+
+        if user_input.lower() in ["خروج", "exit", "quit"]:
+            print("\\n🤖 مع السلامة!")
+            break
+
+        # إضافة للمحادثة
+        conversation.append({
+            "role": "user",
+            "content": user_input
+        })
+
+        try:
+            # استدعاء Claude
+            response = client.messages.create(
+                model="claude-haiku-4-5",
+                max_tokens=1024,
+                system=SYSTEM_PROMPT,
+                messages=conversation
+            )
+
+            assistant_reply = response.content[0].text
+
+            # حفظ الرد في التاريخ
+            conversation.append({
+                "role": "assistant",
+                "content": assistant_reply
+            })
+
+            print(f"\\n🤖 Claude: {assistant_reply}\\n")
+
+        except Exception as e:
+            print(f"❌ خطأ: {e}")
+
+if __name__ == "__main__":
+    chat()
+\`\`\`
+
+---
+
+## إزاي تشغله؟
+
+\`\`\`bash
+# 1. ثبّت الـ SDK
+pip install anthropic
+
+# 2. حدد الـ API Key
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# 3. شغّل
+python chatbot.py
+\`\`\`
+
+---
+
+## تحسينات ممكنة 🚀
+
+### إضافة حد للمحادثة
+\`\`\`python
+MAX_MESSAGES = 20
+
+# قبل الإرسال
+if len(conversation) > MAX_MESSAGES:
+    # احتفظ بأول رسالة + آخر 19
+    conversation = conversation[:1] + conversation[-(MAX_MESSAGES-1):]
+\`\`\`
+
+### حفظ المحادثة في ملف
+\`\`\`python
+import json
+
+def save_conversation(conv, filename="chat_history.json"):
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(conv, f, ensure_ascii=False, indent=2)
+\`\`\`
+
+### إضافة Streaming
+\`\`\`python
+print("🤖 Claude: ", end="", flush=True)
+with client.messages.stream(
+    model="claude-haiku-4-5",
+    max_tokens=1024,
+    system=SYSTEM_PROMPT,
+    messages=conversation
+) as stream:
+    reply = ""
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+        reply += text
+print()  # سطر جديد
+\`\`\`
+
+---
+
+## التحدي 🎯
+
+عدّل الـ Chatbot ده عشان يكون:
+1. متخصص في موضوع معين (طبخ، رياضة، كود)
+2. يحفظ المحادثة في ملف JSON
+3. يستخدم Streaming`,
+
+    contentEn: `## Build a Chatbot from Scratch
+
+In this lesson you'll build a complete chatbot that runs in the terminal using Python — a real multi-turn conversation!
+
+---
+
+## The Complete Code (47 lines)
+
+\`\`\`python
+import anthropic
+import os
+
+client = anthropic.Anthropic(
+    api_key=os.environ.get("ANTHROPIC_API_KEY")
+)
+
+SYSTEM_PROMPT = """You are a smart and helpful assistant.
+Always respond in a clear and concise manner."""
+
+def chat():
+    print("🤖 Chatbot ready! Type 'quit' to exit\\n")
+    conversation = []
+
+    while True:
+        user_input = input("You: ").strip()
+
+        if not user_input:
+            continue
+
+        if user_input.lower() in ["quit", "exit"]:
+            print("\\n🤖 Goodbye!")
+            break
+
+        conversation.append({
+            "role": "user",
+            "content": user_input
+        })
+
+        try:
+            response = client.messages.create(
+                model="claude-haiku-4-5",
+                max_tokens=1024,
+                system=SYSTEM_PROMPT,
+                messages=conversation
+            )
+
+            assistant_reply = response.content[0].text
+
+            conversation.append({
+                "role": "assistant",
+                "content": assistant_reply
+            })
+
+            print(f"\\n🤖 Claude: {assistant_reply}\\n")
+
+        except Exception as e:
+            print(f"❌ Error: {e}")
+
+if __name__ == "__main__":
+    chat()
+\`\`\`
+
+---
+
+## How to Run It?
+
+\`\`\`bash
+# 1. Install SDK
+pip install anthropic
+
+# 2. Set API Key
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# 3. Run
+python chatbot.py
+\`\`\`
+
+---
+
+## Possible Improvements 🚀
+
+### Add conversation limit
+\`\`\`python
+MAX_MESSAGES = 20
+
+if len(conversation) > MAX_MESSAGES:
+    conversation = conversation[:1] + conversation[-(MAX_MESSAGES-1):]
+\`\`\`
+
+### Save to file
+\`\`\`python
+import json
+
+def save_conversation(conv, filename="chat_history.json"):
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(conv, f, ensure_ascii=False, indent=2)
+\`\`\`
+
+### Add Streaming
+\`\`\`python
+print("🤖 Claude: ", end="", flush=True)
+with client.messages.stream(
+    model="claude-haiku-4-5",
+    max_tokens=1024,
+    system=SYSTEM_PROMPT,
+    messages=conversation
+) as stream:
+    reply = ""
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+        reply += text
+print()
+\`\`\`
+
+---
+
+## The Challenge 🎯
+
+Modify this chatbot to:
+1. Specialize in a topic (cooking, sports, code)
+2. Save conversation to JSON file
+3. Use Streaming`,
+
+    quiz: [
+      {
+        id: 'q20-1',
+        questionAr: 'ليه بنحتفظ بالـ conversation list؟',
+        questionEn: 'Why do we maintain the conversation list?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'عشان Claude يتذكر المحادثة السابقة', textEn: 'So Claude remembers the previous conversation', isCorrect: true },
+          { id: 'o2', textAr: 'عشان نوفر tokens', textEn: 'To save tokens', isCorrect: false },
+          { id: 'o3', textAr: 'متطلب من Python', textEn: 'Required by Python', isCorrect: false },
+          { id: 'o4', textAr: 'لمنع الـ errors', textEn: 'To prevent errors', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q20-2',
+        questionAr: 'ليه استخدمنا claude-haiku-4-5 في الـ Chatbot؟',
+        questionEn: 'Why did we use claude-haiku-4-5 in the Chatbot?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'أرخص وأسرع للمحادثات اليومية', textEn: 'Cheaper and faster for everyday conversations', isCorrect: true },
+          { id: 'o2', textAr: 'الوحيد المتاح', textEn: 'The only available model', isCorrect: false },
+          { id: 'o3', textAr: 'الأذكى دايماً', textEn: 'Always the smartest', isCorrect: false },
+          { id: 'o4', textAr: 'بيدعم العربية بس هو', textEn: 'Only one supporting Arabic', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q20-3',
+        questionAr: 'صح ولا غلط: ممكن تضيف Streaming لأي chatbot بتبنيه',
+        questionEn: 'True or False: You can add Streaming to any chatbot you build',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
+          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 21,
+    slug: 'document-qa',
+    agentSlug: 'claude',
+    titleAr: 'Document Q&A — اسأل على المستندات',
+    titleEn: 'Document Q&A — Ask About Documents',
+    descriptionAr: 'ابني نظام يجاوب على أسئلة من ملفات PDF و Word بـ Claude.',
+    descriptionEn: 'Build a system that answers questions from PDF and Word files using Claude.',
+    order: 21,
+    xpReward: 100,
+    estimatedMinutes: 14,
+    emoji: '📄',
+    contentAr: `## Document Q&A
+
+من أقوى تطبيقات الـ AI — نظام بيقرأ مستندات ويجاوب على أسئلة عنها.
+
+---
+
+## الفكرة
+
+\`\`\`
+ملف PDF/Word  →  استخرج النص  →  ابعته لـ Claude  →  اسأل عنه
+\`\`\`
+
+---
+
+## استخراج النص من PDF
+
+\`\`\`python
+pip install anthropic pymupdf
+\`\`\`
+
+\`\`\`python
+import fitz  # PyMuPDF
+import anthropic
+import os
+
+def extract_pdf_text(pdf_path: str) -> str:
+    doc = fitz.open(pdf_path)
+    text = ""
+    for page in doc:
+        text += page.get_text()
+    return text
+
+client = anthropic.Anthropic()
+
+def ask_about_document(pdf_path: str, question: str) -> str:
+    document_text = extract_pdf_text(pdf_path)
+
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=2048,
+        system="""أنت مساعد متخصص في تحليل المستندات.
+أجب على الأسئلة بناءً على محتوى المستند فقط.
+لو المعلومة مش موجودة في المستند، قول ذلك بوضوح.""",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""المستند:
+---
+{document_text}
+---
+
+السؤال: {question}"""
+            }
+        ]
+    )
+
+    return response.content[0].text
+
+# استخدام
+answer = ask_about_document(
+    "contract.pdf",
+    "إيه هي شروط الإلغاء في العقد ده؟"
+)
+print(answer)
+\`\`\`
+
+---
+
+## محادثة متعددة الأسئلة
+
+\`\`\`python
+def document_chat(pdf_path: str):
+    document_text = extract_pdf_text(pdf_path)
+    conversation = []
+
+    print(f"📄 تم تحميل المستند. اسأل أي سؤال!\\n")
+
+    while True:
+        question = input("سؤالك: ").strip()
+        if question.lower() in ["خروج", "exit"]:
+            break
+
+        conversation.append({
+            "role": "user",
+            "content": question
+        })
+
+        response = client.messages.create(
+            model="claude-opus-4-7",
+            max_tokens=2048,
+            system=f"""أنت مساعد لتحليل هذا المستند:
+---
+{document_text}
+---
+أجب فقط بناءً على محتوى المستند.""",
+            messages=conversation
+        )
+
+        answer = response.content[0].text
+        conversation.append({"role": "assistant", "content": answer})
+        print(f"\\n🤖 {answer}\\n")
+\`\`\`
+
+---
+
+## تحسينات للـ Production 🚀
+
+### لو المستند طويل جداً
+Claude عنده context window كبير (1M token في Opus)، بس لو المستند أكبر:
+
+\`\`\`python
+def chunk_text(text: str, max_chars: int = 50000) -> list:
+    # قسّم النص لأجزاء
+    chunks = []
+    for i in range(0, len(text), max_chars):
+        chunks.append(text[i:i + max_chars])
+    return chunks
+\`\`\`
+
+### إضافة Word files
+\`\`\`bash
+pip install python-docx
+\`\`\`
+
+\`\`\`python
+from docx import Document
+
+def extract_word_text(docx_path: str) -> str:
+    doc = Document(docx_path)
+    return "\\n".join([para.text for para in doc.paragraphs])
+\`\`\`
+
+---
+
+## أمثلة على الاستخدام 💡
+
+- 📋 **قانوني:** اسأل على عقود ووثائق قانونية
+- 📊 **أعمال:** حلل تقارير مالية
+- 📚 **أكاديمي:** اسأل على أبحاث ودراسات
+- 📝 **موارد بشرية:** قارن بين CVs`,
+
+    contentEn: `## Document Q&A
+
+One of the most powerful AI applications — a system that reads documents and answers questions about them.
+
+---
+
+## The Concept
+
+\`\`\`
+PDF/Word file  →  Extract text  →  Send to Claude  →  Ask questions
+\`\`\`
+
+---
+
+## Extract Text from PDF
+
+\`\`\`python
+pip install anthropic pymupdf
+\`\`\`
+
+\`\`\`python
+import fitz  # PyMuPDF
+import anthropic
+import os
+
+def extract_pdf_text(pdf_path: str) -> str:
+    doc = fitz.open(pdf_path)
+    text = ""
+    for page in doc:
+        text += page.get_text()
+    return text
+
+client = anthropic.Anthropic()
+
+def ask_about_document(pdf_path: str, question: str) -> str:
+    document_text = extract_pdf_text(pdf_path)
+
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=2048,
+        system="""You are a document analysis assistant.
+Answer questions based solely on the document content.
+If the information isn't in the document, clearly say so.""",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Document:
+---
+{document_text}
+---
+
+Question: {question}"""
+            }
+        ]
+    )
+
+    return response.content[0].text
+
+# Usage
+answer = ask_about_document(
+    "contract.pdf",
+    "What are the cancellation terms in this contract?"
+)
+print(answer)
+\`\`\`
+
+---
+
+## Multi-question Chat
+
+\`\`\`python
+def document_chat(pdf_path: str):
+    document_text = extract_pdf_text(pdf_path)
+    conversation = []
+
+    print(f"📄 Document loaded. Ask any question!\\n")
+
+    while True:
+        question = input("Your question: ").strip()
+        if question.lower() in ["quit", "exit"]:
+            break
+
+        conversation.append({"role": "user", "content": question})
+
+        response = client.messages.create(
+            model="claude-opus-4-7",
+            max_tokens=2048,
+            system=f"""You are an assistant for analyzing this document:
+---
+{document_text}
+---
+Answer only based on the document content.""",
+            messages=conversation
+        )
+
+        answer = response.content[0].text
+        conversation.append({"role": "assistant", "content": answer})
+        print(f"\\n🤖 {answer}\\n")
+\`\`\`
+
+---
+
+## Production Improvements 🚀
+
+### If document is very long
+Claude has a large context window (1M tokens in Opus), but if the document is larger:
+
+\`\`\`python
+def chunk_text(text: str, max_chars: int = 50000) -> list:
+    chunks = []
+    for i in range(0, len(text), max_chars):
+        chunks.append(text[i:i + max_chars])
+    return chunks
+\`\`\`
+
+### Add Word files
+\`\`\`python
+from docx import Document
+
+def extract_word_text(docx_path: str) -> str:
+    doc = Document(docx_path)
+    return "\\n".join([para.text for para in doc.paragraphs])
+\`\`\`
+
+---
+
+## Use Case Examples 💡
+
+- 📋 **Legal:** Ask about contracts and legal documents
+- 📊 **Business:** Analyze financial reports
+- 📚 **Academic:** Ask about research papers
+- 📝 **HR:** Compare CVs`,
+
+    quiz: [
+      {
+        id: 'q21-1',
+        questionAr: 'إيه الخطوة الأولى في بناء Document Q&A؟',
+        questionEn: 'What is the first step in building Document Q&A?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'استخراج النص من الملف', textEn: 'Extracting text from the file', isCorrect: true },
+          { id: 'o2', textAr: 'إرسال الملف مباشرة لـ Claude', textEn: 'Sending the file directly to Claude', isCorrect: false },
+          { id: 'o3', textAr: 'تشغيل الـ chatbot', textEn: 'Running the chatbot', isCorrect: false },
+          { id: 'o4', textAr: 'إنشاء قاعدة بيانات', textEn: 'Creating a database', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q21-2',
+        questionAr: 'لو المستند أكبر من الـ context window، إيه الحل؟',
+        questionEn: 'If the document exceeds the context window, what\'s the solution?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'تقسيم النص لأجزاء (chunking)', textEn: 'Split text into chunks (chunking)', isCorrect: true },
+          { id: 'o2', textAr: 'استخدام نموذج مختلف', textEn: 'Use a different model', isCorrect: false },
+          { id: 'o3', textAr: 'تصغير الملف', textEn: 'Compress the file', isCorrect: false },
+          { id: 'o4', textAr: 'مش ممكن تحل المشكلة دي', textEn: 'This problem can\'t be solved', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q21-3',
+        questionAr: 'صح ولا غلط: Claude يقدر يجاوب على أسئلة من ملفات PDF و Word',
+        questionEn: 'True or False: Claude can answer questions from PDF and Word files',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح — بعد استخراج النص منهم', textEn: 'True — after extracting text from them', isCorrect: true },
+          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 22,
+    slug: 'content-moderation',
+    agentSlug: 'claude',
+    titleAr: 'Content Moderation — مراقبة المحتوى',
+    titleEn: 'Content Moderation — Monitor Content',
+    descriptionAr: 'استخدم Claude عشان تصنّف وتراقب محتوى المستخدمين تلقائياً.',
+    descriptionEn: 'Use Claude to automatically classify and moderate user content.',
+    order: 22,
+    xpReward: 95,
+    estimatedMinutes: 12,
+    emoji: '🛡️',
+    contentAr: `## Content Moderation
+
+الـ **Content Moderation** هو تصنيف المحتوى تلقائياً — هل ده آمن؟ مسيء؟ سبام؟
+
+---
+
+## ليه Claude مثالي للـ Moderation؟
+
+- ✅ يفهم السياق مش بس الكلمات
+- ✅ بيتعامل مع العربية والعامية كويس
+- ✅ ممكن تشرح له قواعدك بالظبط
+- ✅ أقل false positives من الأدوات التقليدية
+
+---
+
+## مثال: تصنيف التعليقات
+
+\`\`\`python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def moderate_comment(comment: str) -> dict:
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=256,
+        system="""أنت نظام مراقبة محتوى.
+صنّف التعليق وأرجع JSON فقط بالشكل ده:
+{
+  "safe": true/false,
+  "category": "safe|spam|hate|violence|adult",
+  "confidence": 0.0-1.0,
+  "reason": "سبب موجز"
+}
+لا تكتب أي كلام تاني غير الـ JSON.""",
+        messages=[
+            {"role": "user", "content": f"صنّف التعليق ده: {comment}"}
+        ]
+    )
+
+    return json.loads(response.content[0].text)
+
+# أمثلة
+comments = [
+    "المنتج ده رائع جداً، بنصح بيه!",
+    "اشتري الآن! سعر خاص! رابط في البايو!",
+    "أنا مش راضي عن الخدمة",
+]
+
+for comment in comments:
+    result = moderate_comment(comment)
+    status = "✅" if result["safe"] else "❌"
+    print(f"{status} '{comment[:30]}...' → {result['category']}")
+\`\`\`
+
+---
+
+## Batch Moderation للـ Scale
+
+\`\`\`python
+def moderate_batch(comments: list[str]) -> list[dict]:
+    # بعت كل التعليقات في request واحد توفيراً
+    comments_text = "\\n".join(
+        f"{i+1}. {c}" for i, c in enumerate(comments)
+    )
+
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=2048,
+        system="""صنّف كل تعليق وأرجع JSON array:
+[{"id": 1, "safe": true, "category": "...", "confidence": 0.9}, ...]""",
+        messages=[{"role": "user", "content": comments_text}]
+    )
+
+    return json.loads(response.content[0].text)
+\`\`\`
+
+---
+
+## تخصيص القواعد لمنصتك
+
+\`\`\`python
+MODERATION_RULES = """
+قواعد المنصة:
+1. لا إعلانات أو سبام
+2. لا ألفاظ مسيئة أو تحرش
+3. لا معلومات شخصية (تليفون، عنوان)
+4. لا محتوى سياسي حاد
+5. التعليقات التعليمية والنقد البناء مسموح بيه
+
+صنّف التعليق: safe, spam, inappropriate, personal_info, political
+"""
+\`\`\`
+
+---
+
+## نصيحة الـ Production 💡
+
+مش لازم Claude يقرر وحده — استخدمه كـ **first filter** ثم راجع الـ edge cases يدوياً:
+
+\`\`\`
+Confidence > 0.9 → قرار تلقائي
+Confidence 0.6-0.9 → مراجعة بشرية
+Confidence < 0.6 → مراجعة بشرية دايماً
+\`\`\``,
+
+    contentEn: `## Content Moderation
+
+**Content Moderation** is automatically classifying content — is it safe? Abusive? Spam?
+
+---
+
+## Why Claude Is Ideal for Moderation?
+
+- ✅ Understands context, not just keywords
+- ✅ Handles Arabic and dialects well
+- ✅ You can explain your exact rules
+- ✅ Fewer false positives than traditional tools
+
+---
+
+## Example: Comment Classification
+
+\`\`\`python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def moderate_comment(comment: str) -> dict:
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=256,
+        system="""You are a content moderation system.
+Classify the comment and return ONLY JSON in this format:
+{
+  "safe": true/false,
+  "category": "safe|spam|hate|violence|adult",
+  "confidence": 0.0-1.0,
+  "reason": "brief reason"
+}
+Write nothing other than the JSON.""",
+        messages=[
+            {"role": "user", "content": f"Classify this comment: {comment}"}
+        ]
+    )
+
+    return json.loads(response.content[0].text)
+
+# Examples
+comments = [
+    "This product is amazing, highly recommended!",
+    "Buy now! Special price! Link in bio!",
+    "I'm not satisfied with the service",
+]
+
+for comment in comments:
+    result = moderate_comment(comment)
+    status = "✅" if result["safe"] else "❌"
+    print(f"{status} '{comment[:30]}...' → {result['category']}")
+\`\`\`
+
+---
+
+## Batch Moderation for Scale
+
+\`\`\`python
+def moderate_batch(comments: list[str]) -> list[dict]:
+    comments_text = "\\n".join(
+        f"{i+1}. {c}" for i, c in enumerate(comments)
+    )
+
+    response = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=2048,
+        system="""Classify each comment and return a JSON array:
+[{"id": 1, "safe": true, "category": "...", "confidence": 0.9}, ...]""",
+        messages=[{"role": "user", "content": comments_text}]
+    )
+
+    return json.loads(response.content[0].text)
+\`\`\`
+
+---
+
+## Customize Rules for Your Platform
+
+\`\`\`python
+MODERATION_RULES = """
+Platform rules:
+1. No ads or spam
+2. No offensive language or harassment
+3. No personal information (phone, address)
+4. No extreme political content
+5. Educational comments and constructive criticism are allowed
+
+Classify as: safe, spam, inappropriate, personal_info, political
+"""
+\`\`\`
+
+---
+
+## Production Tip 💡
+
+Claude doesn't have to decide alone — use it as a **first filter** then manually review edge cases:
+
+\`\`\`
+Confidence > 0.9 → Automatic decision
+Confidence 0.6-0.9 → Human review
+Confidence < 0.6 → Always human review
+\`\`\``,
+
+    quiz: [
+      {
+        id: 'q22-1',
+        questionAr: 'ليه Claude أحسن من أدوات الـ moderation التقليدية في كتير من الحالات؟',
+        questionEn: 'Why is Claude better than traditional moderation tools in many cases?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'لأنه بيفهم السياق مش بس الكلمات', textEn: 'Because it understands context, not just keywords', isCorrect: true },
+          { id: 'o2', textAr: 'لأنه أسرع', textEn: 'Because it\'s faster', isCorrect: false },
+          { id: 'o3', textAr: 'لأنه مجاني', textEn: 'Because it\'s free', isCorrect: false },
+          { id: 'o4', textAr: 'لأنه بيدعم أكتر من 100 لغة', textEn: 'Because it supports over 100 languages', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q22-2',
+        questionAr: 'لما الـ confidence يكون 0.7، إيه المناسب؟',
+        questionEn: 'When confidence is 0.7, what\'s appropriate?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'مراجعة بشرية', textEn: 'Human review', isCorrect: true },
+          { id: 'o2', textAr: 'قرار تلقائي فوري', textEn: 'Immediate automatic decision', isCorrect: false },
+          { id: 'o3', textAr: 'تجاهل التعليق', textEn: 'Ignore the comment', isCorrect: false },
+          { id: 'o4', textAr: 'حذف تلقائي', textEn: 'Automatic deletion', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q22-3',
+        questionAr: 'صح ولا غلط: Batch Moderation بتوفر تكلفة وتبعت كل التعليقات في request واحد',
+        questionEn: 'True or False: Batch Moderation saves cost by sending all comments in one request',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
+          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 23,
+    slug: 'structured-data-extraction',
+    agentSlug: 'claude',
+    titleAr: 'استخراج البيانات المنظمة',
+    titleEn: 'Structured Data Extraction',
+    descriptionAr: 'حوّل أي نص غير منظم لـ JSON نظيف — فواتير، CVs، عقود.',
+    descriptionEn: 'Convert any unstructured text to clean JSON — invoices, CVs, contracts.',
+    order: 23,
+    xpReward: 95,
+    estimatedMinutes: 12,
+    emoji: '🗂️',
+    contentAr: `## استخراج البيانات المنظمة
+
+من أهم تطبيقات الـ AI في الأعمال — تحويل النصوص الحرة لبيانات منظمة يقدر الكمبيوتر يتعامل معها.
+
+---
+
+## المشكلة
+
+\`\`\`
+النص: "أحمد محمد، 28 سنة، مهندس برمجيات، خبرة 5 سنين في Python وJavaScript،
+       شغال في شركة التقنية منذ 2021، حاصل على بكالوريوس هندسة حاسبات"
+
+المطلوب: JSON منظم يقدر نحفظه في DB
+\`\`\`
+
+---
+
+## الحل مع Claude
+
+\`\`\`python
+import anthropic, json
+
+client = anthropic.Anthropic()
+
+def extract_cv_data(cv_text: str) -> dict:
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=1024,
+        system="""استخرج البيانات من الـ CV وأرجع JSON بالشكل ده فقط:
+{
+  "name": "الاسم الكامل",
+  "age": العمر كـ int أو null,
+  "title": "المسمى الوظيفي",
+  "experience_years": سنوات الخبرة كـ int,
+  "skills": ["skill1", "skill2"],
+  "current_company": "اسم الشركة أو null",
+  "education": "أعلى درجة علمية",
+  "languages": ["العربية", "الإنجليزية"]
+}
+لا تكتب أي شيء غير الـ JSON.""",
+        messages=[{"role": "user", "content": cv_text}]
+    )
+
+    return json.loads(response.content[0].text)
+
+cv = """
+أحمد محمد علي
+مهندس برمجيات أول — 28 سنة
+شغال في شركة TechCorp من يناير 2021
+خبرة: Python, JavaScript, React, PostgreSQL
+تعليم: بكالوريوس هندسة حاسبات — جامعة القاهرة 2019
+"""
+
+data = extract_cv_data(cv)
+print(json.dumps(data, ensure_ascii=False, indent=2))
+\`\`\`
+
+**النتيجة:**
+\`\`\`json
+{
+  "name": "أحمد محمد علي",
+  "age": 28,
+  "title": "مهندس برمجيات أول",
+  "experience_years": 5,
+  "skills": ["Python", "JavaScript", "React", "PostgreSQL"],
+  "current_company": "TechCorp",
+  "education": "بكالوريوس هندسة حاسبات",
+  "languages": ["العربية"]
+}
+\`\`\`
+
+---
+
+## استخراج بيانات فاتورة
+
+\`\`\`python
+def extract_invoice(invoice_text: str) -> dict:
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=1024,
+        system="""استخرج بيانات الفاتورة وأرجع JSON:
+{
+  "invoice_number": "رقم الفاتورة",
+  "date": "YYYY-MM-DD",
+  "vendor": "اسم البائع",
+  "total": المبلغ الإجمالي كـ float,
+  "currency": "EGP/USD/EUR",
+  "items": [{"name": "...", "quantity": 1, "price": 0.0}]
+}""",
+        messages=[{"role": "user", "content": invoice_text}]
+    )
+    return json.loads(response.content[0].text)
+\`\`\`
+
+---
+
+## نصيحة للـ Reliability ✅
+
+Claude ممكن يغلط أحياناً في الـ JSON format. استخدم try/except دايماً:
+
+\`\`\`python
+def safe_extract(text: str, extract_fn) -> dict | None:
+    try:
+        return extract_fn(text)
+    except json.JSONDecodeError:
+        # جرب تاني مع تعليمات أوضح
+        return None
+\`\`\``,
+
+    contentEn: `## Structured Data Extraction
+
+One of the most important AI applications in business — converting free-form text into structured data that computers can process.
+
+---
+
+## The Problem
+
+\`\`\`
+Text: "Ahmed Mohamed, 28 years old, software engineer, 5 years experience
+       in Python and JavaScript, working at Tech Company since 2021,
+       BS in Computer Engineering"
+
+Needed: Structured JSON that can be saved in DB
+\`\`\`
+
+---
+
+## The Solution with Claude
+
+\`\`\`python
+import anthropic, json
+
+client = anthropic.Anthropic()
+
+def extract_cv_data(cv_text: str) -> dict:
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=1024,
+        system="""Extract data from the CV and return ONLY this JSON:
+{
+  "name": "Full name",
+  "age": age as int or null,
+  "title": "Job title",
+  "experience_years": years as int,
+  "skills": ["skill1", "skill2"],
+  "current_company": "Company name or null",
+  "education": "Highest degree",
+  "languages": ["Arabic", "English"]
+}
+Write nothing other than the JSON.""",
+        messages=[{"role": "user", "content": cv_text}]
+    )
+
+    return json.loads(response.content[0].text)
+
+cv = """
+Ahmed Mohamed Ali
+Senior Software Engineer — 28 years old
+Working at TechCorp since January 2021
+Skills: Python, JavaScript, React, PostgreSQL
+Education: BS Computer Engineering — Cairo University 2019
+"""
+
+data = extract_cv_data(cv)
+print(json.dumps(data, indent=2))
+\`\`\`
+
+**Result:**
+\`\`\`json
+{
+  "name": "Ahmed Mohamed Ali",
+  "age": 28,
+  "title": "Senior Software Engineer",
+  "experience_years": 5,
+  "skills": ["Python", "JavaScript", "React", "PostgreSQL"],
+  "current_company": "TechCorp",
+  "education": "BS Computer Engineering"
+}
+\`\`\`
+
+---
+
+## Extract Invoice Data
+
+\`\`\`python
+def extract_invoice(invoice_text: str) -> dict:
+    response = client.messages.create(
+        model="claude-opus-4-7",
+        max_tokens=1024,
+        system="""Extract invoice data and return JSON:
+{
+  "invoice_number": "invoice number",
+  "date": "YYYY-MM-DD",
+  "vendor": "vendor name",
+  "total": total amount as float,
+  "currency": "USD/EUR/GBP",
+  "items": [{"name": "...", "quantity": 1, "price": 0.0}]
+}""",
+        messages=[{"role": "user", "content": invoice_text}]
+    )
+    return json.loads(response.content[0].text)
+\`\`\`
+
+---
+
+## Reliability Tip ✅
+
+Claude can sometimes make JSON format mistakes. Always use try/except:
+
+\`\`\`python
+def safe_extract(text: str, extract_fn) -> dict | None:
+    try:
+        return extract_fn(text)
+    except json.JSONDecodeError:
+        # Try again with clearer instructions
+        return None
+\`\`\``,
+
+    quiz: [
+      {
+        id: 'q23-1',
+        questionAr: 'إيه الهدف من Structured Data Extraction؟',
+        questionEn: 'What is the goal of Structured Data Extraction?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'تحويل النصوص الحرة لبيانات منظمة (JSON/DB)', textEn: 'Converting free-form text to structured data (JSON/DB)', isCorrect: true },
+          { id: 'o2', textAr: 'ترجمة النصوص', textEn: 'Translating text', isCorrect: false },
+          { id: 'o3', textAr: 'تلخيص المستندات', textEn: 'Summarizing documents', isCorrect: false },
+          { id: 'o4', textAr: 'إنشاء تقارير PDF', textEn: 'Creating PDF reports', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q23-2',
+        questionAr: 'ليه لازم نستخدم try/except مع JSON extraction؟',
+        questionEn: 'Why should we use try/except with JSON extraction?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'لأن Claude ممكن يغلط أحياناً في الـ JSON format', textEn: 'Because Claude might sometimes make JSON format mistakes', isCorrect: true },
+          { id: 'o2', textAr: 'متطلب من Python', textEn: 'Required by Python', isCorrect: false },
+          { id: 'o3', textAr: 'عشان نوفر tokens', textEn: 'To save tokens', isCorrect: false },
+          { id: 'o4', textAr: 'عشان الـ API بطيء', textEn: 'Because the API is slow', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q23-3',
+        questionAr: 'صح ولا غلط: ممكن نستخدم نفس التقنية لاستخراج بيانات من فواتير وعقود وـ CVs',
+        questionEn: 'True or False: We can use the same technique for invoices, contracts, and CVs',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
+          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 24,
+    slug: 'ai-agent-basics',
+    agentSlug: 'claude',
+    titleAr: 'AI Agent — الوكيل الذكي',
+    titleEn: 'AI Agent — The Smart Agent',
+    descriptionAr: 'ابني AI Agent بيخطط وينفذ مهام معقدة من تلقاء نفسه.',
+    descriptionEn: 'Build an AI Agent that plans and executes complex tasks on its own.',
+    order: 24,
+    xpReward: 110,
+    estimatedMinutes: 15,
+    emoji: '🧠',
+    contentAr: `## AI Agent
+
+الـ **AI Agent** هو برنامج بيستخدم الـ AI عشان يخطط وينفذ مهام معقدة بشكل مستقل — من غير تدخل بشري في كل خطوة.
+
+---
+
+## الفرق بين Chatbot و Agent
+
+| Chatbot | AI Agent |
+|---|---|
+| يرد على سؤال | ينفذ مهمة كاملة |
+| خطوة واحدة | خطوات متعددة |
+| يحتاج توجيه مستمر | يخطط لوحده |
+| مثال: "رد على إيميل" | مثال: "رتّب اجتماع مع الفريق" |
+
+---
+
+## بنية الـ Agent البسيط
+
+\`\`\`python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+# الأدوات المتاحة للـ Agent
+tools = [
+    {
+        "name": "search_web",
+        "description": "ابحث في الإنترنت عن معلومات",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "جملة البحث"}
+            },
+            "required": ["query"]
+        }
+    },
+    {
+        "name": "save_note",
+        "description": "احفظ ملاحظة",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "title": {"type": "string"},
+                "content": {"type": "string"}
+            },
+            "required": ["title", "content"]
+        }
+    }
+]
+
+# تنفيذ الأدوات
+def execute_tool(name: str, inputs: dict) -> str:
+    if name == "search_web":
+        return f"نتائج البحث عن '{inputs['query']}': [نتائج وهمية للتوضيح]"
+    elif name == "save_note":
+        return f"تم حفظ الملاحظة: {inputs['title']}"
+    return "tool not found"
+
+# الـ Agent Loop
+def run_agent(task: str, max_steps: int = 10):
+    messages = [{"role": "user", "content": task}]
+    steps = 0
+
+    print(f"🎯 المهمة: {task}\\n")
+
+    while steps < max_steps:
+        response = client.messages.create(
+            model="claude-opus-4-7",
+            max_tokens=4096,
+            tools=tools,
+            messages=messages,
+            system="""أنت AI Agent مهمتك إنجاز المهام المعقدة.
+استخدم الأدوات المتاحة لإتمام المهمة خطوة خطوة.
+لما تخلص، قول "المهمة اكتملت" واشرح النتيجة."""
+        )
+
+        # لو خلص
+        if response.stop_reason == "end_turn":
+            print(f"✅ {response.content[0].text}")
+            break
+
+        # لو طلب tool
+        if response.stop_reason == "tool_use":
+            messages.append({"role": "assistant", "content": response.content})
+
+            tool_results = []
+            for block in response.content:
+                if block.type == "tool_use":
+                    print(f"🔧 ينفذ: {block.name}({block.input})")
+                    result = execute_tool(block.name, block.input)
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": result
+                    })
+
+            messages.append({"role": "user", "content": tool_results})
+
+        steps += 1
+
+# شغّل الـ Agent
+run_agent("ابحث عن أحدث أخبار الذكاء الاصطناعي واحفظ ملخصها")
+\`\`\`
+
+---
+
+## أمثلة على Agents حقيقية 🚀
+
+- **Research Agent** — يبحث ويلخص ويكتب تقرير
+- **Code Review Agent** — يراجع كود ويقترح تحسينات
+- **Customer Service Agent** — يتعامل مع شكاوى العملاء
+- **Data Pipeline Agent** — يجمع ويحلل ويرفع بيانات
+
+---
+
+## متى تبني Agent؟
+
+✅ المهمة تحتاج خطوات متعددة وقرارات
+✅ المهمة قابلة للأتمتة لكنها معقدة
+✅ قيمة المهمة تبرر التكلفة والوقت
+❌ مهام بسيطة تكفيها API call واحدة`,
+
+    contentEn: `## AI Agent
+
+An **AI Agent** is a program that uses AI to plan and execute complex tasks independently — without human intervention at every step.
+
+---
+
+## Chatbot vs Agent
+
+| Chatbot | AI Agent |
+|---|---|
+| Responds to a question | Executes a complete task |
+| Single step | Multiple steps |
+| Needs constant guidance | Plans on its own |
+| Example: "Reply to email" | Example: "Schedule team meeting" |
+
+---
+
+## Simple Agent Structure
+
+\`\`\`python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+tools = [
+    {
+        "name": "search_web",
+        "description": "Search the internet for information",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "Search query"}
+            },
+            "required": ["query"]
+        }
+    },
+    {
+        "name": "save_note",
+        "description": "Save a note",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "title": {"type": "string"},
+                "content": {"type": "string"}
+            },
+            "required": ["title", "content"]
+        }
+    }
+]
+
+def execute_tool(name: str, inputs: dict) -> str:
+    if name == "search_web":
+        return f"Search results for '{inputs['query']}': [mock results]"
+    elif name == "save_note":
+        return f"Note saved: {inputs['title']}"
+    return "tool not found"
+
+def run_agent(task: str, max_steps: int = 10):
+    messages = [{"role": "user", "content": task}]
+    steps = 0
+
+    print(f"🎯 Task: {task}\\n")
+
+    while steps < max_steps:
+        response = client.messages.create(
+            model="claude-opus-4-7",
+            max_tokens=4096,
+            tools=tools,
+            messages=messages,
+            system="""You are an AI Agent tasked with completing complex tasks.
+Use the available tools to complete the task step by step.
+When done, say "Task completed" and explain the result."""
+        )
+
+        if response.stop_reason == "end_turn":
+            print(f"✅ {response.content[0].text}")
+            break
+
+        if response.stop_reason == "tool_use":
+            messages.append({"role": "assistant", "content": response.content})
+
+            tool_results = []
+            for block in response.content:
+                if block.type == "tool_use":
+                    print(f"🔧 Executing: {block.name}({block.input})")
+                    result = execute_tool(block.name, block.input)
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": result
+                    })
+
+            messages.append({"role": "user", "content": tool_results})
+
+        steps += 1
+
+run_agent("Search for latest AI news and save a summary")
+\`\`\`
+
+---
+
+## Real Agent Examples 🚀
+
+- **Research Agent** — searches, summarizes, writes report
+- **Code Review Agent** — reviews code and suggests improvements
+- **Customer Service Agent** — handles customer complaints
+- **Data Pipeline Agent** — collects, analyzes, uploads data
+
+---
+
+## When to Build an Agent?
+
+✅ Task needs multiple steps and decisions
+✅ Task is automatable but complex
+✅ Task value justifies cost and time
+❌ Simple tasks that need just one API call`,
+
+    quiz: [
+      {
+        id: 'q24-1',
+        questionAr: 'الفرق الرئيسي بين Chatbot وـ AI Agent؟',
+        questionEn: 'The main difference between a Chatbot and an AI Agent?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'الـ Agent بينفذ مهام متعددة الخطوات بشكل مستقل', textEn: 'The Agent executes multi-step tasks independently', isCorrect: true },
+          { id: 'o2', textAr: 'الـ Agent أسرع من الـ Chatbot', textEn: 'The Agent is faster than the Chatbot', isCorrect: false },
+          { id: 'o3', textAr: 'الـ Agent أرخص تكلفة', textEn: 'The Agent is cheaper', isCorrect: false },
+          { id: 'o4', textAr: 'مفيش فرق جوهري', textEn: 'No fundamental difference', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q24-2',
+        questionAr: 'الـ Agent Loop بيتوقف لما؟',
+        questionEn: 'The Agent Loop stops when?',
+        type: 'multiple_choice',
+        options: [
+          { id: 'o1', textAr: 'stop_reason يكون "end_turn" أو يوصل لـ max_steps', textEn: 'stop_reason is "end_turn" or reaches max_steps', isCorrect: true },
+          { id: 'o2', textAr: 'بعد 3 خطوات دايماً', textEn: 'Always after 3 steps', isCorrect: false },
+          { id: 'o3', textAr: 'لما المستخدم يكتب "stop"', textEn: 'When user types "stop"', isCorrect: false },
+          { id: 'o4', textAr: 'بعد استدعاء tool واحد', textEn: 'After one tool call', isCorrect: false },
+        ],
+      },
+      {
+        id: 'q24-3',
+        questionAr: 'صح ولا غلط: مهمة بسيطة زي ترجمة كلمة تستاهل نبني ليها Agent',
+        questionEn: 'True or False: A simple task like translating a word is worth building an Agent for',
+        type: 'true_false',
+        options: [
+          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
+          { id: 'o2', textAr: 'غلط — API call واحدة أكفأ', textEn: 'False — one API call is more efficient', isCorrect: true },
+        ],
+      },
+    ],
+  },
+];
+
+const allLessons: Lesson[] = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons, ...developerLessons];
 
 export function getLessonsByAgent(agentSlug: string): Lesson[] {
   return allLessons.filter((l) => l.agentSlug === agentSlug).sort((a, b) => a.order - b.order);

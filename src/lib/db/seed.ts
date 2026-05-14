@@ -16,9 +16,9 @@ import {
   tracks as tracksTable,
   translations,
 } from './schema';
-import { agents as agentContent, claudeLessons, promptEngineeringLessons, claudeApiLessons } from '../content/claude-lessons';
+import { agents as agentContent, claudeLessons, promptEngineeringLessons, claudeApiLessons, developerLessons } from '../content/claude-lessons';
 
-const allLessonsToSeed = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons];
+const allLessonsToSeed = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons, ...developerLessons];
 
 // ─── helper: bulk insert translations for one entity ─────────────────────────
 async function insertTranslations(

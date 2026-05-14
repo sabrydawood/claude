@@ -4,148 +4,137 @@
 
 ---
 
-## الوضع الحالي — v0.1 (MVP)
+## الوضع الحالي — v0.2 (جارٍ التطوير)
 
-### ✅ مكتمل
-- منصة Next.js 15 عربية-أولاً مع دعم الإنجليزية
-- نظام i18n قابل للتوسع (Translation Table في DB + next-intl للـ UI)
-- قسم Claude كامل: 5 دروس + كويز تفاعلي + نظام XP
-- Authentication: تسجيل دخول وإنشاء حساب (better-auth)
+### ✅ مكتمل (v0.1 — MVP)
+
+**البنية التقنية**
+- Next.js 15 App Router + Bun + TypeScript + Tailwind CSS v4
+- PostgreSQL + Drizzle ORM + Translation Table pattern (i18n قابل للتوسع بدون schema changes)
+- better-auth (email/password)
+- next-intl للـ UI translations
+- Framer Motion للأنيميشن
+
+**المحتوى**
+- قسم Claude: 5 دروس تفاعلية + كويز متعدد الخيارات + نظام XP
+- Prompt Engineering، Use Cases، Advanced Features
+
+**UI/UX**
+- Dark mode كـ Default + Light mode (CSS custom properties)
+- Arabic-first مع دعم English + RTL/LTR تلقائي
+- Header مع ThemeToggle + Language Switcher + User menu
+- Footer، Logo SVG (Robot mascot)، Brand tokens
+
+**الحسابات والتقدم**
+- تسجيل دخول / إنشاء حساب
+- Dashboard: XP bar، streak، إنجازات، lessons list
 - حفظ التقدم (localStorage — جاهز للـ DB)
-- لوحة تحكم مع XP، streak، إنجازات
-- Branding كامل: لوجو SVG، OG image ديناميكي، favicon، manifest
-- SEO كامل: robots.txt، sitemap.xml، JSON-LD، hreflang
+
+**SEO & Branding**
+- Dynamic metadata (generateMetadata per route)
+- OG images ديناميكية (Edge Runtime PNG) عبر `/api/og`
+- JSON-LD Structured Data (WebSite, Organization, Course, LearningResource, Breadcrumb)
+- robots.txt، sitemap.xml، hreflang، PWA manifest
+
+**DB**
+- Schema كامل: users, sessions, accounts, agents, lessons, quiz_questions, quiz_options, achievements, translations, user_progress, user_stats, user_achievements
+- db:reset → db:generate → db:migrate → db:seed (`bun run db:all`)
 
 ---
 
-## v0.2 — تعميق المحتوى وربط DB
+### ✅ مكتمل (v0.2 — جديد)
 
-**الهدف:** الانتقال من static content إلى DB-driven content مع API.
+**Dark/Light Mode (كامل)**
+- CSS custom properties (`--bg`, `--surface`, `--text`, `--border`, `--zkawi-purple`, إلخ)
+- تحديث جميع المكونات: Button، Card، Input، Badge، Progress
+- تحديث جميع الصفحات: Home، Auth، Dashboard، Agent، Lesson، Quiz
+- Wave SVG في Hero يتكيف مع dark/light
+- `.lesson-content` CSS class للمحتوى المحوَّل من Markdown
 
-### المحتوى
-- [ ] إضافة 5+ دروس جديدة عن Claude (مستوى متوسط ومتقدم)
-- [ ] أنواع أنشطة جديدة: Fill-in-the-blank, Drag-and-drop, Matching
-- [ ] تلميحات (hints) داخل الكويز
-- [ ] وضع "مذاكرة" — مراجعة الدروس السابقة
+**Onboarding Wizard**
+- `/onboarding` — 5 خطوات متحركة مع AnimatePresence:
+  1. العمر (child / teen / adult)
+  2. الهدف (chat / work / creative / developer / educator)
+  3. مستوى الخبرة (none / some / advanced)
+  4. طريقة التعلم (visual / reading / practice / game)
+  5. الوقت اليومي (5 / 15 / 30 / 60 دقيقة)
+- بعد إتمامه: مسار تعلم مخصص يُولَّد ويُحفظ في DB
+- Dashboard يتحقق تلقائياً ويُعيد التوجيه إن لم يُكتمل
 
-### Backend
-- [ ] ربط التقدم بقاعدة البيانات عبر API Routes
-- [ ] نظام إنجازات حقيقي مرتبط بـ DB
-- [ ] تتبع streak أوتوماتيكي يومي
-- [ ] Leaderboard بسيط (top learners)
+**Learning Tracks (5 مسارات)**
+- explorer 🚀 (المبتدئ الفضولي — default)
+- creator 🎨 (المبدع والكاتب)
+- engineer ⚙️ (محترف Prompt Engineering)
+- developer 💻 (مطور API)
+- educator 📚 (معلم/مدرب)
 
-### UX
-- [ ] Onboarding flow للمستخدم الجديد (عمر، مستوى، هدف)
-- [ ] إشعارات في المتصفح (remind to learn)
-- [ ] وضع للأطفال الصغار (8-12 سنة) — خط أكبر، ألوان أكثر
+**Schema جديد (5 جداول)**
+- `tracks` — مسارات التعلم
+- `user_preferences` — إجابات Onboarding
+- `learning_paths` — المسارات المخصصة (JSON lesson order)
+- `encrypted_keys` — مفاتيح Anthropic API للـ Sandbox
+- `sandbox_sessions` — تاريخ جلسات الـ Sandbox
 
----
-
-## v0.3 — AI Agents جدد
-
-**الهدف:** توسيع المنصة لتشمل أدوات AI أخرى.
-
-### قسم ChatGPT
-- [ ] 5 دروس: ما هو GPT-4؟، الفرق بين Claude وChatGPT، استخدامات GPT
-- [ ] أنشطة مقارنة بين الأدوات
-
-### قسم Gemini
-- [ ] 4 دروس: Google Gemini، multimodal AI، الفرق مع Claude
-- [ ] درس عملي: متى تستخدم كل أداة؟
-
-### صفحة مقارنة
-- [ ] جدول مقارنة تفاعلي بين Claude / GPT / Gemini
-- [ ] "اختر الأداة المناسبة لك" — quiz تشخيصي
-
----
-
-## v0.4 — تجربة الأطفال
-
-**الهدف:** جعل المنصة تجربة ألعاب تعليمية حقيقية للأطفال.
-
-### Gamification متقدم
-- [ ] شخصية كرتونية قابلة للتخصيص (Avatar builder)
-- [ ] "خريطة التعلم" — رحلة بصرية مثل Duolingo
-- [ ] مستويات: مبتدئ → متوسط → متقدم → خبير
-- [ ] بطاقات جمع (Collection cards) لكل مفهوم يُتعلم
-- [ ] تحديات يومية وأسبوعية
-
-### وضع الأطفال (Kid Mode)
-- [ ] واجهة مبسطة مع شخصيات كرتونية
-- [ ] مراقبة الوالدين: تقرير أسبوعي على البريد
-- [ ] قيود على وقت التعلم
-- [ ] محتوى مُصمَّم لأعمار 6-8، 9-12، 13+
-
-### صوت وحركة
-- [ ] تعليق صوتي عربي على الدروس (Text-to-Speech)
-- [ ] مؤثرات صوتية للـ quiz (صح/غلط/إنجاز)
+**APIs**
+- `POST /api/onboarding` — حفظ إجابات + توليد learning path
+- `GET /api/user/preferences` — قراءة حالة onboarding
+- Learning Path Generator (`src/lib/learning-path.ts`) — يُرتِّب الدروس بناءً على profile
 
 ---
 
-## v0.5 — تعلم حقيقي مع AI
+## v0.3 — ربط DB والـ Sandbox (التالي)
 
-**الهدف:** دمج AI في تجربة التعلم نفسها.
+### أولوية عالية
+- [ ] **Sandbox** — محرر داخل المنصة يستخدم مفتاح Anthropic API الخاص بالمستخدم
+  - واجهة chat بسيطة داخل الدرس
+  - تشفير المفتاح (AES-256) قبل حفظه في `encrypted_keys`
+  - استدعاء API من server-side فقط (المفتاح لا يُكشف للـ client أبداً)
+- [ ] **ربط التقدم بـ DB** — استبدال localStorage بـ API calls إلى `user_progress` و`user_stats`
+- [ ] **الـ Streak الحقيقي** — حساب يومي مرتبط بـ `lastActivityDate` في `user_stats`
+- [ ] **Dashboard الشخصي** — عرض المسار المخصص من `learning_paths`
 
-### مساعد تعليمي
-- [ ] Claude مدمج كـ"معلم" داخل المنصة
-- [ ] اسأل عن أي درس واحصل على شرح مخصص
-- [ ] "اشرحلي بأسلوب آخر" — Claude يشرح بطريقة مختلفة
-
-### تقييم تكيفي
-- [ ] Claude يقيّم إجابات الكويز المفتوحة (مش بس Multiple Choice)
-- [ ] مسار تعلم مخصص بناءً على نتائج المستخدم
-
-### محتوى تفاعلي
-- [ ] المستخدم يجرب prompts على Claude مباشرة داخل الدرس
-- [ ] "تحدي الـ Prompt" — اكتب prompt أفضل من المثال
+### أولوية متوسطة
+- [ ] **Admin Panel** — `/admin` بسيط لإضافة دروس من الـ UI
+- [ ] **Content API** — `POST /api/admin/lessons` لـ AI agents تُضيف محتوى برمجياً
 
 ---
 
-## v1.0 — المنصة الكاملة
+## v0.4 — المحتوى المتقدم
 
-**الهدف:** منصة مستدامة ذات مجتمع نشط.
-
-### Social & Community
-- [ ] ملفات شخصية عامة (Public profiles)
-- [ ] مشاركة الإنجازات على السوشيال ميديا
-- [ ] مجموعات دراسية (Study groups)
-- [ ] تعليقات ونقاشات على كل درس
-
-### تعدد اللغات
-- [ ] اللغة الفرنسية (للمغرب / تونس / الجزائر)
-- [ ] اللغة الأردية (لباكستان وجنوب آسيا)
-- [ ] اللغة التركية
-
-### إدارة المحتوى
-- [ ] Admin Panel لإضافة دروس جديدة من الـ UI
-- [ ] نظام مراجعة المحتوى قبل النشر
-- [ ] تحليلات المحتوى: أي الدروس الأكثر مشاهدة وأقل إتماماً
-
-### تسييل
-- [ ] خطة مجانية (مفتوحة للأطفال دائماً)
-- [ ] خطة Pro للكبار: محتوى متقدم، شهادات، بدون إعلانات
-- [ ] خطة مدارس: لوحة تحكم للمعلمين، تتبع الطلاب
+- [ ] Prompt Engineering track: 8 دروس (Zero-shot, Few-shot, Chain of thought, etc.)
+- [ ] Claude API track: 6 دروس (Auth, Messages, Streaming, Tool Use, Files, Caching)
+- [ ] Developer track: 5 دروس (Build a chatbot, RAG, Agents with tools)
+- [ ] أنواع أنشطة جديدة: Fill-in-the-blank, Drag-and-drop
+- [ ] Kid Mode: خط أكبر، ألوان أكثر، مكافآت مبالغ فيها
 
 ---
 
-## التحسينات التقنية المستقبلية
+## v0.5 — Social & Polish
 
-| الأولوية | التحسين | السبب |
-|---|---|---|
-| عالي | Redis caching للترجمات | تجنب DB queries متكررة للـ translations |
-| عالي | DB-driven content بدلاً من static files | تحديث المحتوى بدون deploy |
-| متوسط | PWA كاملة (Offline mode) | التعلم بدون إنترنت |
-| متوسط | CDN للـ static assets | أداء أفضل في الشرق الأوسط |
-| متوسط | E2E tests (Playwright) | استقرار المنصة عند التطوير |
-| منخفض | React Native app | iOS / Android |
-| منخفض | WebSockets للـ Leaderboard | تحديث لحظي |
+- [ ] Leaderboard (top learners)
+- [ ] مشاركة الإنجازات (OG card مخصص لكل إنجاز)
+- [ ] ملفات شخصية عامة
+- [ ] تعليقات على الدروس
+- [ ] PWA كاملة (Offline mode)
 
 ---
 
-## مبادئ التطوير
+## v1.0 — الكمال
 
-1. **الطفل أولاً:** كل feature جديدة تُختبر على أطفال 8-12 سنة
-2. **العربية أولاً:** أي محتوى جديد يبدأ بالعربية ثم يُترجم
-3. **البساطة:** مش كل تقنية جديدة مناسبة — الأولوية للـ UX
-4. **Privacy by design:** بيانات الأطفال محمية دائماً (COPPA-inspired)
-5. **Open content:** المحتوى التعليمي يظل مجانياً للأطفال أبداً
+- [ ] ChatGPT + Gemini tracks
+- [ ] تعدد اللغات: فرنسي، أردي، تركي
+- [ ] خطة Pro (شهادات، محتوى متقدم)
+- [ ] خطة مدارس (لوحة تحكم معلمين)
+- [ ] React Native app
+
+---
+
+## مبادئ التطوير (اتُّفق عليها)
+
+1. **الطفل أولاً:** كل feature تُختبر على مستخدمين 8-12 سنة
+2. **العربية أولاً — عامية مصرية:** لا فصحى في الـ UI أبداً
+3. **اسئل دائماً قبل الكود:** لا يُكتب سطر كود قبل نقاش الخطة
+4. **Translation Table:** إضافة لغة = INSERT rows فقط، لا schema changes
+5. **Dark default:** الـ dark mode هو الافتراضي دائماً
+6. **Privacy by design:** مفاتيح API مشفرة، بيانات الأطفال محمية
+7. **المحتوى مجاني للأطفال:** دائماً وأبداً

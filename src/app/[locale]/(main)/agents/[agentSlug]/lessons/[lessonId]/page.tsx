@@ -68,6 +68,7 @@ export default function LessonPage({
   const nextLesson = allLessons[currentIndex + 1];
 
   const [view, setView] = useState<LessonView>('content');
+  const [quizKey, setQuizKey] = useState(0);
   const [progress, setProgress] = useState<UserProgress>({
     completedLessons: [], totalXp: 0, streakDays: 1, quizzesCompleted: 0, scores: {}
   });
@@ -116,6 +117,7 @@ export default function LessonPage({
   };
 
   const handleRetry = () => {
+    setQuizKey(prev => prev + 1);
     setView('quiz');
   };
 
@@ -273,6 +275,7 @@ export default function LessonPage({
               >
                 <div className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] shadow-sm p-6 md:p-8">
                   <QuizComponent
+                    key={quizKey}
                     questions={lesson.quiz}
                     xpReward={lesson.xpReward}
                     onComplete={handleQuizComplete}

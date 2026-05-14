@@ -53,7 +53,6 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
       setXpEarned(earned);
       setQuizState('results');
       if (score >= 80) setTimeout(() => confetti(), 300);
-      onComplete(score, earned);
     }
   };
 
@@ -137,7 +136,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
               {t('results.tryAgainButton')}
             </Button>
           )}
-          <Button onClick={() => {}} className="gap-2">
+          <Button onClick={() => onComplete(finalScore, xpEarned)} className="gap-2">
             {t('results.continueButton')}
             <ChevronRight size={16} className="flip-rtl" />
           </Button>

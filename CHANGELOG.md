@@ -5,6 +5,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.4.0] — 2026-05-14
+
+### Added
+- **Prompt Engineering Track** — 8 lessons (ids 6-13)
+  - What is a Prompt?, Zero-shot, Few-shot, Chain of Thought
+  - Role Prompting, Output Formatting, System Prompt, Combining Techniques
+- **Claude API Track** — 6 lessons (ids 14-19)
+  - API Introduction, Messages API, Streaming, Tool Use, Prompt Caching, Best Practices
+- **Developer Track** — 5 lessons (ids 20-24)
+  - Build a Chatbot, Document Q&A, Content Moderation, Structured Data Extraction, AI Agent
+- Total lessons: **24** (was 5)
+
+---
+
 ## [0.3.0] — 2026-05-14
 
 ### Added

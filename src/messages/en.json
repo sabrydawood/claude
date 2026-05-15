@@ -17,7 +17,47 @@
     "newChat": "New chat",
     "placeholder": "Ask Zaki anything...",
     "askZaki": "Ask Zaki",
-    "errorMsg": "Sorry, I can't respond right now. Try again!"
+    "errorMsg": "Sorry, I can't respond right now. Try again!",
+    "patrol": {
+      "login": {
+        "0": "Log in to continue your adventure!",
+        "1": "Enter your info here"
+      },
+      "register": {
+        "0": "Join free and start your journey!",
+        "1": "Fill in your details here"
+      },
+      "dashboard": {
+        "0": "Ready to earn XP today?",
+        "1": "Check your progress above!",
+        "2": "Which lesson today?"
+      },
+      "lessons": {
+        "0": "Read the lesson carefully!",
+        "1": "Ready for the quiz?"
+      },
+      "agents": {
+        "0": "Pick the lesson that suits you!"
+      },
+      "leaderboard": {
+        "0": "Who's #1? It could be you!",
+        "1": "Earn more XP to top the board!"
+      },
+      "sandbox": {
+        "0": "Try chatting with Claude!",
+        "1": "Ask a question and see!"
+      },
+      "profile": {
+        "0": "Check and share your achievements!"
+      },
+      "default": {
+        "0": "Hi! I'm Zaki, your guide!",
+        "1": "Explore Zkawi platform!"
+      },
+      "small": {
+        "0": "Hi! Tap me!"
+      }
+    }
   },
   "pwa": {
     "install": "Install Zkawi on your device",
@@ -488,22 +528,22 @@
     }
   },
   "apiErrors": {
-    "UNAUTHORIZED": "You must be logged in first",
-    "FORBIDDEN": "You are not authorized to perform this action",
-    "RATE_LIMITED": "Rate limit exceeded. Please try again later.",
-    "VALIDATION_ERROR": "Invalid input data",
+    "UNAUTHORIZED": "Please log in first! 😊",
+    "FORBIDDEN": "You can't do that! Contact an Admin 🙏",
+    "RATE_LIMITED": "Slow down a bit, try again in a minute! 😄",
+    "VALIDATION_ERROR": "Something looks wrong, try again! 🤔",
     "INVALID_JSON": "Invalid data format",
-    "NOT_FOUND": "Item not found",
-    "INTERNAL_ERROR": "An internal error occurred. Please try again.",
+    "NOT_FOUND": "Can't find that! It may have been removed 😅",
+    "INTERNAL_ERROR": "Something went wrong, please try again! 🔄",
     "NO_API_KEY": "No API key has been added yet",
     "DECRYPT_FAILED": "Failed to process the API key",
-    "LESSON_NOT_FOUND": "Lesson not found",
+    "LESSON_NOT_FOUND": "That lesson doesn't exist! Go back to the list 📚",
     "AGENT_NOT_FOUND": "Content not found",
     "NO_KEY": "No key is saved",
-    "INVALID_ID": "Invalid identifier",
+    "INVALID_ID": "That link looks wrong! 🤔",
     "INVALID_KEY": "Invalid API key — must start with sk-ant-",
-    "STREAM_ERROR": "An error occurred while processing the response. Please try again.",
-    "AI_UNAVAILABLE": "AI service is currently unavailable"
+    "STREAM_ERROR": "Small hiccup, try again! 🔄",
+    "AI_UNAVAILABLE": "The assistant is taking a quick break, check back soon! 😴"
   },
   "og": {
     "platform": "AI Learning Platform",

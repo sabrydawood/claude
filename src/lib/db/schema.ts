@@ -97,14 +97,72 @@ export const AgentTranslations = pgTable(
   ],
 );
 
+// ─── Subjects ────────────────────────────────────────────────────────────────
+
+export const Subjects = pgTable('Subjects', {
+  Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  Slug:      text('Slug').notNull().unique(),
+  Icon:      text('Icon').notNull().default('BookOpen'),
+  Color:     text('Color').notNull().default('#7C3AED'),
+  Order:     integer('Order').default(0).notNull(),
+  IsActive:  boolean('IsActive').default(true).notNull(),
+  IsDeleted: boolean('IsDeleted').default(false).notNull(),
+  CreatedAt: timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const SubjectTranslations = pgTable(
+  'SubjectTranslations',
+  {
+    Id:          uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    SubjectId:   uuid('SubjectId').notNull().references(() => Subjects.Id, { onDelete: 'cascade' }),
+    Locale:      text('Locale').notNull(),
+    Name:        text('Name').notNull(),
+    Description: text('Description').notNull().default(''),
+  },
+  (T) => [
+    unique('Uq_SubjectTrans').on(T.SubjectId, T.Locale),
+    index('Idx_SubjectTrans_SubjectId').on(T.SubjectId),
+  ],
+);
+
+// ─── Courses ──────────────────────────────────────────────────────────────────
+
+export const Courses = pgTable('Courses', {
+  Id:             uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  SubjectId:      uuid('SubjectId').notNull().references(() => Subjects.Id, { onDelete: 'cascade' }),
+  Order:          integer('Order').default(0).notNull(),
+  Difficulty:     integer('Difficulty').default(1).notNull(),
+  EstimatedHours: integer('EstimatedHours').default(1).notNull(),
+  IsActive:       boolean('IsActive').default(true).notNull(),
+  IsDeleted:      boolean('IsDeleted').default(false).notNull(),
+  CreatedAt:      timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const CourseTranslations = pgTable(
+  'CourseTranslations',
+  {
+    Id:          uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    CourseId:    uuid('CourseId').notNull().references(() => Courses.Id, { onDelete: 'cascade' }),
+    Locale:      text('Locale').notNull(),
+    Name:        text('Name').notNull(),
+    Description: text('Description').notNull().default(''),
+  },
+  (T) => [
+    unique('Uq_CourseTrans').on(T.CourseId, T.Locale),
+    index('Idx_CourseTrans_CourseId').on(T.CourseId),
+  ],
+);
+
 // ─── Lessons ─────────────────────────────────────────────────────────────────
 
 export const Lessons = pgTable('Lessons', {
   Id:               uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
   AgentId:          uuid('AgentId').notNull().references(() => Agents.Id, { onDelete: 'cascade' }),
+  CourseId:         uuid('CourseId').references(() => Courses.Id),
   Order:            integer('Order').default(0).notNull(),
   XpReward:         integer('XpReward').default(50).notNull(),
   EstimatedMinutes: integer('EstimatedMinutes').default(5).notNull(),
+  Difficulty:       integer('Difficulty').default(1),
   IsDeleted:        boolean('IsDeleted').default(false).notNull(),
 });
 
@@ -325,6 +383,37 @@ export const UserAchievements = pgTable(
   ],
 );
 
+// ─── System Prompts ───────────────────────────────────────────────────────────
+
+export const SystemPrompts = pgTable('SystemPrompts', {
+  Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  Key:       text('Key').notNull().unique(),
+  Content:   text('Content').notNull(),
+  Locale:    text('Locale').notNull().default('ar'),
+  IsActive:  boolean('IsActive').default(true).notNull(),
+  UpdatedAt: timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
+  UpdatedBy: text('UpdatedBy'),
+});
+
+// ─── User Course Progress ─────────────────────────────────────────────────────
+
+export const UserCourseProgress = pgTable(
+  'UserCourseProgress',
+  {
+    Id:               uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    UserId:           uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    CourseId:         uuid('CourseId').notNull().references(() => Courses.Id, { onDelete: 'cascade' }),
+    CompletedLessons: integer('CompletedLessons').default(0).notNull(),
+    TotalXp:          integer('TotalXp').default(0).notNull(),
+    StartedAt:        timestamp('StartedAt', { withTimezone: true }).defaultNow().notNull(),
+    CompletedAt:      timestamp('CompletedAt', { withTimezone: true }),
+  },
+  (T) => [
+    index('Idx_UCProgress_UserId').on(T.UserId),
+    unique('Uq_UCProgress_UserCourse').on(T.UserId, T.CourseId),
+  ],
+);
+
 // ─── Relations ────────────────────────────────────────────────────────────────
 
 export const AgentsRelations = relations(Agents, ({ many }) => ({
@@ -410,3 +499,6 @@ export type TUserPreferences   = typeof UserPreferences.$inferSelect;
 export type TLearningPath      = typeof LearningPaths.$inferSelect;
 export type TEncryptedKey      = typeof EncryptedKeys.$inferSelect;
 export type TSandboxSession    = typeof SandboxSessions.$inferSelect;
+export type TSubject           = typeof Subjects.$inferSelect;
+export type TCourse            = typeof Courses.$inferSelect;
+export type TSystemPrompt      = typeof SystemPrompts.$inferSelect;

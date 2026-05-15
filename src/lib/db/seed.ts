@@ -16,6 +16,8 @@ import {
   QuizOptions, QuizOptionTranslations,
   Tracks, TrackTranslations,
   Achievements, AchievementTranslations,
+  SystemPrompts,
+  Subjects, SubjectTranslations,
 } from './Schema';
 import {
   agents as AgentContent,
@@ -117,6 +119,47 @@ async function Seed() {
     }
   }
   console.log(`  ✓ ${LC} lessons, ${QC} questions, ${OC} options`);
+
+  // ─── System Prompts ──────────────────────────────────────────────────────────
+  const mascotPromptAr = `أنت "ذكي" (Zaki)، المرشد الشخصي الذكي في منصة ذكاوي — منصة تعليمية عربية لتعلم الذكاء الاصطناعي.
+
+── شخصيتك ──
+- مرح، ودود، ومشجع دائماً — زي مدرس صاحب وليس جاف
+- تتكلم عربي مصري بسيط يناسب الأطفال والكبار
+- ردودك قصيرة ومركزة (3-5 جمل) إلا لو طُلب شرح تفصيلي
+- دايماً تشجع المستخدم حتى لو أخطأ
+
+── قواعد حاسمة ──
+1. أسئلة الكويز: قول "شغل دماغك شوية حاول لوحدك الأول!"
+2. لو في درس: اشرح بطريقة أبسط، استخدم أمثلة من الحياة اليومية
+3. لو المستخدم محبط: شجّعه بحرارة قبل ما تشرح أي حاجة
+4. ردّك دايماً بنفس لغة المستخدم تماماً`;
+
+  const sandboxPromptAr = `أنت مساعد تعليمي ذكي متخصص في تعليم الذكاء الاصطناعي باللغة العربية.
+اسمك "ذكاوي" وأنت هنا لمساعدة المتعلمين على فهم مفاهيم الذكاء الاصطناعي وتطبيقاتها.`;
+
+  await db.insert(SystemPrompts).values([
+    { Key: 'mascot_base', Content: mascotPromptAr, Locale: 'ar' },
+    { Key: 'sandbox_base', Content: sandboxPromptAr, Locale: 'ar' },
+  ]).onConflictDoNothing();
+  console.log('  ✓ 2 system prompts');
+
+  // ─── Subjects ─────────────────────────────────────────────────────────────────
+  const [aiSubject] = await db.insert(Subjects).values({
+    Slug: 'ai',
+    Icon: 'Bot',
+    Color: '#7C3AED',
+    Order: 1,
+  }).onConflictDoNothing().returning();
+
+  if (aiSubject) {
+    await db.insert(SubjectTranslations).values([
+      { SubjectId: aiSubject.Id, Locale: 'ar', Name: 'الذكاء الاصطناعي', Description: 'تعلم أساسيات الذكاء الاصطناعي والتعامل مع النماذج اللغوية' },
+      { SubjectId: aiSubject.Id, Locale: 'en', Name: 'Artificial Intelligence', Description: 'Learn AI fundamentals and how to work with language models' },
+    ]);
+    console.log('  ✓ 1 subject (AI)');
+  }
+
   console.log('\n✅ Seed complete!\n');
   process.exit(0);
 }

@@ -11,17 +11,26 @@ import Anthropic from '@anthropic-ai/sdk';
 import { GetSessionOrUnauthorized } from '@/Shared/Middleware/Auth.Middleware';
 import { ParseBodyOrBadRequest } from '@/Shared/Middleware/Validation.Middleware';
 import { db } from '@/lib/db/Index';
-import { EncryptedKeys, SandboxSessions } from '@/lib/db/Schema';
-import { eq } from 'drizzle-orm';
+import { EncryptedKeys, SandboxSessions, SystemPrompts } from '@/lib/db/Schema';
+import { and, eq } from 'drizzle-orm';
 import { decryptApiKey } from '@/lib/encryption';
 import { SandboxChatSchema } from './Sandbox.Schemas';
 
 const MODEL = 'claude-haiku-4-5-20251001';
 
-const SYSTEM_PROMPT = `أنت مساعد تعليمي ذكي متخصص في تعليم الذكاء الاصطناعي باللغة العربية.
+const DEFAULT_SANDBOX_PROMPT = `أنت مساعد تعليمي ذكي متخصص في تعليم الذكاء الاصطناعي باللغة العربية.
 اسمك "ذكاوي" وأنت هنا لمساعدة المتعلمين على فهم مفاهيم الذكاء الاصطناعي وتطبيقاتها.
 كن ودوداً ومشجعاً، واستخدم أمثلة من الحياة اليومية لتوضيح المفاهيم المعقدة.
 عند الإجابة بالعربية، استخدم لغة واضحة وبسيطة مناسبة للمبتدئين.`;
+
+async function GetSandboxSystemPrompt(): Promise<string> {
+  const [Row] = await db
+    .select({ Content: SystemPrompts.Content })
+    .from(SystemPrompts)
+    .where(and(eq(SystemPrompts.Key, 'sandbox_base'), eq(SystemPrompts.IsActive, true)))
+    .limit(1);
+  return Row?.Content ?? DEFAULT_SANDBOX_PROMPT;
+}
 
 /**
  * POST /api/v1/sandbox — streams AI response using user's personal Anthropic key.
@@ -56,6 +65,8 @@ export async function PostSandboxChat(Req: NextRequest): Promise<NextResponse | 
     );
   }
 
+  const SystemPrompt = await GetSandboxSystemPrompt();
+
   const Anthropic_ = new Anthropic({ apiKey: ApiKey });
   const Encoder = new TextEncoder();
   let TotalInputTokens = 0;
@@ -69,7 +80,7 @@ export async function PostSandboxChat(Req: NextRequest): Promise<NextResponse | 
         const Response = await Anthropic_.messages.create({
           model: MODEL,
           max_tokens: 2048,
-          system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+          system: [{ type: 'text', text: SystemPrompt, cache_control: { type: 'ephemeral' } }],
           messages: Messages,
           stream: true,
         });

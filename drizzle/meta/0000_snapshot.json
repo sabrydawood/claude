@@ -1,5 +1,5 @@
 {
-  "id": "8e611095-0fae-4472-80c8-74ce9715f413",
+  "id": "f8971ace-dadb-4064-8fc5-8e311e5bf072",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -305,6 +305,170 @@
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.CourseTranslations": {
+      "name": "CourseTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "CourseId": {
+          "name": "CourseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "Idx_CourseTrans_CourseId": {
+          "name": "Idx_CourseTrans_CourseId",
+          "columns": [
+            {
+              "expression": "CourseId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "CourseTranslations_CourseId_Courses_Id_fk": {
+          "name": "CourseTranslations_CourseId_Courses_Id_fk",
+          "tableFrom": "CourseTranslations",
+          "tableTo": "Courses",
+          "columnsFrom": [
+            "CourseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_CourseTrans": {
+          "name": "Uq_CourseTrans",
+          "nullsNotDistinct": false,
+          "columns": [
+            "CourseId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Courses": {
+      "name": "Courses",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "SubjectId": {
+          "name": "SubjectId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "Difficulty": {
+          "name": "Difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "EstimatedHours": {
+          "name": "EstimatedHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Courses_SubjectId_Subjects_Id_fk": {
+          "name": "Courses_SubjectId_Subjects_Id_fk",
+          "tableFrom": "Courses",
+          "tableTo": "Subjects",
+          "columnsFrom": [
+            "SubjectId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -623,6 +787,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "CourseId": {
+          "name": "CourseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "Order": {
           "name": "Order",
           "type": "integer",
@@ -643,6 +813,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": 5
+        },
+        "Difficulty": {
+          "name": "Difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
         },
         "IsDeleted": {
           "name": "IsDeleted",
@@ -665,6 +842,19 @@
             "Id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Lessons_CourseId_Courses_Id_fk": {
+          "name": "Lessons_CourseId_Courses_Id_fk",
+          "tableFrom": "Lessons",
+          "tableTo": "Courses",
+          "columnsFrom": [
+            "CourseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -1021,6 +1211,230 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.SubjectTranslations": {
+      "name": "SubjectTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "SubjectId": {
+          "name": "SubjectId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "Idx_SubjectTrans_SubjectId": {
+          "name": "Idx_SubjectTrans_SubjectId",
+          "columns": [
+            {
+              "expression": "SubjectId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "SubjectTranslations_SubjectId_Subjects_Id_fk": {
+          "name": "SubjectTranslations_SubjectId_Subjects_Id_fk",
+          "tableFrom": "SubjectTranslations",
+          "tableTo": "Subjects",
+          "columnsFrom": [
+            "SubjectId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_SubjectTrans": {
+          "name": "Uq_SubjectTrans",
+          "nullsNotDistinct": false,
+          "columns": [
+            "SubjectId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Subjects": {
+      "name": "Subjects",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Slug": {
+          "name": "Slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Icon": {
+          "name": "Icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'BookOpen'"
+        },
+        "Color": {
+          "name": "Color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'#7C3AED'"
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Subjects_Slug_unique": {
+          "name": "Subjects_Slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "Slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.SystemPrompts": {
+      "name": "SystemPrompts",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Key": {
+          "name": "Key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Content": {
+          "name": "Content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ar'"
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedBy": {
+          "name": "UpdatedBy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "SystemPrompts_Key_unique": {
+          "name": "SystemPrompts_Key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "Key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.TrackTranslations": {
       "name": "TrackTranslations",
       "schema": "",
@@ -1254,6 +1668,116 @@
           "columns": [
             "UserId",
             "AchievementId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UserCourseProgress": {
+      "name": "UserCourseProgress",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "CourseId": {
+          "name": "CourseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "CompletedLessons": {
+          "name": "CompletedLessons",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "TotalXp": {
+          "name": "TotalXp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "StartedAt": {
+          "name": "StartedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "CompletedAt": {
+          "name": "CompletedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "Idx_UCProgress_UserId": {
+          "name": "Idx_UCProgress_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "UserCourseProgress_UserId_users_id_fk": {
+          "name": "UserCourseProgress_UserId_users_id_fk",
+          "tableFrom": "UserCourseProgress",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UserCourseProgress_CourseId_Courses_Id_fk": {
+          "name": "UserCourseProgress_CourseId_Courses_Id_fk",
+          "tableFrom": "UserCourseProgress",
+          "tableTo": "Courses",
+          "columnsFrom": [
+            "CourseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_UCProgress_UserCourse": {
+          "name": "Uq_UCProgress_UserCourse",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId",
+            "CourseId"
           ]
         }
       },

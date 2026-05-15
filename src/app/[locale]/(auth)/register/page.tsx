@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { isRTL } from '@/lib/i18n/locale-utils';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -25,8 +26,8 @@ export default function RegisterPage() {
   const t = useTranslations('auth.register');
   const tVal = useTranslations('auth.validation');
   const tErr = useTranslations('auth.errors');
+  const tNav = useTranslations('nav');
   const locale = useLocale();
-  const isAr = locale === 'ar';
   const router = useRouter();
 
   const [mounted, setMounted] = useState(false);
@@ -99,7 +100,7 @@ export default function RegisterPage() {
 
       {/* Back to home */}
       <motion.div
-        initial={{ opacity: 0, x: isAr ? 20 : -20 }}
+        initial={{ opacity: 0, x: isRTL(locale) ? 20 : -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
         className="absolute top-5 start-5"
@@ -112,7 +113,7 @@ export default function RegisterPage() {
             style={{ background: 'var(--surface)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
           >
             <Home size={15} />
-            {isAr ? 'الرئيسية' : 'Home'}
+            {tNav('home')}
           </motion.button>
         </Link>
       </motion.div>
@@ -225,7 +226,7 @@ export default function RegisterPage() {
           style={{ color: 'var(--text-muted)' }}
         >
           <Gift size={13} style={{ color: '#F59E0B' }} />
-          {isAr ? 'مجاني 100% — مش محتاج بطاقة بنكية' : '100% Free — no credit card required'}
+          {t('freeNote')}
         </motion.div>
       </motion.div>
     </div>

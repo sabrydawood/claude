@@ -4,10 +4,11 @@ import { users, userStats, userAchievements, achievements, translations } from '
 import { eq, and, inArray } from 'drizzle-orm';
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ userId: string }> },
 ) {
   const { userId } = await params;
+  const locale = new URL(req.url).searchParams.get('locale') ?? 'ar';
 
   const [user] = await db
     .select({ id: users.id, name: users.name, image: users.image, createdAt: users.createdAt })
@@ -28,7 +29,7 @@ export async function GET(
     .from(userAchievements)
     .where(eq(userAchievements.userId, userId));
 
-  let earnedAchievements: { id: number; emoji: string; nameAr: string; nameEn: string; earnedAt: Date }[] = [];
+  let earnedAchievements: { id: number; emoji: string; name: string; earnedAt: Date }[] = [];
 
   if (earnedRows.length > 0) {
     const ids = earnedRows.map(r => r.achievementId);
@@ -55,8 +56,7 @@ export async function GET(
     earnedAchievements = achRows.map(a => ({
       id: a.id,
       emoji: a.emoji,
-      nameAr: transMap.get(`${a.id}_ar_name`) ?? '',
-      nameEn: transMap.get(`${a.id}_en_name`) ?? '',
+      name: transMap.get(`${a.id}_${locale}_name`) ?? transMap.get(`${a.id}_en_name`) ?? '',
       earnedAt: earnedRows.find(r => r.achievementId === a.id)!.earnedAt,
     }));
   }

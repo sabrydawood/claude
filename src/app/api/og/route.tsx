@@ -1,5 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 import type { NextRequest } from 'next/server';
+import { getDir } from '@/lib/i18n/locale-utils';
 
 export const runtime = 'edge';
 
@@ -13,7 +14,7 @@ export async function GET(req: NextRequest) {
   const xp = searchParams.get('xp') ?? '';
   const lessons = searchParams.get('lessons') ?? '';
 
-  const isAr = locale === 'ar';
+  const dir = getDir(locale);
 
   return new ImageResponse(
     (
@@ -115,7 +116,7 @@ export async function GET(req: NextRequest) {
             fontWeight: '900',
             lineHeight: '1.15',
             letterSpacing: '-1px',
-            direction: isAr ? 'rtl' : 'ltr',
+            direction: dir,
           }}>
             {title}
           </div>
@@ -125,17 +126,17 @@ export async function GET(req: NextRequest) {
             color: 'rgba(255,255,255,0.6)',
             fontSize: '24px',
             fontWeight: '400',
-            direction: isAr ? 'rtl' : 'ltr',
+            direction: dir,
           }}>
-            {isAr ? 'منصة تعلم الذكاء الاصطناعي' : 'AI Learning Platform'}
+            {locale === 'ar' ? 'منصة تعلم الذكاء الاصطناعي' : 'AI Learning Platform'}
           </div>
 
           {/* Feature pills */}
           <div style={{ display: 'flex', gap: '12px', marginTop: '16px', flexWrap: 'wrap' }}>
             {[
-              isAr ? '🎮 تفاعلي' : '🎮 Interactive',
-              isAr ? '⭐ نقاط XP' : '⭐ XP Points',
-              isAr ? '📚 عربي أولاً' : '📚 Arabic First',
+              locale === 'ar' ? '🎮 تفاعلي' : '🎮 Interactive',
+              locale === 'ar' ? '⭐ نقاط XP' : '⭐ XP Points',
+              locale === 'ar' ? '📚 عربي أولاً' : '📚 Arabic First',
             ].map((pill) => (
               <div key={pill} style={{
                 background: 'rgba(255,255,255,0.1)',
@@ -167,15 +168,15 @@ export async function GET(req: NextRequest) {
             alignItems: 'center', justifyContent: 'center', gap: '24px',
           }}>
             <div style={{ fontSize: '120px', display: 'flex' }}>{emoji}</div>
-            <div style={{ color: 'white', fontSize: '56px', fontWeight: '900', textAlign: 'center', direction: isAr ? 'rtl' : 'ltr' }}>
+            <div style={{ color: 'white', fontSize: '56px', fontWeight: '900', textAlign: 'center', direction: locale === 'ar' ? 'rtl' : 'ltr' }}>
               {title}
             </div>
-            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '28px', textAlign: 'center', direction: isAr ? 'rtl' : 'ltr' }}>
-              {isAr ? `فتح هذا الإنجاز على ذكاوي` : `Unlocked this achievement on Zkawi`}
+            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '28px', textAlign: 'center', direction: locale === 'ar' ? 'rtl' : 'ltr' }}>
+              {locale === 'ar' ? `فتح هذا الإنجاز على ذكاوي` : `Unlocked this achievement on Zkawi`}
             </div>
             <div style={{ display: 'flex', gap: '20px', marginTop: '8px' }}>
               {xp && <div style={{ background: 'rgba(124,58,237,0.3)', borderRadius: '20px', padding: '10px 24px', color: '#A78BFA', fontSize: '22px', display: 'flex', border: '1px solid rgba(124,58,237,0.5)' }}>⭐ {xp} XP</div>}
-              {lessons && <div style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '20px', padding: '10px 24px', color: '#6EE7B7', fontSize: '22px', display: 'flex', border: '1px solid rgba(16,185,129,0.4)' }}>📚 {lessons} {isAr ? 'درس' : 'lessons'}</div>}
+              {lessons && <div style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '20px', padding: '10px 24px', color: '#6EE7B7', fontSize: '22px', display: 'flex', border: '1px solid rgba(16,185,129,0.4)' }}>📚 {lessons} {locale === 'ar' ? 'درس' : 'lessons'}</div>}
             </div>
           </div>
         )}

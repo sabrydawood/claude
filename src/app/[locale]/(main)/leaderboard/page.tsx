@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Card } from '@/components/ui/card';
-import { Loader2, Trophy, Flame, BookOpen } from 'lucide-react';
+import { Loader2, BookOpen, Flame } from 'lucide-react';
 
 interface LeaderboardEntry {
   userId: string;
@@ -21,8 +21,7 @@ interface LeaderboardEntry {
 const MEDALS = ['🥇', '🥈', '🥉'];
 
 export default function LeaderboardPage() {
-  const locale = useLocale();
-  const isAr = locale === 'ar';
+  const t = useTranslations('leaderboard');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,10 +40,10 @@ export default function LeaderboardPage() {
         <div className="text-center">
           <div className="text-5xl mb-3">🏆</div>
           <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
-            {isAr ? 'لوحة المتصدرين' : 'Leaderboard'}
+            {t('title')}
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-            {isAr ? 'أكتر 50 متعلم في المنصة' : 'Top 50 learners on the platform'}
+            {t('subtitle')}
           </p>
         </div>
 
@@ -54,7 +53,7 @@ export default function LeaderboardPage() {
           </div>
         ) : entries.length === 0 ? (
           <div className="text-center py-16" style={{ color: 'var(--text-muted)' }}>
-            {isAr ? 'مفيش بيانات بعد — ابدأ التعلم!' : 'No data yet — start learning!'}
+            {t('noData')}
           </div>
         ) : (
           <div className="flex flex-col gap-3">
@@ -69,7 +68,7 @@ export default function LeaderboardPage() {
                   <Card
                     className="p-4 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.01]"
                     style={{
-                      background: i < 3 ? 'var(--surface)' : 'var(--surface)',
+                      background: 'var(--surface)',
                       border: i === 0 ? '1px solid #F59E0B' : i === 1 ? '1px solid #9CA3AF' : i === 2 ? '1px solid #B45309' : '1px solid var(--border)',
                     }}
                   >
@@ -104,11 +103,11 @@ export default function LeaderboardPage() {
                       <div className="flex items-center gap-3 mt-0.5">
                         <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
                           <BookOpen size={11} />
-                          {entry.lessonsCompleted} {isAr ? 'درس' : 'lessons'}
+                          {entry.lessonsCompleted} {t('lessons')}
                         </span>
                         <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
                           <Flame size={11} />
-                          {entry.streakDays} {isAr ? 'يوم' : 'days'}
+                          {entry.streakDays} {t('days')}
                         </span>
                       </div>
                     </div>

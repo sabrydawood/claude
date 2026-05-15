@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from '@/lib/auth-client';
 import { useRouter } from '@/lib/i18n/navigation';
@@ -17,8 +17,7 @@ interface Message {
 }
 
 export default function SandboxPage() {
-  const locale = useLocale();
-  const isAr = locale === 'ar';
+  const t = useTranslations('sandbox');
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
@@ -73,7 +72,7 @@ export default function SandboxPage() {
 
   async function sendMessage() {
     if (!input.trim() || streaming) return;
-    if (!hint) { setError(isAr ? 'أضف مفتاح API أولاً' : 'Add your API key first'); return; }
+    if (!hint) { setError(t('noKeyError')); return; }
 
     setError('');
     const userMsg: Message = { role: 'user', content: input.trim() };
@@ -115,7 +114,7 @@ export default function SandboxPage() {
       }
     } catch {
       setMessages(prev => prev.slice(0, -1));
-      setError(isAr ? 'فشل الاتصال بالخادم' : 'Connection failed');
+      setError(t('connectionError'));
     } finally {
       setStreaming(false);
     }
@@ -132,10 +131,10 @@ export default function SandboxPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
-              {isAr ? 'ساندبوكس ذكاوي' : 'Zkawi Sandbox'}
+              {t('title')}
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              {isAr ? 'تحدث مع Claude باستخدام مفتاحك الخاص' : 'Chat with Claude using your own key'}
+              {t('subtitle')}
             </p>
           </div>
 
@@ -156,7 +155,7 @@ export default function SandboxPage() {
             ) : (
               <Button size="sm" onClick={() => setShowKeyForm(true)} style={{ background: 'var(--zkawi-purple)', color: '#fff' }}>
                 <Key size={14} className="me-1" />
-                {isAr ? 'أضف مفتاح API' : 'Add API Key'}
+                {t('addKey')}
               </Button>
             )}
           </div>
@@ -172,7 +171,7 @@ export default function SandboxPage() {
             >
               <Card className="p-4 flex flex-col gap-3" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
                 <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>
-                  {isAr ? 'مفتاح Anthropic API (يبدأ بـ sk-ant-)' : 'Anthropic API Key (starts with sk-ant-)'}
+                  {t('keyLabel')}
                 </p>
                 <input
                   type="password"
@@ -186,10 +185,10 @@ export default function SandboxPage() {
                 {keyError && <p className="text-xs text-red-500">{keyError}</p>}
                 <div className="flex gap-2 justify-end">
                   <Button variant="ghost" size="sm" onClick={() => { setShowKeyForm(false); setKeyError(''); }}>
-                    {isAr ? 'إلغاء' : 'Cancel'}
+                    {t('cancel')}
                   </Button>
                   <Button size="sm" onClick={saveKey} disabled={keySaving} style={{ background: 'var(--zkawi-purple)', color: '#fff' }}>
-                    {keySaving ? <Loader2 size={14} className="animate-spin" /> : (isAr ? 'حفظ' : 'Save')}
+                    {keySaving ? <Loader2 size={14} className="animate-spin" /> : t('save')}
                   </Button>
                 </div>
               </Card>
@@ -206,10 +205,10 @@ export default function SandboxPage() {
                   🤖
                 </div>
                 <p className="font-medium" style={{ color: 'var(--text)' }}>
-                  {isAr ? 'مرحباً! أنا ذكاوي' : "Hi! I'm Zkawi"}
+                  {t('greeting')}
                 </p>
                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  {isAr ? 'اسألني أي سؤال عن الذكاء الاصطناعي' : 'Ask me anything about AI'}
+                  {t('greetingSubtitle')}
                 </p>
               </div>
             )}
@@ -257,7 +256,7 @@ export default function SandboxPage() {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                placeholder={isAr ? 'اكتب رسالتك...' : 'Type your message...'}
+                placeholder={t('placeholder')}
                 disabled={streaming}
                 className="flex-1 rounded-xl px-4 py-2.5 text-sm outline-none"
                 style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}

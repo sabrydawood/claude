@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Header from '@/components/layout/header';
@@ -12,12 +12,12 @@ import { Loader2, Trophy, Flame, BookOpen, Star, Calendar } from 'lucide-react';
 interface ProfileData {
   user: { id: string; name: string; image: string | null; memberSince: string };
   stats: { totalXp: number; streakDays: number; lessonsCompleted: number; quizzesCompleted: number };
-  achievements: { id: number; emoji: string; nameAr: string; nameEn: string; earnedAt: string }[];
+  achievements: { id: number; emoji: string; name: string; earnedAt: string }[];
 }
 
 export default function ProfilePage() {
   const locale = useLocale();
-  const isAr = locale === 'ar';
+  const t = useTranslations('profile');
   const { userId } = useParams<{ userId: string }>();
 
   const [data, setData] = useState<ProfileData | null>(null);
@@ -25,13 +25,13 @@ export default function ProfilePage() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/profile/${userId}`)
+    fetch(`/api/profile/${userId}?locale=${locale}`)
       .then(async r => {
         if (r.status === 404) { setNotFound(true); return; }
         setData(await r.json());
       })
       .finally(() => setLoading(false));
-  }, [userId]);
+  }, [userId, locale]);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
@@ -44,9 +44,7 @@ export default function ProfilePage() {
       <Header />
       <main className="flex-1 flex flex-col items-center justify-center gap-3">
         <p className="text-4xl">😔</p>
-        <p className="font-semibold" style={{ color: 'var(--text)' }}>
-          {isAr ? 'المستخدم مش موجود' : 'User not found'}
-        </p>
+        <p className="font-semibold" style={{ color: 'var(--text)' }}>{t('notFound')}</p>
       </main>
       <Footer />
     </div>
@@ -56,10 +54,10 @@ export default function ProfilePage() {
   const memberYear = new Date(user.memberSince).getFullYear();
 
   const statCards = [
-    { icon: <Star size={18} />, label: isAr ? 'إجمالي XP' : 'Total XP', value: stats.totalXp.toLocaleString(), color: '#F59E0B' },
-    { icon: <Flame size={18} />, label: isAr ? 'أيام متتالية' : 'Streak Days', value: stats.streakDays, color: '#EF4444' },
-    { icon: <BookOpen size={18} />, label: isAr ? 'دروس مكتملة' : 'Lessons Done', value: stats.lessonsCompleted, color: '#10B981' },
-    { icon: <Trophy size={18} />, label: isAr ? 'كويزات' : 'Quizzes', value: stats.quizzesCompleted, color: '#8B5CF6' },
+    { icon: <Star size={18} />, label: t('totalXp'), value: stats.totalXp.toLocaleString(), color: '#F59E0B' },
+    { icon: <Flame size={18} />, label: t('streak'), value: stats.streakDays, color: '#EF4444' },
+    { icon: <BookOpen size={18} />, label: t('lessonsCompleted'), value: stats.lessonsCompleted, color: '#10B981' },
+    { icon: <Trophy size={18} />, label: t('quizzes'), value: stats.quizzesCompleted, color: '#8B5CF6' },
   ];
 
   return (
@@ -84,7 +82,7 @@ export default function ProfilePage() {
               <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>{user.name}</h1>
               <p className="text-sm flex items-center justify-center gap-1 mt-1" style={{ color: 'var(--text-muted)' }}>
                 <Calendar size={12} />
-                {isAr ? `عضو منذ ${memberYear}` : `Member since ${memberYear}`}
+                {t('memberSince')} {memberYear}
               </p>
             </div>
 
@@ -94,7 +92,7 @@ export default function ProfilePage() {
               className="text-xs px-4 py-1.5 rounded-full transition-opacity hover:opacity-80"
               style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
             >
-              {isAr ? 'شارك الملف الشخصي' : 'Share Profile'}
+              {t('shareProfile')}
             </button>
           </Card>
         </motion.div>
@@ -120,7 +118,7 @@ export default function ProfilePage() {
         {achievements.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
             <h2 className="font-semibold mb-3" style={{ color: 'var(--text)' }}>
-              {isAr ? `الإنجازات (${achievements.length})` : `Achievements (${achievements.length})`}
+              {t('achievements')} ({achievements.length})
             </h2>
             <div className="grid grid-cols-3 gap-3">
               {achievements.map(a => (
@@ -131,7 +129,7 @@ export default function ProfilePage() {
                 >
                   <span className="text-3xl">{a.emoji}</span>
                   <span className="text-xs font-medium" style={{ color: 'var(--text)' }}>
-                    {isAr ? a.nameAr : a.nameEn}
+                    {a.name}
                   </span>
                 </Card>
               ))}

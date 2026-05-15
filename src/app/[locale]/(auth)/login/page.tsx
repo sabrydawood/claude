@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { isRTL } from '@/lib/i18n/locale-utils';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -26,8 +27,8 @@ export default function LoginPage() {
   const t = useTranslations('auth.login');
   const tVal = useTranslations('auth.validation');
   const tErr = useTranslations('auth.errors');
+  const tNav = useTranslations('nav');
   const locale = useLocale();
-  const isAr = locale === 'ar';
   const router = useRouter();
 
   const [mounted, setMounted] = useState(false);
@@ -93,7 +94,7 @@ export default function LoginPage() {
 
       {/* Back to home */}
       <motion.div
-        initial={{ opacity: 0, x: isAr ? 20 : -20 }}
+        initial={{ opacity: 0, x: isRTL(locale) ? 20 : -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
         className="absolute top-5 start-5"
@@ -106,7 +107,7 @@ export default function LoginPage() {
             style={{ background: 'var(--surface)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
           >
             <Home size={15} />
-            {isAr ? 'الرئيسية' : 'Home'}
+            {tNav('home')}
           </motion.button>
         </Link>
       </motion.div>
@@ -208,7 +209,7 @@ export default function LoginPage() {
           style={{ color: 'var(--text-muted)' }}
         >
           <ShieldCheck size={13} style={{ color: 'var(--zkawi-green)' }} />
-          {isAr ? 'بياناتك محمية وآمنة معنا' : 'Your data is safe and secure with us'}
+          {t('dataSecure')}
         </motion.div>
       </motion.div>
     </div>

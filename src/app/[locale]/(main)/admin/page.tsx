@@ -27,7 +27,6 @@ const EMPTY_FORM = { agentId: '', order: '', xpReward: '50', estimatedMinutes: '
 
 export default function AdminPage() {
   const locale = useLocale();
-  const isAr = locale === 'ar';
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
@@ -103,10 +102,10 @@ export default function AdminPage() {
         <main className="flex-1 flex flex-col items-center justify-center gap-3">
           <AlertCircle size={40} className="text-red-500" />
           <p className="text-lg font-semibold" style={{ color: 'var(--text)' }}>
-            {isAr ? 'غير مصرح لك بالدخول' : 'Access Denied'}
+            {locale === 'ar' ? 'غير مصرح لك بالدخول' : 'Access Denied'}
           </p>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            {isAr ? 'هذه الصفحة للمدراء فقط' : 'This page is for admins only'}
+            {locale === 'ar' ? 'هذه الصفحة للمدراء فقط' : 'This page is for admins only'}
           </p>
         </main>
         <Footer />
@@ -122,22 +121,22 @@ export default function AdminPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
-              {isAr ? 'لوحة الإدارة' : 'Admin Panel'}
+              {locale === 'ar' ? 'لوحة الإدارة' : 'Admin Panel'}
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              {lessons.length} {isAr ? 'درس' : 'lessons'}
+              {lessons.length} {locale === 'ar' ? 'درس' : 'lessons'}
             </p>
           </div>
           <Button onClick={() => { setShowForm(true); setSaveOk(false); }} style={{ background: 'var(--zkawi-purple)', color: '#fff' }}>
             <Plus size={14} className="me-1" />
-            {isAr ? 'درس جديد' : 'New Lesson'}
+            {locale === 'ar' ? 'درس جديد' : 'New Lesson'}
           </Button>
         </div>
 
         {saveOk && (
           <div className="flex items-center gap-2 text-sm text-green-600 px-3 py-2 rounded-lg" style={{ background: 'rgba(34,197,94,0.1)' }}>
             <Check size={14} />
-            {isAr ? 'تم إنشاء الدرس بنجاح' : 'Lesson created successfully'}
+            {locale === 'ar' ? 'تم إنشاء الدرس بنجاح' : 'Lesson created successfully'}
           </div>
         )}
 
@@ -146,18 +145,18 @@ export default function AdminPage() {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="p-5 flex flex-col gap-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <h2 className="font-semibold" style={{ color: 'var(--text)' }}>
-                {isAr ? 'إنشاء درس جديد' : 'Create New Lesson'}
+                {locale === 'ar' ? 'إنشاء درس جديد' : 'Create New Lesson'}
               </h2>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { key: 'agentId', label: isAr ? 'ID الوكيل' : 'Agent ID', type: 'number', placeholder: '1' },
-                  { key: 'order', label: isAr ? 'الترتيب' : 'Order', type: 'number', placeholder: '0' },
+                  { key: 'agentId', label: locale === 'ar' ? 'ID الوكيل' : 'Agent ID', type: 'number', placeholder: '1' },
+                  { key: 'order', label: locale === 'ar' ? 'الترتيب' : 'Order', type: 'number', placeholder: '0' },
                   { key: 'xpReward', label: 'XP', type: 'number', placeholder: '50' },
-                  { key: 'estimatedMinutes', label: isAr ? 'الدقائق' : 'Minutes', type: 'number', placeholder: '5' },
-                  { key: 'titleAr', label: isAr ? 'العنوان (عربي)' : 'Title (AR)', type: 'text', placeholder: 'ما هو الذكاء الاصطناعي؟' },
-                  { key: 'titleEn', label: isAr ? 'العنوان (إنجليزي)' : 'Title (EN)', type: 'text', placeholder: 'What is AI?' },
-                  { key: 'descriptionAr', label: isAr ? 'الوصف (عربي)' : 'Description (AR)', type: 'text', placeholder: '...' },
-                  { key: 'descriptionEn', label: isAr ? 'الوصف (إنجليزي)' : 'Description (EN)', type: 'text', placeholder: '...' },
+                  { key: 'estimatedMinutes', label: locale === 'ar' ? 'الدقائق' : 'Minutes', type: 'number', placeholder: '5' },
+                  { key: 'titleAr', label: locale === 'ar' ? 'العنوان (عربي)' : 'Title (AR)', type: 'text', placeholder: 'ما هو الذكاء الاصطناعي؟' },
+                  { key: 'titleEn', label: locale === 'ar' ? 'العنوان (إنجليزي)' : 'Title (EN)', type: 'text', placeholder: 'What is AI?' },
+                  { key: 'descriptionAr', label: locale === 'ar' ? 'الوصف (عربي)' : 'Description (AR)', type: 'text', placeholder: '...' },
+                  { key: 'descriptionEn', label: locale === 'ar' ? 'الوصف (إنجليزي)' : 'Description (EN)', type: 'text', placeholder: '...' },
                 ].map(field => (
                   <div key={field.key} className="flex flex-col gap-1">
                     <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{field.label}</label>
@@ -175,10 +174,10 @@ export default function AdminPage() {
               {saveError && <p className="text-xs text-red-500">{saveError}</p>}
               <div className="flex gap-2 justify-end">
                 <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setSaveError(''); }}>
-                  {isAr ? 'إلغاء' : 'Cancel'}
+                  {locale === 'ar' ? 'إلغاء' : 'Cancel'}
                 </Button>
                 <Button size="sm" onClick={createLesson} disabled={saving} style={{ background: 'var(--zkawi-purple)', color: '#fff' }}>
-                  {saving ? <Loader2 size={14} className="animate-spin" /> : (isAr ? 'إنشاء' : 'Create')}
+                  {saving ? <Loader2 size={14} className="animate-spin" /> : (locale === 'ar' ? 'إنشاء' : 'Create')}
                 </Button>
               </div>
             </Card>
@@ -191,7 +190,7 @@ export default function AdminPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['ID', isAr ? 'الوكيل' : 'Agent', isAr ? 'العنوان (AR)' : 'Title (AR)', isAr ? 'العنوان (EN)' : 'Title (EN)', 'XP', isAr ? 'الترتيب' : 'Order'].map(h => (
+                  {['ID', locale === 'ar' ? 'الوكيل' : 'Agent', locale === 'ar' ? 'العنوان (AR)' : 'Title (AR)', locale === 'ar' ? 'العنوان (EN)' : 'Title (EN)', 'XP', locale === 'ar' ? 'الترتيب' : 'Order'].map(h => (
                     <th key={h} className="text-start px-4 py-3 font-medium" style={{ color: 'var(--text-muted)' }}>{h}</th>
                   ))}
                 </tr>
@@ -221,7 +220,7 @@ export default function AdminPage() {
                 {lessons.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-4 py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-                      {isAr ? 'لا توجد دروس بعد' : 'No lessons yet'}
+                      {locale === 'ar' ? 'لا توجد دروس بعد' : 'No lessons yet'}
                     </td>
                   </tr>
                 )}

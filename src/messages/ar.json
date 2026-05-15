@@ -437,5 +437,24 @@
     "arabicFirst": "📚 عربي أولاً",
     "achievementUnlocked": "فتح هذا الإنجاز على ذكاوي",
     "lessons": "درس"
+  },
+  "error": {
+    "title": "أوبس! في حاجة غلط 😅",
+    "description": "متقلقش، الموضوع عادي! إحنا بنشتغل على حل المشكلة دي.",
+    "retry": "حاول تاني",
+    "goHome": "ارجع للرئيسية",
+    "goBack": "ارجع",
+    "reload": "حمّل الصفحة تاني",
+    "technicalDetails": "التفاصيل التقنية",
+    "showDetails": "عرض التفاصيل",
+    "hideDetails": "إخفاء التفاصيل",
+    "copied": "تم النسخ!",
+    "copyError": "انسخ الخطأ",
+    "reportError": "بلّغ عن المشكلة",
+    "boundaryMessage": "حصل خطأ أثناء عرض هذا المكون",
+    "unexpectedError": "حصل خطأ غير متوقع",
+    "pageNotFound": "الصفحة مش موجودة",
+    "networkError": "مشكلة في الاتصال بالإنترنت",
+    "tryAgainLater": "حاول تاني بعد شوية"
   }
 }

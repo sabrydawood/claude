@@ -5,6 +5,18 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.5.0] — 2026-05-15
+
+### Added
+- **Leaderboard** — `GET /api/leaderboard` + `/leaderboard` page, top 50 users by XP with medals
+- **Public Profiles** — `GET /api/profile/:userId` + `/profile/:userId` page with stats, achievements, share button
+- **PWA Service Worker** — `/sw.js` offline support (cache-first assets, network-first HTML/API)
+- **PWA Install Banner** — `beforeinstallprompt` bottom sheet, dismissable, localStorage persistence
+- **Achievement OG Images** — `/api/og?type=achievement&emoji=🏆&xp=500&lessons=13`
+- **Header navigation** — added Leaderboard and Sandbox links for logged-in users
+
+---
+
 ## [0.4.0] — 2026-05-14
 
 ### Added

@@ -4,6 +4,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/lib/i18n/routing';
 import { Providers } from '@/components/providers';
+import { PwaRegister } from '@/components/pwa-register';
 import '../globals.css';
 
 const cairo = Cairo({
@@ -125,6 +126,7 @@ export default async function LocaleLayout({
         }}
       >
         <Providers messages={messages} locale={locale}>
+          <PwaRegister />
           {children}
         </Providers>
       </body>

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, LogOut, LayoutDashboard, Home, User, Globe } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, Home, User, Globe, Trophy, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Logo } from '@/components/ui/logo';
@@ -18,6 +18,7 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
+  const isAr = locale === 'ar';
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -32,7 +33,11 @@ export default function Header() {
   };
 
   const navLinks = session
-    ? [{ href: '/dashboard', label: t('nav.dashboard'), icon: <LayoutDashboard size={16} /> }]
+    ? [
+        { href: '/dashboard', label: t('nav.dashboard'), icon: <LayoutDashboard size={16} /> },
+        { href: '/leaderboard', label: isAr ? 'المتصدرين' : 'Leaderboard', icon: <Trophy size={16} /> },
+        { href: '/sandbox', label: isAr ? 'ساندبوكس' : 'Sandbox', icon: <MessageSquare size={16} /> },
+      ]
     : [{ href: '/', label: t('nav.home'), icon: <Home size={16} /> }];
 
   return (

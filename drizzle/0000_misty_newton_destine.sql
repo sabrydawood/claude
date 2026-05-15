@@ -6,7 +6,9 @@ CREATE TABLE "accounts" (
 	"access_token" text,
 	"refresh_token" text,
 	"expires_at" timestamp,
-	"password" text
+	"password" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "achievements" (

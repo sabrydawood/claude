@@ -89,7 +89,7 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
     const res = await fetch(`/api/v1/progress/lesson/${lesson.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ score, xpEarned }),
+      body: JSON.stringify({ Score: score }),
     }).catch(() => null);
 
     if (res?.ok) {

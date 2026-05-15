@@ -48,6 +48,7 @@ export default function LessonPage({
   });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [xpPopup, setXpPopup] = useState<number | null>(null);
+  const [earnedAchievements, setEarnedAchievements] = useState<{ id: number; emoji: string; nameAr: string; nameEn: string }[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,11 +89,18 @@ export default function LessonPage({
     }));
 
     // Persist to DB
-    await fetch(`/api/progress/lesson/${lesson.id}`, {
+    const res = await fetch(`/api/progress/lesson/${lesson.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ score, xpEarned }),
-    }).catch(() => {});
+    }).catch(() => null);
+
+    if (res?.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.newAchievements?.length) {
+        setEarnedAchievements(data.newAchievements);
+      }
+    }
 
     setXpPopup(xpEarned);
     setTimeout(() => setXpPopup(null), 2500);
@@ -123,6 +131,61 @@ export default function LessonPage({
           >
             <Zap size={20} fill="white" />
             <span>+{xpPopup} XP كسبتها! 🎉</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Achievement celebration modal */}
+      <AnimatePresence>
+        {earnedAchievements.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.7)' }}
+            onClick={() => setEarnedAchievements([])}
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ type: 'spring', damping: 12 }}
+              className="rounded-3xl p-8 text-center max-w-sm w-full shadow-2xl"
+              style={{ background: 'var(--surface)', border: '2px solid var(--zkawi-purple)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <motion.div
+                animate={{ rotate: [0, -10, 10, -10, 10, 0], scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.6 }}
+                className="text-7xl mb-4"
+              >
+                {earnedAchievements[0].emoji}
+              </motion.div>
+              <div
+                className="text-xs font-bold mb-2 px-3 py-1 rounded-full inline-block"
+                style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
+              >
+                🏆 {locale === 'ar' ? 'إنجاز جديد!' : 'New Achievement!'}
+              </div>
+              <h3 className="text-xl font-black mt-3" style={{ color: 'var(--text)' }}>
+                {locale === 'ar' ? earnedAchievements[0].nameAr : earnedAchievements[0].nameEn}
+              </h3>
+              {earnedAchievements.length > 1 && (
+                <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
+                  {locale === 'ar'
+                    ? `+ ${earnedAchievements.length - 1} إنجازات أخرى`
+                    : `+ ${earnedAchievements.length - 1} more achievement${earnedAchievements.length > 2 ? 's' : ''}`}
+                </p>
+              )}
+              <button
+                onClick={() => setEarnedAchievements([])}
+                className="mt-6 w-full py-3 rounded-2xl font-bold text-sm"
+                style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
+              >
+                {locale === 'ar' ? 'رائع! 🎉' : 'Awesome! 🎉'}
+              </button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -307,6 +370,22 @@ export default function LessonPage({
                       </div>
                     )}
                   </div>
+
+                  {earnedAchievements.length > 0 && (
+                    <div className="mb-6 p-4 rounded-2xl" style={{ background: 'var(--zkawi-purple)/10', border: '1px solid var(--zkawi-purple)/30' }}>
+                      <p className="text-sm font-bold mb-3" style={{ color: 'var(--zkawi-purple)' }}>
+                        🏆 {locale === 'ar' ? 'إنجازات مفتوحة!' : 'Achievements unlocked!'}
+                      </p>
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {earnedAchievements.map(a => (
+                          <div key={a.id} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--surface-2)', color: 'var(--text)' }}>
+                            <span>{a.emoji}</span>
+                            <span>{locale === 'ar' ? a.nameAr : a.nameEn}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex gap-3 justify-center">
                     <Button variant="outline" onClick={() => setView('content')} className="gap-2">

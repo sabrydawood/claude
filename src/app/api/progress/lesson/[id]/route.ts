@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { userProgress, userStats, achievements, userAchievements } from '@/lib/db/schema';
-import { eq, and, notInArray } from 'drizzle-orm';
+import { userProgress, userStats, achievements, userAchievements, translations } from '@/lib/db/schema';
+import { eq, and, notInArray, inArray } from 'drizzle-orm';
+
+interface AchievementInfo {
+  id: number;
+  emoji: string;
+  nameAr: string;
+  nameEn: string;
+}
 
 function calcStreak(lastActivityDate: Date | null, currentStreak: number): number {
   if (!lastActivityDate) return 1;
@@ -24,8 +31,7 @@ async function checkAndGrantAchievements(
   lessonsCompleted: number,
   streakDays: number,
   totalXp: number,
-) {
-  // All achievements not yet earned by this user
+): Promise<AchievementInfo[]> {
   const earned = await db
     .select({ achievementId: userAchievements.achievementId })
     .from(userAchievements)
@@ -37,23 +43,45 @@ async function checkAndGrantAchievements(
     ? await db.select().from(achievements).where(notInArray(achievements.id, earnedIds))
     : await db.select().from(achievements);
 
-  const newlyEarned: number[] = [];
+  const newlyEarned: typeof pending = [];
 
   for (const ach of pending) {
     let met = false;
     if (ach.conditionType === 'lessons_completed' && lessonsCompleted >= ach.conditionValue) met = true;
     if (ach.conditionType === 'streak_days' && streakDays >= ach.conditionValue) met = true;
     if (ach.conditionType === 'xp_earned' && totalXp >= ach.conditionValue) met = true;
-    if (met) newlyEarned.push(ach.id);
+    if (met) newlyEarned.push(ach);
   }
 
-  if (newlyEarned.length > 0) {
-    await db.insert(userAchievements).values(
-      newlyEarned.map(achievementId => ({ userId, achievementId })),
+  if (newlyEarned.length === 0) return [];
+
+  await db.insert(userAchievements).values(
+    newlyEarned.map(({ id: achievementId }) => ({ userId, achievementId })),
+  );
+
+  const newlyEarnedIds = newlyEarned.map(a => a.id);
+  const achTranslations = await db
+    .select()
+    .from(translations)
+    .where(
+      and(
+        eq(translations.entityType, 'achievement'),
+        inArray(translations.entityId, newlyEarnedIds),
+        eq(translations.field, 'name'),
+      ),
     );
+
+  const nameMap = new Map<string, string>();
+  for (const t of achTranslations) {
+    nameMap.set(`${t.entityId}:${t.locale}`, t.value);
   }
 
-  return newlyEarned;
+  return newlyEarned.map(ach => ({
+    id: ach.id,
+    emoji: ach.emoji,
+    nameAr: nameMap.get(`${ach.id}:ar`) ?? ach.emoji,
+    nameEn: nameMap.get(`${ach.id}:en`) ?? ach.emoji,
+  }));
 }
 
 export async function PUT(
@@ -117,5 +145,5 @@ export async function PUT(
     ? await checkAndGrantAchievements(userId, newLessons, newStreak, newXp).catch(() => [])
     : [];
 
-  return NextResponse.json({ ok: true, newStreak, newAchievements });
+  return NextResponse.json({ ok: true, newStreak, newAchievements } satisfies { ok: boolean; newStreak: number; newAchievements: AchievementInfo[] });
 }

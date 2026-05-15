@@ -3284,8 +3284,8 @@ while True:
  type: 'multiple_choice',
  options: [
  { id: 'o1', textAr: 'Claude محتاج ينفذ tool قبل ما يكمل الإجابة', textEn: 'Claude needs to execute a tool before continuing the answer', isCorrect: true },
- { id: 'o2', textAr: 'الإجابة اتكملت', textEn: 'The answer is complete', isCorrect: false },
- { id: 'o3', textAr: 'في error في الـ API', textEn: 'There\'s an API error', isCorrect: false },
+ { id: 'o2', textAr: 'الإجابة اكتملت', textEn: 'The answer is complete', isCorrect: false },
+ { id: 'o3', textAr: 'في خطأ في الـ API', textEn: 'There\'s an API error', isCorrect: false },
  { id: 'o4', textAr: 'وصل لـ max_tokens', textEn: 'Reached max_tokens', isCorrect: false },
  ],
  },

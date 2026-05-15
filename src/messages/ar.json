@@ -178,7 +178,7 @@
     "stats": {
       "totalXp": "إجمالي XP",
       "streak": "أيام متتالية",
-      "lessonsCompleted": "دروس اتكملت",
+      "lessonsCompleted": "دروس اكتملت",
       "quizzesCompleted": "كويزات اتحلت",
       "achievements": "إنجازات"
     },
@@ -198,7 +198,7 @@
       "startLearning": "ابدأ التعلم",
       "continueLearning": "كمل التعلم",
       "badgeActive": "متاح الآن",
-      "lessonsProgress": "{completed} / {total} دروس اتكملت"
+      "lessonsProgress": "{completed} / {total} دروس اكتملت"
     },
     "streak": {
       "days": "يوم",
@@ -225,7 +225,7 @@
       "lessons": "دروس",
       "startLearning": "ابدأ التعلم",
       "continueLearning": "كمل التعلم",
-      "completedLessons": "درس اتكمل",
+      "completedLessons": "درس اكتمل",
       "totalLessons": "درس"
     },
     "backToAgents": "رجوع للمساعدات",
@@ -248,7 +248,7 @@
     "progress": "تقدمك في الدرس",
     "readingTime": "وقت القراءة",
     "locked": "مقفول",
-    "completed": "اتكمل",
+    "completed": "اكتمل",
     "current": "جاري",
     "activity": {
       "title": "نشاط تفاعلي",
@@ -258,7 +258,7 @@
     "newAchievement": "إنجاز جديد!",
     "moreAchievements": "+ {count} إنجازات أخرى",
     "awesome": "رائع!",
-    "lessonCompletedTitle": "أحسنت! الدرس اتكمل!",
+    "lessonCompletedTitle": "أحسنت! الدرس اكتمل!",
     "lessonCompletedDesc": "كملت درس \"{title}\"وكسبت XP جديدة!",
     "xpEarnedLabel": "XP كسبتها",
     "quizScore": "نتيجة الكويز",

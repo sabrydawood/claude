@@ -50,3 +50,9 @@ next-env.d.ts
 .worktrees/
 .security-key
 logs/security/
+null
+worktrees
+# Auto Claude data directory
+.auto-claude/
+.auto-claude*
+.claude_settings.*

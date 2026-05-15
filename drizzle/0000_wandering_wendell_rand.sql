@@ -67,6 +67,42 @@ CREATE TABLE "EncryptedKeys" (
 	CONSTRAINT "EncryptedKeys_UserId_unique" UNIQUE("UserId")
 );
 --> statement-breakpoint
+CREATE TABLE "ExerciseSubmissions" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"UserId" uuid NOT NULL,
+	"ExerciseId" uuid NOT NULL,
+	"Code" text DEFAULT '' NOT NULL,
+	"Passed" boolean DEFAULT false NOT NULL,
+	"Score" integer DEFAULT 0 NOT NULL,
+	"Attempts" integer DEFAULT 1 NOT NULL,
+	"SubmittedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "ExerciseTranslations" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"ExerciseId" uuid NOT NULL,
+	"Locale" text NOT NULL,
+	"Title" text NOT NULL,
+	"Instructions" text NOT NULL,
+	"HintText" text DEFAULT '' NOT NULL,
+	"StarterCode" text DEFAULT '' NOT NULL,
+	"SolutionCode" text DEFAULT '' NOT NULL,
+	"TestCases" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	CONSTRAINT "Uq_ExTrans_ExLocale" UNIQUE("ExerciseId","Locale")
+);
+--> statement-breakpoint
+CREATE TABLE "Exercises" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"LessonId" uuid,
+	"CourseId" uuid,
+	"Type" text NOT NULL,
+	"Difficulty" integer DEFAULT 1 NOT NULL,
+	"Order" integer DEFAULT 0 NOT NULL,
+	"XpReward" integer DEFAULT 20 NOT NULL,
+	"IsDeleted" boolean DEFAULT false NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "LearningPaths" (
 	"Id" uuid PRIMARY KEY NOT NULL,
 	"UserId" uuid NOT NULL,
@@ -89,7 +125,7 @@ CREATE TABLE "LessonTranslations" (
 --> statement-breakpoint
 CREATE TABLE "Lessons" (
 	"Id" uuid PRIMARY KEY NOT NULL,
-	"AgentId" uuid NOT NULL,
+	"AgentId" uuid,
 	"CourseId" uuid,
 	"Order" integer DEFAULT 0 NOT NULL,
 	"XpReward" integer DEFAULT 50 NOT NULL,
@@ -295,11 +331,16 @@ ALTER TABLE "AgentTranslations" ADD CONSTRAINT "AgentTranslations_AgentId_Agents
 ALTER TABLE "CourseTranslations" ADD CONSTRAINT "CourseTranslations_CourseId_Courses_Id_fk" FOREIGN KEY ("CourseId") REFERENCES "public"."Courses"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Courses" ADD CONSTRAINT "Courses_SubjectId_Subjects_Id_fk" FOREIGN KEY ("SubjectId") REFERENCES "public"."Subjects"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "EncryptedKeys" ADD CONSTRAINT "EncryptedKeys_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ExerciseSubmissions" ADD CONSTRAINT "ExerciseSubmissions_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ExerciseSubmissions" ADD CONSTRAINT "ExerciseSubmissions_ExerciseId_Exercises_Id_fk" FOREIGN KEY ("ExerciseId") REFERENCES "public"."Exercises"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ExerciseTranslations" ADD CONSTRAINT "ExerciseTranslations_ExerciseId_Exercises_Id_fk" FOREIGN KEY ("ExerciseId") REFERENCES "public"."Exercises"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Exercises" ADD CONSTRAINT "Exercises_LessonId_Lessons_Id_fk" FOREIGN KEY ("LessonId") REFERENCES "public"."Lessons"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Exercises" ADD CONSTRAINT "Exercises_CourseId_Courses_Id_fk" FOREIGN KEY ("CourseId") REFERENCES "public"."Courses"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "LearningPaths" ADD CONSTRAINT "LearningPaths_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "LearningPaths" ADD CONSTRAINT "LearningPaths_TrackId_Tracks_Id_fk" FOREIGN KEY ("TrackId") REFERENCES "public"."Tracks"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "LearningPaths" ADD CONSTRAINT "LearningPaths_CurrentLessonId_Lessons_Id_fk" FOREIGN KEY ("CurrentLessonId") REFERENCES "public"."Lessons"("Id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "LessonTranslations" ADD CONSTRAINT "LessonTranslations_LessonId_Lessons_Id_fk" FOREIGN KEY ("LessonId") REFERENCES "public"."Lessons"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Lessons" ADD CONSTRAINT "Lessons_AgentId_Agents_Id_fk" FOREIGN KEY ("AgentId") REFERENCES "public"."Agents"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Lessons" ADD CONSTRAINT "Lessons_AgentId_Agents_Id_fk" FOREIGN KEY ("AgentId") REFERENCES "public"."Agents"("Id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Lessons" ADD CONSTRAINT "Lessons_CourseId_Courses_Id_fk" FOREIGN KEY ("CourseId") REFERENCES "public"."Courses"("Id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "QuizOptionTranslations" ADD CONSTRAINT "QuizOptionTranslations_OptionId_QuizOptions_Id_fk" FOREIGN KEY ("OptionId") REFERENCES "public"."QuizOptions"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "QuizOptions" ADD CONSTRAINT "QuizOptions_QuestionId_QuizQuestions_Id_fk" FOREIGN KEY ("QuestionId") REFERENCES "public"."QuizQuestions"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -322,6 +363,9 @@ CREATE INDEX "Idx_AchTrans_AchievementId" ON "AchievementTranslations" USING btr
 CREATE INDEX "Idx_AgentTranslations_Locale" ON "AgentTranslations" USING btree ("Locale");--> statement-breakpoint
 CREATE INDEX "Idx_AgentTranslations_AgentId" ON "AgentTranslations" USING btree ("AgentId");--> statement-breakpoint
 CREATE INDEX "Idx_CourseTrans_CourseId" ON "CourseTranslations" USING btree ("CourseId");--> statement-breakpoint
+CREATE INDEX "Idx_ExSub_UserId" ON "ExerciseSubmissions" USING btree ("UserId");--> statement-breakpoint
+CREATE INDEX "Idx_ExSub_ExerciseId" ON "ExerciseSubmissions" USING btree ("ExerciseId");--> statement-breakpoint
+CREATE INDEX "Idx_ExTrans_ExerciseId" ON "ExerciseTranslations" USING btree ("ExerciseId");--> statement-breakpoint
 CREATE INDEX "Idx_LearningPaths_UserActive" ON "LearningPaths" USING btree ("UserId","IsActive");--> statement-breakpoint
 CREATE INDEX "Idx_LessonTranslations_Locale" ON "LessonTranslations" USING btree ("Locale");--> statement-breakpoint
 CREATE INDEX "Idx_LessonTranslations_LessonId" ON "LessonTranslations" USING btree ("LessonId");--> statement-breakpoint

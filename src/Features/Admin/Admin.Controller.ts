@@ -47,7 +47,7 @@ export async function GetAdminLessons(Req: NextRequest): Promise<NextResponse> {
   const Result = AllLessons.map((L) => ({
     Id: L.Id,
     AgentId: L.AgentId,
-    AgentSlug: AgentMap.get(L.AgentId) ?? '',
+    AgentSlug: L.AgentId ? (AgentMap.get(L.AgentId) ?? '') : '',
     Order: L.Order,
     XpReward: L.XpReward,
     EstimatedMinutes: L.EstimatedMinutes,

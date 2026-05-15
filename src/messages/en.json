@@ -596,5 +596,36 @@
       "mismatch": "Passwords don't match",
       "minLength": "Minimum 8 characters"
     }
+  },
+  "subjects": {
+    "title": "Choose Your Subject",
+    "subtitle": "Each subject has courses and lessons designed for you",
+    "courses": "course",
+    "lessons": "lesson",
+    "startLearning": "Start Learning",
+    "continueLearning": "Continue Learning",
+    "allCourses": "All Courses",
+    "difficulty": {
+      "1": "Beginner",
+      "2": "Intermediate",
+      "3": "Advanced"
+    },
+    "hours": "hour",
+    "empty": "No subjects yet",
+    "noCourses": "No courses yet in this subject"
+  },
+  "courses": {
+    "title": "Course",
+    "lessons": "lesson",
+    "start": "Start Course",
+    "continue": "Continue Course",
+    "back": "Back to Subjects",
+    "empty": "No lessons yet in this course",
+    "difficulty": {
+      "1": "Beginner",
+      "2": "Intermediate",
+      "3": "Advanced"
+    },
+    "hours": "hour"
   }
 }

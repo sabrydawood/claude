@@ -12,7 +12,7 @@
  */
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from './index';
-import { translations, type TranslationMap } from './schema';
+import { translations, type TranslationMap } from './Schema';
 
 // ─── Read ─────────────────────────────────────────────────────────────────────
 

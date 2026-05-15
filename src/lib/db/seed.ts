@@ -19,6 +19,13 @@ import {
   SystemPrompts,
   Subjects, SubjectTranslations,
 } from './Schema';
+import { seedProgramming } from './seeds/programming.seed';
+import { seedDatabases } from './seeds/databases.seed';
+import { seedWebDesign } from './seeds/web-design.seed';
+import { seedProblemSolving } from './seeds/problem-solving.seed';
+import { seedPromptEngineering } from './seeds/prompt-engineering.seed';
+import { seedProjectBuilding } from './seeds/project-building.seed';
+import { seedDesignPatterns } from './seeds/design-patterns.seed';
 import {
   agents as AgentContent,
   claudeLessons, promptEngineeringLessons,
@@ -159,6 +166,16 @@ async function Seed() {
     ]);
     console.log('  ✓ 1 subject (AI)');
   }
+
+  // ─── New subjects (7 + AI = 8 total) ────────────────────────────────────────
+  console.log('\n📚 Seeding subjects & courses...');
+  await seedProgramming(db);       console.log('  ✓ programming');
+  await seedDatabases(db);         console.log('  ✓ databases');
+  await seedWebDesign(db);         console.log('  ✓ web-design');
+  await seedProblemSolving(db);    console.log('  ✓ problem-solving');
+  await seedPromptEngineering(db); console.log('  ✓ prompt-engineering');
+  await seedProjectBuilding(db);   console.log('  ✓ project-building');
+  await seedDesignPatterns(db);    console.log('  ✓ design-patterns');
 
   console.log('\n✅ Seed complete!\n');
   process.exit(0);

@@ -1,5 +1,5 @@
 {
-  "id": "f8971ace-dadb-4064-8fc5-8e311e5bf072",
+  "id": "707e1915-2aeb-41a7-8b0b-904460df9879",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -546,6 +546,339 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.ExerciseSubmissions": {
+      "name": "ExerciseSubmissions",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ExerciseId": {
+          "name": "ExerciseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Code": {
+          "name": "Code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "Passed": {
+          "name": "Passed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "Score": {
+          "name": "Score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "Attempts": {
+          "name": "Attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "SubmittedAt": {
+          "name": "SubmittedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_ExSub_UserId": {
+          "name": "Idx_ExSub_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_ExSub_ExerciseId": {
+          "name": "Idx_ExSub_ExerciseId",
+          "columns": [
+            {
+              "expression": "ExerciseId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ExerciseSubmissions_UserId_users_id_fk": {
+          "name": "ExerciseSubmissions_UserId_users_id_fk",
+          "tableFrom": "ExerciseSubmissions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ExerciseSubmissions_ExerciseId_Exercises_Id_fk": {
+          "name": "ExerciseSubmissions_ExerciseId_Exercises_Id_fk",
+          "tableFrom": "ExerciseSubmissions",
+          "tableTo": "Exercises",
+          "columnsFrom": [
+            "ExerciseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ExerciseTranslations": {
+      "name": "ExerciseTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ExerciseId": {
+          "name": "ExerciseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Title": {
+          "name": "Title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Instructions": {
+          "name": "Instructions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "HintText": {
+          "name": "HintText",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "StarterCode": {
+          "name": "StarterCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "SolutionCode": {
+          "name": "SolutionCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "TestCases": {
+          "name": "TestCases",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        }
+      },
+      "indexes": {
+        "Idx_ExTrans_ExerciseId": {
+          "name": "Idx_ExTrans_ExerciseId",
+          "columns": [
+            {
+              "expression": "ExerciseId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ExerciseTranslations_ExerciseId_Exercises_Id_fk": {
+          "name": "ExerciseTranslations_ExerciseId_Exercises_Id_fk",
+          "tableFrom": "ExerciseTranslations",
+          "tableTo": "Exercises",
+          "columnsFrom": [
+            "ExerciseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_ExTrans_ExLocale": {
+          "name": "Uq_ExTrans_ExLocale",
+          "nullsNotDistinct": false,
+          "columns": [
+            "ExerciseId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Exercises": {
+      "name": "Exercises",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "LessonId": {
+          "name": "LessonId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CourseId": {
+          "name": "CourseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Type": {
+          "name": "Type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Difficulty": {
+          "name": "Difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "XpReward": {
+          "name": "XpReward",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 20
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Exercises_LessonId_Lessons_Id_fk": {
+          "name": "Exercises_LessonId_Lessons_Id_fk",
+          "tableFrom": "Exercises",
+          "tableTo": "Lessons",
+          "columnsFrom": [
+            "LessonId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Exercises_CourseId_Courses_Id_fk": {
+          "name": "Exercises_CourseId_Courses_Id_fk",
+          "tableFrom": "Exercises",
+          "tableTo": "Courses",
+          "columnsFrom": [
+            "CourseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.LearningPaths": {
       "name": "LearningPaths",
       "schema": "",
@@ -785,7 +1118,7 @@
           "name": "AgentId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "CourseId": {
           "name": "CourseId",
@@ -841,7 +1174,7 @@
           "columnsTo": [
             "Id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "Lessons_CourseId_Courses_Id_fk": {

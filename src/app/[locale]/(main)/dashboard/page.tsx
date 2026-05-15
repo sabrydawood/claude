@@ -11,7 +11,7 @@ import {
   AchievementTranslations,
 } from '@/lib/db/Schema';
 import { eq, and, inArray } from 'drizzle-orm';
-import { getLessonsByAgent } from '@/lib/db/queries/content';
+import { getLessonsByAgent, getSubjects } from '@/lib/db/queries/content';
 import { GetValidLocale } from '@/lib/i18n/Locale.Utils';
 import DashboardClient from './dashboard-client';
 
@@ -36,13 +36,14 @@ export default async function DashboardPage({
 
   if (!prefs?.OnboardingCompleted) redirect(`/${locale}/onboarding`);
 
-  const [progressRows, statsArr, earnedRows, allAchievements, lessonOrderRow, lessons] = await Promise.all([
+  const [progressRows, statsArr, earnedRows, allAchievements, lessonOrderRow, lessons, subjects] = await Promise.all([
     db.select().from(UserProgress).where(eq(UserProgress.UserId, userId)),
     db.select().from(UserStats).where(eq(UserStats.UserId, userId)).limit(1),
     db.select({ AchievementId: UserAchievements.AchievementId }).from(UserAchievements).where(eq(UserAchievements.UserId, userId)),
     db.select().from(Achievements),
     db.select({ LessonOrder: LearningPaths.LessonOrder }).from(LearningPaths).where(eq(LearningPaths.UserId, userId)).limit(1),
     getLessonsByAgent('claude', validLocale),
+    getSubjects(validLocale),
   ]);
 
   const stats = statsArr[0];
@@ -89,6 +90,7 @@ export default async function DashboardPage({
         xpReward: l.xpReward,
       }))}
       lessonOrder={lessonOrderRow[0]?.LessonOrder as string[] | null ?? null}
+      subjects={subjects}
     />
   );
 }

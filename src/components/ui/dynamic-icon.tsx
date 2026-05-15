@@ -2,14 +2,15 @@ import {
   Bot, MessageCircle, Sparkles, Trophy, Rocket, Target, Flame, Zap, Crown,
   Compass, Palette, Settings2, Code2, GraduationCap, Star, BookOpen,
   Gamepad2, Brain, Eye, FlaskConical, Coffee, Briefcase, UserRound,
-  Leaf, TreePine, Sprout, Baby, Globe, TrendingUp, type LucideProps,
+  Leaf, TreePine, Sprout, Baby, Globe, TrendingUp, Database, Layers,
+  type LucideProps,
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.FC<LucideProps>> = {
   Bot, MessageCircle, Sparkles, Trophy, Rocket, Target, Flame, Zap, Crown,
   Compass, Palette, Settings2, Code2, GraduationCap, Star, BookOpen,
   Gamepad2, Brain, Eye, FlaskConical, Coffee, Briefcase, UserRound,
-  Leaf, TreePine, Sprout, Baby, Globe, TrendingUp,
+  Leaf, TreePine, Sprout, Baby, Globe, TrendingUp, Database, Layers,
 };
 
 interface DynamicIconProps extends LucideProps {

@@ -11,8 +11,9 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Flame, BookOpen, Trophy, Target, ChevronRight, Lock, CheckCircle2, Clock, Bot, Lightbulb, GraduationCap } from 'lucide-react';
+import { Flame, BookOpen, Trophy, Target, ChevronRight, Lock, CheckCircle2, Clock, Bot, Lightbulb, GraduationCap, Layers } from 'lucide-react';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
+import type { SubjectRow } from '@/lib/db/queries/content';
 
 interface Achievement {
   id: string;
@@ -43,11 +44,13 @@ interface Props {
   progress: UserProgress;
   lessons: LessonSummary[];
   lessonOrder: string[] | null;
+  subjects: SubjectRow[];
 }
 
-export default function DashboardClient({ userName, progress, lessons, lessonOrder }: Props) {
+export default function DashboardClient({ userName, progress, lessons, lessonOrder, subjects }: Props) {
   const t = useTranslations('dashboard');
   const tL = useTranslations('lessons');
+  const tS = useTranslations('subjects');
   const [mounted] = useState(true);
 
   if (!mounted) return null;
@@ -179,6 +182,48 @@ export default function DashboardClient({ userName, progress, lessons, lessonOrd
                   </div>
                 </Card>
               </motion.div>
+              {/* Subjects mini section */}
+              {subjects.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                  <Card className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="flex items-center gap-2 text-lg font-black text-[var(--text)]">
+                        <Layers size={20} className="text-[var(--zkawi-purple)]" />
+                        {tS('title')}
+                      </h2>
+                      <Link href="/subjects">
+                        <span className="text-sm text-[var(--zkawi-purple)] font-bold hover:opacity-80">
+                          {tS('allCourses')} →
+                        </span>
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {subjects.slice(0, 3).map((subject) => (
+                        <Link key={subject.id} href={`/subjects/${subject.slug}`}>
+                          <div
+                            className="rounded-2xl border-2 p-3 transition-all hover:scale-[1.02] text-center"
+                            style={{
+                              borderColor: subject.color + '30',
+                              background: subject.color + '08',
+                            }}
+                          >
+                            <div
+                              className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2"
+                              style={{ background: subject.color + '20', color: subject.color }}
+                            >
+                              <DynamicIcon name={subject.icon} size={18} />
+                            </div>
+                            <p className="text-xs font-black text-[var(--text)] truncate">{subject.name}</p>
+                            <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                              {subject.courseCount} {tS('courses')}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
             </div>
 
             <div className="space-y-6">

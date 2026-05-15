@@ -157,7 +157,7 @@ export const CourseTranslations = pgTable(
 
 export const Lessons = pgTable('Lessons', {
   Id:               uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
-  AgentId:          uuid('AgentId').notNull().references(() => Agents.Id, { onDelete: 'cascade' }),
+  AgentId:          uuid('AgentId').references(() => Agents.Id, { onDelete: 'set null' }),
   CourseId:         uuid('CourseId').references(() => Courses.Id),
   Order:            integer('Order').default(0).notNull(),
   XpReward:         integer('XpReward').default(50).notNull(),
@@ -414,6 +414,49 @@ export const UserCourseProgress = pgTable(
   ],
 );
 
+// ─── Exercises ────────────────────────────────────────────────────────────────
+
+export const Exercises = pgTable('Exercises', {
+  Id:         uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  LessonId:   uuid('LessonId').references(() => Lessons.Id, { onDelete: 'cascade' }),
+  CourseId:   uuid('CourseId').references(() => Courses.Id, { onDelete: 'cascade' }),
+  Type:       text('Type', { enum: ['fill_blank', 'arrange_code', 'spot_error', 'build_it'] }).notNull(),
+  Difficulty: integer('Difficulty').default(1).notNull(),
+  Order:      integer('Order').default(0).notNull(),
+  XpReward:   integer('XpReward').default(20).notNull(),
+  IsDeleted:  boolean('IsDeleted').default(false).notNull(),
+  CreatedAt:  timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const ExerciseTranslations = pgTable('ExerciseTranslations', {
+  Id:           uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  ExerciseId:   uuid('ExerciseId').notNull().references(() => Exercises.Id, { onDelete: 'cascade' }),
+  Locale:       text('Locale').notNull(),
+  Title:        text('Title').notNull(),
+  Instructions: text('Instructions').notNull(),
+  HintText:     text('HintText').notNull().default(''),
+  StarterCode:  text('StarterCode').notNull().default(''),
+  SolutionCode: text('SolutionCode').notNull().default(''),
+  TestCases:    jsonb('TestCases').$type<{ input: string; expected: string }[]>().notNull().default([]),
+}, (T) => [
+  unique('Uq_ExTrans_ExLocale').on(T.ExerciseId, T.Locale),
+  index('Idx_ExTrans_ExerciseId').on(T.ExerciseId),
+]);
+
+export const ExerciseSubmissions = pgTable('ExerciseSubmissions', {
+  Id:          uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  UserId:      uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  ExerciseId:  uuid('ExerciseId').notNull().references(() => Exercises.Id, { onDelete: 'cascade' }),
+  Code:        text('Code').notNull().default(''),
+  Passed:      boolean('Passed').default(false).notNull(),
+  Score:       integer('Score').default(0).notNull(),
+  Attempts:    integer('Attempts').default(1).notNull(),
+  SubmittedAt: timestamp('SubmittedAt', { withTimezone: true }).defaultNow().notNull(),
+}, (T) => [
+  index('Idx_ExSub_UserId').on(T.UserId),
+  index('Idx_ExSub_ExerciseId').on(T.ExerciseId),
+]);
+
 // ─── Relations ────────────────────────────────────────────────────────────────
 
 export const AgentsRelations = relations(Agents, ({ many }) => ({
@@ -499,6 +542,8 @@ export type TUserPreferences   = typeof UserPreferences.$inferSelect;
 export type TLearningPath      = typeof LearningPaths.$inferSelect;
 export type TEncryptedKey      = typeof EncryptedKeys.$inferSelect;
 export type TSandboxSession    = typeof SandboxSessions.$inferSelect;
-export type TSubject           = typeof Subjects.$inferSelect;
-export type TCourse            = typeof Courses.$inferSelect;
-export type TSystemPrompt      = typeof SystemPrompts.$inferSelect;
+export type TSubject            = typeof Subjects.$inferSelect;
+export type TCourse             = typeof Courses.$inferSelect;
+export type TSystemPrompt       = typeof SystemPrompts.$inferSelect;
+export type TExercise           = typeof Exercises.$inferSelect;
+export type TExerciseSubmission = typeof ExerciseSubmissions.$inferSelect;

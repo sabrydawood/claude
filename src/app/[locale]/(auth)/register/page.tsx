@@ -74,8 +74,12 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4 relative overflow-hidden">
 
-      {/* Floating decorative icons — client-only */}
-      {mounted && <div className="absolute inset-0 pointer-events-none">
+      {/* Floating decorative icons — always rendered, opacity toggled to avoid hydration mismatch */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.4s' }}
+      >
         {FLOATERS.map(({ Icon, size, delay, opacity, ...pos }, i) => (
           <motion.div
             key={i}
@@ -91,7 +95,7 @@ export default function RegisterPage() {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%)' }}
         />
-      </div>}
+      </div>
 
       {/* Back to home */}
       <motion.div

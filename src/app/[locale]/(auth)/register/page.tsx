@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
@@ -14,11 +14,11 @@ import {
 } from 'lucide-react';
 
 const FLOATERS = [
-  { Icon: Trophy,   top: '10%',  end:   '10%', size: 26, delay: 0,    opacity: 0.11 },
-  { Icon: Star,     top: '30%',  start: '8%',  size: 22, delay: 0.9,  opacity: 0.10 },
-  { Icon: Sparkles, bottom:'20%',end:  '20%',  size: 20, delay: 1.7,  opacity: 0.09 },
-  { Icon: BookOpen, top: '55%',  start: '18%', size: 24, delay: 0.5,  opacity: 0.10 },
-  { Icon: Gift,     bottom:'12%',start: '6%',  size: 20, delay: 1.3,  opacity: 0.11 },
+  { Icon: Trophy,   top: '10%',  right: '10%', size: 26, delay: 0,    opacity: 0.11 },
+  { Icon: Star,     top: '30%',  left:  '8%',  size: 22, delay: 0.9,  opacity: 0.10 },
+  { Icon: Sparkles, bottom:'20%',right: '20%', size: 20, delay: 1.7,  opacity: 0.09 },
+  { Icon: BookOpen, top: '55%',  left:  '18%', size: 24, delay: 0.5,  opacity: 0.10 },
+  { Icon: Gift,     bottom:'12%',left:  '6%',  size: 20, delay: 1.3,  opacity: 0.11 },
 ] as const;
 
 export default function RegisterPage() {
@@ -29,12 +29,15 @@ export default function RegisterPage() {
   const isAr = locale === 'ar';
   const router = useRouter();
 
+  const [mounted, setMounted] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+
+  useEffect(() => { setMounted(true); }, []);
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -71,8 +74,8 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4 relative overflow-hidden">
 
-      {/* Floating decorative icons */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Floating decorative icons — client-only */}
+      {mounted && <div className="absolute inset-0 pointer-events-none">
         {FLOATERS.map(({ Icon, size, delay, opacity, ...pos }, i) => (
           <motion.div
             key={i}
@@ -88,7 +91,7 @@ export default function RegisterPage() {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%)' }}
         />
-      </div>
+      </div>}
 
       {/* Back to home */}
       <motion.div

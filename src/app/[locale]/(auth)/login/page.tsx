@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
@@ -15,11 +15,11 @@ import {
 
 // Floating decorative icons (crisp at all sizes, theme-aware)
 const FLOATERS = [
-  { Icon: Star,          top: '12%', start: '8%',  size: 28, delay: 0,    opacity: 0.12 },
-  { Icon: Sparkles,      top: '28%', end:   '12%', size: 22, delay: 0.8,  opacity: 0.10 },
-  { Icon: GraduationCap, bottom:'18%',start: '20%',size: 26, delay: 1.6,  opacity: 0.11 },
-  { Icon: Rocket,        top: '60%', end:  '28%',  size: 20, delay: 0.4,  opacity: 0.09 },
-  { Icon: Zap,           top: '42%', start: '5%',  size: 18, delay: 1.2,  opacity: 0.10 },
+  { Icon: Star,          top: '12%', left: '8%',   size: 28, delay: 0,    opacity: 0.12 },
+  { Icon: Sparkles,      top: '28%', right: '12%', size: 22, delay: 0.8,  opacity: 0.10 },
+  { Icon: GraduationCap, bottom:'18%',left: '20%', size: 26, delay: 1.6,  opacity: 0.11 },
+  { Icon: Rocket,        top: '60%', right: '28%', size: 20, delay: 0.4,  opacity: 0.09 },
+  { Icon: Zap,           top: '42%', left: '5%',   size: 18, delay: 1.2,  opacity: 0.10 },
 ] as const;
 
 export default function LoginPage() {
@@ -30,11 +30,14 @@ export default function LoginPage() {
   const isAr = locale === 'ar';
   const router = useRouter();
 
+  const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+
+  useEffect(() => { setMounted(true); }, []);
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -65,8 +68,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4 relative overflow-hidden">
 
-      {/* Floating decorative Lucide icons */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Floating decorative Lucide icons — client-only to avoid hydration mismatch */}
+      {mounted && <div className="absolute inset-0 pointer-events-none">
         {FLOATERS.map(({ Icon, size, delay, opacity, ...pos }, i) => (
           <motion.div
             key={i}
@@ -84,7 +87,7 @@ export default function LoginPage() {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%)' }}
         />
-      </div>
+      </div>}
 
       {/* Back to home */}
       <motion.div

@@ -8,7 +8,10 @@ export async function GET(req: NextRequest) {
   const title = searchParams.get('title') ?? 'ذكاوي';
   const agent = searchParams.get('agent') ?? 'Claude';
   const locale = searchParams.get('locale') ?? 'ar';
-  const type = searchParams.get('type') ?? 'lesson'; // 'lesson' | 'agent' | 'home'
+  const type = searchParams.get('type') ?? 'lesson'; // 'lesson' | 'agent' | 'home' | 'achievement'
+  const emoji = searchParams.get('emoji') ?? '🏆';
+  const xp = searchParams.get('xp') ?? '';
+  const lessons = searchParams.get('lessons') ?? '';
 
   const isAr = locale === 'ar';
 
@@ -154,6 +157,28 @@ export async function GET(req: NextRequest) {
         }}>
           ZKAWI.APP
         </div>
+
+        {/* Achievement overlay — shown when type=achievement */}
+        {type === 'achievement' && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(135deg, #1E1B4B 0%, #2D1B69 50%, #0F0A1E 100%)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', gap: '24px',
+          }}>
+            <div style={{ fontSize: '120px', display: 'flex' }}>{emoji}</div>
+            <div style={{ color: 'white', fontSize: '56px', fontWeight: '900', textAlign: 'center', direction: isAr ? 'rtl' : 'ltr' }}>
+              {title}
+            </div>
+            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '28px', textAlign: 'center', direction: isAr ? 'rtl' : 'ltr' }}>
+              {isAr ? `فتح هذا الإنجاز على ذكاوي` : `Unlocked this achievement on Zkawi`}
+            </div>
+            <div style={{ display: 'flex', gap: '20px', marginTop: '8px' }}>
+              {xp && <div style={{ background: 'rgba(124,58,237,0.3)', borderRadius: '20px', padding: '10px 24px', color: '#A78BFA', fontSize: '22px', display: 'flex', border: '1px solid rgba(124,58,237,0.5)' }}>⭐ {xp} XP</div>}
+              {lessons && <div style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '20px', padding: '10px 24px', color: '#6EE7B7', fontSize: '22px', display: 'flex', border: '1px solid rgba(16,185,129,0.4)' }}>📚 {lessons} {isAr ? 'درس' : 'lessons'}</div>}
+            </div>
+          </div>
+        )}
 
         {/* Bottom gold accent line */}
         <div style={{

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/lib/i18n/routing';
 import { Providers } from '@/components/providers';
 import { PwaRegister } from '@/components/pwa-register';
+import { PwaInstallBanner } from '@/components/pwa-install-banner';
 import '../globals.css';
 
 const cairo = Cairo({
@@ -128,6 +129,7 @@ export default async function LocaleLayout({
         <Providers messages={messages} locale={locale}>
           <PwaRegister />
           {children}
+          <PwaInstallBanner />
         </Providers>
       </body>
     </html>

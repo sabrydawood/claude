@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getDir } from '@/lib/i18n/locale-utils';
 import type { LessonFull } from '@/lib/db/queries/content';
-import { ChevronLeft, ChevronRight, Clock, Zap, CheckCircle2, BookOpen, Trophy } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Zap, CheckCircle2, BookOpen, Trophy, Target, PartyPopper } from 'lucide-react';
 
 interface UserProgress {
   completedLessons: string[];
@@ -117,7 +117,7 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
             className="fixed bottom-8 start-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-3 font-black"
           >
             <Zap size={20} fill="white" />
-            <span>+{xpPopup} XP {locale === 'ar' ? 'كسبتها! 🎉' : 'earned! 🎉'}</span>
+            <span>+{xpPopup} XP {t('xpEarned')}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -150,19 +150,18 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                 {earnedAchievements[0].emoji}
               </motion.div>
               <div
-                className="text-xs font-bold mb-2 px-3 py-1 rounded-full inline-block"
+                className="flex items-center gap-1.5 text-xs font-bold mb-2 px-3 py-1 rounded-full inline-flex"
                 style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
               >
-                🏆 {locale === 'ar' ? 'إنجاز جديد!' : 'New Achievement!'}
+                <Trophy size={12} />
+                {t('newAchievement')}
               </div>
               <h3 className="text-xl font-black mt-3" style={{ color: 'var(--text)' }}>
                 {earnedAchievements[0].name}
               </h3>
               {earnedAchievements.length > 1 && (
                 <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
-                  {locale === 'ar'
-                    ? `+ ${earnedAchievements.length - 1} إنجازات أخرى`
-                    : `+ ${earnedAchievements.length - 1} more achievement${earnedAchievements.length > 2 ? 's' : ''}`}
+                  {t('moreAchievements', { count: earnedAchievements.length - 1 })}
                 </p>
               )}
               <button
@@ -170,7 +169,7 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                 className="mt-6 w-full py-3 rounded-2xl font-bold text-sm"
                 style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
               >
-                {locale === 'ar' ? 'رائع! 🎉' : 'Awesome! 🎉'}
+                {t('awesome')}
               </button>
             </motion.div>
           </motion.div>
@@ -224,8 +223,8 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
           className="mb-8"
         >
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-14 h-14 bg-[var(--zkawi-purple)]/15 rounded-2xl flex items-center justify-center text-3xl">
-              📖
+            <div className="w-14 h-14 bg-[var(--zkawi-purple)]/15 rounded-2xl flex items-center justify-center text-[var(--zkawi-purple)]">
+              <BookOpen size={28} />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -235,8 +234,12 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                     {t('completed')}
                   </Badge>
                 )}
-                <Badge variant="default">
-                  {view === 'content' ? `📖 ${locale === 'ar' ? 'قراءة' : 'Reading'}` : view === 'quiz' ? `🎯 ${locale === 'ar' ? 'كويز' : 'Quiz'}` : `✅ ${locale === 'ar' ? 'مكتمل' : 'Complete'}`}
+                <Badge variant="default" className="flex items-center gap-1">
+                  {view === 'content'
+                    ? <><BookOpen size={11} />{t('badgeReading')}</>
+                    : view === 'quiz'
+                    ? <><Target size={11} />{t('badgeQuiz')}</>
+                    : <><CheckCircle2 size={11} />{t('badgeCompleted')}</>}
                 </Badge>
               </div>
               <h1 className="text-2xl md:text-3xl font-black text-[var(--text)]">{lesson.title}</h1>
@@ -256,7 +259,9 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                     : 'text-[var(--text-muted)] hover:text-[var(--text)]'
                 }`}
               >
-                {v === 'content' ? `📖 ${locale === 'ar' ? 'الدرس' : 'Lesson'}` : `🎯 ${locale === 'ar' ? 'الكويز' : 'Quiz'}`}
+                {v === 'content'
+                  ? <span className="flex items-center gap-1.5"><BookOpen size={13} />{t('tabLesson')}</span>
+                  : <span className="flex items-center gap-1.5"><Target size={13} />{t('tabQuiz')}</span>}
               </button>
             ))}
           </div>
@@ -285,11 +290,13 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
               </div>
 
               <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-[var(--text-muted)]">
-                  📖 {Math.round(scrollProgress)}% {locale === 'ar' ? 'اتقرأ' : 'read'}
+                <div className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]">
+                  <BookOpen size={14} />
+                  {t('readProgress', { percent: Math.round(scrollProgress) })}
                 </div>
                 <Button onClick={() => setView('quiz')} className="gap-2">
-                  {t('startQuiz')} 🎯
+                  <Target size={16} />
+                  {t('startQuiz')}
                   <ChevronRight size={16} className="flip-rtl" />
                 </Button>
               </div>
@@ -326,17 +333,15 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', delay: 0.2 }}
-                  className="text-6xl mb-4"
+                  className="flex justify-center mb-4 text-[var(--zkawi-gold)]"
                 >
-                  🎉
+                  <PartyPopper size={64} />
                 </motion.div>
                 <h2 className="text-2xl font-black text-[var(--text)] mb-2">
-                  {locale === 'ar' ? 'أحسنت! الدرس اتكمل! ⭐' : 'Well done! Lesson completed! ⭐'}
+                  {t('lessonCompletedTitle')}
                 </h2>
                 <p className="text-[var(--text-muted)] mb-6">
-                  {locale === 'ar'
-                    ? `كملت درس "${lesson.title}" وكسبت XP جديدة!`
-                    : `You completed "${lesson.title}" and earned new XP!`}
+                  {t('lessonCompletedDesc', { title: lesson.title })}
                 </p>
 
                 <div className="flex items-center justify-center gap-4 mb-8">
@@ -345,22 +350,23 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                       <Zap size={18} fill="currentColor" />
                       +{progress.scores[lesson.id] >= 80 ? lesson.xpReward : Math.round(lesson.xpReward * (progress.scores[lesson.id] || 0) / 100)}
                     </div>
-                    <div className="text-xs text-[var(--text-muted)] mt-1">{locale === 'ar' ? 'XP كسبتها' : 'XP earned'}</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-1">{t('xpEarnedLabel')}</div>
                   </div>
                   {progress.scores[lesson.id] !== undefined && (
                     <div className="bg-[var(--zkawi-green)]/10 border border-[var(--zkawi-green)]/30 rounded-2xl p-4 text-center">
                       <div className="text-[var(--zkawi-green)] font-black text-xl">
                         {progress.scores[lesson.id]}%
                       </div>
-                      <div className="text-xs text-[var(--text-muted)] mt-1">{locale === 'ar' ? 'نتيجة الكويز' : 'Quiz score'}</div>
+                      <div className="text-xs text-[var(--text-muted)] mt-1">{t('quizScore')}</div>
                     </div>
                   )}
                 </div>
 
                 {earnedAchievements.length > 0 && (
                   <div className="mb-6 p-4 rounded-2xl" style={{ background: 'var(--zkawi-purple)/10', border: '1px solid var(--zkawi-purple)/30' }}>
-                    <p className="text-sm font-bold mb-3" style={{ color: 'var(--zkawi-purple)' }}>
-                      🏆 {locale === 'ar' ? 'إنجازات مفتوحة!' : 'Achievements unlocked!'}
+                    <p className="flex items-center justify-center gap-1.5 text-sm font-bold mb-3" style={{ color: 'var(--zkawi-purple)' }}>
+                      <Trophy size={14} />
+                      {t('achievementsUnlocked')}
                     </p>
                     <div className="flex flex-wrap gap-2 justify-center">
                       {earnedAchievements.map(a => (
@@ -376,7 +382,7 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                 <div className="flex gap-3 justify-center">
                   <Button variant="outline" onClick={() => setView('content')} className="gap-2">
                     <BookOpen size={16} />
-                    {locale === 'ar' ? 'راجع الدرس' : 'Review lesson'}
+                    {t('reviewLesson')}
                   </Button>
                   {nextLessonId ? (
                     <Link href={`/agents/${agentSlug}/lessons/${nextLessonId}`}>
@@ -389,7 +395,7 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                     <Link href={`/agents/${agentSlug}`}>
                       <Button className="gap-2">
                         <Trophy size={16} />
-                        {locale === 'ar' ? 'شوف كل الدروس' : 'View all lessons'}
+                        {t('viewAllLessons')}
                       </Button>
                     </Link>
                   )}

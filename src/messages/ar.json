@@ -179,7 +179,8 @@
       "totalXp": "إجمالي XP",
       "streak": "أيام متتالية",
       "lessonsCompleted": "دروس اتكملت",
-      "quizzesCompleted": "كويزات اتحلت"
+      "quizzesCompleted": "كويزات اتحلت",
+      "achievements": "إنجازات"
     },
     "progress": {
       "title": "تقدمك",
@@ -189,17 +190,31 @@
     "achievements": {
       "title": "إنجازاتك",
       "noAchievements": "لسه معندكش إنجازات. ابدأ التعلم دلوقتي!",
-      "viewAll": "شوف كل الإنجازات"
+      "viewAll": "شوف كل الإنجازات",
+      "count": "{earned} / {total} إنجازات"
     },
     "agents": {
       "title": "استكشف المساعدات",
       "startLearning": "ابدأ التعلم",
-      "continueLearning": "كمل التعلم"
+      "continueLearning": "كمل التعلم",
+      "badgeActive": "متاح الآن",
+      "lessonsProgress": "{completed} / {total} دروس اتكملت"
     },
     "streak": {
       "days": "يوم",
       "current": "السلسلة الحالية",
       "keepGoing": "واصل عشان متكسرش السلسلة!"
+    },
+    "loading": "جاري التحميل...",
+    "defaultName": "صديقي",
+    "motivational": "كمّل تعلمك النهارده واكسب XP جديدة!",
+    "lessons": {
+      "title": "دروس Claude",
+      "viewAll": "شوف كل الدروس ({count}) ←"
+    },
+    "tip": {
+      "title": "نصيحة اليوم",
+      "body": "اتعلم لو 15 دقيقة بس كل يوم وهتشوف نتايج مذهلة خلال أسبوع!"
     }
   },
   "agents": {
@@ -216,7 +231,10 @@
     "backToAgents": "رجوع للمساعدات",
     "lessonNumber": "الدرس",
     "minutes": "دقيقة",
-    "xpReward": "XP"
+    "xpReward": "XP",
+    "completed": "مكتمل",
+    "lessonsTitle": "الدروس",
+    "emptyLessons": "الدروس قادمة قريباً!"
   },
   "lessons": {
     "backToAgent": "رجوع",
@@ -235,7 +253,25 @@
     "activity": {
       "title": "نشاط تفاعلي",
       "tryIt": "جرب بنفسك"
-    }
+    },
+    "xpEarned": "كسبتها",
+    "newAchievement": "إنجاز جديد!",
+    "moreAchievements": "+ {count} إنجازات أخرى",
+    "awesome": "رائع!",
+    "lessonCompletedTitle": "أحسنت! الدرس اتكمل!",
+    "lessonCompletedDesc": "كملت درس \"{title}\" وكسبت XP جديدة!",
+    "xpEarnedLabel": "XP كسبتها",
+    "quizScore": "نتيجة الكويز",
+    "achievementsUnlocked": "إنجازات مفتوحة!",
+    "reviewLesson": "راجع الدرس",
+    "viewAllLessons": "شوف كل الدروس",
+    "readProgress": "{percent}% اتقرأ",
+    "tabLesson": "الدرس",
+    "tabQuiz": "الكويز",
+    "badgeReading": "قراءة",
+    "badgeQuiz": "كويز",
+    "badgeCompleted": "مكتمل",
+    "questions": "أسئلة"
   },
   "quiz": {
     "title": "وقت الكويز! 🎯",

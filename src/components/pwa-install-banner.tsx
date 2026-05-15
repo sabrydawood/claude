@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download } from 'lucide-react';
+import { X, Download, Bot } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -52,7 +52,7 @@ export function PwaInstallBanner() {
           className="rounded-2xl p-4 flex items-center gap-3 shadow-2xl"
           style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
         >
-          <div className="text-3xl flex-shrink-0">🤖</div>
+          <Bot size={28} className="flex-shrink-0 text-[var(--zkawi-purple)]" />
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
               {t('install')}

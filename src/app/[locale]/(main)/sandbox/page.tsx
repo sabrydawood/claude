@@ -201,8 +201,8 @@ export default function SandboxPage() {
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4" style={{ maxHeight: '60vh' }}>
             {messages.length === 0 && (
               <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center py-12">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl" style={{ background: 'var(--bg)' }}>
-                  🤖
+                <div className="w-16 h-16 rounded-full flex items-center justify-center text-[var(--zkawi-purple)]" style={{ background: 'var(--bg)' }}>
+                  <Bot size={32} />
                 </div>
                 <p className="font-medium" style={{ color: 'var(--text)' }}>
                   {t('greeting')}

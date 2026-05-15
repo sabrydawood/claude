@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Zap } from 'lucide-react';
+import { Zap, Rocket } from 'lucide-react';
 
 export default function HomeCta({ locale }: { locale: string }) {
   const t = useTranslations('home.cta');
@@ -23,7 +23,7 @@ export default function HomeCta({ locale }: { locale: string }) {
           <div className="absolute bottom-0 start-0 w-32 h-32 bg-amber-400/20 rounded-full translate-y-1/2 -translate-x-1/2" />
 
           <div className="relative">
-            <div className="text-5xl mb-4">🚀</div>
+            <Rocket size={52} className="mx-auto mb-4 opacity-90" />
             <h2 className="text-3xl md:text-4xl font-black mb-4">
               {t('title')}
             </h2>
@@ -37,7 +37,7 @@ export default function HomeCta({ locale }: { locale: string }) {
                 className="text-amber-900 font-black shadow-xl hover:shadow-2xl"
               >
                 <Zap size={20} fill="currentColor" />
-                {t('button')} 🎉
+                {t('button')}
               </Button>
             </Link>
           </div>

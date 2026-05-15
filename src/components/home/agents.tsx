@@ -28,7 +28,7 @@ export default function HomeAgents({ agents, locale: _locale }: { agents: AgentR
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-black text-[var(--text)] mb-4">
-            {t('title')} 🤖
+            {t('title')}
           </h2>
           <p className="text-lg text-[var(--text-muted)] max-w-2xl mx-auto">
             {t('subtitle')}
@@ -81,7 +81,7 @@ export default function HomeAgents({ agents, locale: _locale }: { agents: AgentR
                         <span className="text-sm text-[var(--text-muted)]">{t('comingSoon')}</span>
                       </div>
                       <Button variant="outline" className="w-full" size="sm" disabled>
-                        {t('comingSoon')} 🔒
+                        {t('comingSoon')}
                       </Button>
                     </>
                   )}

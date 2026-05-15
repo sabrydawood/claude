@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Flame, BookOpen, Trophy, Target, ChevronRight, Lock, CheckCircle2, Clock } from 'lucide-react';
+import { Flame, BookOpen, Trophy, Target, ChevronRight, Lock, CheckCircle2, Clock, Bot, Zap, Lightbulb, GraduationCap } from 'lucide-react';
 import { useRouter } from '@/lib/i18n/navigation';
 
 interface UserAchievement {
@@ -41,6 +41,7 @@ interface UserProgress {
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
+  const tL = useTranslations('lessons');
   const locale = useLocale();
   const { data: session, isPending } = useSession();
   const router = useRouter();
@@ -83,8 +84,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <div className="text-center">
-          <div className="text-5xl mb-4 animate-bounce">⚡</div>
-          <p className="text-[var(--zkawi-purple)] font-bold">جاري التحميل...</p>
+          <Zap size={48} className="mx-auto mb-4 animate-bounce text-[var(--zkawi-purple)]" />
+          <p className="text-[var(--zkawi-purple)] font-bold">{t('loading')}</p>
         </div>
       </div>
     );
@@ -97,7 +98,7 @@ export default function DashboardPage() {
     ? lessonOrder.map(id => lessons.find(l => l.id === id)).filter(Boolean) as LessonSummary[]
     : lessons;
   const agentProgress = lessons.length > 0 ? (progress.completedLessons.length / lessons.length) * 100 : 0;
-  const userName = session.user?.name || 'صديقي';
+  const userName = session.user?.name || t('defaultName');
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg)]">
@@ -111,16 +112,16 @@ export default function DashboardPage() {
             className="mb-8"
           >
             <div className="bg-gradient-to-r from-[var(--zkawi-purple)] to-indigo-700 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden">
-              <div className="absolute top-0 end-0 text-8xl opacity-20 translate-x-4 -translate-y-4">🤖</div>
+              <Bot size={96} className="absolute top-0 end-0 opacity-10 translate-x-4 -translate-y-4" />
               <div className="relative">
                 <p className="text-purple-200 text-sm font-medium mb-1">
-                  {t('welcomeBack')} 👋
+                  {t('welcomeBack')}
                 </p>
                 <h1 className="text-2xl md:text-3xl font-black mb-2">
                   {t('welcome')}, {userName}!
                 </h1>
                 <p className="text-purple-200 text-sm">
-                  كمل تعلمك النهارده وكسب XP جديدة! 🚀
+                  {t('motivational')}
                 </p>
               </div>
             </div>
@@ -150,7 +151,7 @@ export default function DashboardPage() {
                     icon: <Flame className="text-orange-500" size={20} />,
                     value: progress.streakDays,
                     label: t('stats.streak'),
-                    suffix: locale === 'ar' ? ' يوم 🔥' : ' days 🔥',
+                    suffix: ` ${t('streak.days')}`,
                     border: 'border-orange-500/30',
                   },
                   {
@@ -170,7 +171,7 @@ export default function DashboardPage() {
                   {
                     icon: <Trophy className="text-[var(--zkawi-gold)]" size={20} />,
                     value: progress.achievements.filter(a => a.earned).length,
-                    label: locale === 'ar' ? 'إنجازات' : 'Achievements',
+                    label: t('stats.achievements'),
                     suffix: '',
                     border: 'border-[var(--zkawi-gold)]/30',
                   },
@@ -196,24 +197,25 @@ export default function DashboardPage() {
               >
                 <Card className="p-6">
                   <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-lg font-black text-[var(--text)]">
-                      {t('agents.title')} 🎓
+                    <h2 className="flex items-center gap-2 text-lg font-black text-[var(--text)]">
+                      <GraduationCap size={20} className="text-[var(--zkawi-purple)]" />
+                      {t('agents.title')}
                     </h2>
                   </div>
 
                   {/* Claude agent card */}
                   <div className="bg-[var(--bg-secondary)] border border-[var(--zkawi-purple)]/25 rounded-2xl p-5">
                     <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-[var(--zkawi-purple)] to-[var(--zkawi-purple-dark)] rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-[var(--zkawi-purple)]/20">
-                        🤖
+                      <div className="w-14 h-14 bg-gradient-to-br from-[var(--zkawi-purple)] to-[var(--zkawi-purple-dark)] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[var(--zkawi-purple)]/20 text-white">
+                        <Bot size={28} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-black text-[var(--text)]">Claude</h3>
-                          <Badge variant="default">متاح الآن</Badge>
+                          <Badge variant="default">{t('agents.badgeActive')}</Badge>
                         </div>
                         <p className="text-sm text-[var(--text-muted)] mb-3">
-                          {progress.completedLessons.length} / {lessons.length} {locale === 'ar' ? 'دروس اتكملت' : 'lessons completed'}
+                          {t('agents.lessonsProgress', { completed: progress.completedLessons.length, total: lessons.length })}
                         </p>
                         <Progress value={agentProgress} colorScheme="purple" className="mb-3 h-2" />
                         <Link href="/agents/claude">
@@ -235,8 +237,9 @@ export default function DashboardPage() {
                 transition={{ delay: 0.4 }}
               >
                 <Card className="p-6">
-                  <h2 className="text-lg font-black text-[var(--text)] mb-4">
-                    دروس Claude 📚
+                  <h2 className="flex items-center gap-2 text-lg font-black text-[var(--text)] mb-4">
+                    <BookOpen size={20} className="text-[var(--zkawi-purple)]" />
+                    {t('lessons.title')}
                   </h2>
                   <div className="space-y-3">
                     {claudeLessons.slice(0, 3).map((lesson) => {
@@ -248,8 +251,8 @@ export default function DashboardPage() {
                               ? 'bg-[var(--zkawi-green)]/10 border border-[var(--zkawi-green)]/30'
                               : 'bg-[var(--surface-2)] border border-[var(--border)] hover:border-[var(--zkawi-purple-light)] hover:bg-[var(--bg-secondary)]'
                           }`}>
-                            <div className="text-2xl w-10 h-10 flex items-center justify-center bg-[var(--surface)] rounded-xl shadow-sm">
-                              📖
+                            <div className="w-10 h-10 flex items-center justify-center bg-[var(--surface)] rounded-xl shadow-sm text-[var(--zkawi-purple)]">
+                              <BookOpen size={18} />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="font-bold text-sm text-[var(--text)] truncate">
@@ -257,7 +260,7 @@ export default function DashboardPage() {
                               </div>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <Clock size={11} className="text-[var(--text-muted)]" />
-                                <span className="text-xs text-[var(--text-muted)]">{lesson.estimatedMinutes} {locale === 'ar' ? 'دقيقة' : 'min'}</span>
+                                <span className="text-xs text-[var(--text-muted)]">{lesson.estimatedMinutes} {tL('minutes')}</span>
                                 <span className="text-xs text-[var(--zkawi-purple)] font-bold">+{lesson.xpReward} XP</span>
                               </div>
                             </div>
@@ -275,7 +278,7 @@ export default function DashboardPage() {
                     <Link href="/agents/claude">
                       <div className="text-center pt-2">
                         <span className="text-sm text-[var(--zkawi-purple)] font-bold hover:opacity-80">
-                          {locale === 'ar' ? `شوف كل الدروس (${lessons.length}) →` : `View all lessons (${lessons.length}) →`}
+                          {t('lessons.viewAll', { count: lessons.length })}
                         </span>
                       </div>
                     </Link>
@@ -292,8 +295,9 @@ export default function DashboardPage() {
                 transition={{ delay: 0.3 }}
               >
                 <Card className="p-6">
-                  <h2 className="text-lg font-black text-[var(--text)] mb-4">
-                    {t('achievements.title')} 🏆
+                  <h2 className="flex items-center gap-2 text-lg font-black text-[var(--text)] mb-4">
+                    <Trophy size={20} className="text-[var(--zkawi-gold)]" />
+                    {t('achievements.title')}
                   </h2>
                   <div className="grid grid-cols-3 gap-3">
                     {progress.achievements.map((achievement) => (
@@ -318,7 +322,7 @@ export default function DashboardPage() {
                     ))}
                   </div>
                   <p className="text-xs text-[var(--text-muted)] text-center mt-3">
-                    {progress.achievements.filter(a => a.earned).length} / {progress.achievements.length} {locale === 'ar' ? 'إنجازات' : 'achievements'}
+                    {t('achievements.count', { earned: progress.achievements.filter(a => a.earned).length, total: progress.achievements.length })}
                   </p>
                 </Card>
               </motion.div>
@@ -331,7 +335,7 @@ export default function DashboardPage() {
               >
                 <Card className="p-6 border-orange-500/30">
                   <div className="text-center">
-                    <div className="text-4xl mb-2">🔥</div>
+                    <Flame size={40} className="mx-auto mb-2 text-orange-500" />
                     <div className="text-3xl font-black text-orange-500 mb-1">
                       {progress.streakDays}
                     </div>
@@ -352,7 +356,9 @@ export default function DashboardPage() {
                               : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
                           }`}
                         >
-                          {i < progress.streakDays ? '🔥' : '○'}
+                          {i < progress.streakDays
+                            ? <Flame size={14} className="mx-auto" />
+                            : <span className="text-[10px]">○</span>}
                         </div>
                       ))}
                     </div>
@@ -368,10 +374,10 @@ export default function DashboardPage() {
               >
                 <Card className="p-6 border-[var(--zkawi-purple)]/25">
                   <div className="text-center">
-                    <div className="text-3xl mb-2">💡</div>
-                    <h3 className="font-black text-[var(--text)] mb-2 text-sm">نصيحة اليوم</h3>
+                    <Lightbulb size={32} className="mx-auto mb-2 text-[var(--zkawi-purple)]" />
+                    <h3 className="font-black text-[var(--text)] mb-2 text-sm">{t('tip.title')}</h3>
                     <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                      اتعلم لو 15 دقيقة بس كل يوم وهتشوف نتايج مذهلة خلال أسبوع! 🌟
+                      {t('tip.body')}
                     </p>
                   </div>
                 </Card>

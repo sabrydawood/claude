@@ -150,7 +150,7 @@ export default function Header() {
                   <Button variant="outline" size="sm">{t('nav.login')}</Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm">{t('nav.register')} 🚀</Button>
+                  <Button size="sm">{t('nav.register')}</Button>
                 </Link>
               </div>
             )}
@@ -194,7 +194,7 @@ export default function Header() {
                   </Link>
                   <Link href="/register" onClick={() => setMobileOpen(false)}>
                     <div className="mx-2 px-4 py-3 rounded-xl text-sm font-bold bg-[var(--zkawi-purple)] text-white text-center hover:opacity-90 transition-all">
-                      {t('nav.register')} 🚀
+                      {t('nav.register')}
                     </div>
                   </Link>
                 </>

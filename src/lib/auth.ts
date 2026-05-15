@@ -1,6 +1,8 @@
 /**
  * auth.ts
  * Better Auth server-side configuration.
+ * generateId uses a function (not the 'uuid' string) so Better Auth generates
+ * the ID itself rather than relying on DB defaults — fixing accounts.id issue.
  */
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -31,7 +33,9 @@ export const auth = betterAuth({
     process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   ],
   advanced: {
-    generateId: () => uuidv7(),
+    database: {
+      generateId: ({ model }) => uuidv7(),
+    },
   },
 });
 

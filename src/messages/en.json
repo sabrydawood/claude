@@ -179,7 +179,8 @@
       "totalXp": "Total XP",
       "streak": "Day Streak",
       "lessonsCompleted": "Lessons Completed",
-      "quizzesCompleted": "Quizzes Completed"
+      "quizzesCompleted": "Quizzes Completed",
+      "achievements": "Achievements"
     },
     "progress": {
       "title": "Your Progress",
@@ -189,17 +190,31 @@
     "achievements": {
       "title": "Your Achievements",
       "noAchievements": "No achievements yet. Start learning now!",
-      "viewAll": "View All Achievements"
+      "viewAll": "View All Achievements",
+      "count": "{earned} / {total} achievements"
     },
     "agents": {
       "title": "Explore Assistants",
       "startLearning": "Start Learning",
-      "continueLearning": "Continue Learning"
+      "continueLearning": "Continue Learning",
+      "badgeActive": "Available Now",
+      "lessonsProgress": "{completed} / {total} lessons completed"
     },
     "streak": {
       "days": "days",
       "current": "Current Streak",
       "keepGoing": "Keep going to maintain your streak!"
+    },
+    "loading": "Loading...",
+    "defaultName": "Friend",
+    "motivational": "Keep learning today and earn new XP!",
+    "lessons": {
+      "title": "Claude Lessons",
+      "viewAll": "View all lessons ({count}) →"
+    },
+    "tip": {
+      "title": "Tip of the Day",
+      "body": "Learn just 15 minutes a day and you will see amazing results within a week!"
     }
   },
   "agents": {
@@ -216,7 +231,10 @@
     "backToAgents": "Back to Assistants",
     "lessonNumber": "Lesson",
     "minutes": "min",
-    "xpReward": "XP"
+    "xpReward": "XP",
+    "completed": "Completed",
+    "lessonsTitle": "Lessons",
+    "emptyLessons": "Lessons coming soon!"
   },
   "lessons": {
     "backToAgent": "Back",
@@ -235,7 +253,25 @@
     "activity": {
       "title": "Interactive Activity",
       "tryIt": "Try It Yourself"
-    }
+    },
+    "xpEarned": "earned",
+    "newAchievement": "New Achievement!",
+    "moreAchievements": "+ {count} more achievements",
+    "awesome": "Awesome!",
+    "lessonCompletedTitle": "Well done! Lesson completed!",
+    "lessonCompletedDesc": "You completed \"{title}\" and earned new XP!",
+    "xpEarnedLabel": "XP earned",
+    "quizScore": "Quiz score",
+    "achievementsUnlocked": "Achievements unlocked!",
+    "reviewLesson": "Review lesson",
+    "viewAllLessons": "View all lessons",
+    "readProgress": "{percent}% read",
+    "tabLesson": "Lesson",
+    "tabQuiz": "Quiz",
+    "badgeReading": "Reading",
+    "badgeQuiz": "Quiz",
+    "badgeCompleted": "Complete",
+    "questions": "questions"
   },
   "quiz": {
     "title": "Quiz Time! 🎯",

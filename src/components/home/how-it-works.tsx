@@ -16,7 +16,6 @@ export default function HomeHowItWorks({ locale }: { locale: string }) {
       color: 'from-[var(--zkawi-purple)] to-[var(--zkawi-purple-dark)]',
       bg: 'bg-[var(--zkawi-purple)]/8',
       border: 'border-[var(--zkawi-purple)]/25',
-      emoji: '🚀',
     },
     {
       icon: <BookOpen size={32} />,
@@ -26,7 +25,6 @@ export default function HomeHowItWorks({ locale }: { locale: string }) {
       color: 'from-amber-400 to-orange-500',
       bg: 'bg-amber-500/8',
       border: 'border-amber-500/25',
-      emoji: '🎓',
     },
     {
       icon: <Trophy size={32} />,
@@ -36,7 +34,6 @@ export default function HomeHowItWorks({ locale }: { locale: string }) {
       color: 'from-emerald-400 to-teal-500',
       bg: 'bg-emerald-500/8',
       border: 'border-emerald-500/25',
-      emoji: '🏆',
     },
   ];
 
@@ -50,7 +47,7 @@ export default function HomeHowItWorks({ locale }: { locale: string }) {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-black text-[var(--text)] mb-4">
-            {t('title')} 🗺️
+            {t('title')}
           </h2>
           <p className="text-lg text-[var(--text-muted)] max-w-2xl mx-auto">
             {t('subtitle')}
@@ -80,8 +77,6 @@ export default function HomeHowItWorks({ locale }: { locale: string }) {
               <div className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg`}>
                 {step.icon}
               </div>
-
-              <div className="text-3xl mb-3">{step.emoji}</div>
 
               <h3 className="text-xl font-black text-[var(--text)] mb-2">
                 {t(step.titleKey as Parameters<typeof t>[0])}

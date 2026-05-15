@@ -249,7 +249,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
               <p className="text-purple-200 text-xs mt-0.5">
                 {isStreaming
                   ? t('typing')
-                  : t('guide') + ' 🌟'}
+                  : t('guide')}
               </p>
             </div>
             <div className="flex items-center gap-1">

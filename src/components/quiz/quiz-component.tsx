@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Zap, RotateCcw, ChevronRight, CheckCircle2, XCircle } from 'lucide-react';
+import { Zap, RotateCcw, ChevronRight, CheckCircle2, XCircle, Star, PartyPopper, ThumbsUp, Dumbbell } from 'lucide-react';
 import type { QuizQuestionRow } from '@/lib/db/queries/content';
 import confetti from './confetti-util';
 
@@ -73,9 +73,15 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', delay: 0.2 }}
-          className="text-7xl mb-4"
+          className="flex justify-center mb-4"
         >
-          {isPerfect ? '🌟' : isGreat ? '🎉' : isGood ? '👍' : '💪'}
+          {isPerfect
+            ? <Star size={72} className="text-[var(--zkawi-gold)]" fill="currentColor" />
+            : isGreat
+            ? <PartyPopper size={72} className="text-emerald-500" />
+            : isGood
+            ? <ThumbsUp size={72} className="text-[var(--zkawi-purple)]" />
+            : <Dumbbell size={72} className="text-[var(--text-muted)]" />}
         </motion.div>
 
         <h2 className="text-2xl font-black text-[var(--text)] mb-2">
@@ -258,7 +264,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
               >
                 {answers[answers.length - 1] ? (
                   <div className="bg-[var(--zkawi-green)]/10 border border-[var(--zkawi-green)]/30 rounded-2xl p-4 flex items-center gap-3">
-                    <div className="text-2xl">🎉</div>
+                    <CheckCircle2 size={22} className="text-[var(--zkawi-green)] flex-shrink-0" />
                     <div>
                       <p className="font-black text-[var(--zkawi-green)]">{t('correct')}</p>
                     </div>
@@ -266,7 +272,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                 ) : (
                   <div className="bg-[var(--zkawi-red)]/10 border border-[var(--zkawi-red)]/30 rounded-2xl p-4">
                     <p className="font-bold text-[var(--zkawi-red)] mb-1">
-                      {t('incorrect')} 😕
+                      <span className="flex items-center gap-1.5"><XCircle size={16} />{t('incorrect')}</span>
                     </p>
                     <p className="text-sm text-[var(--text-muted)]">
                       {t('correctAnswer')}: {currentQuestion.options.find(o => o.isCorrect)?.text}

@@ -45,7 +45,7 @@ export default function GlobalError({
   };
 
   return (
-    <html lang="en" dir="ltr">
+    <html lang="en">
       <body className="min-h-screen flex items-center justify-center p-4 bg-[var(--bg)]">
         <Card variant="glass" className="max-w-2xl w-full">
           <CardHeader className="text-center">

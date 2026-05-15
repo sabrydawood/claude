@@ -7,7 +7,7 @@ import { Link } from '@/lib/i18n/navigation';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Card } from '@/components/ui/card';
-import { Loader2, BookOpen, Flame } from 'lucide-react';
+import { Loader2, BookOpen, Flame, Trophy } from 'lucide-react';
 
 interface LeaderboardEntry {
   userId: string;
@@ -38,7 +38,7 @@ export default function LeaderboardPage() {
 
       <main className="flex-1 container mx-auto px-4 py-8 max-w-3xl flex flex-col gap-6">
         <div className="text-center">
-          <div className="text-5xl mb-3">🏆</div>
+          <Trophy size={52} className="mx-auto mb-3 text-[var(--zkawi-gold)]" />
           <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
             {t('title')}
           </h1>

@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/ui/logo';
 import { useSession } from '@/lib/auth-client';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Zap } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -143,7 +143,7 @@ export default function OnboardingPage() {
   if (isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <div className="text-5xl animate-bounce">⚡</div>
+        <Zap size={48} className="animate-bounce text-[var(--zkawi-purple)]" />
       </div>
     );
   }

@@ -6,7 +6,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, BookOpen, Trophy, Clock, Zap, CheckCircle2, Lock, Play } from 'lucide-react';
+import { ChevronLeft, BookOpen, Trophy, Clock, Zap, CheckCircle2, Lock, Play, Construction } from 'lucide-react';
 import type { AgentRow, LessonRow } from '@/lib/db/queries/content';
 
 // Gradient mapping by slug (non-translatable visual config)
@@ -43,6 +43,7 @@ interface Props {
 
 export default function AgentPageClient({ agent, lessons, locale, agentSlug }: Props) {
   const t = useTranslations('agents');
+  const tL = useTranslations('lessons');
   const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], totalXp: 0, scores: {} });
   const [mounted, setMounted] = useState(false);
 
@@ -111,7 +112,7 @@ export default function AgentPageClient({ agent, lessons, locale, agentSlug }: P
                 </div>
                 <div className="flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1.5 text-sm font-bold">
                   <Clock size={14} />
-                  {lessons.reduce((a, l) => a + l.estimatedMinutes, 0)} {locale === 'ar' ? 'دقيقة' : 'min'}
+                  {lessons.reduce((a, l) => a + l.estimatedMinutes, 0)} {tL('minutes')}
                 </div>
                 <div className="flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1.5 text-sm font-bold">
                   <Zap size={14} fill="currentColor" />
@@ -130,7 +131,7 @@ export default function AgentPageClient({ agent, lessons, locale, agentSlug }: P
               className="mt-6 bg-white/10 rounded-2xl p-4"
             >
               <div className="flex justify-between text-sm font-bold mb-2">
-                <span>{completedCount} / {lessons.length} {locale === 'ar' ? 'دروس' : 'lessons'}</span>
+                <span>{completedCount} / {lessons.length} {tL('tabLesson')}</span>
                 <span>{Math.round(progressPercent)}%</span>
               </div>
               <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -149,13 +150,14 @@ export default function AgentPageClient({ agent, lessons, locale, agentSlug }: P
       {/* Lessons list */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-black text-[var(--text)]">
-            📚 {locale === 'ar' ? 'الدروس' : 'Lessons'}
+          <h2 className="flex items-center gap-2 text-xl font-black text-[var(--text)]">
+            <BookOpen size={20} className="text-[var(--zkawi-purple)]" />
+            {t('lessonsTitle')}
           </h2>
           {mounted && completedCount === lessons.length && lessons.length > 0 && (
             <Badge variant="achievement">
               <Trophy size={12} />
-              {locale === 'ar' ? 'مكتمل! 🎉' : 'Completed! 🎉'}
+              {t('completed')}
             </Badge>
           )}
         </div>
@@ -183,14 +185,14 @@ export default function AgentPageClient({ agent, lessons, locale, agentSlug }: P
               >
                 <div className="flex items-start gap-4">
                   <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm ${
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
                       isCompleted
-                        ? 'bg-[var(--zkawi-green)]/15'
+                        ? 'bg-[var(--zkawi-green)]/15 text-[var(--zkawi-green)]'
                         : isLocked
-                        ? 'bg-[var(--surface-2)]'
-                        : 'bg-[var(--zkawi-purple)]/15'
+                        ? 'bg-[var(--surface-2)] text-[var(--text-muted)]'
+                        : 'bg-[var(--zkawi-purple)]/15 text-[var(--zkawi-purple)]'
                     }`}>
-                      {isLocked ? '🔒' : '📖'}
+                      {isLocked ? <Lock size={20} /> : <BookOpen size={20} />}
                     </div>
                     <span className="text-xs font-bold text-[var(--text-muted)]">#{i + 1}</span>
                   </div>
@@ -218,7 +220,7 @@ export default function AgentPageClient({ agent, lessons, locale, agentSlug }: P
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
                         <Clock size={12} />
-                        <span>{lesson.estimatedMinutes} {locale === 'ar' ? 'دقيقة' : 'min'}</span>
+                        <span>{lesson.estimatedMinutes} {tL('minutes')}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Zap size={12} className="text-[var(--zkawi-purple)]" fill="currentColor" />
@@ -262,8 +264,8 @@ export default function AgentPageClient({ agent, lessons, locale, agentSlug }: P
 
         {lessons.length === 0 && (
           <div className="text-center py-16">
-            <div className="text-5xl mb-4">🚧</div>
-            <p className="text-[var(--text-muted)]">{locale === 'ar' ? 'الدروس قادمة قريباً!' : 'Lessons coming soon!'}</p>
+            <Construction size={52} className="mx-auto mb-4 text-[var(--text-muted)]" />
+            <p className="text-[var(--text-muted)]">{t('emptyLessons')}</p>
           </div>
         )}
       </div>

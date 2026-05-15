@@ -1,10 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Lock, Clock, Zap, Play } from 'lucide-react';
+import { CheckCircle2, Lock, Clock, Zap, Play, BookOpen } from 'lucide-react';
 import type { LessonRow } from '@/lib/db/queries/content';
 
 interface LessonCardProps {
@@ -16,7 +16,7 @@ interface LessonCardProps {
 }
 
 export default function LessonCard({ lesson, index, isCompleted, isLocked, score }: LessonCardProps) {
-  const locale = useLocale();
+  const t = useTranslations('lessons');
 
   const card = (
     <motion.div
@@ -35,14 +35,14 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
       <div className="flex items-start gap-4">
         {/* Lesson number & emoji */}
         <div className="flex flex-col items-center gap-1 flex-shrink-0">
-          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm ${
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
             isCompleted
-              ? 'bg-[var(--zkawi-green)]/15'
+              ? 'bg-[var(--zkawi-green)]/15 text-[var(--zkawi-green)]'
               : isLocked
-              ? 'bg-[var(--surface-2)]'
-              : 'bg-[var(--zkawi-purple)]/15'
+              ? 'bg-[var(--surface-2)] text-[var(--text-muted)]'
+              : 'bg-[var(--zkawi-purple)]/15 text-[var(--zkawi-purple)]'
           }`}>
-            {isLocked ? '🔒' : '📖'}
+            {isLocked ? <Lock size={20} /> : <BookOpen size={20} />}
           </div>
           <span className="text-xs font-bold text-[var(--text-muted)]">#{index + 1}</span>
         </div>
@@ -71,14 +71,14 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
               <Clock size={12} />
-              <span>{lesson.estimatedMinutes} {locale === 'ar' ? 'دقيقة' : 'min'}</span>
+              <span>{lesson.estimatedMinutes} {t('minutes')}</span>
             </div>
             <div className="flex items-center gap-1">
               <Zap size={12} className="text-[var(--zkawi-purple)]" fill="currentColor" />
               <span className="text-xs font-bold text-[var(--zkawi-purple)]">+{lesson.xpReward} XP</span>
             </div>
             <div className="text-xs text-[var(--text-muted)]">
-              {locale === 'ar' ? 'أسئلة' : 'questions'}
+              {t('questions')}
             </div>
           </div>
         </div>

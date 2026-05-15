@@ -437,5 +437,24 @@
     "arabicFirst": "📚 Arabic First",
     "achievementUnlocked": "Unlocked this achievement on Zkawi",
     "lessons": "lessons"
+  },
+  "error": {
+    "title": "Oops! Something went wrong 😅",
+    "description": "Don't worry, it happens! We're working on fixing this.",
+    "retry": "Try Again",
+    "goHome": "Go to Home",
+    "goBack": "Go Back",
+    "reload": "Reload Page",
+    "technicalDetails": "Technical Details",
+    "showDetails": "Show Details",
+    "hideDetails": "Hide Details",
+    "copied": "Copied!",
+    "copyError": "Copy Error",
+    "reportError": "Report Error",
+    "boundaryMessage": "An error occurred while rendering this component",
+    "unexpectedError": "An unexpected error occurred",
+    "pageNotFound": "Page not found",
+    "networkError": "Network connection error",
+    "tryAgainLater": "Please try again later"
   }
 }

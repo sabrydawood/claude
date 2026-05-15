@@ -48,6 +48,8 @@ export const accounts = pgTable('accounts', {
   refreshToken: text('refresh_token'),
   expiresAt: timestamp('expires_at'),
   password: text('password'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const verificationTokens = pgTable('verification_tokens', {

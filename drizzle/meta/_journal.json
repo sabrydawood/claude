@@ -8,6 +8,13 @@
       "when": 1778811044167,
       "tag": "0000_giant_speed",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778811436567,
+      "tag": "0001_lazy_jack_flag",
+      "breakpoints": true
     }
   ]
 }

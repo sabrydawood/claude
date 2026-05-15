@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,6 +20,12 @@ export default function Header() {
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  // Use null before mount so server & client initial render match (prevents hydration mismatch)
+  const activeSession = mounted ? session : null;
 
   const switchLocale = () => {
     router.push(pathname, { locale: locale === 'ar' ? 'en' : 'ar' });
@@ -31,7 +37,7 @@ export default function Header() {
     router.refresh();
   };
 
-  const navLinks = session
+  const navLinks = activeSession
     ? [
         { href: '/dashboard', label: t('nav.dashboard'), icon: <LayoutDashboard size={16} /> },
         { href: '/leaderboard', label: t('nav.leaderboard'), icon: <Trophy size={16} /> },
@@ -92,7 +98,7 @@ export default function Header() {
             </button>
 
             {/* User menu or auth buttons */}
-            {session ? (
+            {activeSession ? (
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -100,11 +106,11 @@ export default function Header() {
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="text-xs bg-[var(--zkawi-purple)] text-white">
-                      {getInitials(session.user?.name ?? 'U')}
+                      {getInitials(activeSession.user?.name ?? 'U')}
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden sm:block text-sm font-semibold text-[var(--text)] max-w-24 truncate">
-                    {session.user?.name}
+                    {activeSession.user?.name}
                   </span>
                 </button>
 
@@ -193,7 +199,7 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
-              {!session && (
+              {!activeSession && (
                 <>
                   <Link href="/login" onClick={() => setMobileOpen(false)}>
                     <div className="px-4 py-3 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:bg-[var(--bg-secondary)] flex items-center gap-2">

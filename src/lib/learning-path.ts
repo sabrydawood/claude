@@ -11,23 +11,24 @@ interface PathInput {
  * Generates a personalized lesson order based on onboarding answers.
  * Returns an array of lesson IDs in the recommended order.
  */
-export async function generateLearningPath(input: PathInput): Promise<number[]> {
+export async function generateLearningPath(input: PathInput): Promise<string[]> {
   const allLessons = await getLessonsByAgent('claude', 'en');
 
   // Score each lesson based on the user's profile
   const scored = allLessons.map(lesson => ({
     id: lesson.id,
+    order: lesson.order,
     score: scorLesson(lesson, input),
   }));
 
   // Sort by score descending, then by original order as tiebreaker
-  scored.sort((a, b) => b.score - a.score || a.id - b.id);
+  scored.sort((a, b) => b.score - a.score || a.order - b.order);
 
   return scored.map(s => s.id);
 }
 
 function scorLesson(
-  lesson: { id: number; order: number; xpReward: number },
+  lesson: { id: string; order: number; xpReward: number },
   input: PathInput
 ): number {
   let score = 100;

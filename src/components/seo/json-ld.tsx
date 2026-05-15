@@ -51,7 +51,7 @@ interface CourseSchemaProps {
   agentSlug: string;
   agentName: string;
   agentDescription: string;
-  lessons: Array<{ id: number; title: string; description: string; estimatedMinutes: number }>;
+  lessons: Array<{ id: string; title: string; description: string; estimatedMinutes: number }>;
 }
 
 export function CourseSchema({ locale, agentSlug, agentName, agentDescription, lessons }: CourseSchemaProps) {
@@ -89,7 +89,7 @@ export function CourseSchema({ locale, agentSlug, agentName, agentDescription, l
 interface LessonSchemaProps {
   locale: string;
   agentSlug: string;
-  lessonId: number;
+  lessonId: string;
   lesson: {
     title: string;
     description: string;

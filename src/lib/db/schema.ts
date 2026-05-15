@@ -1,35 +1,45 @@
+/**
+ * Schema.ts
+ * Full Drizzle ORM schema for Zkawi platform.
+ *
+ * Conventions:
+ * - Better Auth tables: snake_case SQL names + camelCase JS props (framework requirement)
+ * - All other tables: PascalCase SQL names + PascalCase JS props
+ * - All content/user PKs: uuidv7 (time-sortable, better index performance)
+ * - Soft delete: IsDeleted boolean on all content tables
+ * - Per-entity translation tables (no universal EAV translations table)
+ */
 import {
   pgTable,
   text,
   timestamp,
   boolean,
   integer,
-  serial,
   uuid,
   unique,
   index,
   jsonb,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { uuidv7 } from 'uuidv7';
 
-// ─── Auth tables (better-auth compatible) ─────────────────────────────────────
+// ─── Better Auth tables ───────────────────────────────────────────────────────
+// camelCase JS props required by Better Auth's Drizzle adapter.
 
 export const users = pgTable('users', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  name: text('name').notNull(),
-  email: text('email').notNull().unique(),
+  id:            uuid('id').defaultRandom().primaryKey(),
+  name:          text('name').notNull(),
+  email:         text('email').notNull().unique(),
   emailVerified: boolean('email_verified').default(false),
-  image: text('image'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  image:         text('image'),
+  createdAt:     timestamp('created_at').defaultNow().notNull(),
+  updatedAt:     timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const sessions = pgTable('sessions', {
-  id: text('id').primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  token: text('token').notNull().unique(),
+  id:        text('id').primaryKey(),
+  userId:    uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  token:     text('token').notNull().unique(),
   expiresAt: timestamp('expires_at').notNull(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
@@ -38,294 +48,365 @@ export const sessions = pgTable('sessions', {
 });
 
 export const accounts = pgTable('accounts', {
-  id: text('id').primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  accountId: text('account_id').notNull(),
-  providerId: text('provider_id').notNull(),
-  accessToken: text('access_token'),
+  id:           text('id').primaryKey(),
+  userId:       uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  accountId:    text('account_id').notNull(),
+  providerId:   text('provider_id').notNull(),
+  accessToken:  text('access_token'),
   refreshToken: text('refresh_token'),
-  expiresAt: timestamp('expires_at'),
-  password: text('password'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  expiresAt:    timestamp('expires_at'),
+  password:     text('password'),
+  createdAt:    timestamp('created_at').defaultNow().notNull(),
+  updatedAt:    timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const verificationTokens = pgTable('verification_tokens', {
-  id: text('id').primaryKey(),
+  id:         text('id').primaryKey(),
   identifier: text('identifier').notNull(),
-  value: text('value').notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
+  value:      text('value').notNull(),
+  expiresAt:  timestamp('expires_at').notNull(),
 });
 
-// ─── Translations table ────────────────────────────────────────────────────────
-//
-//  Single table for ALL translatable strings across the entire app.
-//  Adding a new language = INSERT rows with new locale. Zero schema changes.
-//
-//  entity_type: 'agent' | 'lesson' | 'quiz_question' | 'quiz_option' | 'achievement'
-//  field:       e.g. 'name' | 'description' | 'full_description' | 'content' | 'question' | 'text'
-//  locale:      BCP-47 code e.g. 'ar' | 'en' | 'fr' | 'de' | 'ur' ...
+// ─── Agents ───────────────────────────────────────────────────────────────────
 
-export const translations = pgTable(
-  'translations',
+export const Agents = pgTable('Agents', {
+  Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  Slug:      text('Slug').notNull().unique(),
+  Color:     text('Color').notNull(),
+  Emoji:     text('Emoji').notNull(),
+  IsActive:  boolean('IsActive').default(true).notNull(),
+  Order:     integer('Order').default(0).notNull(),
+  IsDeleted: boolean('IsDeleted').default(false).notNull(),
+  CreatedAt: timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const AgentTranslations = pgTable(
+  'AgentTranslations',
   {
-    id: serial('id').primaryKey(),
-    entityType: text('entity_type').notNull(),
-    entityId: integer('entity_id').notNull(),
-    locale: text('locale').notNull(),
-    field: text('field').notNull(),
-    value: text('value').notNull(),
+    Id:              uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    AgentId:         uuid('AgentId').notNull().references(() => Agents.Id, { onDelete: 'cascade' }),
+    Locale:          text('Locale').notNull(),
+    Name:            text('Name').notNull(),
+    Description:     text('Description').notNull().default(''),
+    FullDescription: text('FullDescription').notNull().default(''),
   },
-  (t) => [
-    // One value per (entity, locale, field) — no duplicates
-    unique('uq_translations').on(t.entityType, t.entityId, t.locale, t.field),
-    // Fast lookup by locale
-    index('idx_translations_locale').on(t.locale),
-    // Fast lookup by entity
-    index('idx_translations_entity').on(t.entityType, t.entityId),
+  (T) => [
+    unique('Uq_AgentTranslations_AgentLocale').on(T.AgentId, T.Locale),
+    index('Idx_AgentTranslations_Locale').on(T.Locale),
+    index('Idx_AgentTranslations_AgentId').on(T.AgentId),
   ],
 );
 
-// ─── Agents ───────────────────────────────────────────────────────────────────
-//  Non-translatable columns only. All text lives in translations.
-
-export const agents = pgTable('agents', {
-  id: serial('id').primaryKey(),
-  slug: text('slug').notNull().unique(),
-  color: text('color').notNull(),
-  emoji: text('emoji').notNull(),
-  isActive: boolean('is_active').default(true).notNull(),
-  order: integer('order').default(0).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
 // ─── Lessons ─────────────────────────────────────────────────────────────────
 
-export const lessons = pgTable('lessons', {
-  id: serial('id').primaryKey(),
-  agentId: integer('agent_id')
-    .notNull()
-    .references(() => agents.id, { onDelete: 'cascade' }),
-  order: integer('order').default(0).notNull(),
-  xpReward: integer('xp_reward').default(50).notNull(),
-  estimatedMinutes: integer('estimated_minutes').default(5).notNull(),
+export const Lessons = pgTable('Lessons', {
+  Id:               uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  AgentId:          uuid('AgentId').notNull().references(() => Agents.Id, { onDelete: 'cascade' }),
+  Order:            integer('Order').default(0).notNull(),
+  XpReward:         integer('XpReward').default(50).notNull(),
+  EstimatedMinutes: integer('EstimatedMinutes').default(5).notNull(),
+  IsDeleted:        boolean('IsDeleted').default(false).notNull(),
 });
+
+export const LessonTranslations = pgTable(
+  'LessonTranslations',
+  {
+    Id:          uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    LessonId:    uuid('LessonId').notNull().references(() => Lessons.Id, { onDelete: 'cascade' }),
+    Locale:      text('Locale').notNull(),
+    Title:       text('Title').notNull(),
+    Description: text('Description').notNull().default(''),
+    Content:     text('Content').notNull().default(''),
+  },
+  (T) => [
+    unique('Uq_LessonTranslations_LessonLocale').on(T.LessonId, T.Locale),
+    index('Idx_LessonTranslations_Locale').on(T.Locale),
+    index('Idx_LessonTranslations_LessonId').on(T.LessonId),
+  ],
+);
 
 // ─── Quiz ─────────────────────────────────────────────────────────────────────
 
-export const quizQuestions = pgTable('quiz_questions', {
-  id: serial('id').primaryKey(),
-  lessonId: integer('lesson_id')
-    .notNull()
-    .references(() => lessons.id, { onDelete: 'cascade' }),
-  type: text('type', { enum: ['multiple_choice', 'true_false'] }).notNull(),
-  order: integer('order').default(0).notNull(),
+export const QuizQuestions = pgTable('QuizQuestions', {
+  Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  LessonId:  uuid('LessonId').notNull().references(() => Lessons.Id, { onDelete: 'cascade' }),
+  Type:      text('Type', { enum: ['multiple_choice', 'true_false'] }).notNull(),
+  Order:     integer('Order').default(0).notNull(),
+  IsDeleted: boolean('IsDeleted').default(false).notNull(),
 });
 
-export const quizOptions = pgTable('quiz_options', {
-  id: serial('id').primaryKey(),
-  questionId: integer('question_id')
-    .notNull()
-    .references(() => quizQuestions.id, { onDelete: 'cascade' }),
-  isCorrect: boolean('is_correct').default(false).notNull(),
-  order: integer('order').default(0).notNull(),
+export const QuizQuestionTranslations = pgTable(
+  'QuizQuestionTranslations',
+  {
+    Id:         uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    QuestionId: uuid('QuestionId').notNull().references(() => QuizQuestions.Id, { onDelete: 'cascade' }),
+    Locale:     text('Locale').notNull(),
+    Question:   text('Question').notNull(),
+  },
+  (T) => [
+    unique('Uq_QQTrans_QuestionLocale').on(T.QuestionId, T.Locale),
+    index('Idx_QQTrans_QuestionId').on(T.QuestionId),
+  ],
+);
+
+export const QuizOptions = pgTable('QuizOptions', {
+  Id:         uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  QuestionId: uuid('QuestionId').notNull().references(() => QuizQuestions.Id, { onDelete: 'cascade' }),
+  IsCorrect:  boolean('IsCorrect').default(false).notNull(),
+  Order:      integer('Order').default(0).notNull(),
 });
 
-// ─── Learning Tracks ─────────────────────────────────────────────────────────
-//  A track = a persona/learning path profile. All text is in translations.
-//  Slugs: 'explorer' | 'creator' | 'engineer' | 'developer' | 'educator'
+export const QuizOptionTranslations = pgTable(
+  'QuizOptionTranslations',
+  {
+    Id:       uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    OptionId: uuid('OptionId').notNull().references(() => QuizOptions.Id, { onDelete: 'cascade' }),
+    Locale:   text('Locale').notNull(),
+    Text:     text('Text').notNull(),
+  },
+  (T) => [
+    unique('Uq_QOTrans_OptionLocale').on(T.OptionId, T.Locale),
+    index('Idx_QOTrans_OptionId').on(T.OptionId),
+  ],
+);
 
-export const tracks = pgTable('tracks', {
-  id: serial('id').primaryKey(),
-  slug: text('slug').notNull().unique(),
-  emoji: text('emoji').notNull(),
-  order: integer('order').default(0).notNull(),
-  isDefault: boolean('is_default').default(false).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
+// ─── Learning Tracks ──────────────────────────────────────────────────────────
+
+export const Tracks = pgTable('Tracks', {
+  Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  Slug:      text('Slug').notNull().unique(),
+  Emoji:     text('Emoji').notNull(),
+  Order:     integer('Order').default(0).notNull(),
+  IsDefault: boolean('IsDefault').default(false).notNull(),
+  IsDeleted: boolean('IsDeleted').default(false).notNull(),
+  CreatedAt: timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const TrackTranslations = pgTable(
+  'TrackTranslations',
+  {
+    Id:          uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    TrackId:     uuid('TrackId').notNull().references(() => Tracks.Id, { onDelete: 'cascade' }),
+    Locale:      text('Locale').notNull(),
+    Name:        text('Name').notNull(),
+    Description: text('Description').notNull().default(''),
+  },
+  (T) => [
+    unique('Uq_TrackTranslations_TrackLocale').on(T.TrackId, T.Locale),
+    index('Idx_TrackTranslations_TrackId').on(T.TrackId),
+  ],
+);
 
 // ─── Achievements ─────────────────────────────────────────────────────────────
 
-export const achievements = pgTable('achievements', {
-  id: serial('id').primaryKey(),
-  emoji: text('emoji').notNull(),
-  conditionType: text('condition_type').notNull(),
-  conditionValue: integer('condition_value').notNull(),
+export const Achievements = pgTable('Achievements', {
+  Id:             uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  Emoji:          text('Emoji').notNull(),
+  ConditionType:  text('ConditionType').notNull(),
+  ConditionValue: integer('ConditionValue').notNull(),
+  IsDeleted:      boolean('IsDeleted').default(false).notNull(),
 });
 
-// ─── User data ────────────────────────────────────────────────────────────────
-//
-// user_preferences: answers from the onboarding wizard
-// learning_paths:   generated personalized lesson order
-// encrypted_keys:   user's Anthropic API key (AES-256 encrypted at rest)
-// sandbox_sessions: history of sandbox interactions
+export const AchievementTranslations = pgTable(
+  'AchievementTranslations',
+  {
+    Id:            uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    AchievementId: uuid('AchievementId').notNull().references(() => Achievements.Id, { onDelete: 'cascade' }),
+    Locale:        text('Locale').notNull(),
+    Name:          text('Name').notNull(),
+    Description:   text('Description').notNull().default(''),
+  },
+  (T) => [
+    unique('Uq_AchTrans_AchLocale').on(T.AchievementId, T.Locale),
+    index('Idx_AchTrans_AchievementId').on(T.AchievementId),
+  ],
+);
 
-export const userPreferences = pgTable('user_preferences', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' })
-    .unique(),
-  ageGroup: text('age_group', { enum: ['child', 'teen', 'adult'] }).notNull().default('adult'),
-  goal: text('goal', { enum: ['chat', 'work', 'creative', 'developer', 'educator'] }).notNull().default('chat'),
-  experience: text('experience', { enum: ['none', 'some', 'advanced'] }).notNull().default('none'),
-  learningStyle: text('learning_style', { enum: ['visual', 'reading', 'practice', 'game'] }).notNull().default('practice'),
-  dailyMinutes: integer('daily_minutes').default(15).notNull(),
-  preferredLocale: text('preferred_locale').default('ar').notNull(),
-  onboardingCompleted: boolean('onboarding_completed').default(false).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+// ─── User Data ────────────────────────────────────────────────────────────────
+
+export const UserPreferences = pgTable('UserPreferences', {
+  Id:                  uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  UserId:              uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  AgeGroup:            text('AgeGroup', { enum: ['child', 'teen', 'adult'] }).notNull().default('adult'),
+  Goal:                text('Goal', { enum: ['chat', 'work', 'creative', 'developer', 'educator'] }).notNull().default('chat'),
+  Experience:          text('Experience', { enum: ['none', 'some', 'advanced'] }).notNull().default('none'),
+  LearningStyle:       text('LearningStyle', { enum: ['visual', 'reading', 'practice', 'game'] }).notNull().default('practice'),
+  DailyMinutes:        integer('DailyMinutes').default(15).notNull(),
+  PreferredLocale:     text('PreferredLocale').default('ar').notNull(),
+  OnboardingCompleted: boolean('OnboardingCompleted').default(false).notNull(),
+  CreatedAt:           timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  UpdatedAt:           timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const learningPaths = pgTable('learning_paths', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  trackId: integer('track_id')
-    .notNull()
-    .references(() => tracks.id, { onDelete: 'cascade' }),
-  lessonOrder: jsonb('lesson_order').notNull().default([]),
-  currentLessonId: integer('current_lesson_id').references(() => lessons.id, { onDelete: 'set null' }),
-  isActive: boolean('is_active').default(true).notNull(),
-  generatedAt: timestamp('generated_at').defaultNow().notNull(),
+export const LearningPaths = pgTable(
+  'LearningPaths',
+  {
+    Id:              uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    UserId:          uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    TrackId:         uuid('TrackId').notNull().references(() => Tracks.Id, { onDelete: 'cascade' }),
+    LessonOrder:     jsonb('LessonOrder').notNull().default([]),
+    CurrentLessonId: uuid('CurrentLessonId').references(() => Lessons.Id, { onDelete: 'set null' }),
+    IsActive:        boolean('IsActive').default(true).notNull(),
+    GeneratedAt:     timestamp('GeneratedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    // SEV-004: Compound index for active learning path lookups
+    index('Idx_LearningPaths_UserActive').on(T.UserId, T.IsActive),
+  ],
+);
+
+export const EncryptedKeys = pgTable('EncryptedKeys', {
+  Id:           uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  UserId:       uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  EncryptedKey: text('EncryptedKey').notNull(),
+  KeyHint:      text('KeyHint').notNull(),
+  CreatedAt:    timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  UpdatedAt:    timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const encryptedKeys = pgTable('encrypted_keys', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' })
-    .unique(),
-  encryptedKey: text('encrypted_key').notNull(),
-  keyHint: text('key_hint').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const SandboxSessions = pgTable(
+  'SandboxSessions',
+  {
+    Id:            uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    UserId:        uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    Model:         text('Model').default('claude-haiku-4-5-20251001').notNull(),
+    MessagesCount: integer('MessagesCount').default(0).notNull(),
+    TokensUsed:    integer('TokensUsed').default(0).notNull(),
+    CreatedAt:     timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    index('Idx_SandboxSessions_UserId').on(T.UserId),
+  ],
+);
+
+export const UserProgress = pgTable(
+  'UserProgress',
+  {
+    Id:          uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    UserId:      uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    LessonId:    uuid('LessonId').notNull().references(() => Lessons.Id, { onDelete: 'cascade' }),
+    Completed:   boolean('Completed').default(false).notNull(),
+    Score:       integer('Score').default(0).notNull(),
+    CompletedAt: timestamp('CompletedAt', { withTimezone: true }),
+    CreatedAt:   timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+    UpdatedAt:   timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    // SEV-004: Fast userId lookup
+    index('Idx_UserProgress_UserId').on(T.UserId),
+    // SEV-011: UNIQUE prevents race condition duplicate rows — enables safe UPSERT
+    unique('Uq_UserProgress_UserLesson').on(T.UserId, T.LessonId),
+  ],
+);
+
+export const UserStats = pgTable('UserStats', {
+  Id:               uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  UserId:           uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  TotalXp:          integer('TotalXp').default(0).notNull(),
+  StreakDays:       integer('StreakDays').default(0).notNull(),
+  LastActivityDate: timestamp('LastActivityDate', { withTimezone: true }),
+  LessonsCompleted: integer('LessonsCompleted').default(0).notNull(),
+  QuizzesCompleted: integer('QuizzesCompleted').default(0).notNull(),
 });
 
-export const sandboxSessions = pgTable('sandbox_sessions', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  model: text('model').default('claude-haiku-4-5-20251001').notNull(),
-  messagesCount: integer('messages_count').default(0).notNull(),
-  tokensUsed: integer('tokens_used').default(0).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+export const UserAchievements = pgTable(
+  'UserAchievements',
+  {
+    Id:            uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    UserId:        uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    AchievementId: uuid('AchievementId').notNull().references(() => Achievements.Id, { onDelete: 'cascade' }),
+    EarnedAt:      timestamp('EarnedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    // SEV-004: Fast achievement lookup per user
+    index('Idx_UserAchievements_UserId').on(T.UserId),
+    // Prevent duplicate achievements
+    unique('Uq_UserAchievements_UserAch').on(T.UserId, T.AchievementId),
+  ],
+);
 
-export const userProgress = pgTable('user_progress', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  lessonId: integer('lesson_id')
-    .notNull()
-    .references(() => lessons.id, { onDelete: 'cascade' }),
-  completed: boolean('completed').default(false).notNull(),
-  score: integer('score').default(0).notNull(),
-  completedAt: timestamp('completed_at'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+// ─── Relations ────────────────────────────────────────────────────────────────
 
-export const userStats = pgTable('user_stats', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' })
-    .unique(),
-  totalXp: integer('total_xp').default(0).notNull(),
-  streakDays: integer('streak_days').default(0).notNull(),
-  lastActivityDate: timestamp('last_activity_date'),
-  lessonsCompleted: integer('lessons_completed').default(0).notNull(),
-  quizzesCompleted: integer('quizzes_completed').default(0).notNull(),
-});
-
-export const userAchievements = pgTable('user_achievements', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  achievementId: integer('achievement_id')
-    .notNull()
-    .references(() => achievements.id, { onDelete: 'cascade' }),
-  earnedAt: timestamp('earned_at').defaultNow().notNull(),
-});
-
-// ─── Relations (for Drizzle relational queries) ───────────────────────────────
-
-export const agentsRelations = relations(agents, ({ many }) => ({
-  lessons: many(lessons),
-  translations: many(translations),
+export const AgentsRelations = relations(Agents, ({ many }) => ({
+  Lessons:      many(Lessons),
+  Translations: many(AgentTranslations),
 }));
 
-export const lessonsRelations = relations(lessons, ({ one, many }) => ({
-  agent: one(agents, { fields: [lessons.agentId], references: [agents.id] }),
-  questions: many(quizQuestions),
-  translations: many(translations),
-  userProgress: many(userProgress),
+export const AgentTranslationsRelations = relations(AgentTranslations, ({ one }) => ({
+  Agent: one(Agents, { fields: [AgentTranslations.AgentId], references: [Agents.Id] }),
 }));
 
-export const quizQuestionsRelations = relations(quizQuestions, ({ one, many }) => ({
-  lesson: one(lessons, { fields: [quizQuestions.lessonId], references: [lessons.id] }),
-  options: many(quizOptions),
-  translations: many(translations),
+export const LessonsRelations = relations(Lessons, ({ one, many }) => ({
+  Agent:        one(Agents, { fields: [Lessons.AgentId], references: [Agents.Id] }),
+  Questions:    many(QuizQuestions),
+  Translations: many(LessonTranslations),
+  UserProgress: many(UserProgress),
 }));
 
-export const quizOptionsRelations = relations(quizOptions, ({ one, many }) => ({
-  question: one(quizQuestions, { fields: [quizOptions.questionId], references: [quizQuestions.id] }),
-  translations: many(translations),
+export const LessonTranslationsRelations = relations(LessonTranslations, ({ one }) => ({
+  Lesson: one(Lessons, { fields: [LessonTranslations.LessonId], references: [Lessons.Id] }),
 }));
 
-export const achievementsRelations = relations(achievements, ({ many }) => ({
-  translations: many(translations),
-  userAchievements: many(userAchievements),
+export const QuizQuestionsRelations = relations(QuizQuestions, ({ one, many }) => ({
+  Lesson:       one(Lessons, { fields: [QuizQuestions.LessonId], references: [Lessons.Id] }),
+  Options:      many(QuizOptions),
+  Translations: many(QuizQuestionTranslations),
 }));
 
-export const tracksRelations = relations(tracks, ({ many }) => ({
-  learningPaths: many(learningPaths),
-  translations: many(translations),
+export const QuizOptionsRelations = relations(QuizOptions, ({ one, many }) => ({
+  Question:     one(QuizQuestions, { fields: [QuizOptions.QuestionId], references: [QuizQuestions.Id] }),
+  Translations: many(QuizOptionTranslations),
 }));
 
-export const usersRelations = relations(users, ({ many, one }) => ({
-  sessions: many(sessions),
-  accounts: many(accounts),
-  progress: many(userProgress),
-  stats: one(userStats),
-  achievements: many(userAchievements),
-  preferences: one(userPreferences),
-  learningPaths: many(learningPaths),
-  encryptedKey: one(encryptedKeys),
-  sandboxSessions: many(sandboxSessions),
+export const TracksRelations = relations(Tracks, ({ many }) => ({
+  LearningPaths: many(LearningPaths),
+  Translations:  many(TrackTranslations),
 }));
 
-export const learningPathsRelations = relations(learningPaths, ({ one }) => ({
-  user: one(users, { fields: [learningPaths.userId], references: [users.id] }),
-  track: one(tracks, { fields: [learningPaths.trackId], references: [tracks.id] }),
-  currentLesson: one(lessons, { fields: [learningPaths.currentLessonId], references: [lessons.id] }),
+export const AchievementsRelations = relations(Achievements, ({ many }) => ({
+  Translations:     many(AchievementTranslations),
+  UserAchievements: many(UserAchievements),
 }));
 
-// ─── TypeScript types ─────────────────────────────────────────────────────────
+export const UsersRelations = relations(users, ({ many, one }) => ({
+  Sessions:        many(sessions),
+  Accounts:        many(accounts),
+  Progress:        many(UserProgress),
+  Stats:           one(UserStats),
+  Achievements:    many(UserAchievements),
+  Preferences:     one(UserPreferences),
+  LearningPaths:   many(LearningPaths),
+  EncryptedKey:    one(EncryptedKeys),
+  SandboxSessions: many(SandboxSessions),
+}));
 
-export type User = typeof users.$inferSelect;
-export type Session = typeof sessions.$inferSelect;
-export type Agent = typeof agents.$inferSelect;
-export type Lesson = typeof lessons.$inferSelect;
-export type QuizQuestion = typeof quizQuestions.$inferSelect;
-export type QuizOption = typeof quizOptions.$inferSelect;
-export type Achievement = typeof achievements.$inferSelect;
-export type Translation = typeof translations.$inferSelect;
-export type UserProgress = typeof userProgress.$inferSelect;
-export type UserStats = typeof userStats.$inferSelect;
-export type UserAchievement = typeof userAchievements.$inferSelect;
-export type Track = typeof tracks.$inferSelect;
-export type UserPreferences = typeof userPreferences.$inferSelect;
-export type LearningPath = typeof learningPaths.$inferSelect;
-export type EncryptedKey = typeof encryptedKeys.$inferSelect;
-export type SandboxSession = typeof sandboxSessions.$inferSelect;
+export const UserProgressRelations = relations(UserProgress, ({ one }) => ({
+  User:   one(users, { fields: [UserProgress.UserId], references: [users.id] }),
+  Lesson: one(Lessons, { fields: [UserProgress.LessonId], references: [Lessons.Id] }),
+}));
 
-// Useful type for a row returned from translations
-export type TranslationMap = Record<string, string>;
+export const LearningPathsRelations = relations(LearningPaths, ({ one }) => ({
+  User:          one(users, { fields: [LearningPaths.UserId], references: [users.id] }),
+  Track:         one(Tracks, { fields: [LearningPaths.TrackId], references: [Tracks.Id] }),
+  CurrentLesson: one(Lessons, { fields: [LearningPaths.CurrentLessonId], references: [Lessons.Id] }),
+}));
+
+// ─── TypeScript Types ─────────────────────────────────────────────────────────
+
+export type TUser              = typeof users.$inferSelect;
+export type TSession           = typeof sessions.$inferSelect;
+export type TAgent             = typeof Agents.$inferSelect;
+export type TAgentTranslation  = typeof AgentTranslations.$inferSelect;
+export type TLesson            = typeof Lessons.$inferSelect;
+export type TLessonTranslation = typeof LessonTranslations.$inferSelect;
+export type TQuizQuestion      = typeof QuizQuestions.$inferSelect;
+export type TQuizOption        = typeof QuizOptions.$inferSelect;
+export type TAchievement       = typeof Achievements.$inferSelect;
+export type TTrack             = typeof Tracks.$inferSelect;
+export type TUserProgress      = typeof UserProgress.$inferSelect;
+export type TUserStats         = typeof UserStats.$inferSelect;
+export type TUserAchievement   = typeof UserAchievements.$inferSelect;
+export type TUserPreferences   = typeof UserPreferences.$inferSelect;
+export type TLearningPath      = typeof LearningPaths.$inferSelect;
+export type TEncryptedKey      = typeof EncryptedKeys.$inferSelect;
+export type TSandboxSession    = typeof SandboxSessions.$inferSelect;

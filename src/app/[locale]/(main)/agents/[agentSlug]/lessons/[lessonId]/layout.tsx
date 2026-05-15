@@ -11,7 +11,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, agentSlug, lessonId } = await params;
 
-  const lesson = await getLessonById(parseInt(lessonId, 10), locale);
+  const lesson = await getLessonById(lessonId, locale);
   const agent = await getAgentBySlug(agentSlug, locale);
 
   if (!lesson || !agent) {
@@ -21,7 +21,6 @@ export async function generateMetadata({
   const lessonTitle = lesson.title;
   const lessonDesc = lesson.description;
   const agentName = agent.name;
-  const lessonIdNum = parseInt(lessonId, 10);
   const pageUrl = `${APP_URL}/${locale}/agents/${agentSlug}/lessons/${lessonId}`;
   const ogImageUrl = `/api/og?title=${encodeURIComponent(lessonTitle)}&agent=${encodeURIComponent(agentName)}&locale=${locale}`;
 
@@ -69,8 +68,7 @@ export default async function LessonLayout({
   params: Promise<{ locale: string; agentSlug: string; lessonId: string }>;
 }) {
   const { locale, agentSlug, lessonId } = await params;
-  const lessonIdNum = parseInt(lessonId, 10);
-  const lesson = await getLessonById(lessonIdNum, locale);
+  const lesson = await getLessonById(lessonId, locale);
   const agent = await getAgentBySlug(agentSlug, locale);
 
   return (
@@ -80,7 +78,7 @@ export default async function LessonLayout({
           <LessonSchema
             locale={locale}
             agentSlug={agentSlug}
-            lessonId={lessonIdNum}
+            lessonId={lessonId}
             lesson={lesson}
           />
           <BreadcrumbSchema

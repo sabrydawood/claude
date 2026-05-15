@@ -10,16 +10,15 @@ export default async function LessonPage({
   params: Promise<{ locale: string; agentSlug: string; lessonId: string }>;
 }) {
   const { locale, agentSlug, lessonId } = await params;
-  const lessonIdNum = parseInt(lessonId, 10);
 
   const [lesson, allLessons] = await Promise.all([
-    getLessonById(lessonIdNum, locale),
+    getLessonById(lessonId, locale),
     getLessonsByAgent(agentSlug, locale),
   ]);
 
   if (!lesson) notFound();
 
-  const currentIndex = allLessons.findIndex(l => l.id === lessonIdNum);
+  const currentIndex = allLessons.findIndex(l => l.id === lessonId);
   const nextLesson = allLessons[currentIndex + 1] ?? null;
 
   return (

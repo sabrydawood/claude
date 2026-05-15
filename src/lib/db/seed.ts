@@ -1,287 +1,124 @@
 /**
- * db:seed — inserts all base data using the translations table pattern.
- * All text content lives in `translations`; base tables hold only non-i18n data.
+ * Seed.ts
+ * Populates the database with initial content using per-entity translation tables.
+ * Run: bun run db:seed
  */
 import { config } from 'dotenv';
 config({ path: '.env.local' });
 config({ path: '.env' });
 
-import { db } from './index';
+import { uuidv7 } from 'uuidv7';
+import { db } from './Index';
 import {
-  agents as agentsTable,
-  lessons as lessonsTable,
-  quizQuestions,
-  quizOptions,
-  achievements as achievementsTable,
-  tracks as tracksTable,
-  translations,
-} from './schema';
-import { agents as agentContent, claudeLessons, promptEngineeringLessons, claudeApiLessons, developerLessons } from '../content/claude-lessons';
+  Agents, AgentTranslations,
+  Lessons, LessonTranslations,
+  QuizQuestions, QuizQuestionTranslations,
+  QuizOptions, QuizOptionTranslations,
+  Tracks, TrackTranslations,
+  Achievements, AchievementTranslations,
+} from './Schema';
+import {
+  agents as AgentContent,
+  claudeLessons, promptEngineeringLessons,
+  claudeApiLessons, developerLessons,
+} from '../content/claude-lessons';
 
-const allLessonsToSeed = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons, ...developerLessons];
+const AllLessons = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons, ...developerLessons];
 
-// ─── helper: bulk insert translations for one entity ─────────────────────────
-async function insertTranslations(
-  entityType: string,
-  entityId: number,
-  rows: Array<{ locale: string; field: string; value: string }>,
-) {
-  if (rows.length === 0) return;
-  await db.insert(translations).values(
-    rows.map((r) => ({ entityType, entityId, ...r })),
-  );
-}
-
-// ─── Achievements data ────────────────────────────────────────────────────────
-const ACHIEVEMENTS = [
-  {
-    emoji: '🎯',
-    conditionType: 'lessons_completed',
-    conditionValue: 1,
-    ar: { name: 'أول خطوة', description: 'كملت أول درس ليك!' },
-    en: { name: 'First Step', description: 'You completed your first lesson!' },
-  },
-  {
-    emoji: '🚀',
-    conditionType: 'lessons_completed',
-    conditionValue: 3,
-    ar: { name: 'على الطريق الصح', description: 'كملت 3 دروس — انت بتتقدم!' },
-    en: { name: 'On the Right Track', description: "Completed 3 lessons — you're progressing!" },
-  },
-  {
-    emoji: '🏆',
-    conditionType: 'lessons_completed',
-    conditionValue: 5,
-    ar: { name: 'متعلم نشيط', description: 'كملت كل دروس Claude — عظيم!' },
-    en: { name: 'Active Learner', description: 'Completed all Claude lessons — amazing!' },
-  },
-  {
-    emoji: '⭐',
-    conditionType: 'perfect_quiz',
-    conditionValue: 1,
-    ar: { name: 'نجم الكويز', description: 'جبت 100% في كويز — أنت نجم!' },
-    en: { name: 'Quiz Star', description: "Scored 100% in a quiz — you're a star!" },
-  },
-  {
-    emoji: '🔥',
-    conditionType: 'streak_days',
-    conditionValue: 7,
-    ar: { name: 'سبع أيام', description: 'فتحت التطبيق 7 أيام متواصلة — رائع!' },
-    en: { name: 'Seven Days', description: 'Opened the app 7 days in a row — amazing!' },
-  },
-  {
-    emoji: '💎',
-    conditionType: 'total_xp',
-    conditionValue: 200,
-    ar: { name: 'جامع النقاط', description: 'وصلت لـ 200 نقطة XP!' },
-    en: { name: 'XP Collector', description: 'Reached 200 XP points!' },
-  },
-  {
-    emoji: '🤖',
-    conditionType: 'agent_completed',
-    conditionValue: 1,
-    ar: { name: 'صاحب Claude', description: 'قضيت وقت كويس مع Claude — اتعلمت حاجات جميلة!' },
-    en: { name: "Claude's Friend", description: 'Spent good time with Claude — you learned great things!' },
-  },
-  {
-    emoji: '🌟',
-    conditionType: 'total_xp',
-    conditionValue: 500,
-    ar: { name: 'صانع المستقبل', description: 'وصلت لـ 500 نقطة XP — انت من صانعي المستقبل!' },
-    en: { name: 'Future Maker', description: 'Reached 500 XP — you are a future maker!' },
-  },
+const ACHIEVEMENTS_DATA = [
+  { emoji: '🎯', conditionType: 'lessons_completed', conditionValue: 1,  nameAr: 'أول خطوة',      nameEn: 'First Step',        descAr: 'كملت أول درس ليك!',           descEn: 'You completed your first lesson!' },
+  { emoji: '🚀', conditionType: 'lessons_completed', conditionValue: 3,  nameAr: 'على الطريق',     nameEn: 'On the Right Track', descAr: 'كملت 3 دروس — انت بتتقدم!',   descEn: "Completed 3 lessons — you're progressing!" },
+  { emoji: '🏆', conditionType: 'lessons_completed', conditionValue: 5,  nameAr: 'متعلم نشيط',    nameEn: 'Active Learner',     descAr: 'كملت 5 دروس — عظيم!',          descEn: 'Completed 5 lessons — amazing!' },
+  { emoji: '⭐', conditionType: 'xp_earned',          conditionValue: 100, nameAr: 'جامع النقاط',  nameEn: 'Point Collector',   descAr: 'جمعت 100 XP!',                 descEn: 'Earned 100 XP!' },
+  { emoji: '💫', conditionType: 'xp_earned',          conditionValue: 500, nameAr: 'على الطريق',   nameEn: 'On the Way',        descAr: 'جمعت 500 XP',                  descEn: 'Collected 500 XP' },
+  { emoji: '👑', conditionType: 'xp_earned',          conditionValue: 1000,nameAr: 'خبير ذكاوي',   nameEn: 'Zkawi Expert',      descAr: 'جمعت 1000 XP',                 descEn: 'Collected 1000 XP' },
+  { emoji: '🔥', conditionType: 'streak_days',        conditionValue: 3,  nameAr: 'متحمس',          nameEn: 'Enthusiast',        descAr: '3 أيام متتالية — استمر!',       descEn: '3 days in a row — keep going!' },
+  { emoji: '⚡', conditionType: 'streak_days',        conditionValue: 7,  nameAr: 'مواظب',           nameEn: 'Consistent',        descAr: '7 أيام متتالية — رائع!',        descEn: '7 days streak — amazing!' },
 ];
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
-async function seed() {
-  console.log('🌱 Starting seed (translations-based schema)...\n');
+const TRACKS_DATA = [
+  { slug: 'explorer',  emoji: '🧭', order: 1, isDefault: true,  nameAr: 'المستكشف', nameEn: 'Explorer',  descAr: 'للمبتدئين الفضوليين', descEn: 'For curious beginners exploring AI' },
+  { slug: 'creator',   emoji: '🎨', order: 2, isDefault: false, nameAr: 'المبدع',    nameEn: 'Creator',   descAr: 'للمبدعين',             descEn: 'For creatives using AI' },
+  { slug: 'engineer',  emoji: '⚙️', order: 3, isDefault: false, nameAr: 'المهندس',   nameEn: 'Engineer',  descAr: 'للمحترفين التقنيين',    descEn: 'For advanced technical professionals' },
+  { slug: 'developer', emoji: '💻', order: 4, isDefault: false, nameAr: 'المطور',    nameEn: 'Developer', descAr: 'للمطورين',              descEn: 'For developers integrating AI' },
+  { slug: 'educator',  emoji: '📚', order: 5, isDefault: false, nameAr: 'المعلم',    nameEn: 'Educator',  descAr: 'للمعلمين والمدربين',    descEn: 'For educators using AI' },
+];
 
-  let totalTranslations = 0;
+async function Seed() {
+  console.log('🌱 Seeding database...\n');
 
-  // ── 0. Tracks ──────────────────────────────────────────────────────────────
-  console.log('🎯 Inserting learning tracks...');
-  const TRACKS = [
-    {
-      slug: 'explorer', emoji: '🚀', order: 0, isDefault: true,
-      ar: { name: 'المستكشف', description: 'ابدأ رحلتك في الذكاء الاصطناعي من الصفر', personaDescription: 'مبتدئ فضولي يريد فهم الذكاء الاصطناعي' },
-      en: { name: 'Explorer', description: 'Start your AI journey from scratch', personaDescription: 'A curious beginner who wants to understand AI' },
-    },
-    {
-      slug: 'creator', emoji: '🎨', order: 1, isDefault: false,
-      ar: { name: 'المبدع', description: 'استخدم الذكاء الاصطناعي في الإبداع والكتابة', personaDescription: 'مبدع يريد توظيف AI في أعماله الإبداعية' },
-      en: { name: 'Creator', description: 'Use AI for creative work and writing', personaDescription: 'A creative who wants to leverage AI in their work' },
-    },
-    {
-      slug: 'engineer', emoji: '⚙️', order: 2, isDefault: false,
-      ar: { name: 'المهندس', description: 'أتقن الـ Prompt Engineering والاستخدام الاحترافي', personaDescription: 'محترف يريد إتقان هندسة المطالبات' },
-      en: { name: 'Engineer', description: 'Master Prompt Engineering and professional use', personaDescription: 'A professional who wants to master prompt engineering' },
-    },
-    {
-      slug: 'developer', emoji: '💻', order: 3, isDefault: false,
-      ar: { name: 'المطور', description: 'ابنِ تطبيقات باستخدام Claude API', personaDescription: 'مطور يريد بناء تطبيقات بالذكاء الاصطناعي' },
-      en: { name: 'Developer', description: 'Build applications using Claude API', personaDescription: 'A developer who wants to build AI-powered applications' },
-    },
-    {
-      slug: 'educator', emoji: '📚', order: 4, isDefault: false,
-      ar: { name: 'المعلم', description: 'وظّف الذكاء الاصطناعي في التعليم والتدريس', personaDescription: 'معلم يريد توظيف AI في الفصل الدراسي' },
-      en: { name: 'Educator', description: 'Use AI in teaching and education', personaDescription: 'An educator who wants to bring AI into the classroom' },
-    },
-  ];
-
-  const insertedTracks = await db.insert(tracksTable).values(
-    TRACKS.map(t => ({ slug: t.slug, emoji: t.emoji, order: t.order, isDefault: t.isDefault }))
-  ).returning();
-
-  for (const track of insertedTracks) {
-    const data = TRACKS.find(t => t.slug === track.slug)!;
-    const rows = [
-      { locale: 'ar', field: 'name', value: data.ar.name },
-      { locale: 'ar', field: 'description', value: data.ar.description },
-      { locale: 'ar', field: 'persona_description', value: data.ar.personaDescription },
-      { locale: 'en', field: 'name', value: data.en.name },
-      { locale: 'en', field: 'description', value: data.en.description },
-      { locale: 'en', field: 'persona_description', value: data.en.personaDescription },
-    ];
-    await insertTranslations('track', track.id, rows);
-    totalTranslations += rows.length;
-  }
-  console.log(`   ✓ ${insertedTracks.length} tracks (${insertedTracks.length * 6} translations)\n`);
-
-  // ── 1. Agents ──────────────────────────────────────────────────────────────
-  console.log('📦 Inserting agents...');
-  const insertedAgents = await db
-    .insert(agentsTable)
-    .values(
-      agentContent.map((a) => ({
-        slug: a.slug,
-        color: a.color,
-        emoji: a.emoji,
-        isActive: a.isActive,
-        order: a.order,
-      })),
-    )
-    .returning();
-
-  for (const agent of insertedAgents) {
-    const src = agentContent.find((a) => a.slug === agent.slug)!;
-    await insertTranslations('agent', agent.id, [
-      { locale: 'ar', field: 'name',             value: src.nameAr },
-      { locale: 'ar', field: 'description',      value: src.descriptionAr },
-      { locale: 'ar', field: 'full_description', value: src.fullDescriptionAr },
-      { locale: 'en', field: 'name',             value: src.nameEn },
-      { locale: 'en', field: 'description',      value: src.descriptionEn },
-      { locale: 'en', field: 'full_description', value: src.fullDescriptionEn },
+  for (const A of ACHIEVEMENTS_DATA) {
+    const AchId = uuidv7();
+    await db.insert(Achievements).values({ Id: AchId, Emoji: A.emoji, ConditionType: A.conditionType, ConditionValue: A.conditionValue });
+    await db.insert(AchievementTranslations).values([
+      { Id: uuidv7(), AchievementId: AchId, Locale: 'ar', Name: A.nameAr, Description: A.descAr },
+      { Id: uuidv7(), AchievementId: AchId, Locale: 'en', Name: A.nameEn, Description: A.descEn },
     ]);
-    totalTranslations += 6;
-    console.log(`   ✓ ${src.nameEn} (id=${agent.id}, active=${agent.isActive})`);
   }
+  console.log(`  ✓ ${ACHIEVEMENTS_DATA.length} achievements`);
 
-  // ── 2. Claude lessons ──────────────────────────────────────────────────────
-  const claudeAgent = insertedAgents.find((a) => a.slug === 'claude')!;
-  console.log('\n📚 Inserting Claude lessons...');
+  for (const T of TRACKS_DATA) {
+    const TrackId = uuidv7();
+    const [Track] = await db.insert(Tracks)
+      .values({ Id: TrackId, Slug: T.slug, Emoji: T.emoji, Order: T.order, IsDefault: T.isDefault })
+      .onConflictDoNothing()
+      .returning({ Id: Tracks.Id });
+    if (Track) {
+      await db.insert(TrackTranslations).values([
+        { Id: uuidv7(), TrackId: Track.Id, Locale: 'ar', Name: T.nameAr, Description: T.descAr },
+        { Id: uuidv7(), TrackId: Track.Id, Locale: 'en', Name: T.nameEn, Description: T.descEn },
+      ]).onConflictDoNothing();
+    }
+  }
+  console.log(`  ✓ ${TRACKS_DATA.length} tracks`);
 
-  let totalQuizQ = 0;
-  let totalQuizOpts = 0;
-
-  for (const lesson of allLessonsToSeed) {
-    // Insert lesson (no text columns)
-    const [dbLesson] = await db
-      .insert(lessonsTable)
-      .values({
-        agentId: claudeAgent.id,
-        order: lesson.order,
-        xpReward: lesson.xpReward,
-        estimatedMinutes: lesson.estimatedMinutes,
-      })
-      .returning();
-
-    // Insert lesson translations
-    await insertTranslations('lesson', dbLesson.id, [
-      { locale: 'ar', field: 'title',       value: lesson.titleAr },
-      { locale: 'ar', field: 'description', value: lesson.descriptionAr },
-      { locale: 'ar', field: 'content',     value: lesson.contentAr },
-      { locale: 'en', field: 'title',       value: lesson.titleEn },
-      { locale: 'en', field: 'description', value: lesson.descriptionEn },
-      { locale: 'en', field: 'content',     value: lesson.contentEn },
+  const AgentIdMap = new Map<string, string>();
+  for (const A of AgentContent) {
+    const AgentId = uuidv7();
+    AgentIdMap.set(A.slug, AgentId);
+    await db.insert(Agents).values({ Id: AgentId, Slug: A.slug, Color: A.color, Emoji: A.emoji, IsActive: A.isActive, Order: A.order });
+    await db.insert(AgentTranslations).values([
+      { Id: uuidv7(), AgentId, Locale: 'ar', Name: A.nameAr, Description: A.descriptionAr, FullDescription: A.fullDescriptionAr },
+      { Id: uuidv7(), AgentId, Locale: 'en', Name: A.nameEn, Description: A.descriptionEn, FullDescription: A.fullDescriptionEn },
     ]);
-    totalTranslations += 6;
+  }
+  console.log(`  ✓ ${AgentContent.length} agents`);
 
-    console.log(`   ✓ Lesson ${dbLesson.id}: ${lesson.titleEn}`);
-
-    // ── Quiz questions ────────────────────────────────────────────────────────
-    for (let qi = 0; qi < lesson.quiz.length; qi++) {
-      const q = lesson.quiz[qi];
-
-      const [dbQ] = await db
-        .insert(quizQuestions)
-        .values({ lessonId: dbLesson.id, type: q.type, order: qi })
-        .returning();
-
-      await insertTranslations('quiz_question', dbQ.id, [
-        { locale: 'ar', field: 'question', value: q.questionAr },
-        { locale: 'en', field: 'question', value: q.questionEn },
+  let LC = 0, QC = 0, OC = 0;
+  for (const L of AllLessons) {
+    const AgentId = AgentIdMap.get(L.agentSlug);
+    if (!AgentId) { console.warn(`  ⚠️  No agent for slug: ${L.agentSlug}`); continue; }
+    const LessonId = uuidv7();
+    await db.insert(Lessons).values({ Id: LessonId, AgentId, Order: L.order, XpReward: L.xpReward, EstimatedMinutes: L.estimatedMinutes });
+    await db.insert(LessonTranslations).values([
+      { Id: uuidv7(), LessonId, Locale: 'ar', Title: L.titleAr, Description: L.descriptionAr, Content: L.contentAr },
+      { Id: uuidv7(), LessonId, Locale: 'en', Title: L.titleEn, Description: L.descriptionEn, Content: L.contentEn },
+    ]);
+    LC++;
+    for (let Qi = 0; Qi < (L.quiz ?? []).length; Qi++) {
+      const Q = L.quiz[Qi];
+      const QuestionId = uuidv7();
+      await db.insert(QuizQuestions).values({ Id: QuestionId, LessonId, Type: Q.type, Order: Qi });
+      await db.insert(QuizQuestionTranslations).values([
+        { Id: uuidv7(), QuestionId, Locale: 'ar', Question: Q.questionAr },
+        { Id: uuidv7(), QuestionId, Locale: 'en', Question: Q.questionEn },
       ]);
-      totalTranslations += 2;
-      totalQuizQ++;
-
-      // ── Quiz options ────────────────────────────────────────────────────────
-      for (let oi = 0; oi < q.options.length; oi++) {
-        const opt = q.options[oi];
-
-        const [dbOpt] = await db
-          .insert(quizOptions)
-          .values({ questionId: dbQ.id, isCorrect: opt.isCorrect, order: oi })
-          .returning();
-
-        await insertTranslations('quiz_option', dbOpt.id, [
-          { locale: 'ar', field: 'text', value: opt.textAr },
-          { locale: 'en', field: 'text', value: opt.textEn },
+      QC++;
+      for (let Oi = 0; Oi < (Q.options ?? []).length; Oi++) {
+        const O = Q.options[Oi];
+        const OptionId = uuidv7();
+        await db.insert(QuizOptions).values({ Id: OptionId, QuestionId, IsCorrect: O.isCorrect, Order: Oi });
+        await db.insert(QuizOptionTranslations).values([
+          { Id: uuidv7(), OptionId, Locale: 'ar', Text: O.textAr },
+          { Id: uuidv7(), OptionId, Locale: 'en', Text: O.textEn },
         ]);
-        totalTranslations += 2;
-        totalQuizOpts++;
+        OC++;
       }
     }
   }
-
-  // ── 3. Achievements ────────────────────────────────────────────────────────
-  console.log('\n🏆 Inserting achievements...');
-  for (const ach of ACHIEVEMENTS) {
-    const [dbAch] = await db
-      .insert(achievementsTable)
-      .values({
-        emoji: ach.emoji,
-        conditionType: ach.conditionType,
-        conditionValue: ach.conditionValue,
-      })
-      .returning();
-
-    await insertTranslations('achievement', dbAch.id, [
-      { locale: 'ar', field: 'name',        value: ach.ar.name },
-      { locale: 'ar', field: 'description', value: ach.ar.description },
-      { locale: 'en', field: 'name',        value: ach.en.name },
-      { locale: 'en', field: 'description', value: ach.en.description },
-    ]);
-    totalTranslations += 4;
-    console.log(`   ✓ ${ach.emoji} ${ach.ar.name}`);
-  }
-
-  // ── Summary ────────────────────────────────────────────────────────────────
-  console.log('\n──────────────────────────────────────────────');
-  console.log('✅ Seed complete!');
-  console.log(`   Agents:        ${insertedAgents.length}`);
-  console.log(`   Lessons:       ${claudeLessons.length}`);
-  console.log(`   Quiz Qs:       ${totalQuizQ}`);
-  console.log(`   Quiz options:  ${totalQuizOpts}`);
-  console.log(`   Achievements:  ${ACHIEVEMENTS.length}`);
-  console.log(`   Translations:  ${totalTranslations} rows`);
-  console.log('──────────────────────────────────────────────\n');
-  console.log('💡 To add a new language, just run upsertTranslations()');
-  console.log('   from src/lib/db/i18n.ts — no schema changes needed.\n');
-
+  console.log(`  ✓ ${LC} lessons, ${QC} questions, ${OC} options`);
+  console.log('\n✅ Seed complete!\n');
   process.exit(0);
 }
 
-seed().catch((err) => {
-  console.error('❌ Seed failed:', err);
-  process.exit(1);
-});
+Seed().catch((Err) => { console.error('❌ Seed failed:', Err); process.exit(1); });

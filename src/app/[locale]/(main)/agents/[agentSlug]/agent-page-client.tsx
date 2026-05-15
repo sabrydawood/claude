@@ -17,9 +17,9 @@ const AGENT_GRADIENTS: Record<string, string> = {
 };
 
 interface UserProgress {
-  completedLessons: number[];
+  completedLessons: string[];
   totalXp: number;
-  scores: Record<number, number>;
+  scores: Record<string, number>;
 }
 
 function getStoredProgress(): UserProgress {

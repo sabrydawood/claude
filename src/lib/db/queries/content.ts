@@ -1,11 +1,26 @@
-import { db } from '@/lib/db';
-import { agents, lessons, quizQuestions, quizOptions, translations } from '@/lib/db/schema';
+/**
+ * content.ts
+ * Database query helpers for agents, lessons, quiz, and sitemap.
+ * Uses per-entity translation tables (AgentTranslations, LessonTranslations, etc.)
+ * with automatic fallback to 'en' when the requested locale has no entry.
+ */
+import { db } from '@/lib/db/Index';
+import {
+  Agents,
+  AgentTranslations,
+  Lessons,
+  LessonTranslations,
+  QuizQuestions,
+  QuizQuestionTranslations,
+  QuizOptions,
+  QuizOptionTranslations,
+} from '@/lib/db/Schema';
 import { eq, and, inArray } from 'drizzle-orm';
 
 // ─── Exported types ────────────────────────────────────────────────────────────
 
 export interface AgentRow {
-  id: number;
+  id: string;
   slug: string;
   color: string;
   emoji: string;
@@ -17,8 +32,8 @@ export interface AgentRow {
 }
 
 export interface LessonRow {
-  id: number;
-  agentId: number;
+  id: string;
+  agentId: string;
   order: number;
   xpReward: number;
   estimatedMinutes: number;
@@ -31,16 +46,16 @@ export interface LessonRow {
 }
 
 export interface QuizOptionRow {
-  id: number;
-  questionId: number;
+  id: string;
+  questionId: string;
   isCorrect: boolean;
   order: number;
   text: string;
 }
 
 export interface QuizQuestionRow {
-  id: number;
-  lessonId: number;
+  id: string;
+  lessonId: string;
   type: 'multiple_choice' | 'true_false';
   order: number;
   question: string;
@@ -49,296 +64,191 @@ export interface QuizQuestionRow {
 
 export interface LessonFull extends LessonRow {
   agentName: string;
-  agentSlug: string;
   questions: QuizQuestionRow[];
 }
 
 // ─── Internal helper ───────────────────────────────────────────────────────────
 
-function buildTransMap(
-  trans: Array<{ entityId: number; field: string; value: string }>,
-): Map<number, Record<string, string>> {
-  const map = new Map<number, Record<string, string>>();
-  for (const t of trans) {
-    if (!map.has(t.entityId)) map.set(t.entityId, {});
-    map.get(t.entityId)![t.field] = t.value;
-  }
-  return map;
-}
-
-// Fetch translations for a given entity type, set of IDs, and locale
-async function fetchTranslations(
-  entityType: string,
-  entityIds: number[],
-  locale: string,
-) {
-  if (entityIds.length === 0) return [];
-  return db
-    .select({
-      entityId: translations.entityId,
-      field: translations.field,
-      value: translations.value,
-    })
-    .from(translations)
-    .where(
-      and(
-        eq(translations.entityType, entityType),
-        inArray(translations.entityId, entityIds),
-        eq(translations.locale, locale),
-      ),
-    );
-}
-
-// Fetch both locale and 'en' fallback translations, return [transMap, fallbackMap]
-async function fetchWithFallback(
-  entityType: string,
-  entityIds: number[],
-  locale: string,
-): Promise<[Map<number, Record<string, string>>, Map<number, Record<string, string>>]> {
-  const [localeTrans, enTrans] = await Promise.all([
-    fetchTranslations(entityType, entityIds, locale),
-    locale !== 'en' ? fetchTranslations(entityType, entityIds, 'en') : Promise.resolve([]),
+/** Fetches agent translations for a locale, with English fallback. */
+async function GetAgentTranslations(AgentIds: string[], Locale: string) {
+  if (AgentIds.length === 0) return { LocaleMap: new Map<string, typeof AgentTranslations.$inferSelect>(), EnMap: new Map<string, typeof AgentTranslations.$inferSelect>() };
+  const [LocaleRows, EnRows] = await Promise.all([
+    db.select().from(AgentTranslations).where(and(inArray(AgentTranslations.AgentId, AgentIds), eq(AgentTranslations.Locale, Locale))),
+    Locale !== 'en' ? db.select().from(AgentTranslations).where(and(inArray(AgentTranslations.AgentId, AgentIds), eq(AgentTranslations.Locale, 'en'))) : Promise.resolve([]),
   ]);
-  return [buildTransMap(localeTrans), buildTransMap(enTrans)];
+  return {
+    LocaleMap: new Map(LocaleRows.map((R) => [R.AgentId, R])),
+    EnMap: new Map(EnRows.map((R) => [R.AgentId, R])),
+  };
 }
 
-function resolve(
-  id: number,
-  field: string,
-  transMap: Map<number, Record<string, string>>,
-  fallbackMap: Map<number, Record<string, string>>,
-): string {
-  return transMap.get(id)?.[field] ?? fallbackMap.get(id)?.[field] ?? '';
+/** Fetches lesson translations for a locale, with English fallback. */
+async function GetLessonTranslations(LessonIds: string[], Locale: string) {
+  if (LessonIds.length === 0) return { LocaleMap: new Map<string, typeof LessonTranslations.$inferSelect>(), EnMap: new Map<string, typeof LessonTranslations.$inferSelect>() };
+  const [LocaleRows, EnRows] = await Promise.all([
+    db.select().from(LessonTranslations).where(and(inArray(LessonTranslations.LessonId, LessonIds), eq(LessonTranslations.Locale, Locale))),
+    Locale !== 'en' ? db.select().from(LessonTranslations).where(and(inArray(LessonTranslations.LessonId, LessonIds), eq(LessonTranslations.Locale, 'en'))) : Promise.resolve([]),
+  ]);
+  return {
+    LocaleMap: new Map(LocaleRows.map((R) => [R.LessonId, R])),
+    EnMap: new Map(EnRows.map((R) => [R.LessonId, R])),
+  };
 }
 
 // ─── Query functions ───────────────────────────────────────────────────────────
 
 /**
- * Get all active agents ordered by `order`, with translations resolved for `locale`.
+ * Get all active agents ordered by Order, with translations resolved for locale.
  */
 export async function getAgents(locale: string): Promise<AgentRow[]> {
-  const rows = await db
-    .select()
-    .from(agents)
-    .where(eq(agents.isActive, true))
-    .orderBy(agents.order);
+  const Rows = await db.select().from(Agents).where(eq(Agents.IsActive, true)).orderBy(Agents.Order);
+  if (Rows.length === 0) return [];
 
-  if (rows.length === 0) return [];
+  const Ids = Rows.map((A) => A.Id);
+  const { LocaleMap, EnMap } = await GetAgentTranslations(Ids, locale);
 
-  const ids = rows.map((a) => a.id);
-  const [transMap, fallbackMap] = await fetchWithFallback('agent', ids, locale);
-
-  return rows.map((a) => ({
-    id: a.id,
-    slug: a.slug,
-    color: a.color,
-    emoji: a.emoji,
-    isActive: a.isActive,
-    order: a.order,
-    name: resolve(a.id, 'name', transMap, fallbackMap),
-    description: resolve(a.id, 'description', transMap, fallbackMap),
-    fullDescription: resolve(a.id, 'full_description', transMap, fallbackMap),
-  }));
+  return Rows.map((A) => {
+    const T = LocaleMap.get(A.Id) ?? EnMap.get(A.Id);
+    return {
+      id: A.Id, slug: A.Slug, color: A.Color, emoji: A.Emoji,
+      isActive: A.IsActive, order: A.Order,
+      name: T?.Name ?? '', description: T?.Description ?? '', fullDescription: T?.FullDescription ?? '',
+    };
+  });
 }
 
 /**
- * Get a single agent by slug, with translations resolved for `locale`.
+ * Get a single agent by slug, with translations resolved for locale.
  */
-export async function getAgentBySlug(
-  slug: string,
-  locale: string,
-): Promise<AgentRow | null> {
-  const rows = await db
-    .select()
-    .from(agents)
-    .where(eq(agents.slug, slug))
-    .limit(1);
+export async function getAgentBySlug(slug: string, locale: string): Promise<AgentRow | null> {
+  const [A] = await db.select().from(Agents).where(eq(Agents.Slug, slug)).limit(1);
+  if (!A) return null;
 
-  if (rows.length === 0) return null;
-  const a = rows[0];
-
-  const [transMap, fallbackMap] = await fetchWithFallback('agent', [a.id], locale);
+  const { LocaleMap, EnMap } = await GetAgentTranslations([A.Id], locale);
+  const T = LocaleMap.get(A.Id) ?? EnMap.get(A.Id);
 
   return {
-    id: a.id,
-    slug: a.slug,
-    color: a.color,
-    emoji: a.emoji,
-    isActive: a.isActive,
-    order: a.order,
-    name: resolve(a.id, 'name', transMap, fallbackMap),
-    description: resolve(a.id, 'description', transMap, fallbackMap),
-    fullDescription: resolve(a.id, 'full_description', transMap, fallbackMap),
+    id: A.Id, slug: A.Slug, color: A.Color, emoji: A.Emoji,
+    isActive: A.IsActive, order: A.Order,
+    name: T?.Name ?? '', description: T?.Description ?? '', fullDescription: T?.FullDescription ?? '',
   };
 }
 
 /**
- * Get lessons for an agent (identified by slug), with translations for `locale`.
+ * Get lessons for an agent (by slug), with translations for locale.
  */
-export async function getLessonsByAgent(
-  agentSlug: string,
-  locale: string,
-): Promise<LessonRow[]> {
-  const agentRows = await db
-    .select()
-    .from(agents)
-    .where(eq(agents.slug, agentSlug))
-    .limit(1);
+export async function getLessonsByAgent(agentSlug: string, locale: string): Promise<LessonRow[]> {
+  const [Agent] = await db.select().from(Agents).where(eq(Agents.Slug, agentSlug)).limit(1);
+  if (!Agent) return [];
 
-  if (agentRows.length === 0) return [];
-  const agent = agentRows[0];
+  const LessonRows = await db.select().from(Lessons).where(eq(Lessons.AgentId, Agent.Id)).orderBy(Lessons.Order);
+  if (LessonRows.length === 0) return [];
 
-  const lessonRows = await db
-    .select()
-    .from(lessons)
-    .where(eq(lessons.agentId, agent.id))
-    .orderBy(lessons.order);
+  const Ids = LessonRows.map((L) => L.Id);
+  const { LocaleMap, EnMap } = await GetLessonTranslations(Ids, locale);
 
-  if (lessonRows.length === 0) return [];
-
-  const lessonIds = lessonRows.map((l) => l.id);
-  const [transMap, fallbackMap] = await fetchWithFallback('lesson', lessonIds, locale);
-
-  return lessonRows.map((l) => ({
-    id: l.id,
-    agentId: l.agentId,
-    order: l.order,
-    xpReward: l.xpReward,
-    estimatedMinutes: l.estimatedMinutes,
-    title: resolve(l.id, 'title', transMap, fallbackMap),
-    description: resolve(l.id, 'description', transMap, fallbackMap),
-    content: resolve(l.id, 'content', transMap, fallbackMap),
-    agentSlug: agent.slug,
-    agentEmoji: agent.emoji,
-    agentColor: agent.color,
-  }));
+  return LessonRows.map((L) => {
+    const T = LocaleMap.get(L.Id) ?? EnMap.get(L.Id);
+    return {
+      id: L.Id, agentId: L.AgentId, order: L.Order,
+      xpReward: L.XpReward, estimatedMinutes: L.EstimatedMinutes,
+      title: T?.Title ?? '', description: T?.Description ?? '', content: T?.Content ?? '',
+      agentSlug: Agent.Slug, agentEmoji: Agent.Emoji, agentColor: Agent.Color,
+    };
+  });
 }
 
 /**
  * Get a single lesson by ID with full translations, quiz questions, and options.
  */
-export async function getLessonById(
-  id: number,
-  locale: string,
-): Promise<LessonFull | null> {
-  const lessonRows = await db
-    .select()
-    .from(lessons)
-    .where(eq(lessons.id, id))
-    .limit(1);
+export async function getLessonById(id: string, locale: string): Promise<LessonFull | null> {
+  const [L] = await db.select().from(Lessons).where(eq(Lessons.Id, id)).limit(1);
+  if (!L) return null;
 
-  if (lessonRows.length === 0) return null;
-  const lesson = lessonRows[0];
+  const [Agent] = await db.select().from(Agents).where(eq(Agents.Id, L.AgentId)).limit(1);
+  if (!Agent) return null;
 
-  // Fetch agent
-  const agentRows = await db
-    .select()
-    .from(agents)
-    .where(eq(agents.id, lesson.agentId))
-    .limit(1);
+  const QuestionRows = await db.select().from(QuizQuestions).where(eq(QuizQuestions.LessonId, id)).orderBy(QuizQuestions.Order);
+  const QIds = QuestionRows.map((Q) => Q.Id);
 
-  if (agentRows.length === 0) return null;
-  const agent = agentRows[0];
+  const OptionRows = QIds.length > 0
+    ? await db.select().from(QuizOptions).where(inArray(QuizOptions.QuestionId, QIds)).orderBy(QuizOptions.Order)
+    : [];
+  const OIds = OptionRows.map((O) => O.Id);
 
-  // Fetch quiz questions and options
-  const questionRows = await db
-    .select()
-    .from(quizQuestions)
-    .where(eq(quizQuestions.lessonId, id))
-    .orderBy(quizQuestions.order);
-
-  const questionIds = questionRows.map((q) => q.id);
-
-  const optionRows =
-    questionIds.length > 0
-      ? await db
-          .select()
-          .from(quizOptions)
-          .where(inArray(quizOptions.questionId, questionIds))
-          .orderBy(quizOptions.order)
-      : [];
-
-  const optionIds = optionRows.map((o) => o.id);
-
-  // Fetch all translations in parallel
   const [
-    [lessonTransMap, lessonFallbackMap],
-    [agentTransMap, agentFallbackMap],
-    [questionTransMap, questionFallbackMap],
-    [optionTransMap, optionFallbackMap],
+    { LocaleMap: LTrans, EnMap: LFallback },
+    { LocaleMap: ATrans, EnMap: AFallback },
+    [QLocaleRows, QEnRows],
+    [OLocaleRows, OEnRows],
   ] = await Promise.all([
-    fetchWithFallback('lesson', [lesson.id], locale),
-    fetchWithFallback('agent', [agent.id], locale),
-    questionIds.length > 0
-      ? fetchWithFallback('quiz_question', questionIds, locale)
-      : Promise.resolve([new Map(), new Map()] as [Map<number, Record<string, string>>, Map<number, Record<string, string>>]),
-    optionIds.length > 0
-      ? fetchWithFallback('quiz_option', optionIds, locale)
-      : Promise.resolve([new Map(), new Map()] as [Map<number, Record<string, string>>, Map<number, Record<string, string>>]),
+    GetLessonTranslations([L.Id], locale),
+    GetAgentTranslations([Agent.Id], locale),
+    QIds.length > 0
+      ? Promise.all([
+          db.select().from(QuizQuestionTranslations).where(and(inArray(QuizQuestionTranslations.QuestionId, QIds), eq(QuizQuestionTranslations.Locale, locale))),
+          locale !== 'en' ? db.select().from(QuizQuestionTranslations).where(and(inArray(QuizQuestionTranslations.QuestionId, QIds), eq(QuizQuestionTranslations.Locale, 'en'))) : Promise.resolve([]),
+        ])
+      : Promise.resolve([[], []]),
+    OIds.length > 0
+      ? Promise.all([
+          db.select().from(QuizOptionTranslations).where(and(inArray(QuizOptionTranslations.OptionId, OIds), eq(QuizOptionTranslations.Locale, locale))),
+          locale !== 'en' ? db.select().from(QuizOptionTranslations).where(and(inArray(QuizOptionTranslations.OptionId, OIds), eq(QuizOptionTranslations.Locale, 'en'))) : Promise.resolve([]),
+        ])
+      : Promise.resolve([[], []]),
   ]);
 
-  // Build options grouped by questionId
-  const optionsByQuestion = new Map<number, QuizOptionRow[]>();
-  for (const opt of optionRows) {
-    if (!optionsByQuestion.has(opt.questionId)) optionsByQuestion.set(opt.questionId, []);
-    optionsByQuestion.get(opt.questionId)!.push({
-      id: opt.id,
-      questionId: opt.questionId,
-      isCorrect: opt.isCorrect,
-      order: opt.order,
-      text: resolve(opt.id, 'text', optionTransMap, optionFallbackMap),
+  const QTransMap = new Map(QLocaleRows.map((R) => [R.QuestionId, R]));
+  const QFallMap  = new Map(QEnRows.map((R) => [R.QuestionId, R]));
+  const OTransMap = new Map(OLocaleRows.map((R) => [R.OptionId, R]));
+  const OFallMap  = new Map(OEnRows.map((R) => [R.OptionId, R]));
+
+  const OptionsByQuestion = new Map<string, QuizOptionRow[]>();
+  for (const Opt of OptionRows) {
+    const T = OTransMap.get(Opt.Id) ?? OFallMap.get(Opt.Id);
+    if (!OptionsByQuestion.has(Opt.QuestionId)) OptionsByQuestion.set(Opt.QuestionId, []);
+    OptionsByQuestion.get(Opt.QuestionId)!.push({
+      id: Opt.Id, questionId: Opt.QuestionId, isCorrect: Opt.IsCorrect,
+      order: Opt.Order, text: T?.Text ?? '',
     });
   }
 
-  const questions: QuizQuestionRow[] = questionRows.map((q) => ({
-    id: q.id,
-    lessonId: q.lessonId,
-    type: q.type as 'multiple_choice' | 'true_false',
-    order: q.order,
-    question: resolve(q.id, 'question', questionTransMap, questionFallbackMap),
-    options: optionsByQuestion.get(q.id) ?? [],
-  }));
+  const Questions: QuizQuestionRow[] = QuestionRows.map((Q) => {
+    const T = QTransMap.get(Q.Id) ?? QFallMap.get(Q.Id);
+    return {
+      id: Q.Id, lessonId: Q.LessonId, type: Q.Type as 'multiple_choice' | 'true_false',
+      order: Q.Order, question: T?.Question ?? '',
+      options: OptionsByQuestion.get(Q.Id) ?? [],
+    };
+  });
+
+  const LT = LTrans.get(L.Id) ?? LFallback.get(L.Id);
+  const AT = ATrans.get(Agent.Id) ?? AFallback.get(Agent.Id);
 
   return {
-    id: lesson.id,
-    agentId: lesson.agentId,
-    order: lesson.order,
-    xpReward: lesson.xpReward,
-    estimatedMinutes: lesson.estimatedMinutes,
-    title: resolve(lesson.id, 'title', lessonTransMap, lessonFallbackMap),
-    description: resolve(lesson.id, 'description', lessonTransMap, lessonFallbackMap),
-    content: resolve(lesson.id, 'content', lessonTransMap, lessonFallbackMap),
-    agentSlug: agent.slug,
-    agentEmoji: agent.emoji,
-    agentColor: agent.color,
-    agentName: resolve(agent.id, 'name', agentTransMap, agentFallbackMap),
-    questions,
+    id: L.Id, agentId: L.AgentId, order: L.Order,
+    xpReward: L.XpReward, estimatedMinutes: L.EstimatedMinutes,
+    title: LT?.Title ?? '', description: LT?.Description ?? '', content: LT?.Content ?? '',
+    agentSlug: Agent.Slug, agentEmoji: Agent.Emoji, agentColor: Agent.Color,
+    agentName: AT?.Name ?? '', questions: Questions,
   };
 }
 
 /**
- * Get all agents for sitemap — just ids and slugs.
+ * Get all agents for sitemap — ids and slugs only.
  */
-export async function getAllAgentsForSitemap(): Promise<{ id: number; slug: string }[]> {
-  return db
-    .select({ id: agents.id, slug: agents.slug })
-    .from(agents)
-    .where(eq(agents.isActive, true));
+export async function getAllAgentsForSitemap(): Promise<{ id: string; slug: string }[]> {
+  return (await db.select({ id: Agents.Id, slug: Agents.Slug }).from(Agents).where(eq(Agents.IsActive, true)))
+    .map((R) => ({ id: R.id, slug: R.slug }));
 }
 
 /**
- * Get all lessons for sitemap — lesson ids with their agent slugs (inner join).
+ * Get all lessons for sitemap — lesson ids with their agent slugs.
  */
-export async function getAllLessonsForSitemap(): Promise<
-  { id: number; agentSlug: string }[]
-> {
-  const rows = await db
-    .select({
-      id: lessons.id,
-      agentSlug: agents.slug,
-    })
-    .from(lessons)
-    .innerJoin(agents, eq(lessons.agentId, agents.id));
-
-  return rows;
+export async function getAllLessonsForSitemap(): Promise<{ id: string; agentSlug: string }[]> {
+  const Rows = await db.select({ id: Lessons.Id, agentId: Lessons.AgentId }).from(Lessons);
+  const AgentIds = [...new Set(Rows.map((R) => R.agentId))];
+  const AgentSlugs = await db.select({ id: Agents.Id, slug: Agents.Slug }).from(Agents).where(inArray(Agents.Id, AgentIds));
+  const SlugMap = new Map(AgentSlugs.map((A) => [A.id, A.slug]));
+  return Rows.map((R) => ({ id: R.id, agentSlug: SlugMap.get(R.agentId) ?? '' }));
 }

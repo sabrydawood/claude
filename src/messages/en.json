@@ -430,6 +430,24 @@
       "order": "Order"
     }
   },
+  "apiErrors": {
+    "UNAUTHORIZED": "You must be logged in first",
+    "FORBIDDEN": "You are not authorized to perform this action",
+    "RATE_LIMITED": "Rate limit exceeded. Please try again later.",
+    "VALIDATION_ERROR": "Invalid input data",
+    "INVALID_JSON": "Invalid data format",
+    "NOT_FOUND": "Item not found",
+    "INTERNAL_ERROR": "An internal error occurred. Please try again.",
+    "NO_API_KEY": "No API key has been added yet",
+    "DECRYPT_FAILED": "Failed to process the API key",
+    "LESSON_NOT_FOUND": "Lesson not found",
+    "AGENT_NOT_FOUND": "Content not found",
+    "NO_KEY": "No key is saved",
+    "INVALID_ID": "Invalid identifier",
+    "INVALID_KEY": "Invalid API key — must start with sk-ant-",
+    "STREAM_ERROR": "An error occurred while processing the response. Please try again.",
+    "AI_UNAVAILABLE": "AI service is currently unavailable"
+  },
   "og": {
     "platform": "AI Learning Platform",
     "interactive": "🎮 Interactive",

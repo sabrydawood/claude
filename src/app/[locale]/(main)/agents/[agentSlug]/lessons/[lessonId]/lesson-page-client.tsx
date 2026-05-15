@@ -12,11 +12,11 @@ import type { LessonFull } from '@/lib/db/queries/content';
 import { ChevronLeft, ChevronRight, Clock, Zap, CheckCircle2, BookOpen, Trophy } from 'lucide-react';
 
 interface UserProgress {
-  completedLessons: number[];
+  completedLessons: string[];
   totalXp: number;
   streakDays: number;
   quizzesCompleted: number;
-  scores: Record<number, number>;
+  scores: Record<string, number>;
 }
 
 type LessonView = 'content' | 'quiz' | 'completed';
@@ -25,7 +25,7 @@ interface Props {
   lesson: LessonFull;
   allLessonsCount: number;
   currentIndex: number;
-  nextLessonId: number | null;
+  nextLessonId: string | null;
   locale: string;
   agentSlug: string;
 }

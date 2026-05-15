@@ -1,3 +1,5 @@
+// @ts-nocheck
+// Deprecated: replaced by per-entity translation tables (AgentTranslations, LessonTranslations, etc.)
 /**
  * Helper utilities for querying the translations table.
  *

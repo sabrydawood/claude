@@ -1,5 +1,10 @@
+/**
+ * auth.ts
+ * Better Auth server-side configuration.
+ */
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { uuidv7 } from 'uuidv7';
 import { db } from './db/Index';
 import * as schema from './db/Schema';
 
@@ -26,12 +31,8 @@ export const auth = betterAuth({
     process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   ],
   advanced: {
-    database: {
-      // users.id column is typed uuid — tell Better Auth to generate UUIDs
-      generateId: 'uuid',
-    },
+    generateId: () => uuidv7(),
   },
 });
 
 export type Auth = typeof auth;
-

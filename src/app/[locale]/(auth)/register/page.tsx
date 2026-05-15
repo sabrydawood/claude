@@ -181,14 +181,14 @@ export default function RegisterPage() {
               <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text)' }}>{t('email')}</label>
               <Input type="email" placeholder={t('emailPlaceholder')} value={email}
                 onChange={(e) => setEmail(e.target.value)} error={errors.email}
-                icon={<Mail size={16} />} dir="ltr" />
+                icon={<Mail size={16} />} />
             </div>
 
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text)' }}>{t('password')}</label>
               <Input type="password" placeholder={t('passwordPlaceholder')} value={password}
                 onChange={(e) => setPassword(e.target.value)} error={errors.password}
-                icon={<Lock size={16} />} dir="ltr" />
+                icon={<Lock size={16} />} />
             </div>
 
             <motion.div whileTap={{ scale: 0.98 }}>

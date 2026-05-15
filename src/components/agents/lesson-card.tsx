@@ -5,10 +5,10 @@ import { useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Lock, Clock, Zap, Play } from 'lucide-react';
-import type { Lesson } from '@/lib/content/claude-lessons';
+import type { LessonRow } from '@/lib/db/queries/content';
 
 interface LessonCardProps {
-  lesson: Lesson;
+  lesson: LessonRow;
   index: number;
   isCompleted: boolean;
   isLocked: boolean;
@@ -42,7 +42,7 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
               ? 'bg-[var(--surface-2)]'
               : 'bg-[var(--zkawi-purple)]/15'
           }`}>
-            {isLocked ? '🔒' : lesson.emoji}
+            {isLocked ? '🔒' : '📖'}
           </div>
           <span className="text-xs font-bold text-[var(--text-muted)]">#{index + 1}</span>
         </div>
@@ -53,7 +53,7 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
             <h3 className={`font-black text-base leading-tight ${
               isLocked ? 'text-[var(--text-muted)]' : 'text-[var(--text)]'
             }`}>
-              {locale === 'ar' ? lesson.titleAr : lesson.titleEn}
+              {lesson.title}
             </h3>
             {isCompleted && score !== undefined && (
               <Badge variant="success" className="flex-shrink-0 text-xs">
@@ -65,7 +65,7 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
           <p className={`text-sm mb-3 line-clamp-2 ${
             isLocked ? 'text-[var(--border)]' : 'text-[var(--text-muted)]'
           }`}>
-            {locale === 'ar' ? lesson.descriptionAr : lesson.descriptionEn}
+            {lesson.description}
           </p>
 
           <div className="flex items-center gap-3">
@@ -78,7 +78,7 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
               <span className="text-xs font-bold text-[var(--zkawi-purple)]">+{lesson.xpReward} XP</span>
             </div>
             <div className="text-xs text-[var(--text-muted)]">
-              {lesson.quiz.length} {locale === 'ar' ? 'أسئلة' : 'questions'}
+              {locale === 'ar' ? 'أسئلة' : 'questions'}
             </div>
           </div>
         </div>

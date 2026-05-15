@@ -1,34 +1,32 @@
 import { NextRequest } from 'next/server';
 import { auth } from '@/lib/auth';
 import { streamChat, type ChatMessage } from '@/lib/ai/providers';
-import { getLessonById } from '@/lib/content/claude-lessons';
+import { getLessonById } from '@/lib/db/queries/content';
 
-function buildSystemPrompt(pathname: string, locale: string): string {
-  const isAr = locale === 'ar';
-
+async function buildSystemPrompt(pathname: string, locale: string): Promise<string> {
   // Inject lesson content when on a lesson page
   const lessonMatch = pathname.match(/\/lessons\/(\d+)/);
-  const lesson = lessonMatch ? getLessonById(parseInt(lessonMatch[1])) : null;
+  const lesson = lessonMatch ? await getLessonById(parseInt(lessonMatch[1]), locale) : null;
 
   const lessonBlock = lesson
     ? `
 
 ── الدرس الحالي ──
-العنوان: ${isAr ? lesson.titleAr : lesson.titleEn}
-الوصف: ${isAr ? lesson.descriptionAr : lesson.descriptionEn}
+العنوان: ${lesson.title}
+الوصف: ${lesson.description}
 
 المحتوى الكامل:
-${(isAr ? lesson.contentAr : lesson.contentEn).slice(0, 3000)}`
+${lesson.content.slice(0, 3000)}`
     : '';
 
   const pageLabel = (() => {
-    if (lesson)                           return isAr ? `درس: ${lesson.titleAr}` : `Lesson: ${lesson.titleEn}`;
-    if (pathname.includes('/dashboard'))  return isAr ? 'لوحة التحكم' : 'Dashboard';
-    if (pathname.includes('/agents'))     return isAr ? 'قائمة الدروس' : 'Lessons list';
-    if (pathname.includes('/leaderboard'))return isAr ? 'لوحة المتصدرين' : 'Leaderboard';
-    if (pathname.includes('/sandbox'))    return isAr ? 'ساندبوكس' : 'Sandbox';
-    if (pathname.includes('/profile'))    return isAr ? 'صفحة الملف الشخصي' : 'Profile';
-    return isAr ? 'الصفحة الرئيسية' : 'Home';
+    if (lesson)                            return locale === 'ar' ? `درس: ${lesson.title}` : `Lesson: ${lesson.title}`;
+    if (pathname.includes('/dashboard'))   return locale === 'ar' ? 'لوحة التحكم' : 'Dashboard';
+    if (pathname.includes('/agents'))      return locale === 'ar' ? 'قائمة الدروس' : 'Lessons list';
+    if (pathname.includes('/leaderboard')) return locale === 'ar' ? 'لوحة المتصدرين' : 'Leaderboard';
+    if (pathname.includes('/sandbox'))     return locale === 'ar' ? 'ساندبوكس' : 'Sandbox';
+    if (pathname.includes('/profile'))     return locale === 'ar' ? 'صفحة الملف الشخصي' : 'Profile';
+    return locale === 'ar' ? 'الصفحة الرئيسية' : 'Home';
   })();
 
   return `أنت "ذكي" (Zaki)، المرشد الشخصي الذكي في منصة ذكاوي — منصة تعليمية عربية لتعلم الذكاء الاصطناعي.
@@ -64,7 +62,7 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: 'No messages' }), { status: 400 });
   }
 
-  const system = buildSystemPrompt(pathname, locale);
+  const system = await buildSystemPrompt(pathname, locale);
   // Keep last 12 messages to control cost while maintaining context
   const trimmed = messages.slice(-12);
 

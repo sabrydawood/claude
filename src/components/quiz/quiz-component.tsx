@@ -6,11 +6,11 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Zap, RotateCcw, ChevronRight, CheckCircle2, XCircle } from 'lucide-react';
-import type { QuizQuestion } from '@/lib/content/claude-lessons';
+import type { QuizQuestionRow } from '@/lib/db/queries/content';
 import confetti from './confetti-util';
 
 interface QuizProps {
-  questions: QuizQuestion[];
+  questions: QuizQuestionRow[];
   xpReward: number;
   onComplete: (score: number, xpEarned: number) => void;
   onRetry: () => void;
@@ -20,7 +20,6 @@ type QuizState = 'answering' | 'feedback' | 'results';
 
 export default function QuizComponent({ questions, xpReward, onComplete, onRetry }: QuizProps) {
   const t = useTranslations('quiz');
-  const locale = useLocale();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -34,7 +33,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
   const checkAnswer = (optionId: string) => {
     if (selectedOption) return;
     setSelectedOption(optionId);
-    const option = currentQuestion.options.find(o => o.id === optionId);
+    const option = currentQuestion.options.find(o => String(o.id) === optionId);
     const isCorrect = option?.isCorrect || false;
     setAnswers(prev => [...prev, isCorrect]);
     setQuizState('feedback');
@@ -111,7 +110,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
 
         <div className="flex items-center justify-center gap-3 mb-4">
           <div className="text-sm text-[var(--text-muted)]">
-            {correctCount} / {questions.length} {locale === 'ar' ? 'إجابات صح' : 'correct answers'}
+            {correctCount} / {questions.length} {t('correctAnswers')}
           </div>
         </div>
 
@@ -186,14 +185,14 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
         >
           <div className="bg-[var(--bg-secondary)] rounded-2xl p-5 border border-[var(--zkawi-purple)]/20 mb-4">
             <p className="font-black text-[var(--text)] text-lg leading-relaxed">
-              {locale === 'ar' ? currentQuestion.questionAr : currentQuestion.questionEn}
+              {currentQuestion.question}
             </p>
           </div>
 
           {/* Options */}
           <div className="space-y-3">
             {currentQuestion.options.map((option) => {
-              const isSelected = selectedOption === option.id;
+              const isSelected = selectedOption === String(option.id);
               const isCorrect = option.isCorrect;
               const showFeedback = quizState === 'feedback';
 
@@ -216,7 +215,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                   key={option.id}
                   whileHover={!selectedOption ? { scale: 1.01 } : {}}
                   whileTap={!selectedOption ? { scale: 0.99 } : {}}
-                  onClick={() => checkAnswer(option.id)}
+                  onClick={() => checkAnswer(String(option.id))}
                   disabled={!!selectedOption}
                   className={`w-full text-start px-5 py-4 rounded-2xl transition-all duration-200 ${optionStyle}`}
                 >
@@ -231,9 +230,9 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                         : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
                     }`}>
                       {showFeedback ? (
-                        isCorrect ? <CheckCircle2 size={16} /> : isSelected ? <XCircle size={16} /> : option.id.slice(-1).toUpperCase()
+                        isCorrect ? <CheckCircle2 size={16} /> : isSelected ? <XCircle size={16} /> : String(option.order + 1)
                       ) : (
-                        option.id.slice(-1).toUpperCase()
+                        String(option.order + 1)
                       )}
                     </div>
                     <span className={`font-semibold ${
@@ -241,7 +240,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                       showFeedback && isSelected && !isCorrect ? 'text-[var(--zkawi-red)]' :
                       'text-[var(--text)]'
                     }`}>
-                      {locale === 'ar' ? option.textAr : option.textEn}
+                      {option.text}
                     </span>
                   </div>
                 </motion.button>
@@ -270,9 +269,7 @@ export default function QuizComponent({ questions, xpReward, onComplete, onRetry
                       {t('incorrect')} 😕
                     </p>
                     <p className="text-sm text-[var(--text-muted)]">
-                      {t('correctAnswer')}: {locale === 'ar'
-                        ? currentQuestion.options.find(o => o.isCorrect)?.textAr
-                        : currentQuestion.options.find(o => o.isCorrect)?.textEn}
+                      {t('correctAnswer')}: {currentQuestion.options.find(o => o.isCorrect)?.text}
                     </p>
                   </div>
                 )}

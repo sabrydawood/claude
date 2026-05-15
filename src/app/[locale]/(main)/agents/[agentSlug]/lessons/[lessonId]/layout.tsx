@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getLessonById, getAgentBySlug } from '@/lib/content/claude-lessons';
+import { getLessonById, getAgentBySlug } from '@/lib/db/queries/content';
 import { LessonSchema, BreadcrumbSchema } from '@/components/seo/json-ld';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -10,29 +10,29 @@ export async function generateMetadata({
   params: Promise<{ locale: string; agentSlug: string; lessonId: string }>;
 }): Promise<Metadata> {
   const { locale, agentSlug, lessonId } = await params;
-  const isAr = locale === 'ar';
 
-  const lesson = getLessonById(parseInt(lessonId, 10));
-  const agent = getAgentBySlug(agentSlug);
+  const lesson = await getLessonById(parseInt(lessonId, 10), locale);
+  const agent = await getAgentBySlug(agentSlug, locale);
 
   if (!lesson || !agent) {
-    return { title: isAr ? 'الدرس غير موجود' : 'Lesson Not Found' };
+    return { title: locale === 'ar' ? 'الدرس غير موجود' : 'Lesson Not Found' };
   }
 
-  const lessonTitle = isAr ? lesson.titleAr : lesson.titleEn;
-  const lessonDesc = isAr ? lesson.descriptionAr : lesson.descriptionEn;
-  const agentName = isAr ? agent.nameAr : agent.nameEn;
+  const lessonTitle = lesson.title;
+  const lessonDesc = lesson.description;
+  const agentName = agent.name;
+  const lessonIdNum = parseInt(lessonId, 10);
   const pageUrl = `${APP_URL}/${locale}/agents/${agentSlug}/lessons/${lessonId}`;
   const ogImageUrl = `/api/og?title=${encodeURIComponent(lessonTitle)}&agent=${encodeURIComponent(agentName)}&locale=${locale}`;
 
-  const fullTitle = isAr
+  const fullTitle = locale === 'ar'
     ? `${lessonTitle} — ${agentName} | ذكاوي`
     : `${lessonTitle} — ${agentName} | Zkawi`;
 
   return {
     title: lessonTitle,
     description: lessonDesc,
-    keywords: isAr
+    keywords: locale === 'ar'
       ? [lessonTitle, agentName, 'ذكاء اصطناعي', 'تعلم', 'درس', 'ذكاوي']
       : [lessonTitle, agentName, 'AI', 'learn', 'lesson', 'zkawi'],
     alternates: {
@@ -48,7 +48,7 @@ export async function generateMetadata({
       description: lessonDesc,
       url: pageUrl,
       siteName: 'ذكاوي | Zkawi',
-      locale: isAr ? 'ar_EG' : 'en_US',
+      locale: locale === 'ar' ? 'ar_EG' : 'en_US',
       type: 'article',
       images: [{ url: ogImageUrl, width: 1200, height: 630, alt: fullTitle }],
     },
@@ -69,24 +69,29 @@ export default async function LessonLayout({
   params: Promise<{ locale: string; agentSlug: string; lessonId: string }>;
 }) {
   const { locale, agentSlug, lessonId } = await params;
-  const isAr = locale === 'ar';
-  const lesson = getLessonById(parseInt(lessonId, 10));
-  const agent = getAgentBySlug(agentSlug);
+  const lessonIdNum = parseInt(lessonId, 10);
+  const lesson = await getLessonById(lessonIdNum, locale);
+  const agent = await getAgentBySlug(agentSlug, locale);
 
   return (
     <>
       {lesson && agent && (
         <>
-          <LessonSchema locale={locale} agentSlug={agentSlug} lesson={lesson} />
+          <LessonSchema
+            locale={locale}
+            agentSlug={agentSlug}
+            lessonId={lessonIdNum}
+            lesson={lesson}
+          />
           <BreadcrumbSchema
             items={[
-              { name: isAr ? 'الرئيسية' : 'Home', url: `${APP_URL}/${locale}` },
+              { name: locale === 'ar' ? 'الرئيسية' : 'Home', url: `${APP_URL}/${locale}` },
               {
-                name: isAr ? agent.nameAr : agent.nameEn,
+                name: agent.name,
                 url: `${APP_URL}/${locale}/agents/${agentSlug}`,
               },
               {
-                name: isAr ? lesson.titleAr : lesson.titleEn,
+                name: lesson.title,
                 url: `${APP_URL}/${locale}/agents/${agentSlug}/lessons/${lessonId}`,
               },
             ]}

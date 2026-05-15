@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download } from 'lucide-react';
 
@@ -11,8 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PwaInstallBanner() {
-  const locale = useLocale();
-  const isAr = locale === 'ar';
+  const t = useTranslations('pwa');
   const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -56,10 +55,10 @@ export function PwaInstallBanner() {
           <div className="text-3xl flex-shrink-0">🤖</div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
-              {isAr ? 'ثبّت ذكاوي على جهازك' : 'Install Zkawi on your device'}
+              {t('install')}
             </p>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-              {isAr ? 'يشتغل بدون إنترنت!' : 'Works offline!'}
+              {t('offline')}
             </p>
           </div>
           <button
@@ -68,7 +67,7 @@ export function PwaInstallBanner() {
             style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
           >
             <Download size={12} />
-            {isAr ? 'ثبّت' : 'Install'}
+            {t('button')}
           </button>
           <button onClick={dismiss} className="flex-shrink-0 p-1 rounded-lg" style={{ color: 'var(--text-muted)' }}>
             <X size={16} />

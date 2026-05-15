@@ -13,8 +13,22 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Flame, BookOpen, Trophy, Target, ChevronRight, Lock, CheckCircle2, Clock } from 'lucide-react';
-import { getLessonsByAgent } from '@/lib/content/claude-lessons';
 import { useRouter } from '@/lib/i18n/navigation';
+
+interface UserAchievement {
+  id: number;
+  emoji: string;
+  name: string;
+  description: string;
+  earned: boolean;
+}
+
+interface LessonSummary {
+  id: number;
+  title: string;
+  estimatedMinutes: number;
+  xpReward: number;
+}
 
 interface UserProgress {
   completedLessons: number[];
@@ -22,23 +36,16 @@ interface UserProgress {
   streakDays: number;
   quizzesCompleted: number;
   scores: Record<number, number>;
+  achievements: UserAchievement[];
 }
-
-const DEMO_ACHIEVEMENTS = [
-  { id: 1, emoji: '🎯', nameAr: 'الخطوة الأولى', nameEn: 'First Step', earned: true },
-  { id: 2, emoji: '🔥', nameAr: '3 أيام ناري', nameEn: '3-Day Streak', earned: false },
-  { id: 3, emoji: '🏆', nameAr: 'ملك الكويز', nameEn: 'Quiz Master', earned: false },
-  { id: 4, emoji: '⭐', nameAr: 'بداية قوية', nameEn: 'Strong Start', earned: true },
-  { id: 5, emoji: '🌟', nameAr: 'المستكشف', nameEn: 'Explorer', earned: false },
-  { id: 6, emoji: '💎', nameAr: 'خبير ذكاوي', nameEn: 'Zkawi Expert', earned: false },
-];
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const locale = useLocale();
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {} });
+  const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {}, achievements: [] });
+  const [lessons, setLessons] = useState<LessonSummary[]>([]);
   const [lessonOrder, setLessonOrder] = useState<number[] | null>(null);
   const [mounted, setMounted] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
@@ -56,15 +63,17 @@ export default function DashboardPage() {
       // Check onboarding + load progress in parallel
       Promise.all([
         fetch('/api/user/preferences').then(r => r.json()),
-        fetch('/api/progress').then(r => r.json()),
+        fetch(`/api/progress?locale=${locale}`).then(r => r.json()),
         fetch('/api/user/learning-path').then(r => r.json()).catch(() => ({ lessonOrder: null })),
-      ]).then(([prefs, prog, path]) => {
+        fetch(`/api/lessons/claude?locale=${locale}`).then(r => r.json()).catch(() => ({ lessons: [] })),
+      ]).then(([prefs, prog, path, lessonsData]) => {
         if (!prefs.onboardingCompleted) {
           router.push('/onboarding');
           return;
         }
         if (prog.completedLessons) setProgress(prog);
         if (path.lessonOrder) setLessonOrder(path.lessonOrder);
+        if (lessonsData.lessons) setLessons(lessonsData.lessons);
         setCheckingOnboarding(false);
       }).catch(() => setCheckingOnboarding(false));
     }
@@ -83,12 +92,11 @@ export default function DashboardPage() {
 
   if (!session) return null;
 
-  const allClaudeLessons = getLessonsByAgent('claude');
   // Show personalized order if available, else default order
   const claudeLessons = lessonOrder
-    ? lessonOrder.map(id => allClaudeLessons.find(l => l.id === id)).filter(Boolean) as typeof allClaudeLessons
-    : allClaudeLessons;
-  const agentProgress = (progress.completedLessons.length / allClaudeLessons.length) * 100;
+    ? lessonOrder.map(id => lessons.find(l => l.id === id)).filter(Boolean) as LessonSummary[]
+    : lessons;
+  const agentProgress = lessons.length > 0 ? (progress.completedLessons.length / lessons.length) * 100 : 0;
   const userName = session.user?.name || 'صديقي';
 
   return (
@@ -161,8 +169,8 @@ export default function DashboardPage() {
                   },
                   {
                     icon: <Trophy className="text-[var(--zkawi-gold)]" size={20} />,
-                    value: DEMO_ACHIEVEMENTS.filter(a => a.earned).length,
-                    label: 'إنجازات',
+                    value: progress.achievements.filter(a => a.earned).length,
+                    label: locale === 'ar' ? 'إنجازات' : 'Achievements',
                     suffix: '',
                     border: 'border-[var(--zkawi-gold)]/30',
                   },
@@ -205,7 +213,7 @@ export default function DashboardPage() {
                           <Badge variant="default">متاح الآن</Badge>
                         </div>
                         <p className="text-sm text-[var(--text-muted)] mb-3">
-                          {progress.completedLessons.length} / {allClaudeLessons.length} دروس اتكملت
+                          {progress.completedLessons.length} / {lessons.length} {locale === 'ar' ? 'دروس اتكملت' : 'lessons completed'}
                         </p>
                         <Progress value={agentProgress} colorScheme="purple" className="mb-3 h-2" />
                         <Link href="/agents/claude">
@@ -241,15 +249,15 @@ export default function DashboardPage() {
                               : 'bg-[var(--surface-2)] border border-[var(--border)] hover:border-[var(--zkawi-purple-light)] hover:bg-[var(--bg-secondary)]'
                           }`}>
                             <div className="text-2xl w-10 h-10 flex items-center justify-center bg-[var(--surface)] rounded-xl shadow-sm">
-                              {lesson.emoji}
+                              📖
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="font-bold text-sm text-[var(--text)] truncate">
-                                {locale === 'ar' ? lesson.titleAr : lesson.titleEn}
+                                {lesson.title}
                               </div>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <Clock size={11} className="text-[var(--text-muted)]" />
-                                <span className="text-xs text-[var(--text-muted)]">{lesson.estimatedMinutes} دقيقة</span>
+                                <span className="text-xs text-[var(--text-muted)]">{lesson.estimatedMinutes} {locale === 'ar' ? 'دقيقة' : 'min'}</span>
                                 <span className="text-xs text-[var(--zkawi-purple)] font-bold">+{lesson.xpReward} XP</span>
                               </div>
                             </div>
@@ -267,7 +275,7 @@ export default function DashboardPage() {
                     <Link href="/agents/claude">
                       <div className="text-center pt-2">
                         <span className="text-sm text-[var(--zkawi-purple)] font-bold hover:opacity-80">
-                          شوف كل الدروس ({allClaudeLessons.length}) →
+                          {locale === 'ar' ? `شوف كل الدروس (${lessons.length}) →` : `View all lessons (${lessons.length}) →`}
                         </span>
                       </div>
                     </Link>
@@ -288,7 +296,7 @@ export default function DashboardPage() {
                     {t('achievements.title')} 🏆
                   </h2>
                   <div className="grid grid-cols-3 gap-3">
-                    {DEMO_ACHIEVEMENTS.map((achievement) => (
+                    {progress.achievements.map((achievement) => (
                       <motion.div
                         key={achievement.id}
                         whileHover={{ scale: 1.1 }}
@@ -297,11 +305,11 @@ export default function DashboardPage() {
                             ? 'bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-2 border-amber-500/40 shadow-sm achievement-glow'
                             : 'bg-[var(--surface-2)] border-2 border-[var(--border)] opacity-50'
                         }`}
-                        title={locale === 'ar' ? achievement.nameAr : achievement.nameEn}
+                        title={achievement.name}
                       >
                         <span className="text-2xl">{achievement.emoji}</span>
                         <span className="text-[9px] font-bold text-[var(--text-muted)] mt-1 leading-tight">
-                          {locale === 'ar' ? achievement.nameAr : achievement.nameEn}
+                          {achievement.name}
                         </span>
                         {!achievement.earned && (
                           <Lock size={10} className="text-[var(--text-muted)] mt-0.5" />
@@ -310,7 +318,7 @@ export default function DashboardPage() {
                     ))}
                   </div>
                   <p className="text-xs text-[var(--text-muted)] text-center mt-3">
-                    {DEMO_ACHIEVEMENTS.filter(a => a.earned).length} / {DEMO_ACHIEVEMENTS.length} إنجازات
+                    {progress.achievements.filter(a => a.earned).length} / {progress.achievements.length} {locale === 'ar' ? 'إنجازات' : 'achievements'}
                   </p>
                 </Card>
               </motion.div>

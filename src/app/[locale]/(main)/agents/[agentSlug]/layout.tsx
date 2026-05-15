@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getAgentBySlug, getLessonsByAgent } from '@/lib/content/claude-lessons';
+import { getAgentBySlug, getLessonsByAgent } from '@/lib/db/queries/content';
 import { CourseSchema, BreadcrumbSchema } from '@/components/seo/json-ld';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -10,15 +10,14 @@ export async function generateMetadata({
   params: Promise<{ locale: string; agentSlug: string }>;
 }): Promise<Metadata> {
   const { locale, agentSlug } = await params;
-  const isAr = locale === 'ar';
-  const agent = getAgentBySlug(agentSlug);
+  const agent = await getAgentBySlug(agentSlug, locale);
 
   if (!agent) {
-    return { title: isAr ? 'غير موجود' : 'Not Found' };
+    return { title: locale === 'ar' ? 'غير موجود' : 'Not Found' };
   }
 
-  const title = isAr ? agent.nameAr : agent.nameEn;
-  const description = isAr ? agent.descriptionAr : agent.descriptionEn;
+  const title = agent.name;
+  const description = agent.description;
   const pageUrl = `${APP_URL}/${locale}/agents/${agentSlug}`;
 
   return {
@@ -33,17 +32,17 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: isAr ? `${title} | ذكاوي` : `${title} | Zkawi`,
+      title: `${title} | ${locale === 'ar' ? 'ذكاوي' : 'Zkawi'}`,
       description,
       url: pageUrl,
       siteName: 'ذكاوي | Zkawi',
-      locale: isAr ? 'ar_EG' : 'en_US',
+      locale: locale === 'ar' ? 'ar_EG' : 'en_US',
       type: 'website',
       images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: isAr ? `${title} | ذكاوي` : `${title} | Zkawi`,
+      title: `${title} | ${locale === 'ar' ? 'ذكاوي' : 'Zkawi'}`,
       description,
       images: ['/og-image.svg'],
     },
@@ -58,9 +57,8 @@ export default async function AgentLayout({
   params: Promise<{ locale: string; agentSlug: string }>;
 }) {
   const { locale, agentSlug } = await params;
-  const isAr = locale === 'ar';
-  const agent = getAgentBySlug(agentSlug);
-  const lessons = agent ? getLessonsByAgent(agentSlug) : [];
+  const agent = await getAgentBySlug(agentSlug, locale);
+  const lessons = agent ? await getLessonsByAgent(agentSlug, locale) : [];
 
   return (
     <>
@@ -69,14 +67,14 @@ export default async function AgentLayout({
           <CourseSchema
             locale={locale}
             agentSlug={agentSlug}
-            agentName={isAr ? agent.nameAr : agent.nameEn}
-            agentDescription={isAr ? agent.descriptionAr : agent.descriptionEn}
+            agentName={agent.name}
+            agentDescription={agent.description}
             lessons={lessons}
           />
           <BreadcrumbSchema
             items={[
-              { name: isAr ? 'الرئيسية' : 'Home', url: `${APP_URL}/${locale}` },
-              { name: isAr ? agent.nameAr : agent.nameEn, url: `${APP_URL}/${locale}/agents/${agentSlug}` },
+              { name: locale === 'ar' ? 'الرئيسية' : 'Home', url: `${APP_URL}/${locale}` },
+              { name: agent.name, url: `${APP_URL}/${locale}/agents/${agentSlug}` },
             ]}
           />
         </>

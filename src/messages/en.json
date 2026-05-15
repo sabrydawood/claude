@@ -5,7 +5,58 @@
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
-    "language": "عربي"
+    "language": "عربي",
+    "leaderboard": "Leaderboard",
+    "sandbox": "Sandbox",
+    "profile": "My Profile"
+  },
+  "mascot": {
+    "typing": "Typing...",
+    "guide": "Your AI guide",
+    "newChat": "New chat",
+    "placeholder": "Ask Zaki anything...",
+    "askZaki": "Ask Zaki",
+    "errorMsg": "Sorry, I can't respond right now. Try again! 😅"
+  },
+  "pwa": {
+    "install": "Install Zkawi on your device",
+    "offline": "Works offline!",
+    "button": "Install"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Top 50 learners on the platform",
+    "rank": "Rank",
+    "player": "Player",
+    "xp": "Points",
+    "empty": "No data yet",
+    "noData": "No data yet — start learning!",
+    "lessons": "lessons",
+    "days": "days"
+  },
+  "profile": {
+    "notFound": "User not found",
+    "totalXp": "Total XP",
+    "streak": "Streak Days",
+    "lessonsCompleted": "Lessons Done",
+    "quizzes": "Quizzes",
+    "memberSince": "Member since",
+    "shareProfile": "Share Profile",
+    "achievements": "Achievements"
+  },
+  "sandbox": {
+    "title": "Zkawi Sandbox",
+    "subtitle": "Chat with Claude using your own key",
+    "addKey": "Add API Key",
+    "keyLabel": "Anthropic API Key (starts with sk-ant-)",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "greeting": "Hi! I'm Zkawi",
+    "greetingSubtitle": "Ask me anything about AI",
+    "placeholder": "Type your message...",
+    "noKeyError": "Add your API key first",
+    "connectionError": "Connection failed"
   },
   "home": {
     "hero": {
@@ -86,7 +137,8 @@
       "loading": "Logging in...",
       "noAccount": "Don't have an account?",
       "register": "Register Now",
-      "forgotPassword": "Forgot Password?"
+      "forgotPassword": "Forgot Password?",
+      "dataSecure": "Your data is safe and secure with us"
     },
     "register": {
       "title": "Join Zkawi! 🚀",
@@ -101,7 +153,8 @@
       "loading": "Creating your account...",
       "hasAccount": "Already have an account?",
       "login": "Login Now",
-      "terms": "By registering, you agree to the Terms of Service"
+      "terms": "By registering, you agree to the Terms of Service",
+      "freeNote": "100% Free — no credit card required"
     },
     "validation": {
       "nameRequired": "Name is required",
@@ -192,6 +245,7 @@
     "correct": "Correct! 🎉",
     "incorrect": "Incorrect, try again",
     "correctAnswer": "Correct Answer",
+    "correctAnswers": "correct answers",
     "next": "Next Question",
     "finish": "Finish Quiz",
     "results": {

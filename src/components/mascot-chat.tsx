@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getDir, isRTL } from '@/lib/i18n/locale-utils';
 import { X, Send, Loader2, MessageCircle, RotateCcw } from 'lucide-react';
 
 interface Message {
@@ -64,7 +65,7 @@ function TypingDots() {
 export function MascotChat({ isOpen, onClose }: Props) {
   const pathname = usePathname();
   const locale = useLocale();
-  const isAr = locale === 'ar';
+  const t = useTranslations('mascot');
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -93,7 +94,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
       setInitialized(true);
       streamResponse([{
         role: 'user',
-        content: isAr
+        content: locale === 'ar'
           ? 'قدّم نفسك وقول إيه اللي تقدر تساعدني بيه في الصفحة دي.'
           : 'Introduce yourself and tell me how you can help me on this page.',
       }], true);
@@ -176,7 +177,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
           if (last?.role === 'assistant' && last.streaming) {
             updated[updated.length - 1] = {
               ...last,
-              content: last.content || (isAr ? 'عذراً، مش قادر أرد دلوقتي. حاول تاني 😅' : 'Sorry, I can\'t respond right now. Try again! 😅'),
+              content: last.content || t('errorMsg'),
             };
           }
           return updated;
@@ -194,7 +195,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
       });
       setIsStreaming(false);
     }
-  }, [pathname, locale, isAr]);
+  }, [pathname, locale, t]);
 
   const handleSend = () => {
     const text = input.trim();
@@ -235,7 +236,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
             border: '1px solid var(--border)',
             maxHeight: '70vh',
           }}
-          dir={isAr ? 'rtl' : 'ltr'}
+          dir={getDir(locale)}
         >
           {/* Header */}
           <div
@@ -247,15 +248,15 @@ export function MascotChat({ isOpen, onClose }: Props) {
               <p className="font-black text-white text-sm leading-none">ذكي · Zaki</p>
               <p className="text-purple-200 text-xs mt-0.5">
                 {isStreaming
-                  ? (isAr ? 'يكتب...' : 'Typing...')
-                  : (isAr ? 'مرشدك الشخصي 🌟' : 'Your AI guide 🌟')}
+                  ? t('typing')
+                  : t('guide') + ' 🌟'}
               </p>
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={handleReset}
                 className="p-1.5 rounded-xl hover:bg-white/10 transition-colors"
-                title={isAr ? 'محادثة جديدة' : 'New chat'}
+                title={t('newChat')}
               >
                 <RotateCcw size={14} color="rgba(255,255,255,0.7)" />
               </button>
@@ -331,7 +332,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isAr ? 'اسأل ذكي أي حاجة...' : 'Ask Zaki anything...'}
+              placeholder={t('placeholder')}
               rows={1}
               disabled={isStreaming}
               className="flex-1 resize-none rounded-xl px-3 py-2 text-sm outline-none"
@@ -355,7 +356,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
             >
               {isStreaming
                 ? <Loader2 size={15} color="white" className="animate-spin" />
-                : <Send size={15} color="white" style={{ transform: isAr ? 'scaleX(-1)' : undefined }} />
+                : <Send size={15} color="white" style={{ transform: isRTL(locale) ? 'scaleX(-1)' : undefined }} />
               }
             </motion.button>
           </div>
@@ -367,8 +368,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
 
 // Small trigger button to open chat (used separately from mascot)
 export function MascotChatTrigger({ onClick }: { onClick: () => void }) {
-  const locale = useLocale();
-  const isAr = locale === 'ar';
+  const t = useTranslations('mascot');
 
   return (
     <motion.button
@@ -383,7 +383,7 @@ export function MascotChatTrigger({ onClick }: { onClick: () => void }) {
       }}
     >
       <MessageCircle size={15} />
-      {isAr ? 'اسأل ذكي' : 'Ask Zaki'}
+      {t('askZaki')}
     </motion.button>
   );
 }

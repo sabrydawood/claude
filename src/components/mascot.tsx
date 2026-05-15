@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getDir } from '@/lib/i18n/locale-utils';
 import { X, MessageCircle } from 'lucide-react';
 import { MascotChat } from '@/components/mascot-chat';
 
@@ -13,7 +14,7 @@ interface Waypoint {
   x: number;      // % from left (viewport)
   y: number;      // % from top (viewport)
   mood: Mood;
-  message: { ar: string; en: string } | null;
+  message: { [locale: string]: string; ar: string; en: string } | null;
   stayMs: number;
 }
 
@@ -229,7 +230,6 @@ function RobotSVG({ mood, walking }: { mood: Mood; walking: boolean }) {
 export function Mascot() {
   const pathname = usePathname();
   const locale = useLocale();
-  const isAr = locale === 'ar';
 
   const [mounted, setMounted]           = useState(false);
   const [pos, setPos]                   = useState({ x: 74, y: 72 });
@@ -237,7 +237,7 @@ export function Mascot() {
   const [facingLeft, setFacingLeft]     = useState(true);
   const [mood, setMood]                 = useState<Mood>('idle');
   const [isWalking, setIsWalking]       = useState(false);
-  const [bubbleMsg, setBubbleMsg]       = useState<{ ar: string; en: string } | null>(null);
+  const [bubbleMsg, setBubbleMsg]       = useState<{ [locale: string]: string; ar: string; en: string } | null>(null);
   const [bubbleOpen, setBubbleOpen]     = useState(false);
   const [isSmall, setIsSmall]           = useState(false);
   const [chatOpen, setChatOpen]         = useState(false);
@@ -370,7 +370,7 @@ export function Mascot() {
                 background: 'var(--surface)',
                 border: '1.5px solid var(--zkawi-purple)',
                 color: 'var(--text)',
-                direction: isAr ? 'rtl' : 'ltr',
+                direction: getDir(locale),
               }}
             >
               <button
@@ -380,7 +380,7 @@ export function Mascot() {
               >
                 <X size={10} />
               </button>
-              {isAr ? bubbleMsg.ar : bubbleMsg.en}
+              {(bubbleMsg as Record<string, string>)[locale] ?? bubbleMsg.en}
               <div
                 className="absolute -bottom-[9px] right-3 w-4 h-4 rotate-45"
                 style={{

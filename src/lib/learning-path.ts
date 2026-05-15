@@ -1,4 +1,4 @@
-import { getLessonsByAgent } from '@/lib/content/claude-lessons';
+import { getLessonsByAgent } from '@/lib/db/queries/content';
 
 interface PathInput {
   goal: string;
@@ -12,7 +12,7 @@ interface PathInput {
  * Returns an array of lesson IDs in the recommended order.
  */
 export async function generateLearningPath(input: PathInput): Promise<number[]> {
-  const allLessons = getLessonsByAgent('claude');
+  const allLessons = await getLessonsByAgent('claude', 'en');
 
   // Score each lesson based on the user's profile
   const scored = allLessons.map(lesson => ({

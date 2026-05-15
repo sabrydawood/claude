@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { claudeLessons, agents } from '@/lib/content/claude-lessons';
+import { getAllAgentsForSitemap, getAllLessonsForSitemap } from '@/lib/db/queries/content';
 import { routing } from '@/lib/i18n/routing';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -9,8 +9,13 @@ function url(path: string): string {
   return `${APP_URL}${path}`;
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+
+  const [agentData, lessonData] = await Promise.all([
+    getAllAgentsForSitemap(),
+    getAllLessonsForSitemap(),
+  ]);
 
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -42,25 +47,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   ];
 
-  const agentPages: MetadataRoute.Sitemap = agents
-    .filter((a) => a.isActive)
-    .flatMap((agent) =>
-      locales.map((locale) => ({
-        url: url(`/${locale}/agents/${agent.slug}`),
-        lastModified: now,
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
-        alternates: {
-          languages: Object.fromEntries(
-            locales.map((l) => [l, url(`/${l}/agents/${agent.slug}`)]),
-          ),
-        },
-      })),
-    );
-
-  const lessonPages: MetadataRoute.Sitemap = claudeLessons.flatMap((lesson) =>
+  const agentPages: MetadataRoute.Sitemap = agentData.flatMap((agent) =>
     locales.map((locale) => ({
-      url: url(`/${locale}/agents/claude/lessons/${lesson.id}`),
+      url: url(`/${locale}/agents/${agent.slug}`),
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+      alternates: {
+        languages: Object.fromEntries(
+          locales.map((l) => [l, url(`/${l}/agents/${agent.slug}`)]),
+        ),
+      },
+    })),
+  );
+
+  const lessonPages: MetadataRoute.Sitemap = lessonData.flatMap((lesson) =>
+    locales.map((locale) => ({
+      url: url(`/${locale}/agents/${lesson.agentSlug}/lessons/${lesson.id}`),
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
@@ -68,7 +71,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         languages: Object.fromEntries(
           locales.map((l) => [
             l,
-            url(`/${l}/agents/claude/lessons/${lesson.id}`),
+            url(`/${l}/agents/${lesson.agentSlug}/lessons/${lesson.id}`),
           ]),
         ),
       },

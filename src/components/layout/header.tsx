@@ -18,7 +18,6 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
-  const isAr = locale === 'ar';
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -35,8 +34,8 @@ export default function Header() {
   const navLinks = session
     ? [
         { href: '/dashboard', label: t('nav.dashboard'), icon: <LayoutDashboard size={16} /> },
-        { href: '/leaderboard', label: isAr ? 'المتصدرين' : 'Leaderboard', icon: <Trophy size={16} /> },
-        { href: '/sandbox', label: isAr ? 'ساندبوكس' : 'Sandbox', icon: <MessageSquare size={16} /> },
+        { href: '/leaderboard', label: t('nav.leaderboard'), icon: <Trophy size={16} /> },
+        { href: '/sandbox', label: t('nav.sandbox'), icon: <MessageSquare size={16} /> },
       ]
     : [{ href: '/', label: t('nav.home'), icon: <Home size={16} /> }];
 

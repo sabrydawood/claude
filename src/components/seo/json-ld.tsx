@@ -5,14 +5,13 @@ interface WebSiteSchemaProps {
 }
 
 export function WebSiteSchema({ locale }: WebSiteSchemaProps) {
-  const isAr = locale === 'ar';
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'ذكاوي | Zkawi',
-    alternateName: isAr ? 'Zkawi' : 'ذكاوي',
+    alternateName: locale === 'ar' ? 'Zkawi' : 'ذكاوي',
     url: APP_URL,
-    description: isAr
+    description: locale === 'ar'
       ? 'منصة تعليمية للأطفال والكبار لتعلم الذكاء الاصطناعي بطريقة سهلة ومرحة'
       : 'Educational platform for kids and adults to learn AI in a fun and easy way',
     inLanguage: [{ '@type': 'Language', name: 'Arabic' }, { '@type': 'Language', name: 'English' }],
@@ -30,20 +29,19 @@ interface OrganizationSchemaProps {
 }
 
 export function OrganizationSchema({ locale }: OrganizationSchemaProps) {
-  const isAr = locale === 'ar';
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
     name: 'ذكاوي | Zkawi',
     url: APP_URL,
     logo: `${APP_URL}/logo-icon.svg`,
-    description: isAr
+    description: locale === 'ar'
       ? 'منصة تعليمية تفاعلية للأطفال والكبار لتعلم الذكاء الاصطناعي'
       : 'Interactive educational platform for learning AI',
     sameAs: [],
     foundingDate: '2024',
     knowsAbout: ['Artificial Intelligence', 'Machine Learning', 'Claude AI', 'AI Education'],
-    audience: { '@type': 'Audience', audienceType: isAr ? 'أطفال وكبار' : 'Kids and Adults' },
+    audience: { '@type': 'Audience', audienceType: locale === 'ar' ? 'أطفال وكبار' : 'Kids and Adults' },
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />;
 }
@@ -53,11 +51,10 @@ interface CourseSchemaProps {
   agentSlug: string;
   agentName: string;
   agentDescription: string;
-  lessons: Array<{ slug: string; titleAr: string; titleEn: string; descriptionAr: string; descriptionEn: string; estimatedMinutes: number }>;
+  lessons: Array<{ id: number; title: string; description: string; estimatedMinutes: number }>;
 }
 
 export function CourseSchema({ locale, agentSlug, agentName, agentDescription, lessons }: CourseSchemaProps) {
-  const isAr = locale === 'ar';
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Course',
@@ -69,7 +66,7 @@ export function CourseSchema({ locale, agentSlug, agentName, agentDescription, l
       url: APP_URL,
     },
     url: `${APP_URL}/${locale}/agents/${agentSlug}`,
-    inLanguage: isAr ? 'ar' : 'en',
+    inLanguage: locale,
     isAccessibleForFree: true,
     hasCourseInstance: {
       '@type': 'CourseInstance',
@@ -78,13 +75,13 @@ export function CourseSchema({ locale, agentSlug, agentName, agentDescription, l
     },
     hasPart: lessons.map((lesson) => ({
       '@type': 'Course',
-      name: isAr ? lesson.titleAr : lesson.titleEn,
-      description: isAr ? lesson.descriptionAr : lesson.descriptionEn,
-      url: `${APP_URL}/${locale}/agents/${agentSlug}/lessons/${lesson.slug}`,
+      name: lesson.title,
+      description: lesson.description,
+      url: `${APP_URL}/${locale}/agents/${agentSlug}/lessons/${lesson.id}`,
       timeRequired: `PT${lesson.estimatedMinutes}M`,
     })),
-    audience: { '@type': 'Audience', audienceType: isAr ? 'أطفال وكبار' : 'Kids and Adults' },
-    educationalLevel: isAr ? 'مبتدئ' : 'Beginner',
+    audience: { '@type': 'Audience', audienceType: locale === 'ar' ? 'أطفال وكبار' : 'Kids and Adults' },
+    educationalLevel: locale === 'ar' ? 'مبتدئ' : 'Beginner',
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />;
 }
@@ -92,22 +89,19 @@ export function CourseSchema({ locale, agentSlug, agentName, agentDescription, l
 interface LessonSchemaProps {
   locale: string;
   agentSlug: string;
+  lessonId: number;
   lesson: {
-    slug: string;
-    titleAr: string;
-    titleEn: string;
-    descriptionAr: string;
-    descriptionEn: string;
+    title: string;
+    description: string;
     estimatedMinutes: number;
     xpReward: number;
   };
 }
 
-export function LessonSchema({ locale, agentSlug, lesson }: LessonSchemaProps) {
-  const isAr = locale === 'ar';
-  const title = isAr ? lesson.titleAr : lesson.titleEn;
-  const description = isAr ? lesson.descriptionAr : lesson.descriptionEn;
-  const url = `${APP_URL}/${locale}/agents/${agentSlug}/lessons/${lesson.slug}`;
+export function LessonSchema({ locale, agentSlug, lessonId, lesson }: LessonSchemaProps) {
+  const title = lesson.title;
+  const description = lesson.description;
+  const url = `${APP_URL}/${locale}/agents/${agentSlug}/lessons/${lessonId}`;
 
   const schema = {
     '@context': 'https://schema.org',
@@ -115,7 +109,7 @@ export function LessonSchema({ locale, agentSlug, lesson }: LessonSchemaProps) {
     name: title,
     description,
     url,
-    inLanguage: isAr ? 'ar' : 'en',
+    inLanguage: locale,
     isAccessibleForFree: true,
     learningResourceType: 'Lesson',
     educationalLevel: 'Beginner',
@@ -131,7 +125,7 @@ export function LessonSchema({ locale, agentSlug, lesson }: LessonSchemaProps) {
       name: 'Claude AI',
       url: `${APP_URL}/${locale}/agents/${agentSlug}`,
     },
-    audience: { '@type': 'Audience', audienceType: isAr ? 'أطفال وكبار' : 'Kids and Adults' },
+    audience: { '@type': 'Audience', audienceType: locale === 'ar' ? 'أطفال وكبار' : 'Kids and Adults' },
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />;
 }

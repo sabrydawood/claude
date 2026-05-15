@@ -5,7 +5,58 @@
     "login": "دخول",
     "register": "تسجيل",
     "logout": "خروج",
-    "language": "English"
+    "language": "English",
+    "leaderboard": "المتصدرين",
+    "sandbox": "ساندبوكس",
+    "profile": "ملفي"
+  },
+  "mascot": {
+    "typing": "يكتب...",
+    "guide": "مرشدك الشخصي",
+    "newChat": "محادثة جديدة",
+    "placeholder": "اسأل ذكي أي حاجة...",
+    "askZaki": "اسأل ذكي",
+    "errorMsg": "عذراً، مش قادر أرد دلوقتي. حاول تاني 😅"
+  },
+  "pwa": {
+    "install": "ثبّت ذكاوي على جهازك",
+    "offline": "يشتغل بدون إنترنت!",
+    "button": "ثبّت"
+  },
+  "leaderboard": {
+    "title": "لوحة المتصدرين",
+    "subtitle": "أكتر 50 متعلم في المنصة",
+    "rank": "الترتيب",
+    "player": "اللاعب",
+    "xp": "النقاط",
+    "empty": "لا يوجد بيانات بعد",
+    "noData": "مفيش بيانات بعد — ابدأ التعلم!",
+    "lessons": "درس",
+    "days": "يوم"
+  },
+  "profile": {
+    "notFound": "المستخدم مش موجود",
+    "totalXp": "إجمالي XP",
+    "streak": "أيام متتالية",
+    "lessonsCompleted": "دروس مكتملة",
+    "quizzes": "كويزات",
+    "memberSince": "عضو منذ",
+    "shareProfile": "شارك الملف الشخصي",
+    "achievements": "الإنجازات"
+  },
+  "sandbox": {
+    "title": "ساندبوكس ذكاوي",
+    "subtitle": "تحدث مع Claude باستخدام مفتاحك الخاص",
+    "addKey": "أضف مفتاح API",
+    "keyLabel": "مفتاح Anthropic API (يبدأ بـ sk-ant-)",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "greeting": "مرحباً! أنا ذكاوي",
+    "greetingSubtitle": "اسألني أي سؤال عن الذكاء الاصطناعي",
+    "placeholder": "اكتب رسالتك...",
+    "noKeyError": "أضف مفتاح API أولاً",
+    "connectionError": "فشل الاتصال بالخادم"
   },
   "home": {
     "hero": {
@@ -86,7 +137,8 @@
       "loading": "بتدخل...",
       "noAccount": "معندكش حساب؟",
       "register": "سجل دلوقتي",
-      "forgotPassword": "نسيت كلمة السر؟"
+      "forgotPassword": "نسيت كلمة السر؟",
+      "dataSecure": "بياناتك محمية وآمنة معنا"
     },
     "register": {
       "title": "انضم لذكاوي! 🚀",
@@ -101,7 +153,8 @@
       "loading": "بنعمل حسابك...",
       "hasAccount": "عندك حساب؟",
       "login": "ادخل دلوقتي",
-      "terms": "بتسجل، بتوافق على شروط الاستخدام"
+      "terms": "بتسجل، بتوافق على شروط الاستخدام",
+      "freeNote": "مجاني 100% — مش محتاج بطاقة بنكية"
     },
     "validation": {
       "nameRequired": "لازم تكتب اسمك",
@@ -192,6 +245,7 @@
     "correct": "صح! 🎉",
     "incorrect": "غلط، حاول تاني",
     "correctAnswer": "الإجابة الصح",
+    "correctAnswers": "إجابات صح",
     "next": "السؤال الجاي",
     "finish": "خلص الكويز",
     "results": {

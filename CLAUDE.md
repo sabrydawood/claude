@@ -113,6 +113,82 @@ await db.insert(LessonTranslations).values([
 
 ---
 
+## قواعد HTTP Client — إلزامية لكل AI Agent
+
+### القاعدة الأساسية
+
+**ممنوع** كتابة `fetch()` مباشرة في أي component. كل اتصال HTTP يمر عبر واحد من ثلاثة أدوات موحدة فقط:
+
+| الأداة | المسار | متى تستخدمها |
+| --- | --- | --- |
+| `http` | `src/lib/api/http-client.ts` | كل الـ mutations وأي GET يبقى client-side |
+| `streamClient.text()` | `src/lib/api/stream-client.ts` | Raw text streaming — e.g. Sandbox chat |
+| `streamClient.sse()` | `src/lib/api/stream-client.ts` | SSE line parsing — e.g. Mascot AI chat |
+
+### Services — لكل feature ملف خاص
+
+كل اتصال HTTP يُغلَّف في service file داخل `src/lib/api/services/`:
+
+```ts
+// مثال — progress.service.ts
+import { http } from '@/lib/api/http-client';
+export const ProgressService = {
+  completeLesson: (lessonId: string, score: number) =>
+    http.post<LessonCompletionData>(`/api/v1/progress/lesson/${lessonId}`, { Score: score }),
+};
+```
+
+**Services الموجودة:**
+
+- `progress.service.ts` — `ProgressService.completeLesson()`
+- `keys.service.ts` — `KeysService.saveKey()` / `deleteKey()`
+- `onboarding.service.ts` — `OnboardingService.submit()`
+- `admin.service.ts` — `AdminService.getLessons()` / `createLesson()`
+
+### SSR أولاً — لا تجلب data بـ useEffect إذا كان ممكناً من السيرفر
+
+كل page-load read يُحوَّل لـ Server Component يجيب البيانات من DB مباشرة:
+
+```ts
+// page.tsx — server component
+import { getServerSession } from '@/lib/auth/server-session';
+import { db } from '@/lib/db/Index';
+
+export default async function MyPage({ params }) {
+  const { locale } = await params;
+  const session = await getServerSession();
+  if (!session?.user?.id) redirect(`/${locale}/login`);
+  const data = await db.select()...;
+  return <MyPageClient data={data} />;
+}
+```
+
+**Helper للـ session على السيرفر:** `src/lib/auth/server-session.ts` → `getServerSession()`
+
+### ما يبقى client-side دائماً
+
+- Streaming responses (sandbox, mascot) — استخدم `streamClient`
+- Mutations بعد تفاعل المستخدم (submit, save, delete) — استخدم `http` عبر service
+
+### نموذج استخدام streamClient
+
+```ts
+// Raw text stream (sandbox)
+await streamClient.text('/api/v1/sandbox', { messages }, {
+  onChunk: (accumulated) => setContent(accumulated),
+  signal: controller.signal,
+});
+
+// SSE stream (mascot)
+await streamClient.sse<{ text?: string }>('/api/v1/mascot', body, {
+  onEvent: (event) => { if (event.text) appendText(event.text); },
+  onDone: () => markDone(),
+  signal: controller.signal,
+});
+```
+
+---
+
 ## معمارية المشروع (Feature-first)
 
 ```text

@@ -1,145 +1,79 @@
-'use client';
+import { db } from '@/lib/db/Index';
+import { users, UserStats, UserAchievements, Achievements, AchievementTranslations } from '@/lib/db/Schema';
+import { eq, and, inArray } from 'drizzle-orm';
+import { GetValidLocale } from '@/lib/i18n/Locale.Utils';
+import ProfileClient from './profile-client';
 
-import { useEffect, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import Header from '@/components/layout/header';
-import Footer from '@/components/layout/footer';
-import { Card } from '@/components/ui/card';
-import { Loader2, Trophy, Flame, BookOpen, Star, Calendar, Frown } from 'lucide-react';
-import { DynamicIcon } from '@/components/ui/dynamic-icon';
+export default async function ProfilePage({
+  params,
+}: {
+  params: Promise<{ locale: string; userId: string }>;
+}) {
+  const { locale, userId } = await params;
+  const validLocale = GetValidLocale(locale);
 
-interface ProfileData {
-  user: { id: string; name: string; image: string | null; memberSince: string };
-  stats: { totalXp: number; streakDays: number; lessonsCompleted: number; quizzesCompleted: number };
-  achievements: { id: number; icon: string; name: string; earnedAt: string }[];
-}
+  const [userRow] = await db
+    .select({ Id: users.id, Name: users.name, Image: users.image, CreatedAt: users.createdAt })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
 
-export default function ProfilePage() {
-  const locale = useLocale();
-  const t = useTranslations('profile');
-  const { userId } = useParams<{ userId: string }>();
+  if (!userRow) return <ProfileClient data={null} />;
 
-  const [data, setData] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  const [stats] = await db
+    .select()
+    .from(UserStats)
+    .where(eq(UserStats.UserId, userId))
+    .limit(1);
 
-  useEffect(() => {
-    fetch(`/api/profile/${userId}?locale=${locale}`)
-      .then(async r => {
-        if (r.status === 404) { setNotFound(true); return; }
-        setData(await r.json());
-      })
-      .finally(() => setLoading(false));
-  }, [userId, locale]);
+  const earnedData = await db
+    .select({
+      Id: Achievements.Id,
+      Icon: Achievements.Icon,
+      AchievementId: UserAchievements.AchievementId,
+      EarnedAt: UserAchievements.EarnedAt,
+    })
+    .from(UserAchievements)
+    .innerJoin(Achievements, eq(UserAchievements.AchievementId, Achievements.Id))
+    .where(eq(UserAchievements.UserId, userId));
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
-      <Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} />
-    </div>
-  );
+  const achIds = earnedData.map(e => e.Id);
+  const transRows = achIds.length > 0
+    ? await db.select().from(AchievementTranslations).where(
+        and(inArray(AchievementTranslations.AchievementId, achIds)),
+      )
+    : [];
 
-  if (notFound || !data) return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
-      <Header />
-      <main className="flex-1 flex flex-col items-center justify-center gap-3">
-        <Frown size={40} className="text-[var(--text-muted)]" />
-        <p className="font-semibold" style={{ color: 'var(--text)' }}>{t('notFound')}</p>
-      </main>
-      <Footer />
-    </div>
-  );
+  const transMap = new Map<string, string>();
+  for (const t of transRows) {
+    transMap.set(`${t.AchievementId}_${t.Locale}`, t.Name);
+  }
+  const earnedAtMap = new Map(earnedData.map(e => [e.Id, e.EarnedAt]));
 
-  const { user, stats, achievements } = data;
-  const memberYear = new Date(user.memberSince).getFullYear();
-
-  const statCards = [
-    { icon: <Star size={18} />, label: t('totalXp'), value: stats.totalXp.toLocaleString(), color: '#F59E0B' },
-    { icon: <Flame size={18} />, label: t('streak'), value: stats.streakDays, color: '#EF4444' },
-    { icon: <BookOpen size={18} />, label: t('lessonsCompleted'), value: stats.lessonsCompleted, color: '#10B981' },
-    { icon: <Trophy size={18} />, label: t('quizzes'), value: stats.quizzesCompleted, color: '#8B5CF6' },
-  ];
+  const achievements = earnedData.map(e => ({
+    id: e.Id,
+    icon: e.Icon,
+    name: transMap.get(`${e.Id}_${validLocale}`) ?? transMap.get(`${e.Id}_en`) ?? '',
+    earnedAt: earnedAtMap.get(e.Id)?.toISOString() ?? '',
+  }));
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
-      <Header />
-
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl flex flex-col gap-6">
-        {/* Profile header */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="p-6 flex flex-col items-center gap-4 text-center" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold"
-              style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
-            >
-              {user.image ? (
-                <img src={user.image} alt={user.name} className="w-full h-full rounded-full object-cover" />
-              ) : (
-                user.name?.[0]?.toUpperCase() ?? '?'
-              )}
-            </div>
-            <div>
-              <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>{user.name}</h1>
-              <p className="text-sm flex items-center justify-center gap-1 mt-1" style={{ color: 'var(--text-muted)' }}>
-                <Calendar size={12} />
-                {t('memberSince')} {memberYear}
-              </p>
-            </div>
-
-            {/* Share button */}
-            <button
-              onClick={() => navigator.share?.({ title: user.name, url: window.location.href }).catch(() => navigator.clipboard.writeText(window.location.href))}
-              className="text-xs px-4 py-1.5 rounded-full transition-opacity hover:opacity-80"
-              style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
-            >
-              {t('shareProfile')}
-            </button>
-          </Card>
-        </motion.div>
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {statCards.map((s, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 + i * 0.05 }}>
-              <Card className="p-4 flex items-center gap-3" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${s.color}20`, color: s.color }}>
-                  {s.icon}
-                </div>
-                <div>
-                  <p className="text-lg font-bold leading-none" style={{ color: 'var(--text)' }}>{s.value}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Achievements */}
-        {achievements.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-            <h2 className="font-semibold mb-3" style={{ color: 'var(--text)' }}>
-              {t('achievements')} ({achievements.length})
-            </h2>
-            <div className="grid grid-cols-3 gap-3">
-              {achievements.map(a => (
-                <Card
-                  key={a.id}
-                  className="p-3 flex flex-col items-center gap-1 text-center"
-                  style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-                >
-                  <DynamicIcon name={a.icon} size={28} className="mx-auto" />
-                  <span className="text-xs font-medium" style={{ color: 'var(--text)' }}>
-                    {a.name}
-                  </span>
-                </Card>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </main>
-
-      <Footer />
-    </div>
+    <ProfileClient
+      data={{
+        user: {
+          id: userRow.Id,
+          name: userRow.Name ?? '',
+          image: userRow.Image,
+          memberSince: userRow.CreatedAt?.toISOString() ?? '',
+        },
+        stats: {
+          totalXp: stats?.TotalXp ?? 0,
+          streakDays: stats?.StreakDays ?? 0,
+          lessonsCompleted: stats?.LessonsCompleted ?? 0,
+          quizzesCompleted: stats?.QuizzesCompleted ?? 0,
+        },
+        achievements,
+      }}
+    />
   );
 }

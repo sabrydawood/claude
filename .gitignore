@@ -58,3 +58,4 @@ worktrees
 .claude_settings.*
 compact.md
 audit-report.md
+.playwright-mcp

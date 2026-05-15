@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/ui/logo';
 import { useSession } from '@/lib/auth-client';
+import { OnboardingService } from '@/lib/api/services/onboarding.service';
 import {
   ChevronRight, ChevronLeft, Zap, UserRound, Gamepad2, Briefcase, Calendar,
   MessageCircle, Palette, Code2, GraduationCap, Target, Sprout, Leaf, TreePine,
@@ -125,22 +126,14 @@ export default function OnboardingPage() {
   const handleFinish = async () => {
     setSaving(true);
     try {
-      const res = await fetch('/api/v1/onboarding', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          AgeGroup:      answers.ageGroup,
-          Goal:          answers.goal,
-          Experience:    answers.experience,
-          LearningStyle: answers.learningStyle,
-          DailyMinutes:  answers.dailyMinutes,
-        }),
+      await OnboardingService.submit({
+        AgeGroup:      answers.ageGroup!,
+        Goal:          answers.goal!,
+        Experience:    answers.experience!,
+        LearningStyle: answers.learningStyle!,
+        DailyMinutes:  answers.dailyMinutes!,
       });
-      if (res.ok) {
-        router.push('/dashboard');
-      } else {
-        setSaving(false);
-      }
+      router.push('/dashboard');
     } catch {
       setSaving(false);
     }

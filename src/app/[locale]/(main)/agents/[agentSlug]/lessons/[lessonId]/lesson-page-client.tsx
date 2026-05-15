@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Link, useRouter } from '@/lib/i18n/navigation';
+import { Link } from '@/lib/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuizComponent from '@/components/quiz/quiz-component';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { getDir } from '@/lib/i18n/locale-utils';
 import type { LessonFull } from '@/lib/db/queries/content';
 import { ChevronLeft, ChevronRight, Clock, Zap, CheckCircle2, BookOpen, Trophy, Target, PartyPopper } from 'lucide-react';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
+import { ProgressService } from '@/lib/api/services/progress.service';
 
 interface UserProgress {
   completedLessons: string[];
@@ -29,37 +30,21 @@ interface Props {
   nextLessonId: string | null;
   locale: string;
   agentSlug: string;
+  initialProgress: UserProgress | null;
 }
 
-export default function LessonPageClient({ lesson, allLessonsCount, currentIndex, nextLessonId, locale, agentSlug }: Props) {
+export default function LessonPageClient({ lesson, allLessonsCount, currentIndex, nextLessonId, locale, agentSlug, initialProgress }: Props) {
   const t = useTranslations('lessons');
-  const router = useRouter();
 
   const [view, setView] = useState<LessonView>('content');
   const [quizKey, setQuizKey] = useState(0);
-  const [progress, setProgress] = useState<UserProgress>({
-    completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {}
-  });
+  const [progress, setProgress] = useState<UserProgress>(
+    initialProgress ?? { completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {} }
+  );
   const [scrollProgress, setScrollProgress] = useState(0);
   const [xpPopup, setXpPopup] = useState<number | null>(null);
   const [earnedAchievements, setEarnedAchievements] = useState<{ id: number; icon: string; name: string }[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    fetch('/api/v1/progress')
-      .then(r => r.json())
-      .then(res => {
-        const d = res.Data ?? res;
-        if (d.CompletedLessons) setProgress({
-          completedLessons: d.CompletedLessons,
-          totalXp: d.TotalXp ?? 0,
-          streakDays: d.StreakDays ?? 0,
-          quizzesCompleted: d.QuizzesCompleted ?? 0,
-          scores: d.Scores ?? {},
-        });
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,22 +71,17 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
       scores: { ...prev.scores, [lesson.id]: score },
     }));
 
-    const res = await fetch(`/api/v1/progress/lesson/${lesson.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ Score: score }),
-    }).catch(() => null);
-
-    if (res?.ok) {
-      const data = await res.json().catch(() => ({}));
-      const newAchievements = data.Data?.NewAchievements ?? data.newAchievements ?? [];
-      if (newAchievements?.length) {
-        setEarnedAchievements(newAchievements.map((a: { Id?: string; id?: number; Icon?: string; icon?: string; NameAr?: string; NameEn?: string; name?: string }) => ({
-          id: a.Id ?? a.id ?? 0,
-          icon: a.Icon ?? a.icon ?? 'Trophy',
-          name: a.name ?? (locale === 'ar' ? a.NameAr : a.NameEn) ?? '',
+    try {
+      const data = await ProgressService.completeLesson(lesson.id, score);
+      if (data.NewAchievements?.length) {
+        setEarnedAchievements(data.NewAchievements.map(a => ({
+          id: 0,
+          icon: a.Icon,
+          name: a.Name,
         })));
       }
+    } catch {
+      // lesson still shows completed locally even if server call fails
     }
 
     setXpPopup(xpEarned);

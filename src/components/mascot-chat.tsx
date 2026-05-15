@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getDir, isRTL } from '@/lib/i18n/locale-utils';
 import { X, Send, Loader2, MessageCircle, RotateCcw } from 'lucide-react';
+import { streamClient } from '@/lib/api/stream-client';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -88,6 +89,64 @@ export function MascotChat({ isOpen, onClose }: Props) {
     }
   }, [isOpen]);
 
+  const streamResponse = useCallback(async (history: Message[], isGreeting = false) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setIsStreaming(true);
+
+    // Add placeholder assistant message
+    setMessages(prev => [
+      ...(isGreeting ? [] : prev),
+      ...(isGreeting ? history.slice(0, -1) : []), // hide internal greeting prompt
+      { role: 'assistant', content: '', streaming: true },
+    ]);
+
+    try {
+      await streamClient.sse<{ text?: string; error?: string }>(
+        '/api/v1/mascot',
+        { messages: history, pathname, locale },
+        {
+          signal: controller.signal,
+          onEvent: (event) => {
+            if (event.text) {
+              setMessages(prev => {
+                const updated = [...prev];
+                const last = updated[updated.length - 1];
+                if (last?.role === 'assistant') {
+                  updated[updated.length - 1] = { ...last, content: last.content + event.text, streaming: true };
+                }
+                return updated;
+              });
+            }
+          },
+        },
+      );
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        setMessages(prev => {
+          const updated = [...prev];
+          const last = updated[updated.length - 1];
+          if (last?.role === 'assistant' && last.streaming) {
+            updated[updated.length - 1] = { ...last, content: last.content || t('errorMsg') };
+          }
+          return updated;
+        });
+      }
+    } finally {
+      setMessages(prev => {
+        const updated = [...prev];
+        const last = updated[updated.length - 1];
+        if (last?.role === 'assistant') {
+          updated[updated.length - 1] = { ...last, streaming: false };
+        }
+        return updated;
+      });
+      setIsStreaming(false);
+    }
+  }, [pathname, locale, t]);
+
   // Send proactive greeting on first open
   useEffect(() => {
     if (isOpen && !initialized && messages.length === 0) {
@@ -108,94 +167,6 @@ export function MascotChat({ isOpen, onClose }: Props) {
     setInitialized(false);
     setInput('');
   }, [pathname]);
-
-  const streamResponse = useCallback(async (history: Message[], isGreeting = false) => {
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    setIsStreaming(true);
-
-    // Add placeholder assistant message
-    setMessages(prev => [
-      ...(isGreeting ? [] : prev),
-      ...(isGreeting ? history.slice(0, -1) : []), // hide internal greeting prompt
-      { role: 'assistant', content: '', streaming: true },
-    ]);
-
-    try {
-      const res = await fetch('/api/v1/mascot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: history,
-          pathname,
-          locale,
-        }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok || !res.body) throw new Error('Network error');
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() ?? '';
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const data = line.slice(6).trim();
-          if (data === '[DONE]') break;
-
-          try {
-            const parsed = JSON.parse(data) as { text?: string; error?: string };
-            if (parsed.text) {
-              setMessages(prev => {
-                const updated = [...prev];
-                const last = updated[updated.length - 1];
-                if (last?.role === 'assistant') {
-                  updated[updated.length - 1] = { ...last, content: last.content + parsed.text, streaming: true };
-                }
-                return updated;
-              });
-            }
-          } catch { /* skip malformed chunk */ }
-        }
-      }
-    } catch (err) {
-      if ((err as Error).name !== 'AbortError') {
-        setMessages(prev => {
-          const updated = [...prev];
-          const last = updated[updated.length - 1];
-          if (last?.role === 'assistant' && last.streaming) {
-            updated[updated.length - 1] = {
-              ...last,
-              content: last.content || t('errorMsg'),
-            };
-          }
-          return updated;
-        });
-      }
-    } finally {
-      // Mark streaming done
-      setMessages(prev => {
-        const updated = [...prev];
-        const last = updated[updated.length - 1];
-        if (last?.role === 'assistant') {
-          updated[updated.length - 1] = { ...last, streaming: false };
-        }
-        return updated;
-      });
-      setIsStreaming(false);
-    }
-  }, [pathname, locale, t]);
 
   const handleSend = () => {
     const text = input.trim();

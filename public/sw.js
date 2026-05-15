@@ -1,4 +1,4 @@
-const CACHE = 'zkawi-v1';
+const CACHE = 'zkawi-v2';
 const OFFLINE_URL = '/ar';
 
 const PRECACHE = [
@@ -39,7 +39,7 @@ self.addEventListener('fetch', e => {
   }
 
   // Cache-first for static assets
-  if (url.pathname.match(/\.(svg|png|jpg|webp|woff2|css|js)$/)) {
+  if (url.pathname.match(/\.(svg|png|jpg|webp|woff2|css)$/)) {
     e.respondWith(
       caches.match(e.request).then(cached => cached ?? fetch(e.request).then(res => {
         const clone = res.clone();

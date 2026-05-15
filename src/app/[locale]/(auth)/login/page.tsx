@@ -11,7 +11,7 @@ import { Logo } from '@/components/ui/logo';
 import { signIn } from '@/lib/auth-client';
 import {
   Mail, Lock, Home, AlertCircle, ShieldCheck,
-  Sparkles, Star, Rocket, GraduationCap, Zap,
+  Sparkles, Star, Rocket, GraduationCap, Zap, CheckCircle2,
 } from 'lucide-react';
 
 // Floating decorative icons (crisp at all sizes, theme-aware)
@@ -37,6 +37,32 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotDone, setForgotDone] = useState(false);
+  const [forgotError, setForgotError] = useState('');
+
+  const handleForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError('');
+    setForgotLoading(true);
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const res = await fetch('/api/auth/request-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail, redirectTo: `${origin}/${locale}/reset-password` }),
+      });
+      if (!res.ok) throw new Error('failed');
+      setForgotDone(true);
+    } catch {
+      setForgotError(t('forgotError'));
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -175,7 +201,7 @@ export default function LoginPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-bold" style={{ color: 'var(--text)' }}>{t('password')}</label>
-                <button type="button" className="text-xs font-medium hover:opacity-70 transition-opacity" style={{ color: 'var(--zkawi-purple)' }}>
+                <button type="button" onClick={() => { setShowForgot(true); setForgotDone(false); setForgotError(''); }} className="text-xs font-medium hover:opacity-70 transition-opacity" style={{ color: 'var(--zkawi-purple)' }}>
                   {t('forgotPassword')}
                 </button>
               </div>
@@ -212,6 +238,57 @@ export default function LoginPage() {
           {t('dataSecure')}
         </motion.div>
       </motion.div>
+
+      {/* Forgot password modal */}
+      {showForgot && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.7)' }}
+          onClick={() => setShowForgot(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-sm rounded-3xl p-8"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {forgotDone ? (
+              <div className="text-center">
+                <CheckCircle2 size={48} className="mx-auto mb-4 text-[var(--zkawi-green)]" />
+                <h3 className="font-black text-[var(--text)] text-lg mb-2">{t('forgotSuccess')}</h3>
+                <button onClick={() => setShowForgot(false)} className="mt-4 text-sm font-bold" style={{ color: 'var(--zkawi-purple)' }}>
+                  إغلاق
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgot} className="flex flex-col gap-4">
+                <div>
+                  <h3 className="font-black text-[var(--text)] text-lg mb-1">{t('forgotTitle')}</h3>
+                  <p className="text-sm text-[var(--text-muted)]">{t('forgotSubtitle')}</p>
+                </div>
+                <Input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={e => setForgotEmail(e.target.value)}
+                  placeholder={t('emailPlaceholder')}
+                  icon={<Mail size={16} />}
+                  required
+                />
+                {forgotError && (
+                  <div className="flex items-center gap-2 text-xs text-red-500">
+                    <AlertCircle size={12} />
+                    {forgotError}
+                  </div>
+                )}
+                <Button type="submit" loading={forgotLoading} className="w-full">
+                  {forgotLoading ? t('forgotSending') : t('forgotSend')}
+                </Button>
+              </form>
+            )}
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

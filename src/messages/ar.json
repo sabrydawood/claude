@@ -8,7 +8,8 @@
     "language": "English",
     "leaderboard": "المتصدرين",
     "sandbox": "ساندبوكس",
-    "profile": "ملفي"
+    "profile": "ملفي",
+    "settings": "الإعدادات"
   },
   "mascot": {
     "typing": "يكتب...",
@@ -138,7 +139,13 @@
       "noAccount": "معندكش حساب؟",
       "register": "سجل دلوقتي",
       "forgotPassword": "نسيت كلمة السر؟",
-      "dataSecure": "بياناتك محمية وآمنة معنا"
+      "dataSecure": "بياناتك محمية وآمنة معنا",
+      "forgotTitle": "نسيت كلمة السر؟",
+      "forgotSubtitle": "ادخل إيميلك وهنبعتلك رابط عشان تعيد تعيين كلمة السر",
+      "forgotSend": "ابعت الرابط",
+      "forgotSending": "بنبعت...",
+      "forgotSuccess": "اتبعت! اتحقق من إيميلك",
+      "forgotError": "في مشكلة، تأكد من الإيميل وحاول تاني"
     },
     "register": {
       "title": "انضم لذكاوي!",
@@ -167,6 +174,20 @@
       "invalidCredentials": "الإيميل أو كلمة السر غلط",
       "emailExists": "الإيميل ده موجود خلاص",
       "generic": "في مشكلة، حاول تاني"
+    },
+    "resetPassword": {
+      "title": "كلمة سر جديدة",
+      "subtitle": "اكتب كلمة سرك الجديدة",
+      "newPassword": "كلمة السر الجديدة",
+      "confirmPassword": "تأكيد كلمة السر",
+      "submit": "حفظ كلمة السر",
+      "submitting": "بيحفظ...",
+      "success": "اتغيّرت كلمة السر!",
+      "successSubtitle": "دلوقتي تقدر تدخل بكلمة السر الجديدة",
+      "goToLogin": "الذهاب لتسجيل الدخول",
+      "mismatch": "كلمتا السر مش متطابقتين",
+      "minLength": "لازم 8 أحرف على الأقل",
+      "invalidToken": "الرابط ده مش صالح أو انتهت مدته"
     }
   },
   "dashboard": {
@@ -510,5 +531,30 @@
     "pageNotFound": "الصفحة مش موجودة",
     "networkError": "مشكلة في الاتصال بالإنترنت",
     "tryAgainLater": "حاول تاني بعد شوية"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "إدارة حسابك ومعلوماتك الشخصية",
+    "profile": {
+      "title": "الملف الشخصي",
+      "name": "الاسم",
+      "namePlaceholder": "اكتب اسمك",
+      "saveProfile": "حفظ",
+      "saving": "بيحفظ...",
+      "saveSuccess": "اتحفظ بنجاح!",
+      "saveError": "في مشكلة، حاول تاني"
+    },
+    "password": {
+      "title": "تغيير كلمة السر",
+      "current": "كلمة السر الحالية",
+      "new": "كلمة السر الجديدة",
+      "confirm": "تأكيد كلمة السر",
+      "save": "تغيير السر",
+      "saving": "بيغيّر...",
+      "saveSuccess": "اتغيّرت كلمة السر!",
+      "saveError": "في مشكلة، تأكد من كلمة السر الحالية",
+      "mismatch": "كلمتا السر مش متطابقتين",
+      "minLength": "لازم 8 أحرف على الأقل"
+    }
   }
 }

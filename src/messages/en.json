@@ -8,7 +8,8 @@
     "language": "عربي",
     "leaderboard": "Leaderboard",
     "sandbox": "Sandbox",
-    "profile": "My Profile"
+    "profile": "My Profile",
+    "settings": "Settings"
   },
   "mascot": {
     "typing": "Typing...",
@@ -138,7 +139,13 @@
       "noAccount": "Don't have an account?",
       "register": "Register Now",
       "forgotPassword": "Forgot Password?",
-      "dataSecure": "Your data is safe and secure with us"
+      "dataSecure": "Your data is safe and secure with us",
+      "forgotTitle": "Forgot your password?",
+      "forgotSubtitle": "Enter your email and we'll send you a reset link",
+      "forgotSend": "Send Reset Link",
+      "forgotSending": "Sending...",
+      "forgotSuccess": "Sent! Check your email",
+      "forgotError": "Something went wrong, check your email and try again"
     },
     "register": {
       "title": "Join Zkawi!",
@@ -167,6 +174,20 @@
       "invalidCredentials": "Invalid email or password",
       "emailExists": "This email is already registered",
       "generic": "Something went wrong, please try again"
+    },
+    "resetPassword": {
+      "title": "New Password",
+      "subtitle": "Enter your new password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Save Password",
+      "submitting": "Saving...",
+      "success": "Password changed!",
+      "successSubtitle": "You can now sign in with your new password",
+      "goToLogin": "Go to Login",
+      "mismatch": "Passwords don't match",
+      "minLength": "Minimum 8 characters",
+      "invalidToken": "This link is invalid or has expired"
     }
   },
   "dashboard": {
@@ -510,5 +531,30 @@
     "pageNotFound": "Page not found",
     "networkError": "Network connection error",
     "tryAgainLater": "Please try again later"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and personal information",
+    "profile": {
+      "title": "Profile",
+      "name": "Display Name",
+      "namePlaceholder": "Enter your name",
+      "saveProfile": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Saved successfully!",
+      "saveError": "Something went wrong, try again"
+    },
+    "password": {
+      "title": "Change Password",
+      "current": "Current Password",
+      "new": "New Password",
+      "confirm": "Confirm Password",
+      "save": "Change Password",
+      "saving": "Changing...",
+      "saveSuccess": "Password changed!",
+      "saveError": "Something went wrong, check your current password",
+      "mismatch": "Passwords don't match",
+      "minLength": "Minimum 8 characters"
+    }
   }
 }

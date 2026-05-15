@@ -7,6 +7,8 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/lib/db/Index';
 import * as Schema from '@/lib/db/Schema';
+import { sendEmail } from '@/lib/email/mailer';
+import { verificationEmailHtml, resetPasswordEmailHtml } from '@/lib/email/templates';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -21,12 +23,21 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }: { user: { email: string }; url: string }) => {
+      await sendEmail({
+        to: user.email,
+        subject: 'ذكاوي — إعادة تعيين كلمة السر',
+        html: resetPasswordEmailHtml(url),
+      });
+    },
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }: { user: { email: string }; url: string }) => {
-      // TODO: implement email sending via SMTP
-      // Use process.env.SMTP_* variables
-      console.info('[Auth] Verification email for:', user.email, url);
+      await sendEmail({
+        to: user.email,
+        subject: 'ذكاوي — تأكيد إيميلك',
+        html: verificationEmailHtml(url),
+      });
     },
   },
   session: {

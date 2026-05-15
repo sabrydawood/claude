@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, LogOut, LayoutDashboard, Home, User, Globe, Trophy, MessageSquare } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, Home, User, Globe, Trophy, MessageSquare, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Logo } from '@/components/ui/logo';
@@ -130,6 +130,14 @@ export default function Header() {
                         >
                           <LayoutDashboard size={16} />
                           {t('nav.dashboard')}
+                        </Link>
+                        <Link
+                          href="/settings"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--bg-secondary)] hover:text-[var(--zkawi-purple)] transition-colors"
+                        >
+                          <Settings size={16} />
+                          {t('nav.settings')}
                         </Link>
                         <hr className="my-1 border-[var(--border)]" />
                         <button

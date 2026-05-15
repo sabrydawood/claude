@@ -25,6 +25,7 @@ export default function AdminPage() {
   const router = useRouter();
 
   const [lessons, setLessons] = useState<AdminLesson[]>([]);
+  const [uniqueAgents, setUniqueAgents] = useState<{ Id: string; Slug: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -40,7 +41,13 @@ export default function AdminPage() {
   useEffect(() => {
     if (!session) return;
     AdminService.getLessons()
-      .then(data => setLessons(data.Lessons))
+      .then(data => {
+        setLessons(data.Lessons);
+        const agents = [...new Map(
+          data.Lessons.map(l => [l.AgentId, { Id: l.AgentId, Slug: l.AgentSlug }])
+        ).values()];
+        setUniqueAgents(agents);
+      })
       .catch(err => { if (err instanceof HttpClientError && err.status === 403) setForbidden(true); })
       .finally(() => setLoading(false));
   }, [session]);
@@ -96,7 +103,6 @@ export default function AdminPage() {
   }
 
   const formFields = [
-    { key: 'AgentId',          label: t('form.agentId'),      type: 'text',   placeholder: 'uuid' },
     { key: 'Order',            label: t('form.order'),        type: 'number', placeholder: '0' },
     { key: 'XpReward',         label: 'XP',                   type: 'number', placeholder: '50' },
     { key: 'EstimatedMinutes', label: t('form.minutes'),      type: 'number', placeholder: '5' },
@@ -134,6 +140,32 @@ export default function AdminPage() {
             <Card className="p-5 flex flex-col gap-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <h2 className="font-semibold" style={{ color: 'var(--text)' }}>{t('createLesson')}</h2>
               <div className="grid grid-cols-2 gap-3">
+                {/* AgentId select */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{t('form.agentId')}</label>
+                  {uniqueAgents.length > 0 ? (
+                    <select
+                      value={form.AgentId}
+                      onChange={e => setForm(prev => ({ ...prev, AgentId: e.target.value }))}
+                      className="rounded-lg px-3 py-2 text-sm outline-none"
+                      style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}
+                    >
+                      <option value="">اختار agent</option>
+                      {uniqueAgents.map(a => (
+                        <option key={a.Id} value={a.Id}>{a.Slug}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={form.AgentId}
+                      onChange={e => setForm(prev => ({ ...prev, AgentId: e.target.value }))}
+                      placeholder="uuid"
+                      className="rounded-lg px-3 py-2 text-sm outline-none"
+                      style={{ background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}
+                    />
+                  )}
+                </div>
                 {formFields.map(field => (
                   <div key={field.key} className="flex flex-col gap-1">
                     <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{field.label}</label>

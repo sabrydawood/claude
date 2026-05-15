@@ -56,3 +56,5 @@ worktrees
 .auto-claude/
 .auto-claude*
 .claude_settings.*
+compact.md
+audit-report.md

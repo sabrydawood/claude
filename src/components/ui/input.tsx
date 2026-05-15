@@ -9,11 +9,8 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, error, icon, dir, ...props }, ref) => {
+  ({ className, type, error, icon, ...props }, ref) => {
     const [passwordVisible, setPasswordVisible] = React.useState(false);
-    // email/password are always LTR (latin characters) — prevents browser hydration mismatch
-    // other types inherit dir from parent or explicit prop
-    const resolvedDir = dir ?? ((type === 'email' || type === 'password') ? 'ltr' : undefined);
     return (
       <div className="relative w-full">
         {icon && (
@@ -31,7 +28,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             icon && "ps-10",
             className,
           )}
-          dir={resolvedDir}
           type={type === "password" && passwordVisible ? "text" : type}
           ref={ref}
           {...props}

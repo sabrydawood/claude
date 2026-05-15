@@ -1,75 +1,22 @@
 # ذكاوي — Zkawi
 
-> منصة تعليمية تفاعلية للذكاء الاصطناعي، موجهة للأطفال والكبار
+> منصة تعليمية تفاعلية للذكاء الاصطناعي، عربية أولاً وقابلة للتوسع لأي لغة
 
-**ذكاوي** هي منصة تعليمية عربية-أولاً تشرح الذكاء الاصطناعي بلغة بسيطة ومرحة. تبدأ بـ Claude وتتوسع لتشمل أدوات AI مختلفة مستقبلاً.
-
-### التوثيق التفصيلي
-
-| الملف | المحتوى |
-|---|---|
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | القرارات التقنية، هيكل DB، تدفق البيانات |
-| [docs/ROADMAP.md](./docs/ROADMAP.md) | الرؤية المستقبلية والتطويرات القادمة |
+**ذكاوي** تشرح الذكاء الاصطناعي بلغة بسيطة ومرحة. تبدأ بـ Claude وتتوسع لتشمل أدوات AI مختلفة. المحتوى كله في قاعدة البيانات وقابل للترجمة لأي عدد من اللغات بدون تغيير في الكود.
 
 ---
 
-## الميزات الرئيسية
+## التقنيات
 
-| الميزة | التفاصيل |
-|---|---|
-| 🌍 **ثنائي اللغة** | عربية (افتراضي، لهجة مصرية بسيطة) + إنجليزية، قابل للتوسع |
-| 👧 **مناسب للأطفال** | تصميم ملوّن، شخصية كرتونية، نقاط XP، إنجازات |
-| 📚 **محتوى تعليمي** | 5 دروس عن Claude مع شرح مبسط وأمثلة عملية |
-| 🎮 **تفاعلي** | كويز بعد كل درس، confetti عند النجاح، شريط تقدم |
-| 🔐 **حسابات المستخدمين** | تسجيل دخول، حفظ التقدم، متابعة الإنجازات |
-| 🔥 **نظام Streak** | تتبع أيام المتابعة المتواصلة |
-
----
-
-## التقنيات المستخدمة
-
-```
-Frontend:   Next.js 15 (App Router) + TypeScript + Tailwind CSS v4
-Animations: Framer Motion
-Auth:       better-auth (email/password)
-Database:   PostgreSQL + Drizzle ORM
-i18n:       next-intl
-Runtime:    Bun
-```
-
----
-
-## هيكل المشروع
-
-```
-src/
-├── app/
-│   ├── [locale]/                    # كل الصفحات تحت locale prefix
-│   │   ├── page.tsx                 # الصفحة الرئيسية
-│   │   ├── (auth)/login/            # تسجيل الدخول
-│   │   ├── (auth)/register/         # إنشاء حساب
-│   │   ├── (main)/dashboard/        # لوحة التحكم
-│   │   └── (main)/agents/[agentSlug]/lessons/[lessonId]/
-│   └── api/auth/[...all]/           # better-auth handler
-├── components/
-│   ├── ui/                          # Button, Card, Input, Badge, Progress, Avatar
-│   ├── layout/                      # Header, Footer
-│   ├── home/                        # Hero, Stats, HowItWorks, Agents, Features, CTA
-│   ├── agents/                      # LessonCard
-│   ├── dashboard/                   # XpBar
-│   └── quiz/                        # QuizComponent, confetti-util
-├── lib/
-│   ├── db/schema.ts                 # Drizzle schema (كل الجداول)
-│   ├── db/index.ts                  # اتصال PostgreSQL
-│   ├── auth.ts                      # better-auth config
-│   ├── auth-client.ts               # better-auth client
-│   ├── utils.ts                     # cn, calculateLevel, getInitials
-│   ├── content/claude-lessons.ts   # محتوى دروس Claude
-│   └── i18n/                        # routing, navigation, request
-└── messages/
-    ├── ar.json                      # الترجمة العربية (الكاملة)
-    └── en.json                      # الترجمة الإنجليزية
-```
+| الطبقة | التقنية |
+|--------|---------|
+| Frontend | Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 |
+| Animations | Framer Motion |
+| Auth | better-auth v1.6.11 (email/password) |
+| Database | PostgreSQL + Drizzle ORM |
+| i18n | next-intl v4 |
+| Runtime | Bun |
+| AI | Anthropic SDK (mascot chat + sandbox) |
 
 ---
 
@@ -78,7 +25,6 @@ src/
 ### المتطلبات
 - Bun >= 1.0
 - PostgreSQL >= 14
-- Node.js >= 18
 
 ### خطوات التشغيل
 
@@ -88,86 +34,186 @@ cp .env.example .env.local
 
 # 2. تعديل .env.local
 DATABASE_URL=postgresql://user:password@localhost:5432/zkawi
-BETTER_AUTH_SECRET=اكتب-سر-عشوائي-طويل-هنا
+BETTER_AUTH_SECRET=<سر-عشوائي-طويل>
 BETTER_AUTH_URL=http://localhost:3000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+ANTHROPIC_API_KEY=<مفتاح-anthropic-اختياري-للـ-mascot>
 
 # 3. تثبيت المكتبات
 bun install
 
-# 4. إنشاء جداول قاعدة البيانات
-bun run db:push
+# 4. بناء قاعدة البيانات + seed كامل
+bun run db:all
 
 # 5. تشغيل المشروع
 bun dev
 ```
-
-افتح [http://localhost:3000](http://localhost:3000) في المتصفح.
 
 ---
 
 ## أوامر قاعدة البيانات
 
 | الأمر | الوظيفة |
-|---|---|
-| `bun run db:generate` | يولّد migration SQL files من الـ schema |
-| `bun run db:migrate` | يشغّل الـ migrations على قاعدة البيانات |
-| `bun run db:push` | يطبّق الـ schema مباشرة بدون migrations (للـ dev السريع) |
-| `bun run db:pull` | يسحب الـ schema الحالي من قاعدة البيانات |
+|-------|---------|
+| `bun run db:generate` | يولّد migration SQL من الـ schema |
+| `bun run db:migrate` | يشغّل الـ migrations |
+| `bun run db:push` | يطبّق الـ schema مباشرة (للـ dev السريع) |
 | `bun run db:seed` | يضيف البيانات الأساسية (agents, lessons, quiz, achievements) |
-| `bun run db:reset` | يحذف كل الجداول + migration files (clean slate) |
-| `bun run db:studio` | يفتح Drizzle Studio لاستعراض البيانات |
+| `bun run db:reset` | يحذف كل الجداول + migration files |
 | `bun run db:all` | **reset → generate → migrate → seed** (إعادة بناء كاملة) |
+| `bun run db:studio` | يفتح Drizzle Studio على http://localhost:4983 |
 
-### أول مرة تشغّل المشروع
+---
 
-```bash
-bun run db:all
+## هيكل المشروع
+
+```
+src/
+├── app/
+│   ├── [locale]/
+│   │   ├── layout.tsx                        # HTML lang/dir، metadata من next-intl
+│   │   ├── page.tsx                          # الصفحة الرئيسية (server component)
+│   │   ├── onboarding/page.tsx               # استطلاع التخصيص
+│   │   ├── (auth)/
+│   │   │   ├── login/page.tsx
+│   │   │   └── register/page.tsx
+│   │   └── (main)/
+│   │       ├── dashboard/page.tsx
+│   │       ├── leaderboard/page.tsx
+│   │       ├── profile/[userId]/page.tsx
+│   │       ├── sandbox/page.tsx              # chat مع Claude بمفتاح المستخدم
+│   │       ├── admin/page.tsx
+│   │       └── agents/[agentSlug]/
+│   │           ├── layout.tsx                # metadata الـ agent
+│   │           ├── page.tsx                  # قائمة الدروس (server component)
+│   │           └── lessons/[lessonId]/
+│   │               ├── layout.tsx            # metadata الدرس + JSON-LD
+│   │               └── page.tsx              # server → LessonPageClient
+│   └── api/
+│       ├── auth/[...all]/                    # better-auth handler
+│       ├── admin/lessons/                    # CRUD للدروس (admin only)
+│       ├── keys/                             # Anthropic API key (sandbox)
+│       ├── leaderboard/                      # top 50 users
+│       ├── lessons/claude/                   # قائمة دروس claude
+│       ├── mascot/chat/                      # mascot AI chat (SSE stream)
+│       ├── og/                               # OG image generation (edge runtime)
+│       ├── onboarding/                       # حفظ بيانات التخصيص
+│       ├── profile/[userId]/                 # بيانات الملف الشخصي (locale-aware)
+│       ├── progress/lesson/[id]/             # حفظ تقدم الدرس + XP + achievements
+│       ├── sandbox/chat/                     # sandbox AI chat (SSE stream)
+│       └── user/                             # بيانات المستخدم الحالي
+├── components/
+│   ├── ui/                                   # Button, Card, Input, Badge, Progress, Logo
+│   ├── layout/                               # Header, Footer
+│   ├── home/                                 # Hero, Stats, Features, HowItWorks, Agents, CTA
+│   ├── agents/                               # LessonCard, AgentPageClient
+│   ├── dashboard/                            # XpBar
+│   ├── quiz/                                 # QuizComponent, confetti-util
+│   ├── seo/                                  # JsonLd (OrganizationSchema, CourseSchema, ...)
+│   ├── mascot.tsx                            # floating mascot مع waypoints
+│   ├── mascot-chat.tsx                       # mascot chat drawer
+│   └── pwa-install-banner.tsx
+├── lib/
+│   ├── db/
+│   │   ├── schema.ts                         # Drizzle schema (كل الجداول)
+│   │   ├── index.ts                          # PostgreSQL connection
+│   │   ├── queries/content.ts                # getAgents, getLessonById, ... (locale-aware)
+│   │   └── seed.ts / reset.ts
+│   ├── auth.ts / auth-client.ts              # better-auth config
+│   ├── i18n/
+│   │   ├── locale-utils.ts                   # getDir(locale), isRTL(locale)
+│   │   ├── routing.ts                        # supported locales
+│   │   ├── navigation.ts                     # Link, useRouter (locale-aware)
+│   │   └── request.ts                        # getRequestConfig
+│   └── learning-path.ts                      # حساب تقدم المستخدم
+└── messages/
+    ├── ar.json                               # UI strings (عربي)
+    └── en.json                               # UI strings (English)
 ```
 
-هذا الأمر يعمل تلقائياً:
-1. 🗑️ يحذف كل الجداول الموجودة + migration files القديمة
-2. ⚙️ يولّد migration files جديدة من الـ schema
-3. 🚀 يشغّل الـ migrations على قاعدة البيانات
-4. 🌱 يضيف البيانات الأساسية:
-   - 3 agents: Claude ✅ | ChatGPT 🔜 | Gemini 🔜
-   - 5 دروس كاملة عن Claude
-   - أسئلة الكويز + خياراتها
-   - 8 إنجازات (achievements)
+---
 
-### تحديث الـ schema بدون حذف البيانات
+## معمارية الـ i18n
 
-```bash
-bun run db:generate   # توليد migration جديد
-bun run db:migrate    # تطبيقه
+المشروع يفصل بوضوح بين نوعين من البيانات:
+
+### ١. UI Strings الثابتة ← next-intl
+
+كل نصوص الواجهة تمر عبر `useTranslations()` أو `getTranslations()`. لا يوجد نص مكتوب مباشرة في الكود.
+
+```ts
+// client component
+const t = useTranslations('dashboard');
+return <h1>{t('title')}</h1>;
+
+// server component / generateMetadata
+const t = await getTranslations({ locale, namespace: 'metadata' });
 ```
 
-### مشاهدة البيانات
+**Namespaces:** `nav`, `home`, `auth`, `dashboard`, `agents`, `lessons`, `quiz`, `leaderboard`, `profile`, `sandbox`, `admin`, `metadata`, `og`, `achievements`, `common`, `onboarding`, `mascot`, `pwa`
 
-```bash
-bun run db:studio     # يفتح http://localhost:4983
+### ٢. المحتوى الديناميكي ← قاعدة البيانات
+
+كل محتوى الدروس والـ agents والإنجازات مخزون في جدول `translations` الموحّد:
+
 ```
+translations (entity_type, entity_id, locale, field, value)
+```
+
+| entity_type | fields المخزونة |
+|-------------|----------------|
+| `agent` | `name`, `description`, `full_description` |
+| `lesson` | `title`, `description`, `content` |
+| `quiz_question` | `question` |
+| `quiz_option` | `text` |
+| `achievement` | `name`, `description` |
+
+استخدام DB queries من `src/lib/db/queries/content.ts`:
+
+```ts
+const agents  = await getAgents(locale);               // fallback to 'en' automatically
+const lesson  = await getLessonById(id, locale);
+const lessons = await getLessonsByAgent('claude', locale);
+```
+
+### ٣. RTL/LTR
+
+الاتجاه يُحدَّد من Set — لا ثنائية ar/en:
+
+```ts
+import { getDir, isRTL } from '@/lib/i18n/locale-utils';
+
+getDir('ar')  // 'rtl'
+getDir('fr')  // 'ltr'
+isRTL('he')   // true  — Hebrew
+isRTL('fr')   // false — French
+```
+
+مجموعة الـ RTL الحالية: `ar, he, fa, ur, yi, ps, sd, ug, dv, ks`
 
 ---
 
 ## إضافة لغة جديدة
 
-1. أضف كود اللغة في `src/lib/i18n/routing.ts`:
 ```ts
-locales: ['ar', 'en', 'fr'],  // أضف 'fr' مثلاً
+// 1. src/lib/i18n/routing.ts
+locales: ['ar', 'en', 'fr'],   // أضف 'fr'
 ```
 
-2. أنشئ ملف الترجمة `src/messages/fr.json` بنفس هيكل `ar.json`
+```bash
+# 2. أنشئ ملف UI strings
+cp src/messages/en.json src/messages/fr.json
+# ترجم القيم في fr.json
+```
 
-3. انتهى! المشروع يتعامل مع الـ RTL/LTR تلقائياً حسب اللغة.
+```sql
+-- 3. أضف translations للمحتوى في DB
+INSERT INTO translations (entity_type, entity_id, locale, field, value)
+VALUES ('lesson', 1, 'fr', 'title', 'Introduction à Claude');
+-- الـ fallback يرجع لـ 'en' تلقائياً لو مفيش ترجمة
+```
 
----
-
-## إضافة AI Agent جديد
-
-1. أضف السجل في جدول `agents` في قاعدة البيانات
-2. أنشئ ملف محتوى `src/lib/content/[agent-name]-lessons.ts` على نمط `claude-lessons.ts`
-3. أضف المعلومات للترجمة في `ar.json` و `en.json`
+لا تغيير في الكود.
 
 ---
 
@@ -175,47 +221,41 @@ locales: ['ar', 'en', 'fr'],  // أضف 'fr' مثلاً
 
 ```
 users ──────┬── sessions
-            ├── accounts (OAuth)
-            ├── userStats (xp, streak, level)
-            ├── userProgress (per lesson)
-            └── userAchievements
+            ├── accounts
+            ├── userStats          (totalXp, streakDays, level, lessonsCompleted, quizzesCompleted)
+            ├── userProgress       (lessonId, completed, score, completedAt)
+            └── userAchievements   (achievementId, earnedAt)
 
-agents ─────── lessons ─────┬── quizQuestions ── quizOptions
-                             └── userProgress (ref)
+agents ─────── lessons ────┬── quizQuestions ── quizOptions
+                           └── userProgress (ref)
 
 achievements ── userAchievements (ref users)
+translations   ← جدول موحّد لكل النصوص القابلة للترجمة
 ```
+
+---
+
+## الصفحات
+
+| الصفحة | الوصف |
+|--------|-------|
+| `/` | الصفحة الرئيسية |
+| `/dashboard` | لوحة التحكم: XP bar، تقدم الدروس، الإنجازات |
+| `/agents/[slug]` | قائمة دروس الـ agent |
+| `/agents/[slug]/lessons/[id]` | محتوى الدرس + كويز |
+| `/leaderboard` | أكتر 50 متعلم في المنصة |
+| `/profile/[userId]` | الملف الشخصي العام |
+| `/sandbox` | chat مع Claude بمفتاح API المستخدم الخاص |
+| `/onboarding` | استطلاع التخصيص عند أول دخول |
+| `/admin` | إدارة الدروس (admin فقط) |
 
 ---
 
 ## بيئة الإنتاج
 
 ```bash
-bun run build    # بناء للإنتاج
-bun run start    # تشغيل في الإنتاج
+bun run build
+bun run start
 ```
 
-ينصح بالنشر على **Vercel** أو **Railway** مع **Supabase** أو **Neon** لقاعدة البيانات.
-
----
-
-## هيكل المحتوى الحالي
-
-### قسم Claude (5 دروس)
-| # | العنوان | الوصف |
-|---|---|---|
-| 1 | مرحبا بـ Claude | مين هو Claude وليه هو مميز |
-| 2 | إزاي تتكلم مع Claude؟ | طريقة التواصل الصح |
-| 3 | Claude يعمل ايه؟ | قائمة كاملة بمهاراته |
-| 4 | اكتب طلب صح | فن كتابة الـ prompt |
-| 5 | Claude في المدرسة | كيف يساعد الطلاب |
-
----
-
-## المساهمة
-
-المشروع مفتوح للإضافات. أهم المناطق المرحب بالمساهمة فيها:
-- إضافة دروس جديدة
-- ترجمة لغات إضافية
-- تصميم أنشطة تفاعلية جديدة (drag-and-drop، fill-in-the-blank)
-- أقسام AI agents جديدة (GPT، Gemini، إلخ)
+ينصح بـ **Vercel** للـ frontend مع **Supabase** أو **Neon** لقاعدة البيانات.

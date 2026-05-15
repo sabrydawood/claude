@@ -59,8 +59,9 @@ const PATROLS: Record<string, Waypoint[]> = {
     { x: 44, y: 72, mood: 'idle',     stayMs: 6000, message: null },
   ],
   default: [
-    { x: 74, y: 72, mood: 'happy',    stayMs: 5000, message: { ar: 'مرحباً! أنا ذكي، مرشدك 🌟', en: "Hi! I'm Zaki, your guide! 🌟" } },
-    { x: 74, y: 72, mood: 'idle',     stayMs: 8000, message: null },
+    { x: 75, y: 68, mood: 'happy',    stayMs: 4000, message: { ar: 'مرحباً! أنا ذكي، مرشدك 🌟', en: "Hi! I'm Zaki, your guide! 🌟" } },
+    { x: 15, y: 65, mood: 'idle',     stayMs: 5000, message: { ar: 'اكتشف منصة ذكاوي! ✨', en: 'Explore Zkawi platform! ✨' } },
+    { x: 45, y: 72, mood: 'thinking', stayMs: 4000, message: null },
   ],
 };
 

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Zap, Star, Sparkles } from 'lucide-react';
+import { Zap, Star, Sparkles, Bot, Target, Lightbulb, Trophy, User } from 'lucide-react';
 
 export default function HomeHero({ locale }: { locale: string }) {
   const t = useTranslations('home.hero');
@@ -107,7 +107,8 @@ export default function HomeHero({ locale }: { locale: string }) {
                   variant="glass"
                   className="w-full sm:w-auto font-bold"
                 >
-                  {t('ctaSecondary')} ✨
+                  <Sparkles size={16} />
+                  {t('ctaSecondary')}
                 </Button>
               </Link>
             </motion.div>
@@ -120,12 +121,17 @@ export default function HomeHero({ locale }: { locale: string }) {
               className="flex items-center gap-3 mt-8 justify-center lg:justify-start"
             >
               <div className="flex -space-x-2 rtl:space-x-reverse">
-                {['🧒', '👦', '👧', '🧑'].map((emoji, i) => (
+                {[
+                  'from-pink-400 to-rose-500',
+                  'from-violet-400 to-purple-600',
+                  'from-amber-400 to-orange-500',
+                  'from-teal-400 to-emerald-500',
+                ].map((gradient, i) => (
                   <div
                     key={i}
-                    className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white flex items-center justify-center text-sm"
+                    className={`w-9 h-9 rounded-full bg-gradient-to-br ${gradient} border-2 border-white flex items-center justify-center`}
                   >
-                    {emoji}
+                    <User size={16} className="text-white" strokeWidth={2} />
                   </div>
                 ))}
               </div>
@@ -150,7 +156,8 @@ export default function HomeHero({ locale }: { locale: string }) {
                 className="relative"
               >
                 <div className="w-64 h-64 md:w-80 md:h-80 bg-gradient-to-br from-amber-300 to-amber-500 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/30">
-                  <div className="text-8xl md:text-9xl select-none">🤖</div>
+                  <Bot size={140} className="text-amber-900/75 md:hidden" strokeWidth={1.2} />
+                  <Bot size={180} className="text-amber-900/75 hidden md:block" strokeWidth={1.2} />
                 </div>
 
                 {/* Floating badges around the mascot */}
@@ -160,17 +167,17 @@ export default function HomeHero({ locale }: { locale: string }) {
                   className="absolute inset-0"
                 >
                   {[
-                    { emoji: '⭐', top: '5%', left: '80%', size: 'text-2xl' },
-                    { emoji: '🎯', top: '75%', left: '85%', size: 'text-xl' },
-                    { emoji: '💡', top: '85%', left: '5%', size: 'text-2xl' },
-                    { emoji: '🏆', top: '5%', left: '0%', size: 'text-xl' },
-                  ].map((item, i) => (
+                    { Icon: Star,      top: '5%',  left: '80%', color: '#F59E0B' },
+                    { Icon: Target,    top: '75%', left: '85%', color: '#EF4444' },
+                    { Icon: Lightbulb, top: '85%', left: '5%',  color: '#10B981' },
+                    { Icon: Trophy,    top: '5%',  left: '0%',  color: '#8B5CF6' },
+                  ].map(({ Icon, top, left, color }, i) => (
                     <div
                       key={i}
-                      className={`absolute ${item.size} bg-[var(--surface)] rounded-full w-12 h-12 flex items-center justify-center shadow-lg`}
-                      style={{ top: item.top, left: item.left }}
+                      className="absolute bg-[var(--surface)] rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
+                      style={{ top, left }}
                     >
-                      {item.emoji}
+                      <Icon size={20} style={{ color }} strokeWidth={1.8} />
                     </div>
                   ))}
                 </motion.div>
@@ -188,7 +195,7 @@ export default function HomeHero({ locale }: { locale: string }) {
                 </div>
                 <div>
                   <div className="text-xs text-[var(--text-muted)] font-medium">XP كسبت</div>
-                  <div className="text-sm font-black text-[var(--zkawi-purple)]">+50 XP 🎉</div>
+                  <div className="text-sm font-black text-[var(--zkawi-purple)]">+50 XP</div>
                 </div>
               </motion.div>
             </div>

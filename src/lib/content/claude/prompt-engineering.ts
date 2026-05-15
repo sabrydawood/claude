@@ -1,19 +1,19 @@
 import type { Lesson } from '../types';
 
 export const promptEngineeringLessons: Lesson[] = [
-  {
-    id: 6,
-    slug: 'what-is-a-prompt',
-    agentSlug: 'claude',
-    titleAr: 'إيه هو الـ Prompt؟',
-    titleEn: 'What is a Prompt?',
-    descriptionAr: 'تعلّم أساس أساس التعامل مع الذكاء الاصطناعي — الطلب الصح.',
-    descriptionEn: 'Learn the foundation of working with AI — the right request.',
-    order: 6,
-    xpReward: 75,
-    estimatedMinutes: 8,
-    emoji: '💬',
-    contentAr: `## إيه هو الـ Prompt؟
+ {
+ id: 6,
+ slug: 'what-is-a-prompt',
+ agentSlug: 'claude',
+ titleAr: 'إيه هو الـ Prompt؟',
+ titleEn: 'What is a Prompt?',
+ descriptionAr: 'تعلّم أساس أساس التعامل مع الذكاء الاصطناعي — الطلب الصح.',
+ descriptionEn: 'Learn the foundation of working with AI — the right request.',
+ order: 6,
+ xpReward: 75,
+ estimatedMinutes: 8,
+ emoji: '',
+ contentAr: `## إيه هو الـ Prompt؟
 
 الـ **Prompt** هو ببساطة الكلام اللي بتكتبه لـ Claude أو أي AI.
 
@@ -35,16 +35,16 @@ export const promptEngineeringLessons: Lesson[] = [
 
 الـ Prompt الكويس فيه 4 حاجات:
 
-### 1. 🎯 الهدف
+### 1. الهدف
 إيه اللي عايزه بالظبط؟
 
-### 2. 📋 السياق
+### 2. السياق
 إيه اللي المفروض Claude يعرفه عشان يساعدك؟
 
-### 3. 📏 الشكل
+### 3. الشكل
 عايز الإجابة إزاي؟ قصيرة؟ طويلة؟ نقط؟ جدول؟
 
-### 4. 🔍 القيود
+### 4. القيود
 في حاجة مش عايزها؟ أو حدود معينة؟
 
 ---
@@ -57,9 +57,9 @@ export const promptEngineeringLessons: Lesson[] = [
 **اكتب:**
 > "اكتب قصة قصيرة (150 كلمة) عن طفل اسمه كريم بيكتشف روبوت في حديقة بيته. الأسلوب يكون مناسب لأطفال 8 سنين، ونهايتها سعيدة."
 
-الفرق ضخم جداً في جودة النتيجة! 🚀`,
+الفرق ضخم جداً في جودة النتيجة! `,
 
-    contentEn: `## What is a Prompt?
+ contentEn: `## What is a Prompt?
 
 A **Prompt** is simply the text you write to Claude or any AI.
 
@@ -81,16 +81,16 @@ Just like talking to a friend and saying "help me with something," the prompt is
 
 A good prompt has 4 things:
 
-### 1. 🎯 Goal
+### 1. Goal
 What exactly do you want?
 
-### 2. 📋 Context
+### 2. Context
 What should Claude know to help you?
 
-### 3. 📏 Format
+### 3. Format
 How do you want the answer? Short? Long? Bullet points? Table?
 
-### 4. 🔍 Constraints
+### 4. Constraints
 Anything you don't want? Any specific limits?
 
 ---
@@ -103,61 +103,61 @@ Anything you don't want? Any specific limits?
 **Write:**
 > "Write a short story (150 words) about a boy named Karim who discovers a robot in his garden. The style should suit 8-year-olds, with a happy ending."
 
-The difference in output quality is huge! 🚀`,
+The difference in output quality is huge! `,
 
-    quiz: [
-      {
-        id: 'q6-1',
-        questionAr: 'إيه هو الـ Prompt؟',
-        questionEn: 'What is a Prompt?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'الكلام اللي بتكتبه للـ AI', textEn: 'The text you write to the AI', isCorrect: true },
-          { id: 'o2', textAr: 'برنامج كمبيوتر خاص', textEn: 'A special computer program', isCorrect: false },
-          { id: 'o3', textAr: 'نوع من أنواع الكود', textEn: 'A type of code', isCorrect: false },
-          { id: 'o4', textAr: 'اسم شركة AI', textEn: 'The name of an AI company', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q6-2',
-        questionAr: 'أنهي Prompt هو الأقوى؟',
-        questionEn: 'Which prompt is stronger?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: '"اكتب موضوع"', textEn: '"Write a topic"', isCorrect: false },
-          { id: 'o2', textAr: '"اكتب موضوع إنشاء عربي لطالب في الصف الأول الإعدادي عن فوائد القراءة، 200 كلمة"', textEn: '"Write an Arabic essay for a 7th grader on benefits of reading, 200 words"', isCorrect: true },
-          { id: 'o3', textAr: '"موضوع كويس"', textEn: '"Good topic"', isCorrect: false },
-          { id: 'o4', textAr: '"موضوع إنشاء"', textEn: '"Essay topic"', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q6-3',
-        questionAr: 'من مكونات الـ Prompt الكويس؟',
-        questionEn: 'Which is a component of a good prompt?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'الهدف + السياق + الشكل + القيود', textEn: 'Goal + Context + Format + Constraints', isCorrect: true },
-          { id: 'o2', textAr: 'الاسم + العمر + البلد', textEn: 'Name + Age + Country', isCorrect: false },
-          { id: 'o3', textAr: 'الكود + البرمجة + الداتا', textEn: 'Code + Programming + Data', isCorrect: false },
-          { id: 'o4', textAr: 'السرعة + الدقة + السعر', textEn: 'Speed + Accuracy + Price', isCorrect: false },
-        ],
-      },
-    ],
-  },
+ quiz: [
+ {
+ id: 'q6-1',
+ questionAr: 'إيه هو الـ Prompt؟',
+ questionEn: 'What is a Prompt?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'الكلام اللي بتكتبه للـ AI', textEn: 'The text you write to the AI', isCorrect: true },
+ { id: 'o2', textAr: 'برنامج كمبيوتر خاص', textEn: 'A special computer program', isCorrect: false },
+ { id: 'o3', textAr: 'نوع من أنواع الكود', textEn: 'A type of code', isCorrect: false },
+ { id: 'o4', textAr: 'اسم شركة AI', textEn: 'The name of an AI company', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q6-2',
+ questionAr: 'أنهي Prompt هو الأقوى؟',
+ questionEn: 'Which prompt is stronger?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: '"اكتب موضوع"', textEn: '"Write a topic"', isCorrect: false },
+ { id: 'o2', textAr: '"اكتب موضوع إنشاء عربي لطالب في الصف الأول الإعدادي عن فوائد القراءة، 200 كلمة"', textEn: '"Write an Arabic essay for a 7th grader on benefits of reading, 200 words"', isCorrect: true },
+ { id: 'o3', textAr: '"موضوع كويس"', textEn: '"Good topic"', isCorrect: false },
+ { id: 'o4', textAr: '"موضوع إنشاء"', textEn: '"Essay topic"', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q6-3',
+ questionAr: 'من مكونات الـ Prompt الكويس؟',
+ questionEn: 'Which is a component of a good prompt?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'الهدف + السياق + الشكل + القيود', textEn: 'Goal + Context + Format + Constraints', isCorrect: true },
+ { id: 'o2', textAr: 'الاسم + العمر + البلد', textEn: 'Name + Age + Country', isCorrect: false },
+ { id: 'o3', textAr: 'الكود + البرمجة + الداتا', textEn: 'Code + Programming + Data', isCorrect: false },
+ { id: 'o4', textAr: 'السرعة + الدقة + السعر', textEn: 'Speed + Accuracy + Price', isCorrect: false },
+ ],
+ },
+ ],
+ },
 
-  {
-    id: 7,
-    slug: 'zero-shot-prompting',
-    agentSlug: 'claude',
-    titleAr: 'Zero-shot: اسأل مباشرة',
-    titleEn: 'Zero-shot: Ask Directly',
-    descriptionAr: 'أبسط طريقة — اسأل Claude مباشرة من غير ما تدي أمثلة.',
-    descriptionEn: 'The simplest technique — ask Claude directly without giving examples.',
-    order: 7,
-    xpReward: 75,
-    estimatedMinutes: 8,
-    emoji: '🎯',
-    contentAr: `## Zero-shot Prompting
+ {
+ id: 7,
+ slug: 'zero-shot-prompting',
+ agentSlug: 'claude',
+ titleAr: 'Zero-shot: اسأل مباشرة',
+ titleEn: 'Zero-shot: Ask Directly',
+ descriptionAr: 'أبسط طريقة — اسأل Claude مباشرة من غير ما تدي أمثلة.',
+ descriptionEn: 'The simplest technique — ask Claude directly without giving examples.',
+ order: 7,
+ xpReward: 75,
+ estimatedMinutes: 8,
+ emoji: '',
+ contentAr: `## Zero-shot Prompting
 
 الـ **Zero-shot** معناها "صفر أمثلة" — بتسأل Claude مباشرة من غير ما تدي أي مثال أو توضيح إضافي.
 
@@ -167,10 +167,10 @@ The difference in output quality is huge! 🚀`,
 
 الـ Zero-shot بتشتغل تمام في:
 
-- ✅ الأسئلة البسيطة والواضحة
-- ✅ المهام اللي Claude اتدرب عليها كتير
-- ✅ لما الوقت ضيق
-- ✅ الترجمة والتلخيص والتصنيف
+- الأسئلة البسيطة والواضحة
+- المهام اللي Claude اتدرب عليها كتير
+- لما الوقت ضيق
+- الترجمة والتلخيص والتصنيف
 
 ---
 
@@ -190,7 +190,7 @@ The difference in output quality is huge! 🚀`,
 
 ---
 
-## نصيحة مهمة 💡
+## نصيحة مهمة 
 
 حتى في الـ Zero-shot، كلما كان طلبك أوضح، كانت النتيجة أحسن.
 
@@ -204,9 +204,9 @@ The difference in output quality is huge! 🚀`,
 
 ## إمتى مش بتكفي؟
 
-لو Claude مش بيفهم المطلوب منه بالظبط، يبقى وقت تجرب الـ **Few-shot** — وهي الدرس الجاي! 👇`,
+لو Claude مش بيفهم المطلوب منه بالظبط، يبقى وقت تجرب الـ **Few-shot** — وهي الدرس الجاي! `,
 
-    contentEn: `## Zero-shot Prompting
+ contentEn: `## Zero-shot Prompting
 
 **Zero-shot** means "zero examples" — you ask Claude directly without giving any examples or extra clarification.
 
@@ -216,10 +216,10 @@ The difference in output quality is huge! 🚀`,
 
 Zero-shot works great for:
 
-- ✅ Simple, clear questions
-- ✅ Tasks Claude was heavily trained on
-- ✅ When you're short on time
-- ✅ Translation, summarization, classification
+- Simple, clear questions
+- Tasks Claude was heavily trained on
+- When you're short on time
+- Translation, summarization, classification
 
 ---
 
@@ -239,7 +239,7 @@ Zero-shot works great for:
 
 ---
 
-## Important Tip 💡
+## Important Tip 
 
 Even in Zero-shot, the clearer your request, the better the result.
 
@@ -253,59 +253,59 @@ Even in Zero-shot, the clearer your request, the better the result.
 
 ## When Is It Not Enough?
 
-If Claude doesn't fully understand what you need, it's time to try **Few-shot** — that's the next lesson! 👇`,
+If Claude doesn't fully understand what you need, it's time to try **Few-shot** — that's the next lesson! `,
 
-    quiz: [
-      {
-        id: 'q7-1',
-        questionAr: 'إيه معنى "Zero-shot"؟',
-        questionEn: 'What does "Zero-shot" mean?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'سؤال مباشر من غير أمثلة', textEn: 'A direct question without examples', isCorrect: true },
-          { id: 'o2', textAr: 'سؤال فيه صفر كلمات', textEn: 'A question with zero words', isCorrect: false },
-          { id: 'o3', textAr: 'سؤال بيتطلب إجابة قصيرة', textEn: 'A question requiring a short answer', isCorrect: false },
-          { id: 'o4', textAr: 'نوع من البرمجة', textEn: 'A type of programming', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q7-2',
-        questionAr: 'الـ Zero-shot بتشتغل كويس في؟',
-        questionEn: 'Zero-shot works well for?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'الترجمة والتلخيص والتصنيف', textEn: 'Translation, summarization, and classification', isCorrect: true },
-          { id: 'o2', textAr: 'المهام المعقدة جداً', textEn: 'Very complex tasks only', isCorrect: false },
-          { id: 'o3', textAr: 'البرمجة المتقدمة فقط', textEn: 'Advanced programming only', isCorrect: false },
-          { id: 'o4', textAr: 'الصور والفيديو', textEn: 'Images and video', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q7-3',
-        questionAr: 'صح ولا غلط: لو Claude مش فاهم، الأحسن تجرب Few-shot',
-        questionEn: 'True or False: If Claude doesn\'t understand, it\'s better to try Few-shot',
-        type: 'true_false',
-        options: [
-          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
-          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
-        ],
-      },
-    ],
-  },
+ quiz: [
+ {
+ id: 'q7-1',
+ questionAr: 'إيه معنى "Zero-shot"؟',
+ questionEn: 'What does "Zero-shot" mean?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'سؤال مباشر من غير أمثلة', textEn: 'A direct question without examples', isCorrect: true },
+ { id: 'o2', textAr: 'سؤال فيه صفر كلمات', textEn: 'A question with zero words', isCorrect: false },
+ { id: 'o3', textAr: 'سؤال بيتطلب إجابة قصيرة', textEn: 'A question requiring a short answer', isCorrect: false },
+ { id: 'o4', textAr: 'نوع من البرمجة', textEn: 'A type of programming', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q7-2',
+ questionAr: 'الـ Zero-shot بتشتغل كويس في؟',
+ questionEn: 'Zero-shot works well for?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'الترجمة والتلخيص والتصنيف', textEn: 'Translation, summarization, and classification', isCorrect: true },
+ { id: 'o2', textAr: 'المهام المعقدة جداً', textEn: 'Very complex tasks only', isCorrect: false },
+ { id: 'o3', textAr: 'البرمجة المتقدمة فقط', textEn: 'Advanced programming only', isCorrect: false },
+ { id: 'o4', textAr: 'الصور والفيديو', textEn: 'Images and video', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q7-3',
+ questionAr: 'صح ولا غلط: لو Claude مش فاهم، الأحسن تجرب Few-shot',
+ questionEn: 'True or False: If Claude doesn\'t understand, it\'s better to try Few-shot',
+ type: 'true_false',
+ options: [
+ { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
+ { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+ ],
+ },
+ ],
+ },
 
-  {
-    id: 8,
-    slug: 'few-shot-prompting',
-    agentSlug: 'claude',
-    titleAr: 'Few-shot: علّم بالمثال',
-    titleEn: 'Few-shot: Teach by Example',
-    descriptionAr: 'دي المفروض تعرفها — إزاي تدي Claude أمثلة يتعلم منها.',
-    descriptionEn: 'The must-know technique — how to give Claude examples to learn from.',
-    order: 8,
-    xpReward: 80,
-    estimatedMinutes: 10,
-    emoji: '📚',
-    contentAr: `## Few-shot Prompting
+ {
+ id: 8,
+ slug: 'few-shot-prompting',
+ agentSlug: 'claude',
+ titleAr: 'Few-shot: علّم بالمثال',
+ titleEn: 'Few-shot: Teach by Example',
+ descriptionAr: 'دي المفروض تعرفها — إزاي تدي Claude أمثلة يتعلم منها.',
+ descriptionEn: 'The must-know technique — how to give Claude examples to learn from.',
+ order: 8,
+ xpReward: 80,
+ estimatedMinutes: 10,
+ emoji: '',
+ contentAr: `## Few-shot Prompting
 
 الـ **Few-shot** معناها "أمثلة قليلة" — بتدي Claude مثال واحد أو أكتر قبل ما تطلب منه المهمة.
 
@@ -317,7 +317,7 @@ If Claude doesn't fully understand what you need, it's time to try **Few-shot** 
 
 | | Zero-shot | Few-shot |
 |---|---|---|
-| **أمثلة** | ❌ مفيش | ✅ في أمثلة |
+| **أمثلة** | مفيش | في أمثلة |
 | **وقت الكتابة** | سريع | أبطأ شوية |
 | **جودة النتيجة** | كويس | أحسن للمهام المعقدة |
 | **أحسن لـ** | مهام واضحة | مهام محتاجة نمط معين |
@@ -334,7 +334,7 @@ If Claude doesn't fully understand what you need, it's time to try **Few-shot** 
 مراجعة: "السعر مناسب بس التغليف بسيط" → ???
 \`\`\`
 
-Claude هيعرف النمط المطلوب ويجاوب: **محايدة** ✅
+Claude هيعرف النمط المطلوب ويجاوب: **محايدة** 
 
 ---
 
@@ -348,7 +348,7 @@ Claude هيعرف النمط المطلوب ويجاوب: **محايدة** ✅
 خالد يوسف → ???
 \`\`\`
 
-Claude هيكمل: **يوسف، خالد** ✅
+Claude هيكمل: **يوسف، خالد** 
 
 ---
 
@@ -361,11 +361,11 @@ Claude هيكمل: **يوسف، خالد** ✅
 
 ---
 
-## نصيحة الـ Pro 💡
+## نصيحة الـ Pro 
 
-مش لازم تشرح القاعدة — بس وري الأمثلة وسيب Claude يفهم الباقي. الـ AI ذكي كفاية يستنتج النمط! 🧠`,
+مش لازم تشرح القاعدة — بس وري الأمثلة وسيب Claude يفهم الباقي. الـ AI ذكي كفاية يستنتج النمط! `,
 
-    contentEn: `## Few-shot Prompting
+ contentEn: `## Few-shot Prompting
 
 **Few-shot** means "a few examples" — you give Claude one or more examples before asking for the task.
 
@@ -377,7 +377,7 @@ Like teaching someone new — instead of explaining in words, you show them "do 
 
 | | Zero-shot | Few-shot |
 |---|---|---|
-| **Examples** | ❌ None | ✅ Has examples |
+| **Examples** | None | Has examples |
 | **Writing time** | Fast | Slightly slower |
 | **Output quality** | Good | Better for complex tasks |
 | **Best for** | Clear tasks | Tasks needing a specific pattern |
@@ -394,7 +394,7 @@ Review: "Delivery was very late" → Negative
 Review: "Price is fair but packaging is simple" → ???
 \`\`\`
 
-Claude will recognize the pattern and answer: **Neutral** ✅
+Claude will recognize the pattern and answer: **Neutral** 
 
 ---
 
@@ -408,7 +408,7 @@ Sara Ali → Ali, Sara
 Khaled Youssef → ???
 \`\`\`
 
-Claude will complete: **Youssef, Khaled** ✅
+Claude will complete: **Youssef, Khaled** 
 
 ---
 
@@ -421,61 +421,61 @@ Claude will complete: **Youssef, Khaled** ✅
 
 ---
 
-## Pro Tip 💡
+## Pro Tip 
 
-You don't need to explain the rule — just show the examples and let Claude figure out the rest. AI is smart enough to infer the pattern! 🧠`,
+You don't need to explain the rule — just show the examples and let Claude figure out the rest. AI is smart enough to infer the pattern! `,
 
-    quiz: [
-      {
-        id: 'q8-1',
-        questionAr: 'Few-shot بتنفع أكتر في؟',
-        questionEn: 'Few-shot is most useful for?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'المهام اللي محتاجة نمط أو أسلوب معين', textEn: 'Tasks that need a specific pattern or style', isCorrect: true },
-          { id: 'o2', textAr: 'الأسئلة البسيطة جداً', textEn: 'Very simple questions', isCorrect: false },
-          { id: 'o3', textAr: 'ترجمة كلمة واحدة', textEn: 'Translating a single word', isCorrect: false },
-          { id: 'o4', textAr: 'إنشاء صور', textEn: 'Generating images', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q8-2',
-        questionAr: 'كام مثال الأنسب في الـ Few-shot؟',
-        questionEn: 'How many examples are ideal for Few-shot?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: '2 إلى 5 أمثلة', textEn: '2 to 5 examples', isCorrect: true },
-          { id: 'o2', textAr: 'مثال واحد فقط دايماً', textEn: 'Always exactly one example', isCorrect: false },
-          { id: 'o3', textAr: '50 مثال على الأقل', textEn: 'At least 50 examples', isCorrect: false },
-          { id: 'o4', textAr: 'مش مهم العدد خالص', textEn: 'The number doesn\'t matter at all', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q8-3',
-        questionAr: 'صح ولا غلط: في الـ Few-shot لازم تشرح القاعدة بالتفصيل',
-        questionEn: 'True or False: In Few-shot you must explain the rule in detail',
-        type: 'true_false',
-        options: [
-          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
-          { id: 'o2', textAr: 'غلط — الأمثلة بتكفي', textEn: 'False — examples are enough', isCorrect: true },
-        ],
-      },
-    ],
-  },
+ quiz: [
+ {
+ id: 'q8-1',
+ questionAr: 'Few-shot بتنفع أكتر في؟',
+ questionEn: 'Few-shot is most useful for?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'المهام اللي محتاجة نمط أو أسلوب معين', textEn: 'Tasks that need a specific pattern or style', isCorrect: true },
+ { id: 'o2', textAr: 'الأسئلة البسيطة جداً', textEn: 'Very simple questions', isCorrect: false },
+ { id: 'o3', textAr: 'ترجمة كلمة واحدة', textEn: 'Translating a single word', isCorrect: false },
+ { id: 'o4', textAr: 'إنشاء صور', textEn: 'Generating images', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q8-2',
+ questionAr: 'كام مثال الأنسب في الـ Few-shot؟',
+ questionEn: 'How many examples are ideal for Few-shot?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: '2 إلى 5 أمثلة', textEn: '2 to 5 examples', isCorrect: true },
+ { id: 'o2', textAr: 'مثال واحد فقط دايماً', textEn: 'Always exactly one example', isCorrect: false },
+ { id: 'o3', textAr: '50 مثال على الأقل', textEn: 'At least 50 examples', isCorrect: false },
+ { id: 'o4', textAr: 'مش مهم العدد خالص', textEn: 'The number doesn\'t matter at all', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q8-3',
+ questionAr: 'صح ولا غلط: في الـ Few-shot لازم تشرح القاعدة بالتفصيل',
+ questionEn: 'True or False: In Few-shot you must explain the rule in detail',
+ type: 'true_false',
+ options: [
+ { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
+ { id: 'o2', textAr: 'غلط — الأمثلة بتكفي', textEn: 'False — examples are enough', isCorrect: true },
+ ],
+ },
+ ],
+ },
 
-  {
-    id: 9,
-    slug: 'chain-of-thought',
-    agentSlug: 'claude',
-    titleAr: 'Chain of Thought: فكّر خطوة خطوة',
-    titleEn: 'Chain of Thought: Think Step by Step',
-    descriptionAr: 'اطلب من Claude يفكر بصوت عالٍ — هتلاقي الإجابات أدق بكتير.',
-    descriptionEn: 'Ask Claude to think out loud — you\'ll find the answers much more accurate.',
-    order: 9,
-    xpReward: 85,
-    estimatedMinutes: 10,
-    emoji: '🧠',
-    contentAr: `## Chain of Thought Prompting
+ {
+ id: 9,
+ slug: 'chain-of-thought',
+ agentSlug: 'claude',
+ titleAr: 'Chain of Thought: فكّر خطوة خطوة',
+ titleEn: 'Chain of Thought: Think Step by Step',
+ descriptionAr: 'اطلب من Claude يفكر بصوت عالٍ — هتلاقي الإجابات أدق بكتير.',
+ descriptionEn: 'Ask Claude to think out loud — you\'ll find the answers much more accurate.',
+ order: 9,
+ xpReward: 85,
+ estimatedMinutes: 10,
+ emoji: '',
+ contentAr: `## Chain of Thought Prompting
 
 الـ **Chain of Thought (CoT)** معناها "سلسلة التفكير" — بتطلب من Claude يوضح خطوات تفكيره قبل ما يوصل للإجابة.
 
@@ -484,10 +484,10 @@ You don't need to explain the rule — just show the examples and let Claude fig
 ## ليه مهم؟
 
 لما Claude بيفكر خطوة خطوة:
-- ✅ بيغلط أقل في المسائل المعقدة
-- ✅ بتقدر تتابع منطقه وتكتشف أي خطأ
-- ✅ الإجابات بتبقى أعمق وأكثر تفصيلاً
-- ✅ مفيد جداً في الرياضيات والمنطق والقرارات
+- بيغلط أقل في المسائل المعقدة
+- بتقدر تتابع منطقه وتكتشف أي خطأ
+- الإجابات بتبقى أعمق وأكثر تفصيلاً
+- مفيد جداً في الرياضيات والمنطق والقرارات
 
 ---
 
@@ -506,7 +506,7 @@ Claude هيقول:
 1. 24 ÷ 4 = 6 تفاحات أكلها أحمد
 2. الباقي = 24 - 6 = 18 تفاحة
 3. أدى نصفها = 18 ÷ 2 = 9 تفاحات
-4. الباقي = 18 - 9 = **9 تفاحات** ✅
+4. الباقي = 18 - 9 = **9 تفاحات** 
 
 ---
 
@@ -527,21 +527,21 @@ Claude هيقول:
 
 | المهمة | تستخدم CoT؟ |
 |---|---|
-| مسألة رياضية | ✅ دايماً |
-| قرار استراتيجي | ✅ دايماً |
-| تحليل نص | ✅ مفيد |
-| ترجمة كلمة | ❌ مش محتاج |
-| إجابة سريعة | ❌ مش محتاج |
+| مسألة رياضية | دايماً |
+| قرار استراتيجي | دايماً |
+| تحليل نص | مفيد |
+| ترجمة كلمة | مش محتاج |
+| إجابة سريعة | مش محتاج |
 
 ---
 
-## Magic Phrase ✨
+## Magic Phrase 
 
 > **"فكّر خطوة خطوة قبل ما تجاوب"**
 
 الجملة دي وحدها بتحسن دقة Claude في المسائل المعقدة بنسبة كبيرة!`,
 
-    contentEn: `## Chain of Thought Prompting
+ contentEn: `## Chain of Thought Prompting
 
 **Chain of Thought (CoT)** means asking Claude to show its thinking steps before reaching an answer.
 
@@ -550,10 +550,10 @@ Claude هيقول:
 ## Why Does It Matter?
 
 When Claude thinks step by step:
-- ✅ Makes fewer mistakes on complex problems
-- ✅ You can follow its reasoning and catch errors
-- ✅ Answers become deeper and more detailed
-- ✅ Very useful for math, logic, and decisions
+- Makes fewer mistakes on complex problems
+- You can follow its reasoning and catch errors
+- Answers become deeper and more detailed
+- Very useful for math, logic, and decisions
 
 ---
 
@@ -571,7 +571,7 @@ Claude will say:
 1. 24 ÷ 4 = 6 apples eaten
 2. Remaining = 24 - 6 = 18 apples
 3. Half given away = 18 ÷ 2 = 9 apples
-4. Remaining = 18 - 9 = **9 apples** ✅
+4. Remaining = 18 - 9 = **9 apples** 
 
 ---
 
@@ -592,71 +592,71 @@ Situation: My company is losing customers due to slow service
 
 | Task | Use CoT? |
 |---|---|
-| Math problem | ✅ Always |
-| Strategic decision | ✅ Always |
-| Text analysis | ✅ Useful |
-| Translating a word | ❌ Not needed |
-| Quick answer | ❌ Not needed |
+| Math problem | Always |
+| Strategic decision | Always |
+| Text analysis | Useful |
+| Translating a word | Not needed |
+| Quick answer | Not needed |
 
 ---
 
-## Magic Phrase ✨
+## Magic Phrase 
 
 > **"Think step by step before answering"**
 
 This phrase alone significantly improves Claude's accuracy on complex problems!`,
 
-    quiz: [
-      {
-        id: 'q9-1',
-        questionAr: 'إيه الهدف من Chain of Thought؟',
-        questionEn: 'What is the goal of Chain of Thought?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'جعل Claude يشرح خطوات تفكيره', textEn: 'Making Claude explain its thinking steps', isCorrect: true },
-          { id: 'o2', textAr: 'جعل الإجابة أقصر', textEn: 'Making the answer shorter', isCorrect: false },
-          { id: 'o3', textAr: 'تقليل استهلاك الـ tokens', textEn: 'Reducing token usage', isCorrect: false },
-          { id: 'o4', textAr: 'جعل Claude يكتب شعر', textEn: 'Making Claude write poetry', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q9-2',
-        questionAr: 'أنهي جملة بتفعّل Chain of Thought؟',
-        questionEn: 'Which phrase activates Chain of Thought?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: '"فكّر خطوة خطوة"', textEn: '"Think step by step"', isCorrect: true },
-          { id: 'o2', textAr: '"كن سريعاً"', textEn: '"Be fast"', isCorrect: false },
-          { id: 'o3', textAr: '"رد باختصار"', textEn: '"Reply briefly"', isCorrect: false },
-          { id: 'o4', textAr: '"اكتب كود"', textEn: '"Write code"', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q9-3',
-        questionAr: 'صح ولا غلط: CoT مفيد في ترجمة الكلمات البسيطة',
-        questionEn: 'True or False: CoT is useful for translating simple words',
-        type: 'true_false',
-        options: [
-          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
-          { id: 'o2', textAr: 'غلط — مش محتاجه في المهام البسيطة', textEn: 'False — not needed for simple tasks', isCorrect: true },
-        ],
-      },
-    ],
-  },
+ quiz: [
+ {
+ id: 'q9-1',
+ questionAr: 'إيه الهدف من Chain of Thought؟',
+ questionEn: 'What is the goal of Chain of Thought?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'جعل Claude يشرح خطوات تفكيره', textEn: 'Making Claude explain its thinking steps', isCorrect: true },
+ { id: 'o2', textAr: 'جعل الإجابة أقصر', textEn: 'Making the answer shorter', isCorrect: false },
+ { id: 'o3', textAr: 'تقليل استهلاك الـ tokens', textEn: 'Reducing token usage', isCorrect: false },
+ { id: 'o4', textAr: 'جعل Claude يكتب شعر', textEn: 'Making Claude write poetry', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q9-2',
+ questionAr: 'أنهي جملة بتفعّل Chain of Thought؟',
+ questionEn: 'Which phrase activates Chain of Thought?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: '"فكّر خطوة خطوة"', textEn: '"Think step by step"', isCorrect: true },
+ { id: 'o2', textAr: '"كن سريعاً"', textEn: '"Be fast"', isCorrect: false },
+ { id: 'o3', textAr: '"رد باختصار"', textEn: '"Reply briefly"', isCorrect: false },
+ { id: 'o4', textAr: '"اكتب كود"', textEn: '"Write code"', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q9-3',
+ questionAr: 'صح ولا غلط: CoT مفيد في ترجمة الكلمات البسيطة',
+ questionEn: 'True or False: CoT is useful for translating simple words',
+ type: 'true_false',
+ options: [
+ { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
+ { id: 'o2', textAr: 'غلط — مش محتاجه في المهام البسيطة', textEn: 'False — not needed for simple tasks', isCorrect: true },
+ ],
+ },
+ ],
+ },
 
-  {
-    id: 10,
-    slug: 'role-prompting',
-    agentSlug: 'claude',
-    titleAr: 'Role Prompting: العب دور',
-    titleEn: 'Role Prompting: Play a Role',
-    descriptionAr: 'بدّل شخصية Claude وشوف كيف تتغير الإجابات — تقنية قوية جداً.',
-    descriptionEn: 'Change Claude\'s persona and watch how answers transform — a very powerful technique.',
-    order: 10,
-    xpReward: 80,
-    estimatedMinutes: 9,
-    emoji: '🎭',
-    contentAr: `## Role Prompting
+ {
+ id: 10,
+ slug: 'role-prompting',
+ agentSlug: 'claude',
+ titleAr: 'Role Prompting: العب دور',
+ titleEn: 'Role Prompting: Play a Role',
+ descriptionAr: 'بدّل شخصية Claude وشوف كيف تتغير الإجابات — تقنية قوية جداً.',
+ descriptionEn: 'Change Claude\'s persona and watch how answers transform — a very powerful technique.',
+ order: 10,
+ xpReward: 80,
+ estimatedMinutes: 9,
+ emoji: '',
+ contentAr: `## Role Prompting
 
 الـ **Role Prompting** معناها إنك بتقول لـ Claude "تصرف كأنك [شخص معين]" قبل ما تطلب منه أي حاجة.
 
@@ -703,11 +703,11 @@ Claude عنده معرفة واسعة جداً في مجالات مختلفة. �
 
 ---
 
-## تحذير مهم ⚠️
+## تحذير مهم 
 
 الـ Role بيأثر على **الأسلوب والتركيز**، مش على **الحقائق**. Claude لسه بيقدم معلومات دقيقة حتى لو بيلعب دور. مش بيكدب عشان "هو في الدور"!`,
 
-    contentEn: `## Role Prompting
+ contentEn: `## Role Prompting
 
 **Role Prompting** means telling Claude "act as [a specific person]" before making any request.
 
@@ -754,63 +754,63 @@ Your audience is [who will read this].
 
 ---
 
-## Important Warning ⚠️
+## Important Warning 
 
 The role affects **style and focus**, not **facts**. Claude still provides accurate information even when playing a role. It doesn't lie because it's "in character"!`,
 
-    quiz: [
-      {
-        id: 'q10-1',
-        questionAr: 'إيه هو الـ Role Prompting؟',
-        questionEn: 'What is Role Prompting?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'تحديد شخصية أو دور معين لـ Claude', textEn: 'Assigning Claude a specific persona or role', isCorrect: true },
-          { id: 'o2', textAr: 'طلب من Claude يكتب مسرحية', textEn: 'Asking Claude to write a play', isCorrect: false },
-          { id: 'o3', textAr: 'إعطاء Claude اسم جديد', textEn: 'Giving Claude a new name', isCorrect: false },
-          { id: 'o4', textAr: 'تغيير لغة الإجابة', textEn: 'Changing the answer language', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q10-2',
-        questionAr: 'الـ Role بيأثر على؟',
-        questionEn: 'The role affects?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'الأسلوب والتركيز فقط', textEn: 'Style and focus only', isCorrect: true },
-          { id: 'o2', textAr: 'الحقائق والمعلومات', textEn: 'Facts and information', isCorrect: false },
-          { id: 'o3', textAr: 'سرعة الإجابة', textEn: 'Answer speed', isCorrect: false },
-          { id: 'o4', textAr: 'طول الإجابة دايماً', textEn: 'Answer length always', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q10-3',
-        questionAr: 'أنهي دور من الأمثلة دي الأنسب لسؤال عن الاستثمار؟',
-        questionEn: 'Which role is most suitable for an investment question?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'مستشار مالي', textEn: 'Financial advisor', isCorrect: true },
-          { id: 'o2', textAr: 'طباخ', textEn: 'Chef', isCorrect: false },
-          { id: 'o3', textAr: 'رياضي محترف', textEn: 'Professional athlete', isCorrect: false },
-          { id: 'o4', textAr: 'طفل', textEn: 'Child', isCorrect: false },
-        ],
-      },
-    ],
-  },
+ quiz: [
+ {
+ id: 'q10-1',
+ questionAr: 'إيه هو الـ Role Prompting؟',
+ questionEn: 'What is Role Prompting?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'تحديد شخصية أو دور معين لـ Claude', textEn: 'Assigning Claude a specific persona or role', isCorrect: true },
+ { id: 'o2', textAr: 'طلب من Claude يكتب مسرحية', textEn: 'Asking Claude to write a play', isCorrect: false },
+ { id: 'o3', textAr: 'إعطاء Claude اسم جديد', textEn: 'Giving Claude a new name', isCorrect: false },
+ { id: 'o4', textAr: 'تغيير لغة الإجابة', textEn: 'Changing the answer language', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q10-2',
+ questionAr: 'الـ Role بيأثر على؟',
+ questionEn: 'The role affects?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'الأسلوب والتركيز فقط', textEn: 'Style and focus only', isCorrect: true },
+ { id: 'o2', textAr: 'الحقائق والمعلومات', textEn: 'Facts and information', isCorrect: false },
+ { id: 'o3', textAr: 'سرعة الإجابة', textEn: 'Answer speed', isCorrect: false },
+ { id: 'o4', textAr: 'طول الإجابة دايماً', textEn: 'Answer length always', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q10-3',
+ questionAr: 'أنهي دور من الأمثلة دي الأنسب لسؤال عن الاستثمار؟',
+ questionEn: 'Which role is most suitable for an investment question?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'مستشار مالي', textEn: 'Financial advisor', isCorrect: true },
+ { id: 'o2', textAr: 'طباخ', textEn: 'Chef', isCorrect: false },
+ { id: 'o3', textAr: 'رياضي محترف', textEn: 'Professional athlete', isCorrect: false },
+ { id: 'o4', textAr: 'طفل', textEn: 'Child', isCorrect: false },
+ ],
+ },
+ ],
+ },
 
-  {
-    id: 11,
-    slug: 'output-formatting',
-    agentSlug: 'claude',
-    titleAr: 'تنسيق الإجابة: شكّل الناتج',
-    titleEn: 'Output Formatting: Shape the Output',
-    descriptionAr: 'تعلّم إزاي تطلب إجابات بشكل محدد — JSON، جدول، نقط، وأكتر.',
-    descriptionEn: 'Learn how to request answers in a specific format — JSON, tables, bullets, and more.',
-    order: 11,
-    xpReward: 85,
-    estimatedMinutes: 10,
-    emoji: '📋',
-    contentAr: `## تنسيق الإجابة
+ {
+ id: 11,
+ slug: 'output-formatting',
+ agentSlug: 'claude',
+ titleAr: 'تنسيق الإجابة: شكّل الناتج',
+ titleEn: 'Output Formatting: Shape the Output',
+ descriptionAr: 'تعلّم إزاي تطلب إجابات بشكل محدد — JSON، جدول، نقط، وأكتر.',
+ descriptionEn: 'Learn how to request answers in a specific format — JSON, tables, bullets, and more.',
+ order: 11,
+ xpReward: 85,
+ estimatedMinutes: 10,
+ emoji: '',
+ contentAr: `## تنسيق الإجابة
 
 من أهم مهارات الـ Prompting إنك تحدد **شكل الإجابة** اللي عايزها — مش بس المحتوى.
 
@@ -818,27 +818,27 @@ The role affects **style and focus**, not **facts**. Claude still provides accur
 
 ## التنسيقات الشائعة
 
-### 📝 نقط (Bullet Points)
+### نقط (Bullet Points)
 \`\`\`
 اكتب فوائد ممارسة الرياضة في شكل نقط قصيرة
 \`\`\`
 
-### 📊 جدول
+### جدول
 \`\`\`
 قارن بين Python و JavaScript في جدول فيه: الاستخدام، السهولة، الراتب
 \`\`\`
 
-### 🔢 قائمة مرقمة
+### قائمة مرقمة
 \`\`\`
 اكتب خطوات تعلم البرمجة من الصفر في 10 خطوات مرقمة
 \`\`\`
 
-### 💻 JSON
+### JSON
 \`\`\`
 أعطني معلومات عن مصر في شكل JSON فيه: الاسم، العاصمة، عدد السكان، اللغة
 \`\`\`
 
-### 📄 Markdown
+### Markdown
 \`\`\`
 اكتب تقرير عن الذكاء الاصطناعي بعناوين وفقرات واضحة بصيغة Markdown
 \`\`\`
@@ -873,13 +873,13 @@ The role affects **style and focus**, not **facts**. Claude still provides accur
 
 ---
 
-## نصيحة الـ Pro 💡
+## نصيحة الـ Pro 
 
 دمج التنسيق مع بقية التقنيات بيعطي نتائج ممتازة:
 
 > "**أنت مستشار تسويق** (Role). حلّل منافسينا الثلاثة **خطوة خطوة** (CoT). النتيجة في **جدول** فيه: الاسم، نقاط القوة، نقاط الضعف، الفرصة." (Format)`,
 
-    contentEn: `## Output Formatting
+ contentEn: `## Output Formatting
 
 One of the most important prompting skills is specifying the **format** of the answer you want — not just the content.
 
@@ -887,27 +887,27 @@ One of the most important prompting skills is specifying the **format** of the a
 
 ## Common Formats
 
-### 📝 Bullet Points
+### Bullet Points
 \`\`\`
 Write the benefits of exercise in short bullet points
 \`\`\`
 
-### 📊 Table
+### Table
 \`\`\`
 Compare Python and JavaScript in a table with: Use case, Ease, Salary
 \`\`\`
 
-### 🔢 Numbered List
+### Numbered List
 \`\`\`
 Write 10 numbered steps to learn programming from scratch
 \`\`\`
 
-### 💻 JSON
+### JSON
 \`\`\`
 Give me information about Egypt in JSON format with: name, capital, population, language
 \`\`\`
 
-### 📄 Markdown
+### Markdown
 \`\`\`
 Write a report on AI with clear headings and paragraphs in Markdown format
 \`\`\`
@@ -942,63 +942,63 @@ You can also control the length:
 
 ---
 
-## Pro Tip 💡
+## Pro Tip 
 
 Combining formatting with other techniques gives excellent results:
 
 > "**You are a marketing consultant** (Role). Analyze our three competitors **step by step** (CoT). Result in a **table** with: Name, Strengths, Weaknesses, Opportunity." (Format)`,
 
-    quiz: [
-      {
-        id: 'q11-1',
-        questionAr: 'لو عايز Claude يرجع بيانات منظمة لبرنامج، أحسن تنسيق هو؟',
-        questionEn: 'If you want Claude to return structured data for a program, the best format is?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'JSON', textEn: 'JSON', isCorrect: true },
-          { id: 'o2', textAr: 'نثر حر', textEn: 'Free prose', isCorrect: false },
-          { id: 'o3', textAr: 'شعر', textEn: 'Poetry', isCorrect: false },
-          { id: 'o4', textAr: 'نقط فقط', textEn: 'Bullet points only', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q11-2',
-        questionAr: 'إزاي بتحدد طول الإجابة؟',
-        questionEn: 'How do you control the answer length?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'بتحدد في الـ prompt: "في 3 نقط" أو "في 200 كلمة"', textEn: 'You specify in the prompt: "in 3 points" or "in 200 words"', isCorrect: true },
-          { id: 'o2', textAr: 'Claude بيحدده وحده دايماً', textEn: 'Claude always decides it automatically', isCorrect: false },
-          { id: 'o3', textAr: 'مفيش طريقة لتحديد الطول', textEn: 'There\'s no way to control length', isCorrect: false },
-          { id: 'o4', textAr: 'بتستخدم كود خاص', textEn: 'You use special code', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q11-3',
-        questionAr: 'صح ولا غلط: ممكن تدمج تنسيق الإجابة مع Role Prompting في نفس الـ Prompt',
-        questionEn: 'True or False: You can combine output formatting with Role Prompting in the same prompt',
-        type: 'true_false',
-        options: [
-          { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
-          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
-        ],
-      },
-    ],
-  },
+ quiz: [
+ {
+ id: 'q11-1',
+ questionAr: 'لو عايز Claude يرجع بيانات منظمة لبرنامج، أحسن تنسيق هو؟',
+ questionEn: 'If you want Claude to return structured data for a program, the best format is?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'JSON', textEn: 'JSON', isCorrect: true },
+ { id: 'o2', textAr: 'نثر حر', textEn: 'Free prose', isCorrect: false },
+ { id: 'o3', textAr: 'شعر', textEn: 'Poetry', isCorrect: false },
+ { id: 'o4', textAr: 'نقط فقط', textEn: 'Bullet points only', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q11-2',
+ questionAr: 'إزاي بتحدد طول الإجابة؟',
+ questionEn: 'How do you control the answer length?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'بتحدد في الـ prompt: "في 3 نقط" أو "في 200 كلمة"', textEn: 'You specify in the prompt: "in 3 points" or "in 200 words"', isCorrect: true },
+ { id: 'o2', textAr: 'Claude بيحدده وحده دايماً', textEn: 'Claude always decides it automatically', isCorrect: false },
+ { id: 'o3', textAr: 'مفيش طريقة لتحديد الطول', textEn: 'There\'s no way to control length', isCorrect: false },
+ { id: 'o4', textAr: 'بتستخدم كود خاص', textEn: 'You use special code', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q11-3',
+ questionAr: 'صح ولا غلط: ممكن تدمج تنسيق الإجابة مع Role Prompting في نفس الـ Prompt',
+ questionEn: 'True or False: You can combine output formatting with Role Prompting in the same prompt',
+ type: 'true_false',
+ options: [
+ { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
+ { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+ ],
+ },
+ ],
+ },
 
-  {
-    id: 12,
-    slug: 'system-prompt',
-    agentSlug: 'claude',
-    titleAr: 'System Prompt: البرمجة الخفية',
-    titleEn: 'System Prompt: The Hidden Programming',
-    descriptionAr: 'اكتشف الـ System Prompt — الكود اللي بيحدد شخصية الـ AI قبل ما تكلمه.',
-    descriptionEn: 'Discover the System Prompt — the code that defines AI\'s personality before you talk to it.',
-    order: 12,
-    xpReward: 90,
-    estimatedMinutes: 11,
-    emoji: '⚙️',
-    contentAr: `## الـ System Prompt
+ {
+ id: 12,
+ slug: 'system-prompt',
+ agentSlug: 'claude',
+ titleAr: 'System Prompt: البرمجة الخفية',
+ titleEn: 'System Prompt: The Hidden Programming',
+ descriptionAr: 'اكتشف الـ System Prompt — الكود اللي بيحدد شخصية الـ AI قبل ما تكلمه.',
+ descriptionEn: 'Discover the System Prompt — the code that defines AI\'s personality before you talk to it.',
+ order: 12,
+ xpReward: 90,
+ estimatedMinutes: 11,
+ emoji: '',
+ contentAr: `## الـ System Prompt
 
 الـ **System Prompt** هو تعليمات مخفية بتتبعث لـ Claude **قبل** ما تبدأ المحادثة. المستخدم مش شايفها، بس Claude بيطبقها طول الوقت.
 
@@ -1025,10 +1025,10 @@ Combining formatting with other techniques gives excellent results:
 ## ليه مهم للمطورين؟
 
 لو بتبني تطبيق بـ Claude API، الـ System Prompt هو اللي:
-- 🎭 بيحدد شخصية الـ AI (اسمه، أسلوبه)
-- 📏 بيحدد القواعد (إيه اللي يعمله وإيه اللي ميعملوش)
-- 🌍 بيحدد السياق (إيه المنتج، مين المستخدمين)
-- 🔒 بيحدد الحدود (لا تتكلم في السياسة، الدين، إلخ)
+- بيحدد شخصية الـ AI (اسمه، أسلوبه)
+- بيحدد القواعد (إيه اللي يعمله وإيه اللي ميعملوش)
+- بيحدد السياق (إيه المنتج، مين المستخدمين)
+- بيحدد الحدود (لا تتكلم في السياسة، الدين، إلخ)
 
 ---
 
@@ -1045,7 +1045,7 @@ Combining formatting with other techniques gives excellent results:
 
 لا تتكلم في أي موضوع غير المطعم والطلبات.
 لو سألك عن حاجة تانية، قول: "أنا متخصص في خدمة مطعم Sakko فقط!"
-لهجتك ودودة ومبتهجة دايماً 😊
+لهجتك ودودة ومبتهجة دايماً 
 \`\`\`
 
 ---
@@ -1061,14 +1061,14 @@ Combining formatting with other techniques gives excellent results:
 
 ---
 
-## جرّبه دلوقتي في Sandbox! 🧪
+## جرّبه دلوقتي في Sandbox! 
 
 افتح الـ Sandbox في المنصة واكتب:
 > "تصرف كأنك مساعد مختص في الطبخ المصري فقط، وردّ على كل سؤال بطريقة شيف محترف"
 
 وبعدين اسأله أي سؤال تاني مش عن الطبخ — هتشوف كيف بيحافظ على الشخصية!`,
 
-    contentEn: `## The System Prompt
+ contentEn: `## The System Prompt
 
 The **System Prompt** is a hidden set of instructions sent to Claude **before** the conversation starts. The user doesn't see it, but Claude follows it throughout the entire conversation.
 
@@ -1095,10 +1095,10 @@ Artificial intelligence is computer programs...
 ## Why Is It Important for Developers?
 
 If you're building an app with the Claude API, the System Prompt is what:
-- 🎭 Defines the AI's persona (name, style)
-- 📏 Sets the rules (what to do and what not to do)
-- 🌍 Defines context (what's the product, who are the users)
-- 🔒 Sets boundaries (no politics, religion, etc.)
+- Defines the AI's persona (name, style)
+- Sets the rules (what to do and what not to do)
+- Defines context (what's the product, who are the users)
+- Sets boundaries (no politics, religion, etc.)
 
 ---
 
@@ -1115,7 +1115,7 @@ Menu: Margherita $8, Pepperoni $10, Veggie $9
 
 Do not discuss any topic other than the restaurant and orders.
 If asked about something else, say: "I specialize in Sakko's restaurant service only!"
-Your tone is always friendly and cheerful 😊
+Your tone is always friendly and cheerful 
 \`\`\`
 
 ---
@@ -1131,64 +1131,64 @@ Your tone is always friendly and cheerful 😊
 
 ---
 
-## Try It Now in Sandbox! 🧪
+## Try It Now in Sandbox! 
 
 Open the Sandbox on the platform and write:
 > "Act as an assistant specialized only in Egyptian cooking, and respond to every question like a professional chef"
 
 Then ask it a question about something else — watch how it maintains the persona!`,
 
-    quiz: [
-      {
-        id: 'q12-1',
-        questionAr: 'مين اللي بيكتب الـ System Prompt عادةً؟',
-        questionEn: 'Who usually writes the System Prompt?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'المطوّر أو صاحب التطبيق', textEn: 'The developer or app owner', isCorrect: true },
-          { id: 'o2', textAr: 'المستخدم العادي', textEn: 'The regular user', isCorrect: false },
-          { id: 'o3', textAr: 'Claude نفسه', textEn: 'Claude itself', isCorrect: false },
-          { id: 'o4', textAr: 'شركة Anthropic بس', textEn: 'Anthropic only', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q12-2',
-        questionAr: 'هل المستخدم بيشوف الـ System Prompt؟',
-        questionEn: 'Does the user see the System Prompt?',
-        type: 'true_false',
-        options: [
-          { id: 'o1', textAr: 'أيوه دايماً', textEn: 'Yes always', isCorrect: false },
-          { id: 'o2', textAr: 'لا، بيكون مخفي', textEn: 'No, it\'s hidden', isCorrect: true },
-        ],
-      },
-      {
-        id: 'q12-3',
-        questionAr: 'الـ System Prompt بيُستخدم في؟',
-        questionEn: 'The System Prompt is used for?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'تحديد شخصية وقواعد الـ AI في التطبيق', textEn: 'Defining the AI\'s persona and rules in the app', isCorrect: true },
-          { id: 'o2', textAr: 'سرعة الإجابات', textEn: 'Speeding up responses', isCorrect: false },
-          { id: 'o3', textAr: 'تخفيض تكلفة الـ API', textEn: 'Reducing API costs', isCorrect: false },
-          { id: 'o4', textAr: 'إنشاء صور', textEn: 'Generating images', isCorrect: false },
-        ],
-      },
-    ],
-  },
+ quiz: [
+ {
+ id: 'q12-1',
+ questionAr: 'مين اللي بيكتب الـ System Prompt عادةً؟',
+ questionEn: 'Who usually writes the System Prompt?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'المطوّر أو صاحب التطبيق', textEn: 'The developer or app owner', isCorrect: true },
+ { id: 'o2', textAr: 'المستخدم العادي', textEn: 'The regular user', isCorrect: false },
+ { id: 'o3', textAr: 'Claude نفسه', textEn: 'Claude itself', isCorrect: false },
+ { id: 'o4', textAr: 'شركة Anthropic بس', textEn: 'Anthropic only', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q12-2',
+ questionAr: 'هل المستخدم بيشوف الـ System Prompt؟',
+ questionEn: 'Does the user see the System Prompt?',
+ type: 'true_false',
+ options: [
+ { id: 'o1', textAr: 'أيوه دايماً', textEn: 'Yes always', isCorrect: false },
+ { id: 'o2', textAr: 'لا، بيكون مخفي', textEn: 'No, it\'s hidden', isCorrect: true },
+ ],
+ },
+ {
+ id: 'q12-3',
+ questionAr: 'الـ System Prompt بيُستخدم في؟',
+ questionEn: 'The System Prompt is used for?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'تحديد شخصية وقواعد الـ AI في التطبيق', textEn: 'Defining the AI\'s persona and rules in the app', isCorrect: true },
+ { id: 'o2', textAr: 'سرعة الإجابات', textEn: 'Speeding up responses', isCorrect: false },
+ { id: 'o3', textAr: 'تخفيض تكلفة الـ API', textEn: 'Reducing API costs', isCorrect: false },
+ { id: 'o4', textAr: 'إنشاء صور', textEn: 'Generating images', isCorrect: false },
+ ],
+ },
+ ],
+ },
 
-  {
-    id: 13,
-    slug: 'prompt-engineering-review',
-    agentSlug: 'claude',
-    titleAr: 'مراجعة: دمج التقنيات',
-    titleEn: 'Review: Combining Techniques',
-    descriptionAr: 'دمّج كل التقنيات اللي اتعلمتها وابني prompts احترافية.',
-    descriptionEn: 'Combine all the techniques you\'ve learned and build professional prompts.',
-    order: 13,
-    xpReward: 100,
-    estimatedMinutes: 12,
-    emoji: '🏆',
-    contentAr: `## دمج التقنيات — المستوى الاحترافي
+ {
+ id: 13,
+ slug: 'prompt-engineering-review',
+ agentSlug: 'claude',
+ titleAr: 'مراجعة: دمج التقنيات',
+ titleEn: 'Review: Combining Techniques',
+ descriptionAr: 'دمّج كل التقنيات اللي اتعلمتها وابني prompts احترافية.',
+ descriptionEn: 'Combine all the techniques you\'ve learned and build professional prompts.',
+ order: 13,
+ xpReward: 100,
+ estimatedMinutes: 12,
+ emoji: '',
+ contentAr: `## دمج التقنيات — المستوى الاحترافي
 
 وصلت للدرس الأخير في Prompt Engineering! جه الوقت تدمج كل حاجة اتعلمتها.
 
@@ -1242,28 +1242,28 @@ Then ask it a question about something else — watch how it maintains the perso
 
 ## الأخطاء الشائعة
 
-❌ **Prompt غامض** → ✅ كن دقيق ومحدد
-❌ **سياق ناقص** → ✅ اديه كل المعلومات المهمة
-❌ **تنسيق مش محدد** → ✅ قول عايز الإجابة إزاي
-❌ **كل تقنية لوحدها** → ✅ ادمجهم مع بعض
+ **Prompt غامض** → كن دقيق ومحدد
+ **سياق ناقص** → اديه كل المعلومات المهمة
+ **تنسيق مش محدد** → قول عايز الإجابة إزاي
+ **كل تقنية لوحدها** → ادمجهم مع بعض
 
 ---
 
-## 🎉 مبروك!
+## مبروك!
 
 خلصت **Prompt Engineering track** كامل! دلوقتي عندك:
 
-- ✅ Zero-shot Prompting
-- ✅ Few-shot Prompting
-- ✅ Chain of Thought
-- ✅ Role Prompting
-- ✅ Output Formatting
-- ✅ System Prompt
-- ✅ دمج التقنيات
+- Zero-shot Prompting
+- Few-shot Prompting
+- Chain of Thought
+- Role Prompting
+- Output Formatting
+- System Prompt
+- دمج التقنيات
 
-جرّب كل اللي اتعلمته في **الـ Sandbox** واكتشف قوتك الحقيقية! 🚀`,
+جرّب كل اللي اتعلمته في **الـ Sandbox** واكتشف قوتك الحقيقية! `,
 
-    contentEn: `## Combining Techniques — Professional Level
+ contentEn: `## Combining Techniques — Professional Level
 
 You've reached the last lesson in Prompt Engineering! Time to combine everything you've learned.
 
@@ -1317,62 +1317,62 @@ We have 500 users and can't retain them.
 
 ## Common Mistakes
 
-❌ **Vague prompt** → ✅ Be precise and specific
-❌ **Missing context** → ✅ Give all important information
-❌ **Unspecified format** → ✅ Say how you want the answer
-❌ **Each technique alone** → ✅ Combine them together
+ **Vague prompt** → Be precise and specific
+ **Missing context** → Give all important information
+ **Unspecified format** → Say how you want the answer
+ **Each technique alone** → Combine them together
 
 ---
 
-## 🎉 Congratulations!
+## Congratulations!
 
 You've completed the full **Prompt Engineering track**! You now have:
 
-- ✅ Zero-shot Prompting
-- ✅ Few-shot Prompting
-- ✅ Chain of Thought
-- ✅ Role Prompting
-- ✅ Output Formatting
-- ✅ System Prompt
-- ✅ Combining Techniques
+- Zero-shot Prompting
+- Few-shot Prompting
+- Chain of Thought
+- Role Prompting
+- Output Formatting
+- System Prompt
+- Combining Techniques
 
-Try everything you've learned in the **Sandbox** and discover your true power! 🚀`,
+Try everything you've learned in the **Sandbox** and discover your true power! `,
 
-    quiz: [
-      {
-        id: 'q13-1',
-        questionAr: 'الـ Prompt الاحترافي بيدمج؟',
-        questionEn: 'A professional prompt combines?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'أكتر من تقنية مع بعض', textEn: 'Multiple techniques together', isCorrect: true },
-          { id: 'o2', textAr: 'تقنية واحدة فقط', textEn: 'Only one technique', isCorrect: false },
-          { id: 'o3', textAr: 'لا تقنيات خالص', textEn: 'No techniques at all', isCorrect: false },
-          { id: 'o4', textAr: 'أطول prompt ممكن', textEn: 'The longest prompt possible', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q13-2',
-        questionAr: 'من الأخطاء الشائعة في كتابة الـ Prompts؟',
-        questionEn: 'Which is a common mistake in writing prompts?',
-        type: 'multiple_choice',
-        options: [
-          { id: 'o1', textAr: 'سياق ناقص + تنسيق مش محدد', textEn: 'Missing context + unspecified format', isCorrect: true },
-          { id: 'o2', textAr: 'استخدام Role Prompting', textEn: 'Using Role Prompting', isCorrect: false },
-          { id: 'o3', textAr: 'طلب إجابة منظمة', textEn: 'Requesting a structured answer', isCorrect: false },
-          { id: 'o4', textAr: 'تحديد الجمهور المستهدف', textEn: 'Specifying the target audience', isCorrect: false },
-        ],
-      },
-      {
-        id: 'q13-3',
-        questionAr: 'صح ولا غلط: تعلمت في الـ track ده Zero-shot, Few-shot, CoT, Role, Format, و System Prompt',
-        questionEn: 'True or False: In this track you learned Zero-shot, Few-shot, CoT, Role, Format, and System Prompt',
-        type: 'true_false',
-        options: [
-          { id: 'o1', textAr: 'صح 🎉', textEn: 'True 🎉', isCorrect: true },
-          { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
-        ],
-      },
-    ],
-  },
+ quiz: [
+ {
+ id: 'q13-1',
+ questionAr: 'الـ Prompt الاحترافي بيدمج؟',
+ questionEn: 'A professional prompt combines?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'أكتر من تقنية مع بعض', textEn: 'Multiple techniques together', isCorrect: true },
+ { id: 'o2', textAr: 'تقنية واحدة فقط', textEn: 'Only one technique', isCorrect: false },
+ { id: 'o3', textAr: 'لا تقنيات خالص', textEn: 'No techniques at all', isCorrect: false },
+ { id: 'o4', textAr: 'أطول prompt ممكن', textEn: 'The longest prompt possible', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q13-2',
+ questionAr: 'من الأخطاء الشائعة في كتابة الـ Prompts؟',
+ questionEn: 'Which is a common mistake in writing prompts?',
+ type: 'multiple_choice',
+ options: [
+ { id: 'o1', textAr: 'سياق ناقص + تنسيق مش محدد', textEn: 'Missing context + unspecified format', isCorrect: true },
+ { id: 'o2', textAr: 'استخدام Role Prompting', textEn: 'Using Role Prompting', isCorrect: false },
+ { id: 'o3', textAr: 'طلب إجابة منظمة', textEn: 'Requesting a structured answer', isCorrect: false },
+ { id: 'o4', textAr: 'تحديد الجمهور المستهدف', textEn: 'Specifying the target audience', isCorrect: false },
+ ],
+ },
+ {
+ id: 'q13-3',
+ questionAr: 'صح ولا غلط: تعلمت في الـ track ده Zero-shot, Few-shot, CoT, Role, Format, و System Prompt',
+ questionEn: 'True or False: In this track you learned Zero-shot, Few-shot, CoT, Role, Format, and System Prompt',
+ type: 'true_false',
+ options: [
+ { id: 'o1', textAr: 'صح ', textEn: 'True ', isCorrect: true },
+ { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
+ ],
+ },
+ ],
+ },
 ];

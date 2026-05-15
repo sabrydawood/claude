@@ -37,7 +37,7 @@ export default function SandboxPage() {
   }, [session, isPending, router]);
 
   useEffect(() => {
-    fetch('/api/keys/hint')
+    fetch('/api/v1/keys/hint')
       .then(r => r.json())
       .then(d => setHint(d.hint ?? null));
   }, []);
@@ -50,7 +50,7 @@ export default function SandboxPage() {
     setKeyError('');
     setKeySaving(true);
     try {
-      const res = await fetch('/api/keys', {
+      const res = await fetch('/api/v1/keys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ apiKey: keyInput }),
@@ -66,7 +66,7 @@ export default function SandboxPage() {
   }
 
   async function deleteKey() {
-    await fetch('/api/keys', { method: 'DELETE' });
+    await fetch('/api/v1/keys', { method: 'DELETE' });
     setHint(null);
   }
 
@@ -85,7 +85,7 @@ export default function SandboxPage() {
     setMessages(prev => [...prev, assistantMsg]);
 
     try {
-      const res = await fetch('/api/sandbox/chat', {
+      const res = await fetch('/api/v1/sandbox', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: newMessages }),

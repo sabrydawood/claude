@@ -73,7 +73,7 @@ export const Agents = pgTable('Agents', {
   Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
   Slug:      text('Slug').notNull().unique(),
   Color:     text('Color').notNull(),
-  Emoji:     text('Emoji').notNull(),
+  Icon:      text('Icon').notNull(),
   IsActive:  boolean('IsActive').default(true).notNull(),
   Order:     integer('Order').default(0).notNull(),
   IsDeleted: boolean('IsDeleted').default(false).notNull(),
@@ -175,7 +175,7 @@ export const QuizOptionTranslations = pgTable(
 export const Tracks = pgTable('Tracks', {
   Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
   Slug:      text('Slug').notNull().unique(),
-  Emoji:     text('Emoji').notNull(),
+  Icon:      text('Icon').notNull(),
   Order:     integer('Order').default(0).notNull(),
   IsDefault: boolean('IsDefault').default(false).notNull(),
   IsDeleted: boolean('IsDeleted').default(false).notNull(),
@@ -201,7 +201,7 @@ export const TrackTranslations = pgTable(
 
 export const Achievements = pgTable('Achievements', {
   Id:             uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
-  Emoji:          text('Emoji').notNull(),
+  Icon:           text('Icon').notNull(),
   ConditionType:  text('ConditionType').notNull(),
   ConditionValue: integer('ConditionValue').notNull(),
   IsDeleted:      boolean('IsDeleted').default(false).notNull(),

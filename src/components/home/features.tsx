@@ -14,7 +14,6 @@ export default function HomeFeatures({ locale }: { locale: string }) {
       descKey: 'forKids.description',
       color: 'text-pink-500',
       bg: 'bg-pink-500/15',
-      emoji: '🧒',
     },
     {
       icon: <Gamepad2 size={28} />,
@@ -22,7 +21,6 @@ export default function HomeFeatures({ locale }: { locale: string }) {
       descKey: 'interactive.description',
       color: 'text-[var(--zkawi-purple)]',
       bg: 'bg-[var(--zkawi-purple)]/15',
-      emoji: '🎮',
     },
     {
       icon: <TrendingUp size={28} />,
@@ -30,7 +28,6 @@ export default function HomeFeatures({ locale }: { locale: string }) {
       descKey: 'progress.description',
       color: 'text-[var(--zkawi-green)]',
       bg: 'bg-[var(--zkawi-green)]/15',
-      emoji: '📈',
     },
     {
       icon: <Globe size={28} />,
@@ -38,7 +35,6 @@ export default function HomeFeatures({ locale }: { locale: string }) {
       descKey: 'arabic.description',
       color: 'text-[var(--zkawi-gold)]',
       bg: 'bg-[var(--zkawi-gold)]/15',
-      emoji: '🌍',
     },
   ];
 
@@ -52,7 +48,7 @@ export default function HomeFeatures({ locale }: { locale: string }) {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-black text-[var(--text)] mb-4">
-            {t('title')} 💜
+            {t('title')}
           </h2>
           <p className="text-lg text-[var(--text-muted)] max-w-2xl mx-auto">
             {t('subtitle')}
@@ -70,7 +66,6 @@ export default function HomeFeatures({ locale }: { locale: string }) {
               whileHover={{ y: -5 }}
               className="bg-[var(--surface-2)] border border-[var(--border)] rounded-3xl p-6 text-center shadow-sm"
             >
-              <div className="text-4xl mb-3">{feature.emoji}</div>
               <div className={`${feature.bg} ${feature.color} w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4`}>
                 {feature.icon}
               </div>

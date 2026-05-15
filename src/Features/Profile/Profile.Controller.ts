@@ -39,7 +39,7 @@ export async function GetUserProfile(
   const EarnedData = await db
     .select({
       Id: Achievements.Id,
-      Emoji: Achievements.Emoji,
+      Icon: Achievements.Icon,
       AchievementId: UserAchievements.AchievementId,
       EarnedAt: UserAchievements.EarnedAt,
     })
@@ -63,7 +63,7 @@ export async function GetUserProfile(
 
   const AchievementList = EarnedData.map((E) => ({
     Id: E.Id,
-    Emoji: E.Emoji,
+    Icon: E.Icon,
     Name: TransMap.get(`${E.Id}_${Locale}`) ?? TransMap.get(`${E.Id}_en`) ?? '',
     EarnedAt: EarnedAtMap.get(E.Id)!,
   }));

@@ -7,7 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/ui/logo';
 import { useSession } from '@/lib/auth-client';
-import { ChevronRight, ChevronLeft, Zap } from 'lucide-react';
+import {
+  ChevronRight, ChevronLeft, Zap, UserRound, Gamepad2, Briefcase, Calendar,
+  MessageCircle, Palette, Code2, GraduationCap, Target, Sprout, Leaf, TreePine,
+  Brain, Eye, BookOpen, FlaskConical, Sparkles, Coffee, Flame,
+} from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,13 +32,13 @@ interface OnboardingAnswers {
 // ─── Step option component ────────────────────────────────────────────────────
 
 function OptionCard({
-  emoji,
+  icon,
   title,
   desc,
   selected,
   onClick,
 }: {
-  emoji: string;
+  icon: React.ReactNode;
   title: string;
   desc: string;
   selected: boolean;
@@ -48,7 +52,7 @@ function OptionCard({
       className={`wizard-option rounded-2xl p-4 text-start w-full transition-all ${selected ? 'selected' : ''}`}
     >
       <div className="flex items-center gap-3">
-        <span className="text-3xl">{emoji}</span>
+        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${selected ? 'bg-[var(--zkawi-purple)]/15 text-[var(--zkawi-purple)]' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}>{icon}</span>
         <div className="flex-1 min-w-0">
           <div className={`font-black text-sm ${selected ? 'text-[var(--zkawi-purple)]' : 'text-[var(--text)]'}`}>
             {title}
@@ -121,19 +125,21 @@ export default function OnboardingPage() {
   const handleFinish = async () => {
     setSaving(true);
     try {
-      const res = await fetch('/api/onboarding', {
+      const res = await fetch('/api/v1/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ageGroup: answers.ageGroup,
-          goal: answers.goal,
-          experience: answers.experience,
-          learningStyle: answers.learningStyle,
-          dailyMinutes: answers.dailyMinutes,
+          AgeGroup:      answers.ageGroup,
+          Goal:          answers.goal,
+          Experience:    answers.experience,
+          LearningStyle: answers.learningStyle,
+          DailyMinutes:  answers.dailyMinutes,
         }),
       });
       if (res.ok) {
         router.push('/dashboard');
+      } else {
+        setSaving(false);
       }
     } catch {
       setSaving(false);
@@ -271,10 +277,10 @@ type StepProps = {
   t: ReturnType<typeof useTranslations<'onboarding'>>;
 };
 
-function StepHeader({ emoji, title, subtitle }: { emoji: string; title: string; subtitle: string }) {
+function StepHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
   return (
     <div className="text-center mb-8">
-      <div className="text-5xl mb-3">{emoji}</div>
+      <div className="flex justify-center mb-3 text-[var(--zkawi-purple)]">{icon}</div>
       <h2 className="text-2xl font-black text-[var(--text)] mb-2">{title}</h2>
       <p className="text-[var(--text-muted)]">{subtitle}</p>
     </div>
@@ -283,20 +289,20 @@ function StepHeader({ emoji, title, subtitle }: { emoji: string; title: string; 
 
 function StepAge({ answers, setAnswers, t }: StepProps) {
   const st = t.raw('steps.age') as Record<string, string>;
-  const options: { value: AgeGroup; emoji: string; title: string; desc: string }[] = [
-    { value: 'child', emoji: '🧒', title: st.child, desc: st.childDesc },
-    { value: 'teen', emoji: '🎮', title: st.teen, desc: st.teenDesc },
-    { value: 'adult', emoji: '💼', title: st.adult, desc: st.adultDesc },
+  const options: { value: AgeGroup; icon: React.ReactNode; title: string; desc: string }[] = [
+    { value: 'child', icon: <UserRound size={20} />, title: st.child, desc: st.childDesc },
+    { value: 'teen',  icon: <Gamepad2 size={20} />,  title: st.teen,  desc: st.teenDesc },
+    { value: 'adult', icon: <Briefcase size={20} />, title: st.adult, desc: st.adultDesc },
   ];
 
   return (
     <div>
-      <StepHeader emoji="🎂" title={st.title} subtitle={st.subtitle} />
+      <StepHeader icon={<Calendar size={52} />} title={st.title} subtitle={st.subtitle} />
       <div className="space-y-3">
         {options.map(opt => (
           <OptionCard
             key={opt.value}
-            emoji={opt.emoji}
+            icon={opt.icon}
             title={opt.title}
             desc={opt.desc}
             selected={answers.ageGroup === opt.value}
@@ -310,22 +316,22 @@ function StepAge({ answers, setAnswers, t }: StepProps) {
 
 function StepGoal({ answers, setAnswers, t }: StepProps) {
   const st = t.raw('steps.goal') as Record<string, string>;
-  const options: { value: Goal; emoji: string; title: string; desc: string }[] = [
-    { value: 'chat', emoji: '💬', title: st.chat, desc: st.chatDesc },
-    { value: 'work', emoji: '💼', title: st.work, desc: st.workDesc },
-    { value: 'creative', emoji: '🎨', title: st.creative, desc: st.creativeDesc },
-    { value: 'developer', emoji: '💻', title: st.developer, desc: st.developerDesc },
-    { value: 'educator', emoji: '📚', title: st.educator, desc: st.educatorDesc },
+  const options: { value: Goal; icon: React.ReactNode; title: string; desc: string }[] = [
+    { value: 'chat',      icon: <MessageCircle size={20} />, title: st.chat,      desc: st.chatDesc },
+    { value: 'work',      icon: <Briefcase size={20} />,     title: st.work,      desc: st.workDesc },
+    { value: 'creative',  icon: <Palette size={20} />,       title: st.creative,  desc: st.creativeDesc },
+    { value: 'developer', icon: <Code2 size={20} />,         title: st.developer, desc: st.developerDesc },
+    { value: 'educator',  icon: <GraduationCap size={20} />, title: st.educator,  desc: st.educatorDesc },
   ];
 
   return (
     <div>
-      <StepHeader emoji="🎯" title={st.title} subtitle={st.subtitle} />
+      <StepHeader icon={<Target size={52} />} title={st.title} subtitle={st.subtitle} />
       <div className="space-y-3">
         {options.map(opt => (
           <OptionCard
             key={opt.value}
-            emoji={opt.emoji}
+            icon={opt.icon}
             title={opt.title}
             desc={opt.desc}
             selected={answers.goal === opt.value}
@@ -339,20 +345,20 @@ function StepGoal({ answers, setAnswers, t }: StepProps) {
 
 function StepExperience({ answers, setAnswers, t }: StepProps) {
   const st = t.raw('steps.experience') as Record<string, string>;
-  const options: { value: Experience; emoji: string; title: string; desc: string }[] = [
-    { value: 'none', emoji: '🌱', title: st.none, desc: st.noneDesc },
-    { value: 'some', emoji: '🌿', title: st.some, desc: st.someDesc },
-    { value: 'advanced', emoji: '🌳', title: st.advanced, desc: st.advancedDesc },
+  const options: { value: Experience; icon: React.ReactNode; title: string; desc: string }[] = [
+    { value: 'none',     icon: <Sprout size={20} />,   title: st.none,     desc: st.noneDesc },
+    { value: 'some',     icon: <Leaf size={20} />,      title: st.some,     desc: st.someDesc },
+    { value: 'advanced', icon: <TreePine size={20} />,  title: st.advanced, desc: st.advancedDesc },
   ];
 
   return (
     <div>
-      <StepHeader emoji="🧠" title={st.title} subtitle={st.subtitle} />
+      <StepHeader icon={<Brain size={52} />} title={st.title} subtitle={st.subtitle} />
       <div className="space-y-3">
         {options.map(opt => (
           <OptionCard
             key={opt.value}
-            emoji={opt.emoji}
+            icon={opt.icon}
             title={opt.title}
             desc={opt.desc}
             selected={answers.experience === opt.value}
@@ -366,21 +372,21 @@ function StepExperience({ answers, setAnswers, t }: StepProps) {
 
 function StepStyle({ answers, setAnswers, t }: StepProps) {
   const st = t.raw('steps.style') as Record<string, string>;
-  const options: { value: LearningStyle; emoji: string; title: string; desc: string }[] = [
-    { value: 'visual', emoji: '👁️', title: st.visual, desc: st.visualDesc },
-    { value: 'reading', emoji: '📖', title: st.reading, desc: st.readingDesc },
-    { value: 'practice', emoji: '🔬', title: st.practice, desc: st.practiceDesc },
-    { value: 'game', emoji: '🎮', title: st.game, desc: st.gameDesc },
+  const options: { value: LearningStyle; icon: React.ReactNode; title: string; desc: string }[] = [
+    { value: 'visual',   icon: <Eye size={20} />,         title: st.visual,   desc: st.visualDesc },
+    { value: 'reading',  icon: <BookOpen size={20} />,    title: st.reading,  desc: st.readingDesc },
+    { value: 'practice', icon: <FlaskConical size={20} />,title: st.practice, desc: st.practiceDesc },
+    { value: 'game',     icon: <Gamepad2 size={20} />,    title: st.game,     desc: st.gameDesc },
   ];
 
   return (
     <div>
-      <StepHeader emoji="✨" title={st.title} subtitle={st.subtitle} />
+      <StepHeader icon={<Sparkles size={52} />} title={st.title} subtitle={st.subtitle} />
       <div className="space-y-3">
         {options.map(opt => (
           <OptionCard
             key={opt.value}
-            emoji={opt.emoji}
+            icon={opt.icon}
             title={opt.title}
             desc={opt.desc}
             selected={answers.learningStyle === opt.value}
@@ -394,21 +400,21 @@ function StepStyle({ answers, setAnswers, t }: StepProps) {
 
 function StepTime({ answers, setAnswers, t }: StepProps) {
   const st = t.raw('steps.time') as Record<string, string>;
-  const options: { value: DailyMinutes; emoji: string; title: string; desc: string }[] = [
-    { value: 5, emoji: '⚡', title: st.min5, desc: st.min5Desc },
-    { value: 15, emoji: '☕', title: st.min15, desc: st.min15Desc },
-    { value: 30, emoji: '📚', title: st.min30, desc: st.min30Desc },
-    { value: 60, emoji: '🔥', title: st.min60, desc: st.min60Desc },
+  const options: { value: DailyMinutes; icon: React.ReactNode; title: string; desc: string }[] = [
+    { value: 5,  icon: <Zap size={20} />,      title: st.min5,  desc: st.min5Desc },
+    { value: 15, icon: <Coffee size={20} />,    title: st.min15, desc: st.min15Desc },
+    { value: 30, icon: <BookOpen size={20} />,  title: st.min30, desc: st.min30Desc },
+    { value: 60, icon: <Flame size={20} />,     title: st.min60, desc: st.min60Desc },
   ];
 
   return (
     <div>
-      <StepHeader emoji="⏰" title={st.title} subtitle={st.subtitle} />
+      <StepHeader icon={<Zap size={52} />} title={st.title} subtitle={st.subtitle} />
       <div className="space-y-3">
         {options.map(opt => (
           <OptionCard
             key={opt.value}
-            emoji={opt.emoji}
+            icon={opt.icon}
             title={opt.title}
             desc={opt.desc}
             selected={answers.dailyMinutes === opt.value}

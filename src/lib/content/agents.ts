@@ -9,7 +9,7 @@ export interface Agent {
   fullDescriptionEn: string;
   color: string;
   gradient: string;
-  emoji: string;
+  icon: string;
   isActive: boolean;
   order: number;
 }
@@ -26,7 +26,7 @@ export const agents: Agent[] = [
     fullDescriptionEn: 'Claude is an advanced AI assistant from Anthropic. Known for its natural and respectful communication, it helps with writing, coding, math, and explaining complex topics simply.',
     color: '#7C3AED',
     gradient: 'from-purple-500 to-purple-700',
-    emoji: '🤖',
+    icon: 'Bot',
     isActive: true,
     order: 1,
   },
@@ -41,7 +41,7 @@ export const agents: Agent[] = [
     fullDescriptionEn: 'ChatGPT is an AI assistant from OpenAI, which became world-famous in 2022.',
     color: '#10B981',
     gradient: 'from-emerald-400 to-teal-500',
-    emoji: '💬',
+    icon: 'MessageCircle',
     isActive: false,
     order: 2,
   },
@@ -56,7 +56,7 @@ export const agents: Agent[] = [
     fullDescriptionEn: 'Gemini is Google\'s AI assistant known for understanding multiple content types.',
     color: '#3B82F6',
     gradient: 'from-blue-400 to-blue-600',
-    emoji: '✨',
+    icon: 'Sparkles',
     isActive: false,
     order: 3,
   },

@@ -16,7 +16,7 @@
     "newChat": "محادثة جديدة",
     "placeholder": "اسأل ذكي أي حاجة...",
     "askZaki": "اسأل ذكي",
-    "errorMsg": "عذراً، مش قادر أرد دلوقتي. حاول تاني 😅"
+    "errorMsg": "عذراً، مش قادر أرد دلوقتي. حاول تاني"
   },
   "pwa": {
     "install": "ثبّت ذكاوي على جهازك",
@@ -127,7 +127,7 @@
   },
   "auth": {
     "login": {
-      "title": "أهلاً بيك تاني! 👋",
+      "title": "أهلاً بيك تاني!",
       "subtitle": "دخل على حسابك وكمل مسيرتك في التعلم",
       "email": "الإيميل",
       "emailPlaceholder": "اكتب إيميلك هنا",
@@ -141,7 +141,7 @@
       "dataSecure": "بياناتك محمية وآمنة معنا"
     },
     "register": {
-      "title": "انضم لذكاوي! 🚀",
+      "title": "انضم لذكاوي!",
       "subtitle": "اعمل حساب وابدأ رحلة التعلم الممتعة",
       "name": "الاسم",
       "namePlaceholder": "اكتب اسمك هنا",
@@ -259,7 +259,7 @@
     "moreAchievements": "+ {count} إنجازات أخرى",
     "awesome": "رائع!",
     "lessonCompletedTitle": "أحسنت! الدرس اتكمل!",
-    "lessonCompletedDesc": "كملت درس \"{title}\" وكسبت XP جديدة!",
+    "lessonCompletedDesc": "كملت درس \"{title}\"وكسبت XP جديدة!",
     "xpEarnedLabel": "XP كسبتها",
     "quizScore": "نتيجة الكويز",
     "achievementsUnlocked": "إنجازات مفتوحة!",
@@ -274,11 +274,11 @@
     "questions": "أسئلة"
   },
   "quiz": {
-    "title": "وقت الكويز! 🎯",
+    "title": "وقت الكويز!",
     "subtitle": "اختبر اللي اتعلمته",
     "question": "سؤال",
     "of": "من",
-    "correct": "صح! 🎉",
+    "correct": "صح!",
     "incorrect": "غلط، حاول تاني",
     "correctAnswer": "الإجابة الصح",
     "correctAnswers": "إجابات صح",
@@ -286,9 +286,9 @@
     "finish": "خلص الكويز",
     "results": {
       "title": "النتيجة",
-      "perfect": "ممتاز! 🌟",
-      "great": "عظيم! 🎉",
-      "good": "كويس! 👍",
+      "perfect": "ممتاز!",
+      "great": "عظيم!",
+      "good": "كويس!",
       "tryAgain": "حاول تاني",
       "score": "نتيجتك",
       "xpEarned": "XP كسبتها",
@@ -361,17 +361,17 @@
     "tagline": "تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة"
   },
   "onboarding": {
-    "title": "خليني أعرفك أكتر! 🤖",
+    "title": "خليني أعرفك أكتر!",
     "subtitle": "عشان نعمل لك تجربة تعلم مخصوصة ليك",
     "step": "خطوة",
     "of": "من",
     "next": "التالي",
     "prev": "السابق",
-    "finish": "ابدأ رحلتك! 🚀",
+    "finish": "ابدأ رحلتك!",
     "steps": {
       "age": {
         "title": "عندك كام سنة؟",
-        "subtitle": "مش هنحكم عليك 😄",
+        "subtitle": "مش هنحكم عليك",
         "child": "طفل (٧-١٢)",
         "childDesc": "تعلم بالألعاب والأنشطة",
         "teen": "مراهق (١٣-١٧)",
@@ -486,14 +486,14 @@
   },
   "og": {
     "platform": "منصة تعلم الذكاء الاصطناعي",
-    "interactive": "🎮 تفاعلي",
+    "interactive": "تفاعلي",
     "xpPoints": "⭐ نقاط XP",
-    "arabicFirst": "📚 عربي أولاً",
+    "arabicFirst": "عربي أولاً",
     "achievementUnlocked": "فتح هذا الإنجاز على ذكاوي",
     "lessons": "درس"
   },
   "error": {
-    "title": "أوبس! في حاجة غلط 😅",
+    "title": "أوبس! في حاجة غلط",
     "description": "متقلقش، الموضوع عادي! إحنا بنشتغل على حل المشكلة دي.",
     "retry": "حاول تاني",
     "goHome": "ارجع للرئيسية",

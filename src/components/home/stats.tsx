@@ -69,7 +69,7 @@ export default function HomeStats({ locale }: { locale: string }) {
           className="text-center mb-10"
         >
           <h2 className="text-2xl md:text-3xl font-black text-[var(--text)]">
-            {t('title')} 📊
+            {t('title')}
           </h2>
         </motion.div>
 

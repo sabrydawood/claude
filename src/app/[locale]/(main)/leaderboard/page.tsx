@@ -26,7 +26,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/leaderboard')
+    fetch('/api/v1/leaderboard')
       .then(r => r.json())
       .then(d => setEntries(d.leaderboard ?? []))
       .finally(() => setLoading(false));

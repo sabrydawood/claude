@@ -46,7 +46,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!session) return;
-    fetch('/api/admin/lessons')
+    fetch('/api/v1/admin/lessons')
       .then(async r => {
         if (r.status === 403) { setForbidden(true); return; }
         const data = await r.json();
@@ -60,7 +60,7 @@ export default function AdminPage() {
     setSaving(true);
     setSaveOk(false);
     try {
-      const res = await fetch('/api/admin/lessons', {
+      const res = await fetch('/api/v1/admin/lessons', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -80,7 +80,7 @@ export default function AdminPage() {
       setForm(EMPTY_FORM);
       setShowForm(false);
       // Refresh list
-      const listRes = await fetch('/api/admin/lessons');
+      const listRes = await fetch('/api/v1/admin/lessons');
       const listData = await listRes.json();
       setLessons(listData.lessons ?? []);
     } finally {

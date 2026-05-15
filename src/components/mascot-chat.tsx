@@ -124,7 +124,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
     ]);
 
     try {
-      const res = await fetch('/api/mascot/chat', {
+      const res = await fetch('/api/v1/mascot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

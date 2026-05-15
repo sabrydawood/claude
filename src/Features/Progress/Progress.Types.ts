@@ -6,7 +6,7 @@
 
 export interface IAchievementInfo {
   Id: string;
-  Emoji: string;
+  Icon: string;
   NameAr: string;
   NameEn: string;
 }
@@ -29,7 +29,7 @@ export interface IProgressResponse {
 
 export interface IUserAchievementItem {
   Id: string;
-  Emoji: string;
+  Icon: string;
   Name: string;
   Description: string;
   Earned: boolean;

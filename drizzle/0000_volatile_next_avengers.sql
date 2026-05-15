@@ -9,7 +9,7 @@ CREATE TABLE "AchievementTranslations" (
 --> statement-breakpoint
 CREATE TABLE "Achievements" (
 	"Id" uuid PRIMARY KEY NOT NULL,
-	"Emoji" text NOT NULL,
+	"Icon" text NOT NULL,
 	"ConditionType" text NOT NULL,
 	"ConditionValue" integer NOT NULL,
 	"IsDeleted" boolean DEFAULT false NOT NULL
@@ -29,7 +29,7 @@ CREATE TABLE "Agents" (
 	"Id" uuid PRIMARY KEY NOT NULL,
 	"Slug" text NOT NULL,
 	"Color" text NOT NULL,
-	"Emoji" text NOT NULL,
+	"Icon" text NOT NULL,
 	"IsActive" boolean DEFAULT true NOT NULL,
 	"Order" integer DEFAULT 0 NOT NULL,
 	"IsDeleted" boolean DEFAULT false NOT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE "TrackTranslations" (
 CREATE TABLE "Tracks" (
 	"Id" uuid PRIMARY KEY NOT NULL,
 	"Slug" text NOT NULL,
-	"Emoji" text NOT NULL,
+	"Icon" text NOT NULL,
 	"Order" integer DEFAULT 0 NOT NULL,
 	"IsDefault" boolean DEFAULT false NOT NULL,
 	"IsDeleted" boolean DEFAULT false NOT NULL,

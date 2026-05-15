@@ -7,12 +7,13 @@ import { motion } from 'framer-motion';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Card } from '@/components/ui/card';
-import { Loader2, Trophy, Flame, BookOpen, Star, Calendar } from 'lucide-react';
+import { Loader2, Trophy, Flame, BookOpen, Star, Calendar, Frown } from 'lucide-react';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 
 interface ProfileData {
   user: { id: string; name: string; image: string | null; memberSince: string };
   stats: { totalXp: number; streakDays: number; lessonsCompleted: number; quizzesCompleted: number };
-  achievements: { id: number; emoji: string; name: string; earnedAt: string }[];
+  achievements: { id: number; icon: string; name: string; earnedAt: string }[];
 }
 
 export default function ProfilePage() {
@@ -43,7 +44,7 @@ export default function ProfilePage() {
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
       <Header />
       <main className="flex-1 flex flex-col items-center justify-center gap-3">
-        <p className="text-4xl">😔</p>
+        <Frown size={40} className="text-[var(--text-muted)]" />
         <p className="font-semibold" style={{ color: 'var(--text)' }}>{t('notFound')}</p>
       </main>
       <Footer />
@@ -127,7 +128,7 @@ export default function ProfilePage() {
                   className="p-3 flex flex-col items-center gap-1 text-center"
                   style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
                 >
-                  <span className="text-3xl">{a.emoji}</span>
+                  <DynamicIcon name={a.icon} size={28} className="mx-auto" />
                   <span className="text-xs font-medium" style={{ color: 'var(--text)' }}>
                     {a.name}
                   </span>

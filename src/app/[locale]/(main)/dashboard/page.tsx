@@ -13,29 +13,30 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Flame, BookOpen, Trophy, Target, ChevronRight, Lock, CheckCircle2, Clock, Bot, Zap, Lightbulb, GraduationCap } from 'lucide-react';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { useRouter } from '@/lib/i18n/navigation';
 
 interface UserAchievement {
-  id: number;
-  emoji: string;
+  id: string;
+  icon: string;
   name: string;
   description: string;
   earned: boolean;
 }
 
 interface LessonSummary {
-  id: number;
+  id: string;
   title: string;
   estimatedMinutes: number;
   xpReward: number;
 }
 
 interface UserProgress {
-  completedLessons: number[];
+  completedLessons: string[];
   totalXp: number;
   streakDays: number;
   quizzesCompleted: number;
-  scores: Record<number, number>;
+  scores: Record<string, number>;
   achievements: UserAchievement[];
 }
 
@@ -45,9 +46,9 @@ export default function DashboardPage() {
   const locale = useLocale();
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {}, achievements: [] });
+  const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {}, achievements: [] as UserAchievement[] });
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
-  const [lessonOrder, setLessonOrder] = useState<number[] | null>(null);
+  const [lessonOrder, setLessonOrder] = useState<string[] | null>(null);
   const [mounted, setMounted] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
@@ -63,18 +64,32 @@ export default function DashboardPage() {
     if (!isPending && session) {
       // Check onboarding + load progress in parallel
       Promise.all([
-        fetch('/api/user/preferences').then(r => r.json()),
-        fetch(`/api/progress?locale=${locale}`).then(r => r.json()),
-        fetch('/api/user/learning-path').then(r => r.json()).catch(() => ({ lessonOrder: null })),
-        fetch(`/api/lessons/claude?locale=${locale}`).then(r => r.json()).catch(() => ({ lessons: [] })),
-      ]).then(([prefs, prog, path, lessonsData]) => {
-        if (!prefs.onboardingCompleted) {
+        fetch('/api/v1/onboarding').then(r => r.json()),
+        fetch(`/api/v1/progress`).then(r => r.json()),
+        fetch(`/api/v1/agents/claude/lessons?locale=${locale}`).then(r => r.json()).catch(() => ({ Data: { lessons: [] } })),
+      ]).then(([prefs, prog, lessonsResp]) => {
+        const prefData = prefs.Data ?? prefs;
+        if (!prefData.onboardingCompleted) {
           router.push('/onboarding');
           return;
         }
-        if (prog.completedLessons) setProgress(prog);
-        if (path.lessonOrder) setLessonOrder(path.lessonOrder);
-        if (lessonsData.lessons) setLessons(lessonsData.lessons);
+        if (prog.Data?.CompletedLessons) {
+          setProgress({
+            completedLessons: prog.Data.CompletedLessons,
+            totalXp: prog.Data.TotalXp,
+            streakDays: prog.Data.StreakDays,
+            quizzesCompleted: prog.Data.QuizzesCompleted,
+            scores: prog.Data.Scores ?? {},
+            achievements: (prog.Data.Achievements ?? []).map((a: { Id: string; Icon: string; Name: string; Description: string; Earned: boolean }) => ({
+              id: a.Id, icon: a.Icon, name: a.Name, description: a.Description, earned: a.Earned,
+            })),
+          });
+        }
+        if (prefData.lessonOrder) setLessonOrder(prefData.lessonOrder);
+        const rawLessons = lessonsResp.Data?.lessons ?? [];
+        if (rawLessons.length) setLessons(rawLessons.map((l: { id: string; title: string; estimatedMinutes: number; xpReward: number }) => ({
+          id: l.id, title: l.title, estimatedMinutes: l.estimatedMinutes, xpReward: l.xpReward,
+        })));
         setCheckingOnboarding(false);
       }).catch(() => setCheckingOnboarding(false));
     }
@@ -311,7 +326,7 @@ export default function DashboardPage() {
                         }`}
                         title={achievement.name}
                       >
-                        <span className="text-2xl">{achievement.emoji}</span>
+                        <DynamicIcon name={achievement.icon} size={22} />
                         <span className="text-[9px] font-bold text-[var(--text-muted)] mt-1 leading-tight">
                           {achievement.name}
                         </span>

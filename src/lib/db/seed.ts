@@ -26,22 +26,22 @@ import {
 const AllLessons = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons, ...developerLessons];
 
 const ACHIEVEMENTS_DATA = [
-  { emoji: '🎯', conditionType: 'lessons_completed', conditionValue: 1,  nameAr: 'أول خطوة',      nameEn: 'First Step',        descAr: 'كملت أول درس ليك!',           descEn: 'You completed your first lesson!' },
-  { emoji: '🚀', conditionType: 'lessons_completed', conditionValue: 3,  nameAr: 'على الطريق',     nameEn: 'On the Right Track', descAr: 'كملت 3 دروس — انت بتتقدم!',   descEn: "Completed 3 lessons — you're progressing!" },
-  { emoji: '🏆', conditionType: 'lessons_completed', conditionValue: 5,  nameAr: 'متعلم نشيط',    nameEn: 'Active Learner',     descAr: 'كملت 5 دروس — عظيم!',          descEn: 'Completed 5 lessons — amazing!' },
-  { emoji: '⭐', conditionType: 'xp_earned',          conditionValue: 100, nameAr: 'جامع النقاط',  nameEn: 'Point Collector',   descAr: 'جمعت 100 XP!',                 descEn: 'Earned 100 XP!' },
-  { emoji: '💫', conditionType: 'xp_earned',          conditionValue: 500, nameAr: 'على الطريق',   nameEn: 'On the Way',        descAr: 'جمعت 500 XP',                  descEn: 'Collected 500 XP' },
-  { emoji: '👑', conditionType: 'xp_earned',          conditionValue: 1000,nameAr: 'خبير ذكاوي',   nameEn: 'Zkawi Expert',      descAr: 'جمعت 1000 XP',                 descEn: 'Collected 1000 XP' },
-  { emoji: '🔥', conditionType: 'streak_days',        conditionValue: 3,  nameAr: 'متحمس',          nameEn: 'Enthusiast',        descAr: '3 أيام متتالية — استمر!',       descEn: '3 days in a row — keep going!' },
-  { emoji: '⚡', conditionType: 'streak_days',        conditionValue: 7,  nameAr: 'مواظب',           nameEn: 'Consistent',        descAr: '7 أيام متتالية — رائع!',        descEn: '7 days streak — amazing!' },
+  { icon: 'Target',    conditionType: 'lessons_completed', conditionValue: 1,   nameAr: 'أول خطوة',   nameEn: 'First Step',        descAr: 'كملت أول درس ليك!',         descEn: 'You completed your first lesson!' },
+  { icon: 'Rocket',    conditionType: 'lessons_completed', conditionValue: 3,   nameAr: 'على الطريق', nameEn: 'On the Right Track', descAr: 'كملت 3 دروس — انت بتتقدم!', descEn: "Completed 3 lessons — you're progressing!" },
+  { icon: 'Trophy',    conditionType: 'lessons_completed', conditionValue: 5,   nameAr: 'متعلم نشيط', nameEn: 'Active Learner',     descAr: 'كملت 5 دروس — عظيم!',       descEn: 'Completed 5 lessons — amazing!' },
+  { icon: 'Star',      conditionType: 'xp_earned',         conditionValue: 100, nameAr: 'جامع النقاط', nameEn: 'Point Collector',   descAr: 'جمعت 100 XP!',              descEn: 'Earned 100 XP!' },
+  { icon: 'Sparkles',  conditionType: 'xp_earned',         conditionValue: 500, nameAr: 'على الطريق', nameEn: 'On the Way',        descAr: 'جمعت 500 XP',               descEn: 'Collected 500 XP' },
+  { icon: 'Crown',     conditionType: 'xp_earned',         conditionValue: 1000,nameAr: 'خبير ذكاوي', nameEn: 'Zkawi Expert',      descAr: 'جمعت 1000 XP',              descEn: 'Collected 1000 XP' },
+  { icon: 'Flame',     conditionType: 'streak_days',       conditionValue: 3,   nameAr: 'متحمس',      nameEn: 'Enthusiast',        descAr: '3 أيام متتالية — استمر!',    descEn: '3 days in a row — keep going!' },
+  { icon: 'Zap',       conditionType: 'streak_days',       conditionValue: 7,   nameAr: 'مواظب',      nameEn: 'Consistent',        descAr: '7 أيام متتالية — رائع!',     descEn: '7 days streak — amazing!' },
 ];
 
 const TRACKS_DATA = [
-  { slug: 'explorer',  emoji: '🧭', order: 1, isDefault: true,  nameAr: 'المستكشف', nameEn: 'Explorer',  descAr: 'للمبتدئين الفضوليين', descEn: 'For curious beginners exploring AI' },
-  { slug: 'creator',   emoji: '🎨', order: 2, isDefault: false, nameAr: 'المبدع',    nameEn: 'Creator',   descAr: 'للمبدعين',             descEn: 'For creatives using AI' },
-  { slug: 'engineer',  emoji: '⚙️', order: 3, isDefault: false, nameAr: 'المهندس',   nameEn: 'Engineer',  descAr: 'للمحترفين التقنيين',    descEn: 'For advanced technical professionals' },
-  { slug: 'developer', emoji: '💻', order: 4, isDefault: false, nameAr: 'المطور',    nameEn: 'Developer', descAr: 'للمطورين',              descEn: 'For developers integrating AI' },
-  { slug: 'educator',  emoji: '📚', order: 5, isDefault: false, nameAr: 'المعلم',    nameEn: 'Educator',  descAr: 'للمعلمين والمدربين',    descEn: 'For educators using AI' },
+  { slug: 'explorer',  icon: 'Compass',      order: 1, isDefault: true,  nameAr: 'المستكشف', nameEn: 'Explorer',  descAr: 'للمبتدئين الفضوليين', descEn: 'For curious beginners exploring AI' },
+  { slug: 'creator',   icon: 'Palette',      order: 2, isDefault: false, nameAr: 'المبدع',   nameEn: 'Creator',   descAr: 'للمبدعين',             descEn: 'For creatives using AI' },
+  { slug: 'engineer',  icon: 'Settings2',    order: 3, isDefault: false, nameAr: 'المهندس',  nameEn: 'Engineer',  descAr: 'للمحترفين التقنيين',    descEn: 'For advanced technical professionals' },
+  { slug: 'developer', icon: 'Code2',        order: 4, isDefault: false, nameAr: 'المطور',   nameEn: 'Developer', descAr: 'للمطورين',              descEn: 'For developers integrating AI' },
+  { slug: 'educator',  icon: 'GraduationCap',order: 5, isDefault: false, nameAr: 'المعلم',   nameEn: 'Educator',  descAr: 'للمعلمين والمدربين',    descEn: 'For educators using AI' },
 ];
 
 async function Seed() {
@@ -49,7 +49,7 @@ async function Seed() {
 
   for (const A of ACHIEVEMENTS_DATA) {
     const AchId = uuidv7();
-    await db.insert(Achievements).values({ Id: AchId, Emoji: A.emoji, ConditionType: A.conditionType, ConditionValue: A.conditionValue });
+    await db.insert(Achievements).values({ Id: AchId, Icon: A.icon, ConditionType: A.conditionType, ConditionValue: A.conditionValue });
     await db.insert(AchievementTranslations).values([
       { Id: uuidv7(), AchievementId: AchId, Locale: 'ar', Name: A.nameAr, Description: A.descAr },
       { Id: uuidv7(), AchievementId: AchId, Locale: 'en', Name: A.nameEn, Description: A.descEn },
@@ -60,7 +60,7 @@ async function Seed() {
   for (const T of TRACKS_DATA) {
     const TrackId = uuidv7();
     const [Track] = await db.insert(Tracks)
-      .values({ Id: TrackId, Slug: T.slug, Emoji: T.emoji, Order: T.order, IsDefault: T.isDefault })
+      .values({ Id: TrackId, Slug: T.slug, Icon: T.icon, Order: T.order, IsDefault: T.isDefault })
       .onConflictDoNothing()
       .returning({ Id: Tracks.Id });
     if (Track) {
@@ -76,7 +76,7 @@ async function Seed() {
   for (const A of AgentContent) {
     const AgentId = uuidv7();
     AgentIdMap.set(A.slug, AgentId);
-    await db.insert(Agents).values({ Id: AgentId, Slug: A.slug, Color: A.color, Emoji: A.emoji, IsActive: A.isActive, Order: A.order });
+    await db.insert(Agents).values({ Id: AgentId, Slug: A.slug, Color: A.color, Icon: A.icon, IsActive: A.isActive, Order: A.order });
     await db.insert(AgentTranslations).values([
       { Id: uuidv7(), AgentId, Locale: 'ar', Name: A.nameAr, Description: A.descriptionAr, FullDescription: A.fullDescriptionAr },
       { Id: uuidv7(), AgentId, Locale: 'en', Name: A.nameEn, Description: A.descriptionEn, FullDescription: A.fullDescriptionEn },

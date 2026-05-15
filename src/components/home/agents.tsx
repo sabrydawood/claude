@@ -6,6 +6,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Lock, BookOpen, ChevronRight } from 'lucide-react';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import type { AgentRow } from '@/lib/db/queries/content';
 
 // Gradient mapping by slug (non-translatable visual config)
@@ -49,7 +50,9 @@ export default function HomeAgents({ agents, locale: _locale }: { agents: AgentR
               >
                 {/* Card header with gradient */}
                 <div className={`bg-gradient-to-br ${gradient} p-6 text-white text-center`}>
-                  <div className="text-6xl mb-2">{agent.emoji}</div>
+                  <div className="flex justify-center mb-2 text-white/90">
+                    <DynamicIcon name={agent.icon} size={52} />
+                  </div>
                   <h3 className="text-2xl font-black">{agent.name}</h3>
                 </div>
 

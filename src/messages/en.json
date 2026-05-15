@@ -16,7 +16,7 @@
     "newChat": "New chat",
     "placeholder": "Ask Zaki anything...",
     "askZaki": "Ask Zaki",
-    "errorMsg": "Sorry, I can't respond right now. Try again! 😅"
+    "errorMsg": "Sorry, I can't respond right now. Try again!"
   },
   "pwa": {
     "install": "Install Zkawi on your device",
@@ -127,7 +127,7 @@
   },
   "auth": {
     "login": {
-      "title": "Welcome Back! 👋",
+      "title": "Welcome Back!",
       "subtitle": "Login to your account and continue your learning journey",
       "email": "Email",
       "emailPlaceholder": "Enter your email",
@@ -141,7 +141,7 @@
       "dataSecure": "Your data is safe and secure with us"
     },
     "register": {
-      "title": "Join Zkawi! 🚀",
+      "title": "Join Zkawi!",
       "subtitle": "Create an account and start your fun learning journey",
       "name": "Name",
       "namePlaceholder": "Enter your name",
@@ -259,7 +259,7 @@
     "moreAchievements": "+ {count} more achievements",
     "awesome": "Awesome!",
     "lessonCompletedTitle": "Well done! Lesson completed!",
-    "lessonCompletedDesc": "You completed \"{title}\" and earned new XP!",
+    "lessonCompletedDesc": "You completed \"{title}\"and earned new XP!",
     "xpEarnedLabel": "XP earned",
     "quizScore": "Quiz score",
     "achievementsUnlocked": "Achievements unlocked!",
@@ -274,11 +274,11 @@
     "questions": "questions"
   },
   "quiz": {
-    "title": "Quiz Time! 🎯",
+    "title": "Quiz Time!",
     "subtitle": "Test what you've learned",
     "question": "Question",
     "of": "of",
-    "correct": "Correct! 🎉",
+    "correct": "Correct!",
     "incorrect": "Incorrect, try again",
     "correctAnswer": "Correct Answer",
     "correctAnswers": "correct answers",
@@ -286,9 +286,9 @@
     "finish": "Finish Quiz",
     "results": {
       "title": "Results",
-      "perfect": "Perfect! 🌟",
-      "great": "Great! 🎉",
-      "good": "Good! 👍",
+      "perfect": "Perfect!",
+      "great": "Great!",
+      "good": "Good!",
       "tryAgain": "Try Again",
       "score": "Your Score",
       "xpEarned": "XP Earned",
@@ -361,17 +361,17 @@
     "tagline": "Learn AI the easy and fun way"
   },
   "onboarding": {
-    "title": "Tell us about yourself! 🤖",
+    "title": "Tell us about yourself!",
     "subtitle": "So we can create a personalized learning experience",
     "step": "Step",
     "of": "of",
     "next": "Next",
     "prev": "Back",
-    "finish": "Start your journey! 🚀",
+    "finish": "Start your journey!",
     "steps": {
       "age": {
         "title": "How old are you?",
-        "subtitle": "We won't judge! 😄",
+        "subtitle": "We won't judge!",
         "child": "Child (7-12)",
         "childDesc": "Learn through games and activities",
         "teen": "Teen (13-17)",
@@ -486,14 +486,14 @@
   },
   "og": {
     "platform": "AI Learning Platform",
-    "interactive": "🎮 Interactive",
+    "interactive": "Interactive",
     "xpPoints": "⭐ XP Points",
-    "arabicFirst": "📚 Arabic First",
+    "arabicFirst": "Arabic First",
     "achievementUnlocked": "Unlocked this achievement on Zkawi",
     "lessons": "lessons"
   },
   "error": {
-    "title": "Oops! Something went wrong 😅",
+    "title": "Oops! Something went wrong",
     "description": "Don't worry, it happens! We're working on fixing this.",
     "retry": "Try Again",
     "goHome": "Go to Home",

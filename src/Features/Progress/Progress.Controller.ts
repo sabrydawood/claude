@@ -56,7 +56,7 @@ export async function GetUserProgress(Req: NextRequest): Promise<NextResponse> {
 
   const AchievementList = AllAchievements.map((A) => ({
     Id: A.Id,
-    Emoji: A.Emoji,
+    Icon: A.Icon,
     Name: TransMap.get(`${A.Id}:${Locale}:name`) ?? TransMap.get(`${A.Id}:en:name`) ?? '',
     Description: TransMap.get(`${A.Id}:${Locale}:description`) ?? TransMap.get(`${A.Id}:en:description`) ?? '',
     Earned: EarnedIds.has(A.Id),

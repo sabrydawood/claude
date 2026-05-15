@@ -1,5 +1,5 @@
 {
-  "id": "c1450aa0-628d-47bb-b14c-d56849d26a0d",
+  "id": "8e611095-0fae-4472-80c8-74ce9715f413",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -97,8 +97,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "Emoji": {
-          "name": "Emoji",
+        "Icon": {
+          "name": "Icon",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -258,8 +258,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "Emoji": {
-          "name": "Emoji",
+        "Icon": {
+          "name": "Icon",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1120,8 +1120,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "Emoji": {
-          "name": "Emoji",
+        "Icon": {
+          "name": "Icon",
           "type": "text",
           "primaryKey": false,
           "notNull": true

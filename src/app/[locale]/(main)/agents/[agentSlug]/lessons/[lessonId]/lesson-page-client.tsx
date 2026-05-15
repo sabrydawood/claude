@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { getDir } from '@/lib/i18n/locale-utils';
 import type { LessonFull } from '@/lib/db/queries/content';
 import { ChevronLeft, ChevronRight, Clock, Zap, CheckCircle2, BookOpen, Trophy, Target, PartyPopper } from 'lucide-react';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 
 interface UserProgress {
   completedLessons: string[];
@@ -41,14 +42,21 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
   });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [xpPopup, setXpPopup] = useState<number | null>(null);
-  const [earnedAchievements, setEarnedAchievements] = useState<{ id: number; emoji: string; name: string }[]>([]);
+  const [earnedAchievements, setEarnedAchievements] = useState<{ id: number; icon: string; name: string }[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch('/api/progress')
+    fetch('/api/v1/progress')
       .then(r => r.json())
-      .then(data => {
-        if (data.completedLessons) setProgress(data);
+      .then(res => {
+        const d = res.Data ?? res;
+        if (d.CompletedLessons) setProgress({
+          completedLessons: d.CompletedLessons,
+          totalXp: d.TotalXp ?? 0,
+          streakDays: d.StreakDays ?? 0,
+          quizzesCompleted: d.QuizzesCompleted ?? 0,
+          scores: d.Scores ?? {},
+        });
       })
       .catch(() => {});
   }, []);
@@ -78,7 +86,7 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
       scores: { ...prev.scores, [lesson.id]: score },
     }));
 
-    const res = await fetch(`/api/progress/lesson/${lesson.id}`, {
+    const res = await fetch(`/api/v1/progress/lesson/${lesson.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ score, xpEarned }),
@@ -86,11 +94,12 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
 
     if (res?.ok) {
       const data = await res.json().catch(() => ({}));
-      if (data.newAchievements?.length) {
-        setEarnedAchievements(data.newAchievements.map((a: { id: number; emoji: string; nameAr?: string; nameEn?: string; name?: string }) => ({
-          id: a.id,
-          emoji: a.emoji,
-          name: a.name ?? (locale === 'ar' ? a.nameAr : a.nameEn) ?? '',
+      const newAchievements = data.Data?.NewAchievements ?? data.newAchievements ?? [];
+      if (newAchievements?.length) {
+        setEarnedAchievements(newAchievements.map((a: { Id?: string; id?: number; Icon?: string; icon?: string; NameAr?: string; NameEn?: string; name?: string }) => ({
+          id: a.Id ?? a.id ?? 0,
+          icon: a.Icon ?? a.icon ?? 'Trophy',
+          name: a.name ?? (locale === 'ar' ? a.NameAr : a.NameEn) ?? '',
         })));
       }
     }
@@ -145,9 +154,9 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
               <motion.div
                 animate={{ rotate: [0, -10, 10, -10, 10, 0], scale: [1, 1.2, 1] }}
                 transition={{ duration: 0.6 }}
-                className="text-7xl mb-4"
+                className="flex justify-center mb-4 text-[var(--zkawi-gold)]"
               >
-                {earnedAchievements[0].emoji}
+                <DynamicIcon name={earnedAchievements[0].icon} size={72} />
               </motion.div>
               <div
                 className="flex items-center gap-1.5 text-xs font-bold mb-2 px-3 py-1 rounded-full inline-flex"
@@ -371,7 +380,7 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                     <div className="flex flex-wrap gap-2 justify-center">
                       {earnedAchievements.map(a => (
                         <div key={a.id} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--surface-2)', color: 'var(--text)' }}>
-                          <span>{a.emoji}</span>
+                          <DynamicIcon name={a.icon} size={16} />
                           <span>{a.name}</span>
                         </div>
                       ))}

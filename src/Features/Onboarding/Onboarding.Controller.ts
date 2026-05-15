@@ -11,6 +11,34 @@ import { OnboardingSchema } from './Onboarding.Schemas';
 import { ResolveTrack, GenerateLearningPath } from './Onboarding.Service';
 
 /**
+ * GET /api/v1/onboarding — returns onboarding completion status + learning path order.
+ */
+export async function GetOnboarding(Req: NextRequest): Promise<NextResponse> {
+  const Session = await GetSessionOrUnauthorized(Req);
+  if (Session instanceof NextResponse) return Session;
+
+  const [Prefs] = await db
+    .select({ OnboardingCompleted: UserPreferences.OnboardingCompleted })
+    .from(UserPreferences)
+    .where(eq(UserPreferences.UserId, Session.user.id))
+    .limit(1);
+
+  const [Path] = await db
+    .select({ LessonOrder: LearningPaths.LessonOrder })
+    .from(LearningPaths)
+    .where(eq(LearningPaths.UserId, Session.user.id))
+    .limit(1);
+
+  return NextResponse.json({
+    Success: true,
+    Data: {
+      onboardingCompleted: Prefs?.OnboardingCompleted ?? false,
+      lessonOrder: Path?.LessonOrder ?? null,
+    },
+  });
+}
+
+/**
  * POST /api/v1/onboarding — saves user preferences and generates learning path.
  */
 export async function PostOnboarding(Req: NextRequest): Promise<NextResponse> {

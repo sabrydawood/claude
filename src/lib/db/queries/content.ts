@@ -23,7 +23,7 @@ export interface AgentRow {
   id: string;
   slug: string;
   color: string;
-  emoji: string;
+  icon: string;
   isActive: boolean;
   order: number;
   name: string;
@@ -41,7 +41,7 @@ export interface LessonRow {
   description: string;
   content: string;
   agentSlug: string;
-  agentEmoji: string;
+  agentIcon: string;
   agentColor: string;
 }
 
@@ -110,7 +110,7 @@ export async function getAgents(locale: string): Promise<AgentRow[]> {
   return Rows.map((A) => {
     const T = LocaleMap.get(A.Id) ?? EnMap.get(A.Id);
     return {
-      id: A.Id, slug: A.Slug, color: A.Color, emoji: A.Emoji,
+      id: A.Id, slug: A.Slug, color: A.Color, icon: A.Icon,
       isActive: A.IsActive, order: A.Order,
       name: T?.Name ?? '', description: T?.Description ?? '', fullDescription: T?.FullDescription ?? '',
     };
@@ -128,7 +128,7 @@ export async function getAgentBySlug(slug: string, locale: string): Promise<Agen
   const T = LocaleMap.get(A.Id) ?? EnMap.get(A.Id);
 
   return {
-    id: A.Id, slug: A.Slug, color: A.Color, emoji: A.Emoji,
+    id: A.Id, slug: A.Slug, color: A.Color, icon: A.Icon,
     isActive: A.IsActive, order: A.Order,
     name: T?.Name ?? '', description: T?.Description ?? '', fullDescription: T?.FullDescription ?? '',
   };
@@ -153,7 +153,7 @@ export async function getLessonsByAgent(agentSlug: string, locale: string): Prom
       id: L.Id, agentId: L.AgentId, order: L.Order,
       xpReward: L.XpReward, estimatedMinutes: L.EstimatedMinutes,
       title: T?.Title ?? '', description: T?.Description ?? '', content: T?.Content ?? '',
-      agentSlug: Agent.Slug, agentEmoji: Agent.Emoji, agentColor: Agent.Color,
+      agentSlug: Agent.Slug, agentIcon: Agent.Icon, agentColor: Agent.Color,
     };
   });
 }
@@ -229,7 +229,7 @@ export async function getLessonById(id: string, locale: string): Promise<LessonF
     id: L.Id, agentId: L.AgentId, order: L.Order,
     xpReward: L.XpReward, estimatedMinutes: L.EstimatedMinutes,
     title: LT?.Title ?? '', description: LT?.Description ?? '', content: LT?.Content ?? '',
-    agentSlug: Agent.Slug, agentEmoji: Agent.Emoji, agentColor: Agent.Color,
+    agentSlug: Agent.Slug, agentIcon: Agent.Icon, agentColor: Agent.Color,
     agentName: AT?.Name ?? '', questions: Questions,
   };
 }

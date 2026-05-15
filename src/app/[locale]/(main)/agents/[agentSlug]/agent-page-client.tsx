@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, BookOpen, Trophy, Clock, Zap, CheckCircle2, Lock, Play, Construction } from 'lucide-react';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import type { AgentRow, LessonRow } from '@/lib/db/queries/content';
 
 // Gradient mapping by slug (non-translatable visual config)
@@ -78,9 +79,9 @@ export default function AgentPageClient({ agent, lessons, locale, agentSlug }: P
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring' }}
-              className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center text-4xl shadow-lg flex-shrink-0"
+              className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center shadow-lg flex-shrink-0 text-white"
             >
-              {agent.emoji}
+              <DynamicIcon name={agent.icon} size={40} />
             </motion.div>
             <div>
               <motion.h1

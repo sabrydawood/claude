@@ -88,9 +88,9 @@ async function CheckAndGrantAchievements(
 
   return NewlyEarned.map((Ach) => ({
     Id: Ach.Id,
-    Emoji: Ach.Emoji,
-    NameAr: NameMap.get(`${Ach.Id}:ar`) ?? Ach.Emoji,
-    NameEn: NameMap.get(`${Ach.Id}:en`) ?? Ach.Emoji,
+    Icon: Ach.Icon,
+    NameAr: NameMap.get(`${Ach.Id}:ar`) ?? '',
+    NameEn: NameMap.get(`${Ach.Id}:en`) ?? '',
   }));
 }
 

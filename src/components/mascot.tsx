@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, MessageCircle } from 'lucide-react';
+import { MascotChat } from '@/components/mascot-chat';
 
 type Mood = 'idle' | 'happy' | 'thinking';
 
@@ -229,15 +230,16 @@ export function Mascot() {
   const locale = useLocale();
   const isAr = locale === 'ar';
 
-  const [mounted, setMounted]         = useState(false);
-  const [pos, setPos]                 = useState({ x: 74, y: 72 });
+  const [mounted, setMounted]           = useState(false);
+  const [pos, setPos]                   = useState({ x: 74, y: 72 });
   const [walkDuration, setWalkDuration] = useState(0.05);
-  const [facingLeft, setFacingLeft]   = useState(true);
-  const [mood, setMood]               = useState<Mood>('idle');
-  const [isWalking, setIsWalking]     = useState(false);
-  const [bubbleMsg, setBubbleMsg]     = useState<{ ar: string; en: string } | null>(null);
-  const [bubbleOpen, setBubbleOpen]   = useState(false);
-  const [isSmall, setIsSmall]         = useState(false);
+  const [facingLeft, setFacingLeft]     = useState(true);
+  const [mood, setMood]                 = useState<Mood>('idle');
+  const [isWalking, setIsWalking]       = useState(false);
+  const [bubbleMsg, setBubbleMsg]       = useState<{ ar: string; en: string } | null>(null);
+  const [bubbleOpen, setBubbleOpen]     = useState(false);
+  const [isSmall, setIsSmall]           = useState(false);
+  const [chatOpen, setChatOpen]         = useState(false);
 
   const currentPosRef = useRef({ x: 74, y: 72 });
   const timerRef      = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -342,6 +344,7 @@ export function Mascot() {
   if (!mounted || hide) return null;
 
   return (
+    <>
     <motion.div
       className="fixed z-40"
       style={{ width: 56, height: 72 }}
@@ -403,8 +406,8 @@ export function Mascot() {
         whileHover={{ scale: 1.12 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => {
-          if (bubbleOpen) setBubbleOpen(false);
-          else if (bubbleMsg) setBubbleOpen(true);
+          setBubbleOpen(false);
+          setChatOpen(prev => !prev);
         }}
       >
         {/* Ground shadow */}
@@ -415,7 +418,27 @@ export function Mascot() {
           transition={{ repeat: Infinity, duration: isWalking ? 0.32 : 2.6 }}
         />
         <RobotSVG mood={mood} walking={isWalking} />
+
+        {/* Chat badge — shows when chat is closed */}
+        <AnimatePresence>
+          {!chatOpen && (
+            <motion.div
+              key="badge"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0 }}
+              className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
+              style={{ background: 'var(--zkawi-purple)', scaleX: facingLeft ? -1 : 1 }}
+            >
+              <MessageCircle size={10} color="white" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>
+
+    {/* Chat popup — rendered at root level, not inside the moving mascot */}
+    <MascotChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+  </>
   );
 }

@@ -4,7 +4,7 @@
 
 ---
 
-## آخر تحديث: 2026-05-14 — الجلسة الخامسة (مكتملة ✅)
+## آخر تحديث: 2026-05-15 — الجلسة السادسة (مكتملة ✅)
 
 ---
 
@@ -22,7 +22,7 @@
 
 ---
 
-## ما تم بناؤه (الجلسات 1-5) — **كل شيء مكتمل ✅**
+## ما تم بناؤه (الجلسات 1-6) — **كل شيء مكتمل ✅**
 
 ### ✅ البنية الأساسية (جلسة 1)
 - Next.js 16 App Router + Bun + Tailwind v4 + better-auth + next-intl
@@ -54,15 +54,32 @@
 - `POST /api/admin/lessons` — إنشاء درس جديد (للـ AI agents)
 - `src/app/[locale]/(main)/admin/page.tsx` — واجهة ويب للمدراء
 
+### ✅ Leaderboard + Public Profiles + PWA (الجلسة السادسة — v0.5.0)
+- `GET /api/leaderboard` — top 50 by XP with medals
+- `GET /api/profile/[userId]` — public stats + achievements with translations
+- `/leaderboard` page — rank table with 🥇🥈🥉 medals, links to profiles
+- `/profile/[userId]` page — stats cards + achievement grid + share button
+- `public/sw.js` — service worker (cache-first assets, network-first HTML/API)
+- `src/components/pwa-register.tsx` — registers SW on mount
+- `src/components/pwa-install-banner.tsx` — beforeinstallprompt bottom sheet
+- `src/app/api/og/route.tsx` — achievement OG image type added
+- Header updated — Leaderboard + Sandbox nav links for logged-in users
+- Achievement auto-grant in `PUT /api/progress/lesson/[id]` with `checkAndGrantAchievements()`
+- **Achievement celebration toast** — spring-animated modal when new achievements earned
+
 ---
 
-## الحالة: **كل الـ 4 features مكتملة ✅**
+## الحالة: **v0.5.0 مكتملة بالكامل ✅**
 
 ```
 ✅ 1. ربط التقدم بـ DB
 ✅ 2. Dashboard الشخصي
 ✅ 3. Sandbox (Chat + API Keys)
 ✅ 4. Admin Panel
+✅ 5. Leaderboard + Public Profiles
+✅ 6. PWA (Service Worker + Install Banner)
+✅ 7. Achievement OG Images
+✅ 8. Achievement celebration toast
 ```
 
 ---
@@ -87,12 +104,20 @@ src/
 │   │   ├── user/preferences/route.ts         ✅
 │   │   ├── user/learning-path/route.ts       ✅
 │   │   ├── progress/route.ts                 ✅ GET
-│   │   ├── progress/lesson/[id]/route.ts     ✅ PUT
+│   │   ├── progress/lesson/[id]/route.ts     ✅ PUT + achievement grant
 │   │   ├── keys/route.ts                     ✅ POST/DELETE
 │   │   ├── keys/hint/route.ts                ✅ GET
 │   │   ├── sandbox/chat/route.ts             ✅ POST streaming
 │   │   ├── admin/lessons/route.ts            ✅ GET/POST
-│   │   └── og/route.tsx                      ✅
+│   │   ├── og/route.tsx                      ✅ + achievement type
+│   │   ├── leaderboard/route.ts              ✅ GET top 50
+│   │   └── profile/[userId]/route.ts         ✅ GET public profile
+│   └── (main)/
+│       ├── leaderboard/page.tsx              ✅
+│       └── profile/[userId]/page.tsx         ✅
+├── components/
+│   ├── pwa-register.tsx                      ✅
+│   └── pwa-install-banner.tsx                ✅
 ├── lib/
 │   ├── auth.ts                               ✅
 │   ├── admin.ts                              ✅ isAdminEmail()

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { useSession } from '@/lib/auth-client';
 import { useRouter } from '@/lib/i18n/navigation';
@@ -26,7 +26,8 @@ interface LessonRow {
 const EMPTY_FORM = { agentId: '', order: '', xpReward: '50', estimatedMinutes: '5', titleAr: '', titleEn: '', descriptionAr: '', descriptionEn: '' };
 
 export default function AdminPage() {
-  const locale = useLocale();
+  const t = useTranslations('admin');
+  const tCommon = useTranslations('common');
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
@@ -102,10 +103,10 @@ export default function AdminPage() {
         <main className="flex-1 flex flex-col items-center justify-center gap-3">
           <AlertCircle size={40} className="text-red-500" />
           <p className="text-lg font-semibold" style={{ color: 'var(--text)' }}>
-            {locale === 'ar' ? 'غير مصرح لك بالدخول' : 'Access Denied'}
+            {t('accessDenied')}
           </p>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            {locale === 'ar' ? 'هذه الصفحة للمدراء فقط' : 'This page is for admins only'}
+            {t('adminOnly')}
           </p>
         </main>
         <Footer />
@@ -121,22 +122,22 @@ export default function AdminPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
-              {locale === 'ar' ? 'لوحة الإدارة' : 'Admin Panel'}
+              {t('title')}
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              {lessons.length} {locale === 'ar' ? 'درس' : 'lessons'}
+              {lessons.length} {t('lessonsLabel')}
             </p>
           </div>
           <Button onClick={() => { setShowForm(true); setSaveOk(false); }} style={{ background: 'var(--zkawi-purple)', color: '#fff' }}>
             <Plus size={14} className="me-1" />
-            {locale === 'ar' ? 'درس جديد' : 'New Lesson'}
+            {t('newLesson')}
           </Button>
         </div>
 
         {saveOk && (
           <div className="flex items-center gap-2 text-sm text-green-600 px-3 py-2 rounded-lg" style={{ background: 'rgba(34,197,94,0.1)' }}>
             <Check size={14} />
-            {locale === 'ar' ? 'تم إنشاء الدرس بنجاح' : 'Lesson created successfully'}
+            {t('lessonCreated')}
           </div>
         )}
 
@@ -145,18 +146,18 @@ export default function AdminPage() {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="p-5 flex flex-col gap-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <h2 className="font-semibold" style={{ color: 'var(--text)' }}>
-                {locale === 'ar' ? 'إنشاء درس جديد' : 'Create New Lesson'}
+                {t('createLesson')}
               </h2>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { key: 'agentId', label: locale === 'ar' ? 'ID الوكيل' : 'Agent ID', type: 'number', placeholder: '1' },
-                  { key: 'order', label: locale === 'ar' ? 'الترتيب' : 'Order', type: 'number', placeholder: '0' },
+                  { key: 'agentId', label: t('form.agentId'), type: 'number', placeholder: '1' },
+                  { key: 'order', label: t('form.order'), type: 'number', placeholder: '0' },
                   { key: 'xpReward', label: 'XP', type: 'number', placeholder: '50' },
-                  { key: 'estimatedMinutes', label: locale === 'ar' ? 'الدقائق' : 'Minutes', type: 'number', placeholder: '5' },
-                  { key: 'titleAr', label: locale === 'ar' ? 'العنوان (عربي)' : 'Title (AR)', type: 'text', placeholder: 'ما هو الذكاء الاصطناعي؟' },
-                  { key: 'titleEn', label: locale === 'ar' ? 'العنوان (إنجليزي)' : 'Title (EN)', type: 'text', placeholder: 'What is AI?' },
-                  { key: 'descriptionAr', label: locale === 'ar' ? 'الوصف (عربي)' : 'Description (AR)', type: 'text', placeholder: '...' },
-                  { key: 'descriptionEn', label: locale === 'ar' ? 'الوصف (إنجليزي)' : 'Description (EN)', type: 'text', placeholder: '...' },
+                  { key: 'estimatedMinutes', label: t('form.minutes'), type: 'number', placeholder: '5' },
+                  { key: 'titleAr', label: t('form.titleAr'), type: 'text', placeholder: 'ما هو الذكاء الاصطناعي؟' },
+                  { key: 'titleEn', label: t('form.titleEn'), type: 'text', placeholder: 'What is AI?' },
+                  { key: 'descriptionAr', label: t('form.descriptionAr'), type: 'text', placeholder: '...' },
+                  { key: 'descriptionEn', label: t('form.descriptionEn'), type: 'text', placeholder: '...' },
                 ].map(field => (
                   <div key={field.key} className="flex flex-col gap-1">
                     <label className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{field.label}</label>
@@ -174,10 +175,10 @@ export default function AdminPage() {
               {saveError && <p className="text-xs text-red-500">{saveError}</p>}
               <div className="flex gap-2 justify-end">
                 <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setSaveError(''); }}>
-                  {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+                  {tCommon('cancel')}
                 </Button>
                 <Button size="sm" onClick={createLesson} disabled={saving} style={{ background: 'var(--zkawi-purple)', color: '#fff' }}>
-                  {saving ? <Loader2 size={14} className="animate-spin" /> : (locale === 'ar' ? 'إنشاء' : 'Create')}
+                  {saving ? <Loader2 size={14} className="animate-spin" /> : t('form.create')}
                 </Button>
               </div>
             </Card>
@@ -190,8 +191,15 @@ export default function AdminPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['ID', locale === 'ar' ? 'الوكيل' : 'Agent', locale === 'ar' ? 'العنوان (AR)' : 'Title (AR)', locale === 'ar' ? 'العنوان (EN)' : 'Title (EN)', 'XP', locale === 'ar' ? 'الترتيب' : 'Order'].map(h => (
-                    <th key={h} className="text-start px-4 py-3 font-medium" style={{ color: 'var(--text-muted)' }}>{h}</th>
+                  {[
+                    { key: 'id', label: 'ID' },
+                    { key: 'agent', label: t('table.agent') },
+                    { key: 'titleAr', label: t('table.titleAr') },
+                    { key: 'titleEn', label: t('table.titleEn') },
+                    { key: 'xp', label: 'XP' },
+                    { key: 'order', label: t('table.order') },
+                  ].map(h => (
+                    <th key={h.key} className="text-start px-4 py-3 font-medium" style={{ color: 'var(--text-muted)' }}>{h.label}</th>
                   ))}
                 </tr>
               </thead>
@@ -220,7 +228,7 @@ export default function AdminPage() {
                 {lessons.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-4 py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-                      {locale === 'ar' ? 'لا توجد دروس بعد' : 'No lessons yet'}
+                      {t('noLessons')}
                     </td>
                   </tr>
                 )}

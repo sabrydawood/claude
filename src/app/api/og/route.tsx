@@ -1,6 +1,11 @@
 import { ImageResponse } from '@vercel/og';
 import type { NextRequest } from 'next/server';
 import { getDir } from '@/lib/i18n/locale-utils';
+import en from '@/messages/en.json';
+import ar from '@/messages/ar.json';
+
+type Messages = typeof en;
+const MESSAGES: Record<string, Messages> = { en, ar };
 
 export const runtime = 'edge';
 
@@ -15,6 +20,7 @@ export async function GET(req: NextRequest) {
   const lessons = searchParams.get('lessons') ?? '';
 
   const dir = getDir(locale);
+  const ogMsgs = (MESSAGES[locale] ?? MESSAGES.ar).og;
 
   return new ImageResponse(
     (
@@ -128,16 +134,12 @@ export async function GET(req: NextRequest) {
             fontWeight: '400',
             direction: dir,
           }}>
-            {locale === 'ar' ? 'منصة تعلم الذكاء الاصطناعي' : 'AI Learning Platform'}
+            {ogMsgs.platform}
           </div>
 
           {/* Feature pills */}
           <div style={{ display: 'flex', gap: '12px', marginTop: '16px', flexWrap: 'wrap' }}>
-            {[
-              locale === 'ar' ? '🎮 تفاعلي' : '🎮 Interactive',
-              locale === 'ar' ? '⭐ نقاط XP' : '⭐ XP Points',
-              locale === 'ar' ? '📚 عربي أولاً' : '📚 Arabic First',
-            ].map((pill) => (
+            {[ogMsgs.interactive, ogMsgs.xpPoints, ogMsgs.arabicFirst].map((pill) => (
               <div key={pill} style={{
                 background: 'rgba(255,255,255,0.1)',
                 borderRadius: '20px', padding: '8px 18px',
@@ -168,15 +170,15 @@ export async function GET(req: NextRequest) {
             alignItems: 'center', justifyContent: 'center', gap: '24px',
           }}>
             <div style={{ fontSize: '120px', display: 'flex' }}>{emoji}</div>
-            <div style={{ color: 'white', fontSize: '56px', fontWeight: '900', textAlign: 'center', direction: locale === 'ar' ? 'rtl' : 'ltr' }}>
+            <div style={{ color: 'white', fontSize: '56px', fontWeight: '900', textAlign: 'center', direction: dir }}>
               {title}
             </div>
-            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '28px', textAlign: 'center', direction: locale === 'ar' ? 'rtl' : 'ltr' }}>
-              {locale === 'ar' ? `فتح هذا الإنجاز على ذكاوي` : `Unlocked this achievement on Zkawi`}
+            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '28px', textAlign: 'center', direction: dir }}>
+              {ogMsgs.achievementUnlocked}
             </div>
             <div style={{ display: 'flex', gap: '20px', marginTop: '8px' }}>
               {xp && <div style={{ background: 'rgba(124,58,237,0.3)', borderRadius: '20px', padding: '10px 24px', color: '#A78BFA', fontSize: '22px', display: 'flex', border: '1px solid rgba(124,58,237,0.5)' }}>⭐ {xp} XP</div>}
-              {lessons && <div style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '20px', padding: '10px 24px', color: '#6EE7B7', fontSize: '22px', display: 'flex', border: '1px solid rgba(16,185,129,0.4)' }}>📚 {lessons} {locale === 'ar' ? 'درس' : 'lessons'}</div>}
+              {lessons && <div style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '20px', padding: '10px 24px', color: '#6EE7B7', fontSize: '22px', display: 'flex', border: '1px solid rgba(16,185,129,0.4)' }}>📚 {lessons} {ogMsgs.lessons}</div>}
             </div>
           </div>
         )}

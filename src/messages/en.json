@@ -392,5 +392,50 @@
         "min60Desc": "For the seriously enthusiastic"
       }
     }
+  },
+  "metadata": {
+    "title": "Zkawi — Learn AI the Easy and Fun Way",
+    "titleTemplate": "%s | Zkawi",
+    "description": "An interactive educational platform for kids and adults to learn AI in a fun way. Earn XP, unlock achievements, and become an AI expert!",
+    "keywords": "AI,artificial intelligence,learn AI,kids,Claude,education,zkawi",
+    "ogLocale": "en_US",
+    "ogTitle": "Zkawi — Learn AI the Easy and Fun Way",
+    "ogDescription": "Interactive AI learning platform. Earn XP and unlock achievements!",
+    "twitterTitle": "Zkawi — Learn AI",
+    "twitterDescription": "Interactive AI learning for kids and adults"
+  },
+  "admin": {
+    "accessDenied": "Access Denied",
+    "adminOnly": "This page is for admins only",
+    "title": "Admin Panel",
+    "lessonsLabel": "lessons",
+    "newLesson": "New Lesson",
+    "lessonCreated": "Lesson created successfully",
+    "createLesson": "Create New Lesson",
+    "noLessons": "No lessons yet",
+    "form": {
+      "agentId": "Agent ID",
+      "order": "Order",
+      "minutes": "Minutes",
+      "titleAr": "Title (AR)",
+      "titleEn": "Title (EN)",
+      "descriptionAr": "Description (AR)",
+      "descriptionEn": "Description (EN)",
+      "create": "Create"
+    },
+    "table": {
+      "agent": "Agent",
+      "titleAr": "Title (AR)",
+      "titleEn": "Title (EN)",
+      "order": "Order"
+    }
+  },
+  "og": {
+    "platform": "AI Learning Platform",
+    "interactive": "🎮 Interactive",
+    "xpPoints": "⭐ XP Points",
+    "arabicFirst": "📚 Arabic First",
+    "achievementUnlocked": "Unlocked this achievement on Zkawi",
+    "lessons": "lessons"
   }
 }

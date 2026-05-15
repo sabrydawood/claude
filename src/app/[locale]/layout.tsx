@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Cairo, Inter } from 'next/font/google';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/lib/i18n/routing';
 import { getDir, isRTL } from '@/lib/i18n/locale-utils';
@@ -30,20 +30,15 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata' });
 
   return {
     title: {
-      default: locale === 'ar'
-        ? 'ذكاوي — تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة'
-        : 'Zkawi — Learn AI the Easy and Fun Way',
-      template: locale === 'ar' ? '%s | ذكاوي' : '%s | Zkawi',
+      default: t('title'),
+      template: t('titleTemplate'),
     },
-    description: locale === 'ar'
-      ? 'منصة تعليمية للأطفال والكبار لتعلم الذكاء الاصطناعي بطريقة سهلة وممتعة. كسب XP، افتح إنجازات، وبقى خبير AI!'
-      : 'An interactive educational platform for kids and adults to learn AI in a fun way. Earn XP, unlock achievements, and become an AI expert!',
-    keywords: locale === 'ar'
-      ? ['ذكاء اصطناعي', 'تعلم', 'أطفال', 'Claude', 'AI', 'تعليم', 'ذكاوي', 'zkawi', 'برومبت']
-      : ['AI', 'artificial intelligence', 'learn AI', 'kids', 'Claude', 'education', 'zkawi'],
+    description: t('description'),
+    keywords: t('keywords').split(',').map(k => k.trim()),
     metadataBase: new URL(APP_URL),
     authors: [{ name: 'ذكاوي' }],
     creator: 'ذكاوي',
@@ -62,24 +57,17 @@ export async function generateMetadata({
     },
     openGraph: {
       type: 'website',
-      locale: locale === 'ar' ? 'ar_EG' : 'en_US',
-      alternateLocale: locale === 'ar' ? 'en_US' : 'ar_EG',
+      locale: t('ogLocale'),
       url: `${APP_URL}/${locale}`,
       siteName: 'ذكاوي | Zkawi',
-      title: locale === 'ar'
-        ? 'ذكاوي — تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة'
-        : 'Zkawi — Learn AI the Easy and Fun Way',
-      description: locale === 'ar'
-        ? 'منصة تعليمية تفاعلية للأطفال والكبار. كسب XP وافتح إنجازات!'
-        : 'Interactive AI learning platform. Earn XP and unlock achievements!',
+      title: t('ogTitle'),
+      description: t('ogDescription'),
       images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: 'ذكاوي' }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: locale === 'ar' ? 'ذكاوي — تعلم الذكاء الاصطناعي' : 'Zkawi — Learn AI',
-      description: locale === 'ar'
-        ? 'منصة تعليمية تفاعلية للأطفال والكبار'
-        : 'Interactive AI learning for kids and adults',
+      title: t('twitterTitle'),
+      description: t('twitterDescription'),
       images: ['/og-image.svg'],
     },
     icons: {

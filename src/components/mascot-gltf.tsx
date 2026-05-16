@@ -298,7 +298,13 @@ function GltfModelInner({
     }
   }, [mood, walking, actions, cfg]);
 
-  // Smooth rotation with shortest-path lerp (no scaleX, no snap)
+  // Track previous walking/facingLeft to detect walk-start transitions
+  const prevWalkingRef = useRef(false);
+  const prevFacingRef = useRef(facingLeft);
+
+  // Rotation strategy:
+  //   Walk START or direction change → snap immediately (no lag during movement)
+  //   Walk STOP → slow smooth lerp back to face camera (looks natural)
   useFrame(({ clock }) => {
     if (!clonedRef.current) return;
 
@@ -307,12 +313,22 @@ function GltfModelInner({
       ? baseRotY + (facingLeft ? Math.PI / 2 : -Math.PI / 2)
       : baseRotY;
 
-    // Shortest-path delta: always rotate ≤ 180° (avoids the 270° long-way spin)
-    let delta = targetRotY - clonedRef.current.rotation.y;
-    if (delta > Math.PI) delta -= 2 * Math.PI;
-    else if (delta < -Math.PI) delta += 2 * Math.PI;
+    const justStartedWalking = walking && !prevWalkingRef.current;
+    const changedDirection = walking && facingLeft !== prevFacingRef.current;
+    prevWalkingRef.current = !!walking;
+    prevFacingRef.current = facingLeft;
 
-    clonedRef.current.rotation.y += delta * 0.15;
+    if (justStartedWalking || changedDirection) {
+      // SNAP: instant rotation when walk begins or direction changes
+      // This prevents the slow 90° turn-during-movement that causes shaking
+      clonedRef.current.rotation.y = targetRotY;
+    } else {
+      // LERP: smooth only when stopping (idle ← walking)
+      let delta = targetRotY - clonedRef.current.rotation.y;
+      if (delta > Math.PI) delta -= 2 * Math.PI;
+      else if (delta < -Math.PI) delta += 2 * Math.PI;
+      clonedRef.current.rotation.y += delta * 0.12;
+    }
 
     // Float (only for models without their own idle animation)
     if (!cfg.noFloat) {

@@ -56,6 +56,19 @@
       },
       "small": {
         "0": "Hi! Tap me!"
+      },
+      "pool": {
+        "0":  "Ready to learn something new today? 🚀",
+        "1":  "Every lesson brings you closer to your goal!",
+        "2":  "Tap me if you need help 😊",
+        "3":  "I'm Zaki, your learning guide!",
+        "4":  "Start and don't stop — every step counts!",
+        "5":  "Earn XP and climb the leaderboard!",
+        "6":  "Got questions? Chat with me anytime 💬",
+        "7":  "Try all the lessons — each one is unique!",
+        "8":  "Coding isn't hard, it just takes time 💪",
+        "9":  "Check out the sandbox and experiment!",
+        "10": "Your achievements are adding up — keep going! ⭐"
       }
     }
   },

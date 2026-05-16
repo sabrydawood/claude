@@ -36,77 +36,47 @@ interface Waypoint {
   stayMs: number;
 }
 
-// NPC patrol patterns — x/y are viewport percentages
-const PATROLS: Record<string, Waypoint[]> = {
-  login: [
-    { x: 74, y: 66, mood: "happy", stayMs: 4000, message: "patrol.login.0" },
-    { x: 40, y: 66, mood: "idle", stayMs: 3500, message: "patrol.login.1" },
-    { x: 74, y: 72, mood: "idle", stayMs: 5000, message: null },
-  ],
-  register: [
-    { x: 74, y: 63, mood: "happy", stayMs: 4000, message: "patrol.register.0" },
-    { x: 40, y: 63, mood: "idle", stayMs: 3500, message: "patrol.register.1" },
-    { x: 74, y: 72, mood: "idle", stayMs: 5000, message: null },
-  ],
-  dashboard: [
-    {
-      x: 74,
-      y: 64,
-      mood: "happy",
-      stayMs: 4000,
-      message: "patrol.dashboard.0",
-    },
-    { x: 10, y: 64, mood: "idle", stayMs: 4000, message: "patrol.dashboard.1" },
-    {
-      x: 40,
-      y: 72,
-      mood: "thinking",
-      stayMs: 4000,
-      message: "patrol.dashboard.2",
-    },
-  ],
-  lessons: [
-    { x: 8, y: 58, mood: "idle", stayMs: 4000, message: "patrol.lessons.0" },
-    { x: 74, y: 65, mood: "happy", stayMs: 4000, message: "patrol.lessons.1" },
-    { x: 40, y: 72, mood: "idle", stayMs: 5000, message: null },
-  ],
-  agents: [
-    { x: 74, y: 65, mood: "happy", stayMs: 4000, message: "patrol.agents.0" },
-    { x: 40, y: 72, mood: "idle", stayMs: 5000, message: null },
-    { x: 74, y: 72, mood: "idle", stayMs: 6000, message: null },
-  ],
-  leaderboard: [
-    {
-      x: 74,
-      y: 55,
-      mood: "happy",
-      stayMs: 4000,
-      message: "patrol.leaderboard.0",
-    },
-    {
-      x: 12,
-      y: 60,
-      mood: "thinking",
-      stayMs: 4000,
-      message: "patrol.leaderboard.1",
-    },
-    { x: 44, y: 70, mood: "idle", stayMs: 5000, message: null },
-  ],
-  sandbox: [
-    { x: 74, y: 65, mood: "happy", stayMs: 4000, message: "patrol.sandbox.0" },
-    { x: 12, y: 65, mood: "idle", stayMs: 4000, message: "patrol.sandbox.1" },
-    { x: 44, y: 72, mood: "thinking", stayMs: 5000, message: null },
-  ],
-  profile: [
-    { x: 74, y: 60, mood: "happy", stayMs: 4000, message: "patrol.profile.0" },
-    { x: 44, y: 72, mood: "idle", stayMs: 6000, message: null },
-  ],
-  default: [
-    { x: 75, y: 68, mood: "happy", stayMs: 4000, message: "patrol.default.0" },
-    { x: 15, y: 65, mood: "idle", stayMs: 5000, message: "patrol.default.1" },
-    { x: 45, y: 72, mood: "thinking", stayMs: 4000, message: null },
-  ],
-};
+// ─── 20-waypoint pool — covers full screen except header (y ≥ 15%) ─────────────
+// Each waypoint is a candidate position; they get Fisher-Yates shuffled every
+// cycle so movement is unpredictable. Bubble messages are spread across them.
+
+const WAYPOINT_POOL: Waypoint[] = [
+  // Left column
+  { x: 6,  y: 20, mood: "happy",    stayMs: 3500, message: "patrol.pool.0" },
+  { x: 8,  y: 38, mood: "idle",     stayMs: 4000, message: null },
+  { x: 5,  y: 55, mood: "thinking", stayMs: 4500, message: "patrol.pool.1" },
+  { x: 9,  y: 72, mood: "idle",     stayMs: 3500, message: null },
+  { x: 7,  y: 85, mood: "happy",    stayMs: 3000, message: "patrol.pool.2" },
+  // Center-left
+  { x: 24, y: 18, mood: "thinking", stayMs: 4000, message: null },
+  { x: 22, y: 40, mood: "happy",    stayMs: 4500, message: "patrol.pool.3" },
+  { x: 26, y: 62, mood: "idle",     stayMs: 3500, message: null },
+  { x: 20, y: 80, mood: "thinking", stayMs: 4000, message: "patrol.pool.4" },
+  // Center
+  { x: 44, y: 22, mood: "happy",    stayMs: 4000, message: "patrol.pool.5" },
+  { x: 42, y: 50, mood: "idle",     stayMs: 3500, message: null },
+  { x: 46, y: 70, mood: "thinking", stayMs: 4500, message: "patrol.pool.6" },
+  { x: 40, y: 84, mood: "idle",     stayMs: 3000, message: null },
+  // Center-right
+  { x: 63, y: 16, mood: "idle",     stayMs: 3500, message: "patrol.pool.7" },
+  { x: 65, y: 38, mood: "happy",    stayMs: 4000, message: null },
+  { x: 61, y: 60, mood: "thinking", stayMs: 4500, message: "patrol.pool.8" },
+  { x: 67, y: 78, mood: "idle",     stayMs: 3500, message: null },
+  // Right column
+  { x: 80, y: 25, mood: "happy",    stayMs: 4000, message: "patrol.pool.9" },
+  { x: 82, y: 50, mood: "idle",     stayMs: 3500, message: null },
+  { x: 78, y: 75, mood: "thinking", stayMs: 4000, message: "patrol.pool.10" },
+];
+
+/** Fisher-Yates in-place shuffle */
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 function getRouteKey(pathname: string): string {
   if (pathname.includes("/login")) return "login";
@@ -302,91 +272,89 @@ export function Mascot() {
 
     const routeKey = getRouteKey(pathname);
 
-    // On small screens: stay at bottom-right and just wave
-    const waypoints: Waypoint[] = isSmall
-      ? [
-          {
-            x: 74,
-            y: 75,
-            mood: "happy",
-            stayMs: 5000,
-            message: "patrol.small.0",
-          },
-          { x: 74, y: 75, mood: "idle", stayMs: 8000, message: null },
-        ]
-      : (PATROLS[routeKey] ?? PATROLS.default);
+    // Small screens: fixed corner position
+    if (isSmall) {
+      setPos({ x: 80, y: 76 });
+      setMood("happy");
+      currentPosRef.current = { x: 80, y: 76 };
+      return () => { activeRef.current = false; clearTimeout(timerRef.current); };
+    }
 
-    let wpIndex = 0;
+    // Build a shuffled deck — reshuffle when all 20 visited
+    let deck = shuffleArray(WAYPOINT_POOL);
+    let deckIdx = 0;
 
-    // Recursive patrol loop
+    function nextWaypoint(): Waypoint {
+      if (deckIdx >= deck.length) {
+        deck = shuffleArray(WAYPOINT_POOL);
+        deckIdx = 0;
+      }
+      return deck[deckIdx++];
+    }
+
+    // Recursive patrol loop — picks next random waypoint each time
     function runLoop() {
       if (!activeRef.current || chatOpenRef.current) return;
 
-      const wp = waypoints[wpIndex];
-      setIsWalking(false);
-      setMood(wp.mood);
+      const wp = nextWaypoint();
 
-      if (wp.message) {
-        setBubbleMsg(wp.message);
-        setBubbleOpen(true);
-      } else {
-        setBubbleOpen(false);
-      }
+      // Walk to waypoint
+      const dx = wp.x - currentPosRef.current.x;
+      const dy = wp.y - currentPosRef.current.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const durSec = Math.max(0.6, dist * 0.022);
 
+      setFacingLeft(dx < 0);
+      setIsWalking(true);
+      setMood("idle");
+      setBubbleOpen(false);
+      setWalkDuration(durSec);
+      setPos({ x: wp.x, y: wp.y });
+      currentPosRef.current = { x: wp.x, y: wp.y };
+
+      // After arriving: stand + optional bubble
       timerRef.current = setTimeout(() => {
         if (!activeRef.current) return;
-        setBubbleOpen(false);
+        setIsWalking(false);
+        setMood(wp.mood);
 
+        if (wp.message) {
+          setBubbleMsg(wp.message);
+          setBubbleOpen(true);
+        } else {
+          setBubbleOpen(false);
+        }
+
+        // Stay at waypoint, then move on
         timerRef.current = setTimeout(() => {
           if (!activeRef.current) return;
-
-          wpIndex = (wpIndex + 1) % waypoints.length;
-          const next = waypoints[wpIndex];
-
-          const dx = next.x - currentPosRef.current.x;
-          const dy = next.y - currentPosRef.current.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const durSec = Math.max(0.55, dist * 0.023);
-
-          const newFacingLeft = dx < 0;
-          setFacingLeft(newFacingLeft);
-          setIsWalking(true);
-          setMood("idle");
           setBubbleOpen(false);
-          setWalkDuration(durSec);
-          setPos({ x: next.x, y: next.y });
-          currentPosRef.current = { x: next.x, y: next.y };
-
-          timerRef.current = setTimeout(runLoop, durSec * 1000 + 50);
-        }, 350);
-      }, wp.stayMs);
+          timerRef.current = setTimeout(runLoop, 300);
+        }, wp.stayMs);
+      }, durSec * 1000 + 50);
     }
 
-    // Walk to first waypoint of this route, then begin loop
-    const firstWp = waypoints[0];
-    const dx0 = firstWp.x - currentPosRef.current.x;
-    const dy0 = firstWp.y - currentPosRef.current.y;
+    // Walk to a random starting waypoint, then begin loop
+    const startWp = nextWaypoint();
+    const dx0 = startWp.x - currentPosRef.current.x;
+    const dy0 = startWp.y - currentPosRef.current.y;
     const dist0 = Math.sqrt(dx0 * dx0 + dy0 * dy0);
-    const dur0 = dist0 > 3 ? Math.max(0.55, dist0 * 0.023) : 0.05;
+    const dur0 = Math.max(0.6, dist0 * 0.022);
 
     setFacingLeft(dx0 < 0);
-    setIsWalking(dist0 > 3);
+    setIsWalking(true);
     setMood("idle");
     setWalkDuration(dur0);
-    setPos({ x: firstWp.x, y: firstWp.y });
-    currentPosRef.current = { x: firstWp.x, y: firstWp.y };
+    setPos({ x: startWp.x, y: startWp.y });
+    currentPosRef.current = { x: startWp.x, y: startWp.y };
 
-    timerRef.current = setTimeout(
-      () => {
-        if (!activeRef.current) return;
-        setIsWalking(false);
-        setMood("happy");
-        // Fetch AI greeting once the mascot has settled on this page
-        fetchAiBubble(routeKey);
-        timerRef.current = setTimeout(runLoop, 600);
-      },
-      dur0 * 1000 + 50,
-    );
+    timerRef.current = setTimeout(() => {
+      if (!activeRef.current) return;
+      setIsWalking(false);
+      setMood("happy");
+      fetchAiBubble(routeKey);
+      timerRef.current = setTimeout(runLoop, 800);
+    }, dur0 * 1000 + 50);
 
     return () => {
       activeRef.current = false;

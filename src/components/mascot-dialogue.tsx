@@ -496,7 +496,7 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
                     ذكي · Zaki
                   </span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 bg-red-500">
                   {hasHistory && (
                     <button
                       onClick={handleReset}
@@ -508,7 +508,7 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
                   )}
                   <button
                     onClick={onClose}
-                    className="p-1 rounded-lg hover:bg-white/10 transition-colors opacity-60 hover:opacity-100"
+                    className="p-1 rounded-lg hover:bg-white/10 z-50 transition-colors opacity-60 hover:opacity-100"
                     aria-label={locale === "ar" ? "إغلاق" : "Close"}
                   >
                     <X size={14} color="rgba(255,255,255,0.8)" />

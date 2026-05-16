@@ -5,6 +5,28 @@
 
 ---
 
+## خارطة تطوير ما هو موجود — Phase 0 → ALI
+
+> كل شيء في Phase 0 مهم ولا شيء عبء — لكن بعضه يحتاج تطوراً لا حذفاً.
+> الجدول التالي يربط كل عنصر موجود بمساره في الـ Roadmap.
+
+| ما هو موجود الآن | الحكم | يتطور في | كيف يتطور |
+|-----------------|-------|----------|-----------|
+| Multi-provider AI chain | أساسي ✓ | Phase 1 | + Cache check قبل كل call |
+| Conversation persistence | أساسي ✓ | Phase 1 | Raw data للـ Flywheel |
+| Mascot 3D (Xbot) + Dialogue | أساسي ✓ | Phase 4 | Living Explanation + TTS |
+| Selection Tooltip | مهم ✓ | Phase 1 | Learning signal يُغذّي الـ Graph |
+| XP (بسيط — flat per lesson) | يتطور | Phase 2.3 | XP سمعة + Credits عملة + time-limits |
+| الكويز (صح/غلط فقط) | يتطور | Phase 2.2 | Multi-Signal: quiz+Socratic+practical+peer |
+| UserPreferences (غير متصلة) | يتطور | Phase 1.2 | تُدمج في StudentMastery Profile |
+| LearningPaths (مسار ثابت) | يتطور | Phase 1.1 | Graph-based traversal ديناميكي |
+| Onboarding (5 أسئلة بسيطة) | يُعاد | Phase 2 | اسم+إيميل+عمر+اهتمام → AI يولّد مسار |
+| Achievements (flat badges) | يتطور | Phase 2.2 | Concept mastery badges مرتبطة بالـ Graph |
+| Leaderboard + Profile | يتطور | Phase 3 | Classroom social layer |
+| SandboxSessions metadata | محايد | Phase 2 | يُستبدل بـ ConversationMessages |
+
+---
+
 ## Phase 0 — الأساس (مكتمل)
 
 ### البنية التقنية

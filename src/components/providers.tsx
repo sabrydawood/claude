@@ -18,7 +18,7 @@ export function Providers({ children, messages, locale }: ProvidersProps) {
       enableSystem={false}
       disableTransitionOnChange={false}
     >
-      <NextIntlClientProvider messages={messages} locale={locale}>
+      <NextIntlClientProvider messages={messages} locale={locale} timeZone="UTC">
         {children}
       </NextIntlClientProvider>
     </ThemeProvider>

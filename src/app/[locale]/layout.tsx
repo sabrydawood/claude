@@ -8,6 +8,7 @@ import { Providers } from '@/components/providers';
 import { PwaRegister } from '@/components/pwa-register';
 import { PwaInstallBanner } from '@/components/pwa-install-banner';
 import { Mascot } from '@/components/mascot';
+import { DevSidebar } from '@/components/dev-sidebar';
 import { APP_URL } from '@/lib/utils';
 import '../globals.css';
 
@@ -120,6 +121,7 @@ export default async function LocaleLayout({
           {children}
           <PwaInstallBanner />
           <Mascot />
+          <DevSidebar />
         </Providers>
       </body>
     </html>

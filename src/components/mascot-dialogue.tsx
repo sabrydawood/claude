@@ -440,9 +440,9 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
                   </div>
                 )}
 
-                {/* Latest AI message — RPG dialogue style */}
+                {/* Latest AI message — RPG dialogue style (div, not p, to allow TypingDots inside) */}
                 {lastAiMsg && (
-                  <motion.p
+                  <motion.div
                     key={messages.length}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -475,7 +475,7 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
                         )}
                       </>
                     )}
-                  </motion.p>
+                  </motion.div>
                 )}
                 <div ref={messagesEndRef} />
               </div>

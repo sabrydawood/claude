@@ -38,11 +38,14 @@ export async function PostMascotChat(Req: NextRequest): Promise<NextResponse | R
   const SystemPrompt = await BuildMascotSystemPrompt(Body.Pathname, Body.Locale);
   const TrimmedMessages = Body.Messages.slice(-12) as ChatMessage[];
   const Encoder = new TextEncoder();
+  const IsDebug = process.env.AI_DEBUG === 'true';
 
   const Stream = new ReadableStream({
     async start(Controller) {
       try {
-        for await (const Text of streamChat(SystemPrompt, TrimmedMessages)) {
+        for await (const Text of streamChat(SystemPrompt, TrimmedMessages, IsDebug ? (info) => {
+          Controller.enqueue(Encoder.encode(`data: ${JSON.stringify({ debug: info })}\n\n`));
+        } : undefined)) {
           Controller.enqueue(Encoder.encode(`data: ${JSON.stringify({ text: Text })}\n\n`));
         }
       } catch (Err: unknown) {

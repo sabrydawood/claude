@@ -332,7 +332,10 @@
     "badgeReading": "Reading",
     "badgeQuiz": "Quiz",
     "badgeCompleted": "Complete",
-    "questions": "questions"
+    "questions": "questions",
+    "guestSaveTitle": "Save your progress!",
+    "guestSaveSubtitle": "Sign in to keep your points and achievements",
+    "guestSaveCta": "Sign Up"
   },
   "quiz": {
     "title": "Quiz Time!",
@@ -627,5 +630,22 @@
       "3": "Advanced"
     },
     "hours": "hour"
+  },
+  "playground": {
+    "javascript": "JavaScript",
+    "python": "Python",
+    "runCode": "Run",
+    "reset": "Reset",
+    "running": "Running…",
+    "loadingPython": "Loading Python…",
+    "output": "Output",
+    "errorLabel": "Error:",
+    "pass": "Correct! Great job.",
+    "fail": "Not quite — try again!",
+    "hint": "Hint",
+    "showHint": "Show",
+    "hideHint": "Hide",
+    "timeoutError": "Code timed out after 5 seconds.",
+    "loadPyodideError": "Failed to load Python runtime. Check your connection."
   }
 }

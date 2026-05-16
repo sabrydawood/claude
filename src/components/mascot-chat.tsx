@@ -8,10 +8,17 @@ import { getDir, isRTL } from '@/lib/i18n/locale-utils';
 import { X, Send, Loader2, MessageCircle, RotateCcw } from 'lucide-react';
 import { streamClient } from '@/lib/api/stream-client';
 
+interface DebugInfo {
+  provider: string;
+  inputTokens: number;
+  outputTokens: number;
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   streaming?: boolean;
+  debug?: DebugInfo;
 }
 
 interface Props {
@@ -104,7 +111,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
     ]);
 
     try {
-      await streamClient.sse<{ text?: string; error?: string }>(
+      await streamClient.sse<{ text?: string; error?: string; debug?: DebugInfo }>(
         '/api/v1/mascot',
         { Messages: history, Pathname: pathname, Locale: locale },
         {
@@ -116,6 +123,16 @@ export function MascotChat({ isOpen, onClose }: Props) {
                 const last = updated[updated.length - 1];
                 if (last?.role === 'assistant') {
                   updated[updated.length - 1] = { ...last, content: last.content + event.text, streaming: true };
+                }
+                return updated;
+              });
+            }
+            if (event.debug) {
+              setMessages(prev => {
+                const updated = [...prev];
+                const last = updated[updated.length - 1];
+                if (last?.role === 'assistant') {
+                  updated[updated.length - 1] = { ...last, debug: event.debug };
                 }
                 return updated;
               });
@@ -160,6 +177,37 @@ export function MascotChat({ isOpen, onClose }: Props) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialized]);
+
+  // Listen for platform events and proactively respond
+  useEffect(() => {
+    const onLessonStart = (e: Event) => {
+      const { lessonTitle } = (e as CustomEvent<{ lessonTitle: string }>).detail ?? {};
+      if (isStreaming) return;
+      const prompt = locale === 'ar'
+        ? `المستخدم بدأ درس "${lessonTitle}". شجّعه ببضع كلمات وادّيله نصيحة واحدة عشان يستفيد من الدرس.`
+        : `The user just started the lesson "${lessonTitle}". Give a short encouraging message and one tip to get the most from it.`;
+      const newHistory: Message[] = [...messages, { role: 'user', content: prompt }];
+      streamResponse(newHistory, true);
+    };
+
+    const onQuizComplete = (e: Event) => {
+      const { score, xpEarned } = (e as CustomEvent<{ score: number; xpEarned: number }>).detail ?? {};
+      if (isStreaming) return;
+      const prompt = locale === 'ar'
+        ? `المستخدم خلّص الكويز وجاب ${score}% وكسب ${xpEarned} XP. علّق على نتيجته وشجّعه.`
+        : `The user just completed the quiz with ${score}% and earned ${xpEarned} XP. Comment briefly on their result.`;
+      const newHistory: Message[] = [...messages, { role: 'user', content: prompt }];
+      streamResponse(newHistory, true);
+    };
+
+    window.addEventListener('zkawi:lesson_start', onLessonStart);
+    window.addEventListener('zkawi:quiz_complete', onQuizComplete);
+    return () => {
+      window.removeEventListener('zkawi:lesson_start', onLessonStart);
+      window.removeEventListener('zkawi:quiz_complete', onQuizComplete);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStreaming, messages, locale]);
 
   // Reset on route change
   useEffect(() => {
@@ -255,36 +303,43 @@ export function MascotChat({ isOpen, onClose }: Props) {
                 >
                   {msg.role === 'assistant' && <ZakiAvatar size={24} />}
 
-                  <div
-                    className="max-w-[78%] rounded-2xl px-3 py-2 text-sm leading-relaxed"
-                    style={
-                      msg.role === 'user'
-                        ? {
-                            background: 'var(--zkawi-purple)',
-                            color: '#fff',
-                            borderEndEndRadius: 4,
-                          }
-                        : {
-                            background: 'var(--surface)',
-                            color: 'var(--text)',
-                            border: '1px solid var(--border)',
-                            borderStartStartRadius: 4,
-                          }
-                    }
-                  >
-                    {msg.streaming && msg.content === '' ? (
-                      <TypingDots />
-                    ) : (
-                      <>
-                        {msg.content}
-                        {msg.streaming && (
-                          <motion.span
-                            animate={{ opacity: [1, 0] }}
-                            transition={{ repeat: Infinity, duration: 0.6 }}
-                            className="inline-block w-0.5 h-3.5 bg-current ms-0.5 align-middle"
-                          />
-                        )}
-                      </>
+                  <div className="max-w-[78%] flex flex-col gap-1">
+                    <div
+                      className="rounded-2xl px-3 py-2 text-sm leading-relaxed"
+                      style={
+                        msg.role === 'user'
+                          ? {
+                              background: 'var(--zkawi-purple)',
+                              color: '#fff',
+                              borderEndEndRadius: 4,
+                            }
+                          : {
+                              background: 'var(--surface)',
+                              color: 'var(--text)',
+                              border: '1px solid var(--border)',
+                              borderStartStartRadius: 4,
+                            }
+                      }
+                    >
+                      {msg.streaming && msg.content === '' ? (
+                        <TypingDots />
+                      ) : (
+                        <>
+                          {msg.content}
+                          {msg.streaming && (
+                            <motion.span
+                              animate={{ opacity: [1, 0] }}
+                              transition={{ repeat: Infinity, duration: 0.6 }}
+                              className="inline-block w-0.5 h-3.5 bg-current ms-0.5 align-middle"
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
+                    {msg.role === 'assistant' && msg.debug && (
+                      <p className="text-[10px] px-1" style={{ color: 'var(--text-muted)', opacity: 0.7 }}>
+                        {msg.debug.provider} · ↑{msg.debug.inputTokens} ↓{msg.debug.outputTokens} tokens
+                      </p>
                     )}
                   </div>
                 </motion.div>

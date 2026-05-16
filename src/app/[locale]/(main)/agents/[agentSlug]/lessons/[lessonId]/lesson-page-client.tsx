@@ -1,17 +1,20 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuizComponent from '@/components/quiz/quiz-component';
+import LessonContent from '@/components/lesson/lesson-content';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getDir } from '@/lib/i18n/locale-utils';
 import type { LessonFull } from '@/lib/db/queries/content';
-import { ChevronLeft, ChevronRight, Clock, Zap, CheckCircle2, BookOpen, Trophy, Target, PartyPopper } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Zap, CheckCircle2, BookOpen, Trophy, Target, PartyPopper, LogIn } from 'lucide-react';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { ProgressService } from '@/lib/api/services/progress.service';
+
+const GUEST_PROGRESS_KEY = 'zkawi_guest_progress';
 
 interface UserProgress {
   completedLessons: string[];
@@ -31,26 +34,46 @@ interface Props {
   locale: string;
   agentSlug: string;
   initialProgress: UserProgress | null;
+  /** Guest visitor — progress saved to localStorage, no API calls */
+  isGuest?: boolean;
   /** Override back button URL — defaults to /agents/${agentSlug} */
   backHref?: string;
   /** Override base path for lesson links — defaults to /agents/${agentSlug}/lessons */
   lessonBasePath?: string;
 }
 
-export default function LessonPageClient({ lesson, allLessonsCount, currentIndex, nextLessonId, locale, agentSlug, initialProgress, backHref, lessonBasePath }: Props) {
+function dispatchMascotEvent(name: string, detail?: Record<string, unknown>) {
+  window.dispatchEvent(new CustomEvent(name, { detail }));
+}
+
+export default function LessonPageClient({ lesson, allLessonsCount, currentIndex, nextLessonId, locale, agentSlug, initialProgress, isGuest = false, backHref, lessonBasePath }: Props) {
   const resolvedBackHref = backHref ?? `/agents/${agentSlug}`;
   const resolvedLessonBase = lessonBasePath ?? `/agents/${agentSlug}/lessons`;
   const t = useTranslations('lessons');
 
   const [view, setView] = useState<LessonView>('content');
   const [quizKey, setQuizKey] = useState(0);
-  const [progress, setProgress] = useState<UserProgress>(
-    initialProgress ?? { completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {} }
-  );
+  const [progress, setProgress] = useState<UserProgress>(() => {
+    if (initialProgress) return initialProgress;
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(GUEST_PROGRESS_KEY);
+        if (stored) return JSON.parse(stored) as UserProgress;
+      } catch { /* ignore */ }
+    }
+    return { completedLessons: [], totalXp: 0, streakDays: 0, quizzesCompleted: 0, scores: {} };
+  });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [xpPopup, setXpPopup] = useState<number | null>(null);
   const [earnedAchievements, setEarnedAchievements] = useState<{ id: number; icon: string; name: string }[]>([]);
+  const [showGuestSavePrompt, setShowGuestSavePrompt] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Dispatch lesson_start event for mascot
+  useEffect(() => {
+    dispatchMascotEvent('zkawi:lesson_start', { lessonTitle: lesson.title, locale });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lesson.id]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,34 +88,46 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
     return () => el?.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const saveGuestProgress = useCallback((updated: UserProgress) => {
+    try { localStorage.setItem(GUEST_PROGRESS_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
+  }, []);
+
   const isAlreadyCompleted = progress.completedLessons.includes(lesson.id);
 
   const handleQuizComplete = async (score: number, xpEarned: number) => {
     const isNew = !progress.completedLessons.includes(lesson.id);
-    setProgress(prev => ({
-      ...prev,
-      completedLessons: isNew ? [...prev.completedLessons, lesson.id] : prev.completedLessons,
-      totalXp: isNew ? prev.totalXp + xpEarned : prev.totalXp,
-      quizzesCompleted: isNew ? prev.quizzesCompleted + 1 : prev.quizzesCompleted,
-      scores: { ...prev.scores, [lesson.id]: score },
-    }));
+    const updated: UserProgress = {
+      ...progress,
+      completedLessons: isNew ? [...progress.completedLessons, lesson.id] : progress.completedLessons,
+      totalXp: isNew ? progress.totalXp + xpEarned : progress.totalXp,
+      quizzesCompleted: isNew ? progress.quizzesCompleted + 1 : progress.quizzesCompleted,
+      scores: { ...progress.scores, [lesson.id]: score },
+    };
+    setProgress(updated);
 
-    try {
-      const data = await ProgressService.completeLesson(lesson.id, score);
-      if (data.NewAchievements?.length) {
-        setEarnedAchievements(data.NewAchievements.map(a => ({
-          id: 0,
-          icon: a.Icon,
-          name: a.Name,
-        })));
+    dispatchMascotEvent('zkawi:quiz_complete', { score, xpEarned, lessonTitle: lesson.title });
+
+    if (isGuest) {
+      saveGuestProgress(updated);
+      setXpPopup(xpEarned);
+      setTimeout(() => setXpPopup(null), 2500);
+      setView('completed');
+      setTimeout(() => setShowGuestSavePrompt(true), 1200);
+    } else {
+      try {
+        const data = await ProgressService.completeLesson(lesson.id, score);
+        if (data.NewAchievements?.length) {
+          setEarnedAchievements(data.NewAchievements.map(a => ({ id: 0, icon: a.Icon, name: a.Name })));
+        }
+      } catch {
+        // lesson still shows completed locally even if server call fails
       }
-    } catch {
-      // lesson still shows completed locally even if server call fails
+      setXpPopup(xpEarned);
+      setTimeout(() => setXpPopup(null), 2500);
+      setView('completed');
     }
 
-    setXpPopup(xpEarned);
-    setTimeout(() => setXpPopup(null), 2500);
-    setView('completed');
+    dispatchMascotEvent('zkawi:lesson_complete', { lessonTitle: lesson.title, score, xpEarned });
   };
 
   const handleRetry = () => {
@@ -275,12 +310,9 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                 ref={contentRef}
                 className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] shadow-sm p-6 md:p-8 max-h-[60vh] overflow-y-auto"
               >
-                <div
-                  className="prose prose-lg max-w-none lesson-content"
-                  style={{ direction: getDir(locale) }}
-                  dangerouslySetInnerHTML={{
-                    __html: markdownToHtml(lesson.content),
-                  }}
+                <LessonContent
+                  content={lesson.content}
+                  direction={getDir(locale)}
                 />
               </div>
 
@@ -374,6 +406,28 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                   </div>
                 )}
 
+                {/* Guest save-progress prompt */}
+                <AnimatePresence>
+                  {isGuest && showGuestSavePrompt && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="mb-6 rounded-2xl p-4 flex items-center gap-4"
+                      style={{ background: 'var(--zkawi-purple)/10', border: '1px solid var(--zkawi-purple)/30' }}
+                    >
+                      <LogIn size={20} style={{ color: 'var(--zkawi-purple)', flexShrink: 0 }} />
+                      <div className="flex-1 text-start">
+                        <p className="font-black text-sm" style={{ color: 'var(--text)' }}>{t('guestSaveTitle')}</p>
+                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('guestSaveSubtitle')}</p>
+                      </div>
+                      <Link href="/register">
+                        <Button size="sm" className="shrink-0">{t('guestSaveCta')}</Button>
+                      </Link>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="flex gap-3 justify-center">
                   <Button variant="outline" onClick={() => setView('content')} className="gap-2">
                     <BookOpen size={16} />
@@ -402,19 +456,4 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
       </div>
     </main>
   );
-}
-
-// Simple markdown to HTML converter
-function markdownToHtml(markdown: string): string {
-  return markdown
-    .trim()
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/^- (.+)$/gm, '<li><span class="bullet">•</span><span>$1</span></li>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-    .replace(/^(\d+)\. (.+)$/gm, '<li><span class="num">$1.</span><span>$2</span></li>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(?!<[h|u|b|l|p])(.+)$/gm, '<p>$1</p>');
 }

@@ -332,7 +332,10 @@
     "badgeReading": "قراءة",
     "badgeQuiz": "كويز",
     "badgeCompleted": "مكتمل",
-    "questions": "أسئلة"
+    "questions": "أسئلة",
+    "guestSaveTitle": "احفظ تقدمك!",
+    "guestSaveSubtitle": "سجّل دخولك عشان تحافظ على نقاطك",
+    "guestSaveCta": "سجّل"
   },
   "quiz": {
     "title": "وقت الكويز!",
@@ -627,5 +630,22 @@
       "3": "متقدم"
     },
     "hours": "ساعة"
+  },
+  "playground": {
+    "javascript": "جافاسكريبت",
+    "python": "بايثون",
+    "runCode": "شغّل",
+    "reset": "إعادة",
+    "running": "جاري التشغيل…",
+    "loadingPython": "جاري تحميل بايثون…",
+    "output": "الناتج",
+    "errorLabel": "خطأ:",
+    "pass": "صح! عمل ممتاز.",
+    "fail": "مش تمام — حاول تاني!",
+    "hint": "تلميح",
+    "showHint": "أظهر",
+    "hideHint": "أخفِ",
+    "timeoutError": "الكود وقف بعد 5 ثواني.",
+    "loadPyodideError": "فشل تحميل بايثون. تحقق من اتصالك."
   }
 }

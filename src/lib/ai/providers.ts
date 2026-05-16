@@ -15,11 +15,25 @@ export interface ChatMessage {
   content: string;
 }
 
+/** Debug metadata returned after a successful stream. */
+export interface StreamDebugInfo {
+  provider: string;
+  inputTokens: number;
+  outputTokens: number;
+}
+
 /** Internal provider contract — not exported. */
 interface IAIProvider {
   Name: string;
   IsAvailable: () => boolean;
-  GenerateStream: (System: string, Messages: ChatMessage[]) => AsyncGenerator<string>;
+  /** Yields text chunks. Sets debug counters on the tracker object when available. */
+  GenerateStream: (System: string, Messages: ChatMessage[], debug: DebugTracker) => AsyncGenerator<string>;
+}
+
+/** Mutable tracker — providers write token counts here during streaming. */
+interface DebugTracker {
+  inputTokens: number;
+  outputTokens: number;
 }
 
 // ─── OpenRouter (OpenAI-compatible, routes to many models) ───────────────────
@@ -28,7 +42,7 @@ interface IAIProvider {
 const OpenRouterProvider: IAIProvider = {
   Name: 'OpenRouter',
   IsAvailable: () => !!process.env.OPENROUTER_API_KEY,
-  async *GenerateStream(System, Messages) {
+  async *GenerateStream(System, Messages, debug) {
     const Client = new OpenAI({
       apiKey: process.env.OPENROUTER_API_KEY,
       baseURL: 'https://openrouter.ai/api/v1',
@@ -42,12 +56,17 @@ const OpenRouterProvider: IAIProvider = {
       model: 'google/gemini-2.0-flash-lite-001',
       messages: [{ role: 'system', content: System }, ...Messages],
       stream: true,
+      stream_options: { include_usage: true },
       max_tokens: 512,
     });
 
     for await (const Chunk of Stream) {
       const Text = Chunk.choices[0]?.delta?.content;
       if (Text) yield Text;
+      if (Chunk.usage) {
+        debug.inputTokens = Chunk.usage.prompt_tokens ?? 0;
+        debug.outputTokens = Chunk.usage.completion_tokens ?? 0;
+      }
     }
   },
 };
@@ -58,7 +77,7 @@ const OpenRouterProvider: IAIProvider = {
 const GeminiProvider: IAIProvider = {
   Name: 'Gemini',
   IsAvailable: () => !!process.env.GEMINI_API_KEY,
-  async *GenerateStream(System, Messages) {
+  async *GenerateStream(System, Messages, debug) {
     const Client = new OpenAI({
       apiKey: process.env.GEMINI_API_KEY,
       baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
@@ -68,12 +87,17 @@ const GeminiProvider: IAIProvider = {
       model: 'gemini-2.0-flash-lite',
       messages: [{ role: 'system', content: System }, ...Messages],
       stream: true,
+      stream_options: { include_usage: true },
       max_tokens: 512,
     });
 
     for await (const Chunk of Stream) {
       const Text = Chunk.choices[0]?.delta?.content;
       if (Text) yield Text;
+      if (Chunk.usage) {
+        debug.inputTokens = Chunk.usage.prompt_tokens ?? 0;
+        debug.outputTokens = Chunk.usage.completion_tokens ?? 0;
+      }
     }
   },
 };
@@ -84,19 +108,24 @@ const GeminiProvider: IAIProvider = {
 const OpenAIProvider: IAIProvider = {
   Name: 'OpenAI',
   IsAvailable: () => !!process.env.OPENAI_API_KEY,
-  async *GenerateStream(System, Messages) {
+  async *GenerateStream(System, Messages, debug) {
     const Client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const Stream = await Client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'system', content: System }, ...Messages],
       stream: true,
+      stream_options: { include_usage: true },
       max_tokens: 512,
     });
 
     for await (const Chunk of Stream) {
       const Text = Chunk.choices[0]?.delta?.content;
       if (Text) yield Text;
+      if (Chunk.usage) {
+        debug.inputTokens = Chunk.usage.prompt_tokens ?? 0;
+        debug.outputTokens = Chunk.usage.completion_tokens ?? 0;
+      }
     }
   },
 };
@@ -107,7 +136,7 @@ const OpenAIProvider: IAIProvider = {
 const AnthropicProvider: IAIProvider = {
   Name: 'Anthropic',
   IsAvailable: () => !!process.env.ANTHROPIC_API_KEY,
-  async *GenerateStream(System, Messages) {
+  async *GenerateStream(System, Messages, debug) {
     const Client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const Stream = await Client.messages.create({
@@ -121,6 +150,12 @@ const AnthropicProvider: IAIProvider = {
     for await (const Event of Stream) {
       if (Event.type === 'content_block_delta' && Event.delta.type === 'text_delta') {
         yield Event.delta.text;
+      }
+      if (Event.type === 'message_delta' && Event.usage) {
+        debug.outputTokens = Event.usage.output_tokens ?? 0;
+      }
+      if (Event.type === 'message_start' && Event.message.usage) {
+        debug.inputTokens = Event.message.usage.input_tokens ?? 0;
       }
     }
   },
@@ -145,10 +180,12 @@ const PROVIDERS: IAIProvider[] = [
  *
  * @param System   - System prompt string
  * @param Messages - Conversation history
+ * @param onDebug  - Optional callback with provider/token info (called after stream ends)
  */
 export async function* StreamChat(
   System: string,
   Messages: ChatMessage[],
+  onDebug?: (info: StreamDebugInfo) => void,
 ): AsyncGenerator<string> {
   const Available = PROVIDERS.filter((P) => P.IsAvailable());
 
@@ -159,8 +196,10 @@ export async function* StreamChat(
   }
 
   for (const Provider of Available) {
+    const debug: DebugTracker = { inputTokens: 0, outputTokens: 0 };
     try {
-      yield* Provider.GenerateStream(System, Messages);
+      yield* Provider.GenerateStream(System, Messages, debug);
+      onDebug?.({ provider: Provider.Name, inputTokens: debug.inputTokens, outputTokens: debug.outputTokens });
       return;
     } catch (Err) {
       console.error(`[AI] ${Provider.Name} failed, trying next:`, (Err as Error).message);

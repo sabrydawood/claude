@@ -12,7 +12,8 @@ import { ParseBodyOrBadRequest } from '@/Shared/Middleware/Validation.Middleware
 import { CheckRateLimit, AI_RATE_LIMIT } from '@/Shared/Middleware/RateLimit.Middleware';
 import { streamChat, type ChatMessage } from '@/lib/ai/Providers';
 import { MascotChatSchema } from './Mascot.Schemas';
-import { BuildMascotSystemPrompt } from './Mascot.Service';
+import { BuildMascotSystemPromptCached } from './Mascot.Service';
+import { BuildCacheKey, CheckCache, BumpCacheHit, SaveToCache, GetPageKey } from '@/Lib/Ai/Cache.Service';
 
 const GUEST_RATE_LIMIT = { MaxRequests: 10, WindowMs: 60_000 };
 
@@ -35,11 +36,63 @@ export async function PostMascotChat(Req: NextRequest): Promise<NextResponse | R
   const Body = await ParseBodyOrBadRequest(Req, MascotChatSchema);
   if (Body instanceof NextResponse) return Body;
 
-  const SystemPrompt = await BuildMascotSystemPrompt(Body.Pathname, Body.Locale);
+  const SystemPrompt = await BuildMascotSystemPromptCached(Body.Pathname, Body.Locale);
   const TrimmedMessages = Body.Messages.slice(-12) as ChatMessage[];
   const Encoder = new TextEncoder();
   const IsDebug = process.env.AI_DEBUG === 'true';
 
+  // Get the last user message (the actual question to cache)
+  const LastUserMsg = Body.Messages.filter(m => m.role === 'user').at(-1);
+  const PageKey = GetPageKey(Body.Pathname);
+
+  if (LastUserMsg) {
+    const CacheKey = await BuildCacheKey(LastUserMsg.content, PageKey, Body.Locale);
+    const CacheHit = await CheckCache(CacheKey);
+
+    if (CacheHit) {
+      // Serve from cache — same SSE format as live response
+      BumpCacheHit(CacheHit.Id);
+      const Enc = new TextEncoder();
+      return new Response(
+        new ReadableStream({
+          start(Ctrl) {
+            Ctrl.enqueue(Enc.encode(`data: ${JSON.stringify({ text: CacheHit.Answer })}\n\n`));
+            Ctrl.enqueue(Enc.encode('data: [DONE]\n\n'));
+            Ctrl.close();
+          },
+        }),
+        { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' } },
+      );
+    }
+
+    // Cache miss — run AI and save result
+    let FullResponse = '';
+    const OriginalStream = new ReadableStream({
+      async start(Controller) {
+        try {
+          for await (const Text of streamChat(SystemPrompt, TrimmedMessages, IsDebug ? (info) => {
+            Controller.enqueue(Encoder.encode(`data: ${JSON.stringify({ debug: info })}\n\n`));
+          } : undefined)) {
+            FullResponse += Text;
+            Controller.enqueue(Encoder.encode(`data: ${JSON.stringify({ text: Text })}\n\n`));
+          }
+          // Save to cache after successful stream (fire-and-forget)
+          SaveToCache(CacheKey, LastUserMsg.content, FullResponse, PageKey, Body.Locale);
+        } catch (Err: unknown) {
+          console.error('[Mascot] Stream error:', Err);
+          Controller.enqueue(Encoder.encode(`data: ${JSON.stringify({ error: 'AI unavailable' })}\n\n`));
+        } finally {
+          Controller.enqueue(Encoder.encode('data: [DONE]\n\n'));
+          Controller.close();
+        }
+      },
+    });
+    return new Response(OriginalStream, {
+      headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
+    });
+  }
+
+  // Fallback: no user message found — run AI without caching
   const Stream = new ReadableStream({
     async start(Controller) {
       try {

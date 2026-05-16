@@ -22,6 +22,28 @@ const DEFAULT_MASCOT_PROMPT = `أنت "ذكي" (Zaki)، المرشد الشخص�
 4. ردّك دايماً بنفس لغة المستخدم تماماً
 5. لو السؤال مش متعلق بالذكاء الاصطناعي أو المنصة: أجب بإيجاز وارجع للموضوع برفق`;
 
+// In-process LRU cache for system prompts — avoids DB lookup on every request
+const PROMPT_LRU = new Map<string, { Prompt: string; ExpiresAt: number }>();
+const PROMPT_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+export async function BuildMascotSystemPromptCached(Pathname: string, Locale: string): Promise<string> {
+  const Key = `${Pathname}:${Locale}`;
+  const Cached = PROMPT_LRU.get(Key);
+  if (Cached && Date.now() < Cached.ExpiresAt) return Cached.Prompt;
+
+  const Prompt = await BuildMascotSystemPrompt(Pathname, Locale);
+  PROMPT_LRU.set(Key, { Prompt, ExpiresAt: Date.now() + PROMPT_TTL_MS });
+
+  // Evict expired entries if cache grows large
+  if (PROMPT_LRU.size > 200) {
+    const Now = Date.now();
+    for (const [K, V] of PROMPT_LRU) {
+      if (Now >= V.ExpiresAt) PROMPT_LRU.delete(K);
+    }
+  }
+  return Prompt;
+}
+
 /**
  * Builds the system prompt for the mascot based on current page context.
  * Loads base prompt from DB (SystemPrompts table), falls back to hardcoded default.

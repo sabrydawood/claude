@@ -16,7 +16,7 @@
 
 import { useEffect, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, useAnimations } from '@react-three/drei';
+import { useGLTF, useAnimations, OrbitControls } from '@react-three/drei';
 import { SkeletonUtils } from 'three-stdlib';
 import * as THREE from 'three';
 
@@ -97,12 +97,16 @@ function RobotExpressiveInner({ mood, walking }: RobotProps) {
     }
   });
 
+  // Offset by -1.75 so robot center lands at world y=0:
+  //   feet  ≈ -1.75,  chest ≈ 0.25,  head ≈ 1.75
+  // Model faces -Z → rotate π so it faces camera at +Z
   return (
     <primitive
       ref={clonedRef}
       object={clonedScene}
-      scale={1.1}
-      position={[0, -1.1, 0]}
+      scale={1.0}
+      position={[0, -1.75, 0]}
+      rotation={[0, Math.PI, 0]}
       dispose={null}
     />
   );
@@ -126,51 +130,66 @@ function RobotLighting() {
 interface CanvasProps extends RobotProps {
   width?: number;
   height?: number;
-  cameraZ?: number;
-  cameraY?: number;
-  fov?: number;
+  /** Allow user to rotate/zoom — useful for dev preview pages */
+  orbitControls?: boolean;
 }
 
-/** Full 3D robot on a transparent canvas — for the NPC mascot. */
+/*
+ * Camera calibration — model centered at y=0 (position=[0,-1.75,0]):
+ *   feet≈-1.75  waist≈-0.75  chest≈0.25  head≈1.75
+ *
+ * Full body: cam at [0,0.4,6] tilted slightly up, lookAt=[0,0,0]
+ *   → half_h=6*tan21°=2.30 → visible [-1.90, 2.70] → covers feet+head ✓
+ *   → face (y≈1.3) appears at upper-center of frame
+ *
+ * Portrait: cam at [0,1.4,2.5], lookAt=[0,1.4,0]
+ *   → half_h=2.5*tan15°=0.67 → visible [0.73, 2.07] → head area ✓
+ */
+
 export function RobotExpressive({
   mood,
   walking = false,
   width = 100,
   height = 130,
-  cameraZ = 3.6,
-  cameraY = 0.5,
-  fov = 42,
+  orbitControls = false,
 }: CanvasProps) {
   return (
     <Canvas
       gl={{ antialias: true, alpha: true }}
-      camera={{ position: [0, cameraY, cameraZ], fov }}
+      camera={{ position: [0, 0.2, 7.5], fov: 40 }}
       style={{ width, height, display: 'block', background: 'transparent' }}
     >
       <RobotLighting />
       <RobotExpressiveInner mood={mood} walking={walking} />
+      {orbitControls && (
+        <OrbitControls target={[0, 0, 0]} enableZoom enableRotate enablePan={false} minDistance={3} maxDistance={20} />
+      )}
     </Canvas>
   );
 }
 
-/** Close-up portrait crop for the RPG dialogue box. */
 export function RobotExpressivePortrait({
   mood,
   width = 150,
   height = 270,
+  orbitControls = false,
 }: {
   mood: RobotMood;
   width?: number;
   height?: number;
+  orbitControls?: boolean;
 }) {
   return (
     <Canvas
       gl={{ antialias: true, alpha: true }}
-      camera={{ position: [0, 0.6, 2.4], fov: 36 }}
+      camera={{ position: [0, 0.8, 2.8], fov: 32 }}
       style={{ width, height, display: 'block', background: 'transparent' }}
     >
       <RobotLighting />
       <RobotExpressiveInner mood={mood} walking={false} />
+      {orbitControls && (
+        <OrbitControls target={[0, 0.8, 0]} enableZoom enableRotate enablePan={false} />
+      )}
     </Canvas>
   );
 }

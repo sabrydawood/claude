@@ -16,10 +16,15 @@ export default async function SandboxPage({
   if (!session?.user?.id) redirect(`/${locale}/login`);
 
   const [keyRow] = await db
-    .select({ KeyHint: EncryptedKeys.KeyHint })
+    .select({ KeyHint: EncryptedKeys.KeyHint, Provider: EncryptedKeys.Provider })
     .from(EncryptedKeys)
     .where(eq(EncryptedKeys.UserId, session.user.id))
     .limit(1);
 
-  return <SandboxClient initialHint={keyRow?.KeyHint ?? null} />;
+  return (
+    <SandboxClient
+      initialHint={keyRow?.KeyHint ?? null}
+      initialProvider={keyRow?.Provider ?? null}
+    />
+  );
 }

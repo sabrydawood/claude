@@ -8,6 +8,13 @@
       "when": 1778888022526,
       "tag": "0000_wandering_wendell_rand",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778942783119,
+      "tag": "0001_sweet_naoko",
+      "breakpoints": true
     }
   ]
 }

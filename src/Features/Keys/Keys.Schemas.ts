@@ -1,16 +1,11 @@
-/**
- * Keys.Schemas.ts
- * Zod validation for API key storage.
- */
 import { z } from 'zod';
 
+export const PROVIDER_VALUES = ['anthropic', 'openai', 'gemini', 'openrouter'] as const;
+export type TProvider = typeof PROVIDER_VALUES[number];
+
 export const SaveKeySchema = z.object({
-  ApiKey: z.string()
-    .min(10)
-    .max(120)
-    .refine((V) => V.startsWith('sk-ant-'), {
-      message: 'مفتاح غير صحيح — لازم يبدأ بـ sk-ant-',
-    }),
+  Provider: z.enum(PROVIDER_VALUES),
+  ApiKey:   z.string().min(10).max(200),
 });
 
 export type TSaveKeyInput = z.infer<typeof SaveKeySchema>;

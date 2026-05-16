@@ -55,5 +55,11 @@ export async function BuildMascotSystemPrompt(Pathname: string, Locale: string):
 
   const BasePrompt = PromptRow?.Content ?? DEFAULT_MASCOT_PROMPT;
 
-  return `${BasePrompt}\n\n── الصفحة الحالية ──\n${PageLabel}${LessonBlock}`;
+  // Explicit language override — appended LAST so it overrides any language
+  // inference the model may derive from the Arabic system prompt text.
+  const LangInstruction = Locale === 'ar'
+    ? `\n\n── اللغة المطلوبة ──\nردّك دايماً بالعربية (عامية مصرية مفهومة) — حتى لو المستخدم كتب بالإنجليزي.`
+    : `\n\n── Required Language ──\nALWAYS respond in English only. The user interface is in English. Do NOT use Arabic regardless of the instructions above.`;
+
+  return `${BasePrompt}\n\n── الصفحة الحالية ──\n${PageLabel}${LessonBlock}${LangInstruction}`;
 }

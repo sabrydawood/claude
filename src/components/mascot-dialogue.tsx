@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getDir, isRTL } from "@/lib/i18n/locale-utils";
 import { X, Send, Loader2, RotateCcw } from "lucide-react";
 import { streamClient } from "@/lib/api/stream-client";
-import { XbotPortrait } from "@/components/mascot-gltf";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -334,7 +333,6 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
 
   // ── Mood derived from state ────────────────────────────────────────────────
 
-  const portraitMood = isStreaming ? "talking" : "idle";
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -354,20 +352,7 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
           dir={dir}
           style={{ height: 230 }}
         >
-          {/* ── Character portrait — overlaps above the box ── */}
-          <div
-            className="absolute bottom-0 left-4 z-20 pointer-events-none"
-            style={{ width: 150, height: 270 }}
-          >
-            <XbotPortrait
-              mood={portraitMood}
-              width={150}
-              height={270}
-              orbitControls={true}
-            />
-          </div>
-
-          {/* ── Dialogue box ── */}
+          {/* ── Dialogue box — full width, no portrait ── */}
           <div
             className="absolute bottom-0 left-0 right-0"
             style={{
@@ -377,7 +362,6 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
               borderTop: "2px solid rgba(124, 58, 237, 0.55)",
               boxShadow:
                 "0 -10px 80px rgba(80, 30, 200, 0.3), inset 0 1px 0 rgba(167,139,250,0.08)",
-              paddingLeft: 168,
             }}
           >
             <div className="h-full flex flex-col px-5 py-3" dir={dir}>

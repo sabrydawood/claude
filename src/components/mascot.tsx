@@ -200,69 +200,13 @@ export function Mascot() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatOpen]);
 
-  // Word click: detect text clicks anywhere on the page, explain via mascot
+  // Listen for zkawi:open_chat event (dispatched by SelectionTooltip)
   useEffect(() => {
     if (!mounted) return;
-
-    const handleClick = (e: MouseEvent) => {
-      // Skip if on interactive UI elements
-      const target = e.target as HTMLElement;
-      if (target.closest('[data-mascot], button, a, input, select, textarea, [role="button"], [role="dialog"]')) return;
-
-      // Cooldown check — 5 seconds between clicks
-      const now = Date.now();
-      if (now - lastWordClickRef.current < 5000) return;
-
-      // Get text at click position
-      let range: Range | null = null;
-      if (document.caretRangeFromPoint) {
-        range = document.caretRangeFromPoint(e.clientX, e.clientY);
-      } else {
-        const pos = (document as unknown as { caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null }).caretPositionFromPoint?.(e.clientX, e.clientY);
-        if (pos) {
-          range = document.createRange();
-          range.setStart(pos.offsetNode, pos.offset);
-          range.collapse(true);
-        }
-      }
-
-      if (!range) return;
-      const node = range.startContainer;
-      if (node.nodeType !== Node.TEXT_NODE) return;
-
-      const text = node.textContent ?? '';
-      if (!text.trim() || text.trim().length < 5) return;
-
-      // Extract word without range.expand (cross-browser safe)
-      const offset = range.startOffset;
-      let start = offset, end = offset;
-      while (start > 0 && /\S/.test(text[start - 1])) start--;
-      while (end < text.length && /\S/.test(text[end])) end++;
-      const word = text.slice(start, end).trim();
-      if (!word || word.length < 2) return;
-
-      // Get surrounding sentence from parent block element
-      const blockEl = target.closest('p, li, h1, h2, h3, blockquote, td');
-      const sentence = (blockEl?.textContent ?? text).trim().slice(0, 300);
-      if (sentence.length < 5) return;
-
-      lastWordClickRef.current = now;
-      // Open chat and auto-send explanation request
-      setChatOpen(true);
-      setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('zkawi:auto_send', {
-          detail: {
-            message: locale === 'ar'
-              ? `اشرح لي بأسلوب بسيط للأطفال: "${sentence}"`
-              : `Explain this to me in simple terms for kids: "${sentence}"`,
-          },
-        }));
-      }, 200);
-    };
-
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, [mounted, locale]);
+    const open = () => setChatOpen(true);
+    window.addEventListener('zkawi:open_chat', open);
+    return () => window.removeEventListener('zkawi:open_chat', open);
+  }, [mounted]);
 
   useEffect(() => {
     if (!mounted || hide) return;

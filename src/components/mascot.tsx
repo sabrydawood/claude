@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getDir, isRTL } from "@/lib/i18n/locale-utils";
 import { X, MessageCircle } from "lucide-react";
 import { MascotDialogue } from "@/components/mascot-dialogue";
@@ -126,8 +126,6 @@ export function Mascot() {
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("mascot");
-  const prefersReduced = useReducedMotion() ?? false;
-
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState({ x: 74, y: 72 });
   const [walkDuration, setWalkDuration] = useState(0.05);
@@ -472,22 +470,8 @@ export function Mascot() {
         <motion.div
           className="pointer-events-auto cursor-pointer w-full h-full relative"
           style={{ scaleX: facingLeft ? -1 : 1 }}
-          animate={
-            prefersReduced
-              ? {}
-              : isWalking
-                ? { y: [0, -5, 0, -5, 0] }
-                : { y: [0, -7, 0] }
-          }
-          transition={
-            prefersReduced
-              ? {}
-              : isWalking
-                ? { repeat: Infinity, duration: 0.32, ease: "easeInOut" }
-                : { repeat: Infinity, duration: 2.6, ease: "easeInOut" }
-          }
-          whileHover={{ scale: 1.12 }}
-          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.92 }}
           role="button"
           tabIndex={0}
           aria-label={
@@ -503,11 +487,9 @@ export function Mascot() {
           }}
         >
           {/* Ground shadow */}
-          <motion.div
+          <div
             className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
-            style={{ width: 60, height: 10, background: "rgba(109,40,217,0.3)", filter: "blur(8px)" }}
-            animate={prefersReduced ? {} : { scaleX: isWalking ? [1, 0.75, 1] : [1, 0.7, 1] }}
-            transition={prefersReduced ? {} : { repeat: Infinity, duration: isWalking ? 0.32 : 2.6 }}
+            style={{ width: 60, height: 10, background: "rgba(109,40,217,0.25)", filter: "blur(8px)" }}
           />
           <XbotExpressive mood={mood} walking={isWalking} width={140} height={180} />
 

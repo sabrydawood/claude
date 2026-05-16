@@ -248,6 +248,14 @@ function GltfModelInner({
   const { actions, mixer } = useAnimations(animations, clonedRef);
   const activeAnim = useRef("");
 
+  // Set initial rotation immediately so model faces camera from frame 0
+  useEffect(() => {
+    if (clonedRef.current) {
+      clonedRef.current.rotation.y = cfg.rotationY ?? 0;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Apply tint color to all mesh materials on mount
   useEffect(() => {
     if (!cfg.tint) return;
@@ -296,18 +304,28 @@ function GltfModelInner({
     }
   }, [mood, walking, actions, cfg]);
 
-  // Smooth rotation when facing direction changes (avoids scaleX snap/shake)
-  // + optional float for models without built-in idle animation
+  // Smooth rotation + logging to diagnose shaking
   useFrame(({ clock }) => {
     if (!clonedRef.current) return;
 
-    // Smooth direction turn: idle/talking face camera, walking turns 90° sideways
     const baseRotY = cfg.rotationY ?? 0;
     const targetRotY = walking
       ? baseRotY + (facingLeft ? Math.PI / 2 : -Math.PI / 2)
       : baseRotY;
-    clonedRef.current.rotation.y +=
-      (targetRotY - clonedRef.current.rotation.y) * 0.12;
+    const currentRotY = clonedRef.current.rotation.y;
+    const delta = targetRotY - currentRotY;
+    clonedRef.current.rotation.y += delta * 0.12;
+
+    // LOG: flag large or oscillating deltas that could cause shaking
+    if (Math.abs(delta) > 0.5) {
+      console.log('[Mascot rotation]', {
+        target: targetRotY.toFixed(3),
+        current: currentRotY.toFixed(3),
+        delta: delta.toFixed(3),
+        walking,
+        facingLeft,
+      });
+    }
 
     // Float (only for models without their own idle animation)
     if (!cfg.noFloat) {

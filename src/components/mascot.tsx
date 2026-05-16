@@ -348,7 +348,16 @@ export function Mascot() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           const durSec = Math.max(0.55, dist * 0.023);
 
-          setFacingLeft(dx < 0);
+          const newFacingLeft = dx < 0;
+          console.log('[Mascot walk]', {
+            from: currentPosRef.current,
+            to: { x: next.x, y: next.y },
+            dist: dist.toFixed(1),
+            durSec: durSec.toFixed(2),
+            facingLeft: newFacingLeft,
+          });
+
+          setFacingLeft(newFacingLeft);
           setIsWalking(true);
           setMood("idle");
           setBubbleOpen(false);
@@ -367,6 +376,14 @@ export function Mascot() {
     const dy0 = firstWp.y - currentPosRef.current.y;
     const dist0 = Math.sqrt(dx0 * dx0 + dy0 * dy0);
     const dur0 = dist0 > 3 ? Math.max(0.55, dist0 * 0.023) : 0.05;
+
+    console.log('[Mascot init walk]', {
+      from: currentPosRef.current,
+      to: { x: firstWp.x, y: firstWp.y },
+      dist0: dist0.toFixed(1),
+      dur0: dur0.toFixed(2),
+      isJump: dist0 <= 3,
+    });
 
     setFacingLeft(dx0 < 0);
     setIsWalking(dist0 > 3);

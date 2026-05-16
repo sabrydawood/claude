@@ -317,7 +317,7 @@ function GltfModelInner({
 
     const baseRotY = cfg.rotationY ?? 0;
     const targetRotY = walking
-      ? baseRotY + (facingLeft ? Math.PI / 2 : -Math.PI / 2)
+      ? baseRotY + (facingLeft ? -Math.PI / 2 : Math.PI / 2)
       : baseRotY;
 
     const justStartedWalking = walking && !prevWalkingRef.current;
@@ -415,7 +415,7 @@ const XBOT_CFG: GltfConfig = {
   },
   scale: 2.2,
   positionY: -1.75,
-  rotationY: Math.PI,
+  rotationY: 0,
   tint: "#7C3AED", // Zkawi purple
   noFloat: true, // Xbot has its own idle animation, no extra float needed
 };

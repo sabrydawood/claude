@@ -208,7 +208,7 @@ export default function AgentPageClient({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
                 whileHover={!isLocked ? { y: -3, scale: 1.01 } : {}}
-                className={`relative bg-[var(--surface)] rounded-3xl border-2 p-5 transition-all ${
+                className={`relative bg-[var(--surface)] rounded-3xl mt-2 border-2 p-5 transition-all ${
                   isCompleted
                     ? "border-[var(--zkawi-green)]/40 bg-[var(--zkawi-green)]/5"
                     : isLocked

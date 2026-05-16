@@ -6,10 +6,27 @@ import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { getDir, isRTL } from "@/lib/i18n/locale-utils";
 import { X, MessageCircle } from "lucide-react";
-import { MascotChat } from "@/components/mascot-chat";
+import { MascotDialogue } from "@/components/mascot-dialogue";
+import { ZakiRobot } from "@/components/mascot-3d";
 import { streamClient } from "@/lib/api/stream-client";
 
-type Mood = "idle" | "happy" | "thinking";
+type Mood = "idle" | "happy" | "thinking" | "talking";
+
+// ─── Varied AI bubble prompts ──────────────────────────────────────────────────
+const BUBBLE_PROMPTS: Record<"ar" | "en", Array<(p: string) => string>> = {
+  ar: [
+    (p) => `في جملة واحدة (8 كلمات بالأقصى)، قول كلام مشجع لطفل في صفحة "${p}".`,
+    (p) => `في جملة واحدة (8 كلمات)، اسأل سؤال ممتع عن "${p}" لطفل.`,
+    (p) => `في جملة واحدة (8 كلمات)، قدّم نصيحة مفيدة عن "${p}" للمتعلم.`,
+    (p) => `في جملة واحدة (8 كلمات)، اطرح تحدي بسيط للطفل في صفحة "${p}".`,
+  ],
+  en: [
+    (p) => `In one sentence (max 8 words), say something encouraging for the "${p}" page.`,
+    (p) => `In one sentence (8 words), ask a fun question about "${p}" for kids.`,
+    (p) => `In one sentence (8 words), share a useful tip about "${p}".`,
+    (p) => `In one sentence (8 words), give a simple challenge related to "${p}".`,
+  ],
+};
 
 interface Waypoint {
   x: number; // % from left (viewport)
@@ -452,7 +469,11 @@ export function Mascot() {
   const [isSmall, setIsSmall] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [aiBubble, setAiBubble] = useState("");
+  const [patrolKey, setPatrolKey] = useState(0);
   const aiBubbleAbortRef = useRef<AbortController | null>(null);
+  const chatOpenRef = useRef(false);
+  const promptIndexRef = useRef(0);
+  const lastWordClickRef = useRef(0);
 
   const currentPosRef = useRef({ x: 74, y: 72 });
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);

@@ -8,6 +8,7 @@ import { Providers } from '@/components/providers';
 import { PwaRegister } from '@/components/pwa-register';
 import { PwaInstallBanner } from '@/components/pwa-install-banner';
 import { Mascot } from '@/components/mascot';
+import { APP_URL } from '@/lib/utils';
 import '../globals.css';
 
 const cairo = Cairo({
@@ -22,7 +23,6 @@ const inter = Inter({
   display: 'swap',
 });
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
 export async function generateMetadata({
   params,

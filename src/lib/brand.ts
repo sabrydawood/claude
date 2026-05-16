@@ -1,10 +1,11 @@
+import { APP_URL } from './utils';
+
 export const brand = {
   name: 'ذكاوي',
   nameEn: 'Zkawi',
   taglineAr: 'تعلم الذكاء الاصطناعي بطريقة سهلة ومرحة',
   taglineEn: 'Learn AI the easy and fun way',
-  url: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
-
+  url: APP_URL,
   colors: {
     primary: '#7C3AED',
     primaryLight: '#A855F7',

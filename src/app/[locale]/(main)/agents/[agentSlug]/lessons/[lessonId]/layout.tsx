@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { getLessonById, getAgentBySlug } from '@/lib/db/queries/content';
 import { LessonSchema, BreadcrumbSchema } from '@/components/seo/json-ld';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+import { APP_URL } from '@/lib/utils';
 
 export async function generateMetadata({
   params,

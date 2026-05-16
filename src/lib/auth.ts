@@ -9,6 +9,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { uuidv7 } from 'uuidv7';
 import { db } from './db/Index';
 import * as schema from './db/Schema';
+import { APP_URL } from '@/lib/utils';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -29,8 +30,8 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,
   },
   trustedOrigins: [
-    process.env.BETTER_AUTH_URL || 'http://localhost:3000',
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    process.env.BETTER_AUTH_URL || APP_URL,
+    APP_URL,
   ],
   advanced: {
     database: {

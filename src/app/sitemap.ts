@@ -1,8 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { getAllAgentsForSitemap, getAllLessonsForSitemap } from '@/lib/db/queries/content';
 import { routing } from '@/lib/i18n/routing';
+import { APP_URL } from '@/lib/utils';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 const locales = routing.locales;
 
 function url(path: string): string {

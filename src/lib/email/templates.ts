@@ -3,8 +3,7 @@
  * HTML email templates for verification and password reset.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-
+import { APP_URL } from '@/lib/utils';
 const wrapper = (content: string) => `
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
@@ -33,7 +32,7 @@ const wrapper = (content: string) => `
         <tr>
           <td style="padding:24px 32px;border-top:1px solid #2a2a2a;text-align:center;">
             <p style="margin:0;font-size:12px;color:#666;">
-              © 2025 ذكاوي · <a href="${BASE_URL}" style="color:#7C3AED;text-decoration:none;">zkawi.com</a>
+              © 2025 ذكاوي · <a href="${APP_URL}" style="color:#7C3AED;text-decoration:none;">zkawi.com</a>
             </p>
             <p style="margin:8px 0 0;font-size:11px;color:#444;">
               لو مش طلبت ده، تجاهل الإيميل ده بكل أمان.

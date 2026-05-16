@@ -7,6 +7,7 @@
 
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
+import { APP_URL } from '@/lib/utils';
 
 /** Chat message shape shared across all providers. */
 export interface ChatMessage {
@@ -32,7 +33,7 @@ const OpenRouterProvider: IAIProvider = {
       apiKey: process.env.OPENROUTER_API_KEY,
       baseURL: 'https://openrouter.ai/api/v1',
       defaultHeaders: {
-        'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
+        'HTTP-Referer': APP_URL,
         'X-Title': 'Zkawi',
       },
     });

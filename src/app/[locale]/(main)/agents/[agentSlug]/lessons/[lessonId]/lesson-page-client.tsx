@@ -31,9 +31,15 @@ interface Props {
   locale: string;
   agentSlug: string;
   initialProgress: UserProgress | null;
+  /** Override back button URL — defaults to /agents/${agentSlug} */
+  backHref?: string;
+  /** Override base path for lesson links — defaults to /agents/${agentSlug}/lessons */
+  lessonBasePath?: string;
 }
 
-export default function LessonPageClient({ lesson, allLessonsCount, currentIndex, nextLessonId, locale, agentSlug, initialProgress }: Props) {
+export default function LessonPageClient({ lesson, allLessonsCount, currentIndex, nextLessonId, locale, agentSlug, initialProgress, backHref, lessonBasePath }: Props) {
+  const resolvedBackHref = backHref ?? `/agents/${agentSlug}`;
+  const resolvedLessonBase = lessonBasePath ?? `/agents/${agentSlug}/lessons`;
   const t = useTranslations('lessons');
 
   const [view, setView] = useState<LessonView>('content');
@@ -177,7 +183,7 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
       <div className="bg-[var(--surface)] border-b border-[var(--border)] sticky top-16 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center gap-3">
-            <Link href={`/agents/${agentSlug}`}>
+            <Link href={resolvedBackHref}>
               <button className="flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-[var(--zkawi-purple)] transition-colors font-medium">
                 <ChevronLeft size={16} className="flip-rtl" />
                 {t('backToAgent')}
@@ -374,14 +380,14 @@ export default function LessonPageClient({ lesson, allLessonsCount, currentIndex
                     {t('reviewLesson')}
                   </Button>
                   {nextLessonId ? (
-                    <Link href={`/agents/${agentSlug}/lessons/${nextLessonId}`}>
+                    <Link href={`${resolvedLessonBase}/${nextLessonId}`}>
                       <Button className="gap-2">
                         {t('nextLesson')}
                         <ChevronRight size={16} className="flip-rtl" />
                       </Button>
                     </Link>
                   ) : (
-                    <Link href={`/agents/${agentSlug}`}>
+                    <Link href={resolvedBackHref}>
                       <Button className="gap-2">
                         <Trophy size={16} />
                         {t('viewAllLessons')}

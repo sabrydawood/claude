@@ -276,10 +276,14 @@ export default function CoursePageClient({ course, lessons, locale: _locale }: P
                 </motion.div>
               );
 
-              if (isLocked || !lesson.agentSlug) return <div key={lesson.id}>{card}</div>;
+              if (isLocked) return <div key={lesson.id}>{card}</div>;
+
+              const lessonHref = lesson.agentSlug
+                ? `/agents/${lesson.agentSlug}/lessons/${lesson.id}`
+                : `/courses/${course.id}/lessons/${lesson.id}`;
 
               return (
-                <Link key={lesson.id} href={`/agents/${lesson.agentSlug}/lessons/${lesson.id}`}>
+                <Link key={lesson.id} href={lessonHref}>
                   {card}
                 </Link>
               );

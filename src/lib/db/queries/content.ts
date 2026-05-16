@@ -272,9 +272,10 @@ export async function getLessonById(id: string, locale: string): Promise<LessonF
   const [L] = await db.select().from(Lessons).where(eq(Lessons.Id, id)).limit(1);
   if (!L) { cacheSet(key, null); return null; }
 
-  if (!L.AgentId) { cacheSet(key, null); return null; }
-  const [Agent] = await db.select().from(Agents).where(eq(Agents.Id, L.AgentId)).limit(1);
-  if (!Agent) { cacheSet(key, null); return null; }
+  // Agent is optional — course-based lessons have AgentId = null
+  const Agent = L.AgentId
+    ? (await db.select().from(Agents).where(eq(Agents.Id, L.AgentId)).limit(1))[0] ?? null
+    : null;
 
   const QuestionRows = await db.select().from(QuizQuestions).where(eq(QuizQuestions.LessonId, id)).orderBy(QuizQuestions.Order);
   const QIds = QuestionRows.map((Q) => Q.Id);
@@ -291,7 +292,7 @@ export async function getLessonById(id: string, locale: string): Promise<LessonF
     [OLocaleRows, OEnRows],
   ] = await Promise.all([
     GetLessonTranslations([L.Id], locale),
-    GetAgentTranslations([Agent.Id], locale),
+    Agent ? GetAgentTranslations([Agent.Id], locale) : Promise.resolve({ LocaleMap: new Map(), EnMap: new Map() }),
     QIds.length > 0
       ? Promise.all([
           db.select().from(QuizQuestionTranslations).where(and(inArray(QuizQuestionTranslations.QuestionId, QIds), eq(QuizQuestionTranslations.Locale, locale))),
@@ -331,13 +332,13 @@ export async function getLessonById(id: string, locale: string): Promise<LessonF
   });
 
   const LT = LTrans.get(L.Id) ?? LFallback.get(L.Id);
-  const AT = ATrans.get(Agent.Id) ?? AFallback.get(Agent.Id);
+  const AT = Agent ? (ATrans.get(Agent.Id) ?? AFallback.get(Agent.Id)) : null;
 
   const result: LessonFull = {
     id: L.Id, agentId: L.AgentId, order: L.Order,
     xpReward: L.XpReward, estimatedMinutes: L.EstimatedMinutes,
     title: LT?.Title ?? '', description: LT?.Description ?? '', content: LT?.Content ?? '',
-    agentSlug: Agent.Slug, agentIcon: Agent.Icon, agentColor: Agent.Color,
+    agentSlug: Agent?.Slug ?? '', agentIcon: Agent?.Icon ?? 'BookOpen', agentColor: Agent?.Color ?? '#7C3AED',
     agentName: AT?.Name ?? '', questions: Questions,
   };
 

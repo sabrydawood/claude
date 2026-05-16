@@ -174,22 +174,32 @@ export function Mascot() {
       clearTimeout(timerRef.current);
       aiBubbleAbortRef.current?.abort();
       setIsWalking(false);
-      setMood("happy");
+      setMood("talking");
       setAiBubble("");
       setBubbleOpen(false);
-      // Walk mascot to a position near the bottom-right (beside dialogue box)
-      const targetX = 87;
-      const targetY = 62;
+
+      // Same horizontal side as current position, just above the dialogue box
+      const isOnLeft = currentPosRef.current.x < 50;
+      const targetX = isOnLeft ? 5 : 84;
+
+      // Compute y% so mascot sits just above the dialogue (260px default + 20px gap)
+      const dialogueH = 280;
+      const mascotH = 180;
+      const targetYpx = (typeof window !== "undefined" ? window.innerHeight : 800) - dialogueH - mascotH;
+      const targetY = Math.max(15, Math.round((targetYpx / (typeof window !== "undefined" ? window.innerHeight : 800)) * 100));
+
       const dx = targetX - currentPosRef.current.x;
       const dy = targetY - currentPosRef.current.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const dur = Math.max(0.3, dist * 0.018);
-      setFacingLeft(true);
+
+      // Face toward the same side (natural for the direction walked)
+      setFacingLeft(isOnLeft);
       setIsWalking(dist > 4);
       setWalkDuration(dur);
       setPos({ x: targetX, y: targetY });
       currentPosRef.current = { x: targetX, y: targetY };
-      setTimeout(() => { setIsWalking(false); setMood("happy"); }, dur * 1000 + 50);
+      setTimeout(() => { setIsWalking(false); setMood("talking"); }, dur * 1000 + 50);
     } else {
       // Resume patrol after a short delay
       const resume = setTimeout(() => {

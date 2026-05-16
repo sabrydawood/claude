@@ -1,202 +1,168 @@
-# ذكاوي — Zkawi
+# ذكاوي — منصة تعليمية ذكية للأطفال العرب
 
-> **طفرة نوعية في المفهوم التعليمي** — منصة تعلّم تتكيف مع كل طفل، لا العكس
+> **Zkawi** — Adaptive Learning Platform for Arabic-speaking Children (Ages 4–16)
 
----
-
-## الرؤية
-
-المنصات التعليمية التقليدية — حتى تلك التي تستخدم الذكاء الاصطناعي — تفكر بنفس الطريقة:
-
-> "كيف نعلّم الطالب؟"
-
-**ذكاوي تفكر بطريقة مختلفة جذرياً:**
-
-> "كيف يتعلم هذا الطفل بالذات، وكيف نصمّم التجربة له تحديداً؟"
-
-ذكاوي ليست منصة كورسات بها دردشة ذكاء اصطناعي. هي **نظام تعليمي ذكي ذاتي التطور** — يتذكر، يتكيف، يُدرس، يقيس الفهم الحقيقي، ويصبح أرخص وأذكى مع كل استخدام.
+منصة تعليمية شاملة تعتمد على **ALI (Adaptive Learning Intelligence)** — نظام يتعلم من كل طفل ويتكيف معه، ويصبح أذكى وأرخص مع الوقت.
 
 ---
 
-## ماذا يعني هذا عملياً؟
+## لماذا ذكاوي؟
 
-### المعلم الذكي (AI Teacher)
-الذكاء الاصطناعي ليس مساعداً — هو المعلم الأساسي. يشرح بأسلوب الطفل، ولهجته، ومستواه. يعرف متى يتوقف، ومتى يُعيد الشرح بطريقة مختلفة.
-
-### قياس الفهم الحقيقي (Multi-Signal Mastery)
-لا يكفي أن يجيب الطفل على سؤال اختياري. الفهم الحقيقي يُقاس بأربعة مستويات:
-1. **كويز موقوت** — اختبار المعرفة السريعة
-2. **Socratic Dialogue** — AI يسأله بأسلوبه ويحكم على عمق الفهم
-3. **التطبيق العملي** — بناء حاجة حقيقية (كود، مشروع)
-4. **تعليم الزميل** — الطفل الذي يشرح لغيره يفهم أعمق
-
-### فصول ذكية (AI Classrooms)
-أطفال متعددون، في نفس الوقت، مع معلم ذكاء اصطناعي يدير الفصل بالكامل — يطرح أسئلة جماعية، يُدير النقاش، يكتشف من يحتاج مساعدة فردية، يُشجع الأقوى على مساعدة الأضعف.
-
-### الشرح المرئي الحي (Living Explanation)
-لا فيديو مسجل ثابت. بدلاً منه:
-- صوت AI يشرح بلغة الطفل ومستواه
-- رسوم متحركة تُنشأ في الوقت الفعلي
-- كود يُنفَّذ live خطوة بخطوة
-- Mascot (ذكي) يعلّق ويشجع
-
-### اقتصاد المعرفة (Credits + XP)
-نظام مزدوج يجعل التعلم تحدياً حقيقياً:
-- **XP** — سمعة علنية، تتراكم مع الإتقان
-- **Credits** — عملة داخلية، تُكسب بالإجابات الصحيحة وتُنفق على الخدمات المتقدمة
-- أسئلة موقوتة، إجابة واحدة لكل سؤال، لا تكرار للكريديت
+| المشكلة | ذكاوي |
+|---------|-------|
+| منصات عالمية (Khan، Duolingo) — محتوى إنجليزي بالأساس | محتوى عربي أصيل من اليوم الأول |
+| منصات تكيفية — مجال واحد فقط (Prodigy: رياضيات) | برمجة + رياضيات + عربية + ذكاء اصطناعي + أكثر |
+| المحتوى ثابت، الطالب يتكيف | **الطالب ثابت، المحتوى يتكيف** |
+| التكلفة تزيد خطياً مع المستخدمين | **يصبح أرخص كلما زاد الاستخدام** |
 
 ---
 
-## مبدأ "يصبح أرخص مع الاستخدام"
+## المجالات التعليمية
 
-هذا ما يميّز النظام جذرياً:
+**النواة الأولى:**
+
+- البرمجة وعلوم الحاسوب (Scratch-like → Python → AI)
+- الرياضيات (التفكير المنطقي → جبر → إحصاء)
+- اللغة العربية (قراءة → كتابة → تعبير)
+
+**المستقبل:** الذكاء الاصطناعي · العلوم · الإنجليزية · المهارات المالية · ريادة الأعمال
+
+---
+
+## المميزات الرئيسية
+
+### ALI — الذكاء التكيفي
 
 ```
-المنصات التقليدية:    تكلفة AI = عدد المستخدمين × سعر الطلب
-                      1000 مستخدم = $200/يوم, 10,000 = $2000/يوم ← تكلفة خطية
-
-ذكاوي (ALI):          أول من يسأل عن مفهوم يدفع التكلفة
-                      كل من بعده يحصل على الإجابة من الذاكرة
-                      1000 مستخدم ≈ $15/يوم, 10,000 ≈ $20/يوم ← تكلفة شبه ثابتة
+Knowledge Graph  →  Student Mastery  →  Semantic Cache
+      ↓                   ↓                   ↓
+  مفاهيم مترابطة   مستوى إتقان حقيقي   كل سؤال يُجاب مرة واحدة
 ```
 
-المنظومة: **Adaptive Learning Intelligence (ALI)** — معمارية ذكية تجمع بين الـ Knowledge Graph والـ RAG والـ Semantic Cache لتحقيق هذا.
+- **Multi-Signal Mastery:** quiz (20%) + Socratic (35%) + practical (30%) + peer teaching (15%)
+- **Data Flywheel:** كل تفاعل يُحسّن النظام لجميع الأطفال
+- **Semantic Cache:** يُخفّض تكلفة AI مع كل استخدام
+
+### التنقل حسب العمر
+
+| المرحلة | العمر | النمط |
+|---------|-------|-------|
+| Spark | 6–9 | Xbot يقود خطوة بخطوة |
+| Explorer | 9–12 | Knowledge Islands |
+| Builder | 12–16 | Skill Map كامل |
+
+### Parent Portal
+
+ملخص يومي + أسبوعي + شهري + لوحة بيانات كاملة — COPPA 2025 compliant.
+
+### نظام XP + Credits
+
+- **XP:** سمعة علنية، تُكسب بالإتقان، لا تُشترى
+- **Credits:** تُكسب بالتعلم + تُشترى إضافية — تُنفق على شروح مخصصة وتحديات
 
 ---
 
-## المحتوى (8 مسارات تعليمية)
+## Tech Stack
 
-| # | المسار | الوصف |
-|---|--------|-------|
-| 1 | الذكاء الاصطناعي | كيف يعمل، كيف تستخدمه، كيف تبنيه |
-| 2 | البرمجة | JavaScript، Python — بأسلوب لعبة تفاعلية |
-| 3 | قواعد البيانات | SQL وNoSQL — كيف تُخزّن وتسترجع المعرفة |
-| 4 | التفكير الخوارزمي | حل المشكلات، المنطق، الخوارزميات |
-| 5 | بناء المشاريع | من الفكرة للمنتج — رحلة كاملة |
-| 6 | هندسة الـ Prompts | التواصل الفعّال مع الذكاء الاصطناعي |
-| 7 | تصميم الويب | HTML، CSS، واجهات المستخدم |
-| 8 | ريادة الأعمال التقنية | كيف تبني منتجاً رقمياً من الصفر |
+```
+Frontend    Next.js 16 · TypeScript · Tailwind v4 · Framer Motion · Three.js/R3F
+Backend     Bun · Next.js API Routes
+Database    PostgreSQL + pgvector · Drizzle ORM
+AI          OpenAI · Semantic Cache · Knowledge Graph
+Auth        better-auth
+i18n        next-intl (AR + EN, RTL-first)
+Monitoring  Sentry
+```
 
 ---
 
-## التقنيات
+## هيكل المشروع
 
-| الطبقة | التقنية |
-|--------|---------|
-| Framework | Next.js 16 (App Router) + TypeScript |
-| Runtime | Bun |
-| Styling | Tailwind CSS v4 + CSS Variables |
-| Animations | Framer Motion |
-| 3D Mascot | React Three Fiber + Three.js (Xbot/Mixamo) |
-| Auth | better-auth v1.6.11 |
-| Database | PostgreSQL + Drizzle ORM + pgvector (قريباً) |
-| i18n | next-intl v4 (ar default + en) |
-| AI — Mascot | Multi-provider: OpenRouter → Gemini → OpenAI → Anthropic |
-| AI — Sandbox | Multi-provider + User's own key (AES-256-GCM encrypted) |
-| Real-time | WebSocket (Classroom — قريباً) |
-| TTS | ElevenLabs / Murf Arabic (قريباً) |
-| Error Tracking | Sentry |
-| PWA | Service Worker + Install Banner |
-| Deployment | Vercel + Neon/Supabase |
+```
+src/
+├── app/                    # Next.js pages + API routes
+├── Features/               # Feature modules (Mascot, Mastery, Cache…)
+├── Lib/
+│   ├── Db/                 # Schema + Seed
+│   ├── Graph/              # Knowledge Graph Service
+│   └── Ai/                 # Cache Service
+├── components/             # Shared UI components
+├── Messages/               # AR.json + EN.json (i18n)
+└── Shared/Types/           # Shared TypeScript types
+
+docs/
+├── DECISIONS.md            # كل القرارات المتفق عليها (D-001 → D-024)
+├── AI_VISION.md            # فلسفة ALI الكاملة
+├── ARCHITECTURE.md         # المعمارية التقنية
+├── ROADMAP.md              # خارطة الطريق
+├── PROGRESS.md             # تتبع Phase 1
+└── RESEARCH/               # أبحاث أكاديمية وتنافسية
+    ├── 1.md                # المجالات، الموهبة، Parent Portal، Onboarding
+    ├── 2.md                # التسعير، Block editor، Portfolio، Offline، Voice
+    └── 3.md                # التمارين التفاعلية، Prompt Gallery
+```
 
 ---
 
 ## البدء السريع
 
-### المتطلبات
-- **Bun** >= 1.0 — [تثبيت Bun](https://bun.sh)
-- **PostgreSQL** >= 14
-
-### خطوات التشغيل
-
 ```bash
-# 1. استنساخ المشروع
-git clone https://github.com/sabrydawood/claude zkawi
-cd zkawi
-
-# 2. تثبيت المكتبات
+# تثبيت الاعتماديات
 bun install
 
-# 3. متغيرات البيئة
-cp .env.example .env.local
-# عدّل .env.local
-
-# 4. بناء قاعدة البيانات
+# إعداد قاعدة البيانات
 bun run db:all
 
-# 5. تشغيل
-bun dev
-# → http://localhost:3000
+# تشغيل المشروع
+bun run dev
+
+# فحص الأنواع
+bun run typecheck
+```
+
+**المتطلبات:** Bun · PostgreSQL · `.env` بالمتغيرات المطلوبة
+
+---
+
+## الوضع الحالي
+
+```
+Phase 1 (ALI Foundation):  ██████████  100% ✅
+  ✅ DB Schema (7 جداول جديدة)
+  ✅ Knowledge Graph Service
+  ✅ Semantic Cache Service
+  ✅ Student Mastery API
+  ✅ Typecheck 0 errors
+
+Phase 2 (UI + Features):   ░░░░░░░░░░   0%  🔜
+  🔜 Block-based Programming Editor
+  🔜 Interactive Activities (Match + Fill + Fix)
+  🔜 Age-Adaptive Navigation
+  🔜 Parent Portal
+  🔜 Offline / PWA
 ```
 
 ---
 
-## متغيرات البيئة
-
-```bash
-DATABASE_URL=postgresql://user:password@localhost:5432/zkawi
-BETTER_AUTH_SECRET=                    # openssl rand -hex 32
-BETTER_AUTH_URL=http://localhost:3000
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-ENCRYPTION_KEY=                        # openssl rand -hex 32
-ADMIN_EMAILS=admin@example.com
-
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=noreply@example.com
-SMTP_PASS=
-SMTP_FROM=noreply@zkawi.com
-
-# AI Providers — واحد على الأقل
-OPENROUTER_API_KEY=
-GEMINI_API_KEY=
-OPENAI_API_KEY=
-ANTHROPIC_API_KEY=
-
-NEXT_PUBLIC_SENTRY_DSN=
-SENTRY_ORG=
-SENTRY_PROJECT=
-SENTRY_AUTH_TOKEN=
-```
-
----
-
-## أوامر قاعدة البيانات
-
-| الأمر | الوظيفة |
-|-------|---------|
-| `bun run db:clear` | حذف كامل للـ DB |
-| `bun run db:generate` | توليد migrations من Schema.ts |
-| `bun run db:migrate` | تطبيق الـ migrations |
-| `bun run db:seed` | إضافة البيانات الأساسية |
-| `bun run db:all` | clear → generate → migrate → seed |
-| `bun run db:studio` | Drizzle Studio على :4983 |
-
----
-
-## سير عمل التطوير
-
-```bash
-bun dev              # تشغيل في وضع التطوير
-bun run typecheck    # التحقق من الـ types (إلزامي قبل كل commit)
-bun run lint         # lint
-bun run verify       # typecheck + lint
-bun run db:all       # إعادة بناء DB من الصفر
-```
-
----
-
-## الوثائق الكاملة
+## الوثائق
 
 | الملف | المحتوى |
 |-------|---------|
-| `docs/AI_VISION.md` | كيف يفكر الذكاء الاصطناعي في هذه المنصة |
-| `docs/ARCHITECTURE.md` | معمارية ALI الكاملة |
-| `docs/ROADMAP.md` | خارطة الطريق بالمراحل + جدول تطوير Phase 0 |
-| `docs/DECISIONS.md` | **سجل البحث الخارجي وكل القرارات المتفق عليها** |
-| `CLAUDE.md` | قواعد الكود + وضع التفكير للـ AI |
+| [CLAUDE.md](CLAUDE.md) | قواعد الكود والـ conventions — للمطورين والـ AI agents |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | كل القرارات المتفق عليها — المرجع الأول |
+| [docs/AI_VISION.md](docs/AI_VISION.md) | فلسفة ALI والرؤية الكاملة |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | المعمارية التقنية |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | خارطة الطريق بالمراحل |
 
 ---
 
-> **هذه المنصة تُبنى من المستقبل للحاضر — لا العكس.**
+## الالتزامات
+
+- **COPPA 2025** — حماية بيانات الأطفال كاملة من اليوم الأول
+- **RTL-First** — العربية ليست ترجمة، هي اللغة الأساسية
+- **Mobile-First** — 90%+ من أطفال MENA على الموبايل
+- **Offline-Ready** — PWA + pre-generated content للمناطق ضعيفة الإنترنت
+
+---
+
+> **ذكاوي ليس منصة كورسات — هو نظام يتعلم من كل طفل، يُعلّم بأسلوبه، ويصبح أذكى يومياً.**

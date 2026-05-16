@@ -36,9 +36,19 @@
 
 ## عن المنصة
 
-**ذكاوي** منصة تعليمية ذكية — لا منصة كورسات تقليدية. القلب هو **ALI (Adaptive Learning Intelligence)**: نظام يتعلم من كل طفل ويصبح أذكى وأرخص مع الوقت.
+**ذكاوي** منصة تعليمية ذكية شاملة للأطفال العرب (4-16 سنة) — لا منصة كورسات تقليدية. القلب هو **ALI (Adaptive Learning Intelligence)**: نظام يتعلم من كل طفل ويصبح أذكى وأرخص مع الوقت.
+
+**المجالات الأساسية (النواة الأولى):** البرمجة وعلوم الحاسوب · الرياضيات · اللغة العربية
+**المجالات المستقبلية:** الذكاء الاصطناعي (12-16) · العلوم · اللغة الإنجليزية · المهارات المالية
+
+**السوق:** العالم العربي كاملاً — 22+ دولة، محتوى عربي أصيل من اليوم الأول
+
+**نموذج العمل:** Freemium + Credits (تُكسب بالتعلم وتُشترى) — COPPA 2025 كاملاً من اليوم الأول
 
 **Stack:** Next.js 16 · TypeScript · Bun · PostgreSQL + pgvector · Drizzle ORM · next-intl · better-auth · Tailwind v4 · Framer Motion · Three.js/R3F · Sentry
+
+> **جميع القرارات المعمارية والمنتجية موثّقة في `docs/DECISIONS.md` (D-001 → D-024)**
+> **البحث الأكاديمي والتنافسي في `docs/RESEARCH/` (3 تقارير حتى الآن)**
 
 ---
 
@@ -163,13 +173,19 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 | الرقم | القاعدة |
 |-------|---------|
 | SEV-001 | XP يُحسب server-side من DB فقط |
-| SEV-002 | Rate limiting على كل AI endpoints |
+| SEV-002 | Rate limiting على كل AI endpoints — 20 req/min per user |
 | SEV-003 | Zod validation على كل API route |
 | SEV-004 | DB indexes على كل hot query paths |
 | SEV-005 | SSE streams: error codes فقط، لا رسائل داخلية |
 | SEV-006 | Email verification إلزامي |
 | SEV-011 | UNIQUE(UserId, LessonId) على UserProgress |
 | SEV-016 | Security headers على كل routes |
+| SEV-020 | **COPPA:** الوالد يُنشئ حساب الطفل < 13 — لا تسجيل مستقل |
+| SEV-021 | **COPPA:** لا نشر محتوى عام (اسم، صورة، تعليق) للأطفال < 13 بدون VPC |
+| SEV-022 | **COPPA:** لا مشاركة بيانات الأطفال مع أطراف ثالثة أو تدريب AI خارجي |
+| SEV-023 | **COPPA:** تسجيل الصوت يُحذف فوراً — لا احتفاظ إلا بموافقة والدين صريحة |
+| SEV-024 | **Voice:** TTS فقط في MVP — لا STT (Voice-Guided لا Voice-Controlled) |
+| SEV-025 | **Gallery:** كل Prompt ينتظر Human review < 8 ساعات قبل النشر |
 
 ---
 
@@ -289,10 +305,40 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 ---
 
+## قواعد الميزات الجديدة (Phase 2+)
+
+### التمارين التفاعلية (D-023)
+
+- **Match:** Drag-and-Drop + `dnd-kit` + اختبار RTL يدوي على جهاز فعلي إلزامي
+- **Fill:** Word Bank أولاً → Free Text لاحقاً. تجريد التشكيل قبل Validation العربية
+- **"صحّح هذا":** التصحيح فوري وصريح دائماً — لا تأخير بعد الخطأ
+- XP متدرج: 100% بدون hints → 80% → 50% → 20% بعد Hint الإجابة
+
+### Prompt Gallery (D-024)
+
+- 13+ مباشرة، 10-12 بموافقة والدين (VPC من Parent Portal)
+- Username مستعار — لا اسم حقيقي، لا صورة
+- Upvote فقط (Stars) — لا Downvote
+- Credits: +10 عند قبول النشر + 5/استخدام من طفل آخر
+- "Try this Prompt": `/sandbox?prompt=<encoded>` — جلسة نظيفة
+
+### Offline / PWA (D-019)
+
+- كل محتوى جلسة يُحمَّل مسبقاً (5-25 MB/درس) عند توفر الإنترنت
+- AI يعمل فقط مع إنترنت — لا fake responses offline
+- Background Sync للتقدم عند عودة الإنترنت
+
+---
+
 ## مراجع
 
 | الملف | المحتوى |
 |-------|---------|
+| `docs/DECISIONS.md` | **جميع القرارات المتفق عليها (D-001 → D-024) — المرجع الأول** |
 | `docs/AI_VISION.md` | الفلسفة الكاملة لـ ALI — اقرأه أولاً |
 | `docs/ARCHITECTURE.md` | المعمارية التقنية الكاملة |
 | `docs/ROADMAP.md` | خارطة الطريق بالمراحل |
+| `docs/PROGRESS.md` | تتبع تقدم Phase 1 |
+| `docs/RESEARCH/1.md` | بحث: المجالات التعليمية، قياس الموهبة، Parent Portal، Onboarding |
+| `docs/RESEARCH/2.md` | بحث: التسعير، Block editor، Portfolio، GitHub، Offline، Voice |
+| `docs/RESEARCH/3.md` | بحث: التمارين التفاعلية، Prompt Gallery المجهولة |

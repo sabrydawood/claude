@@ -13,7 +13,7 @@ import { CheckRateLimit, AI_RATE_LIMIT } from '@/Shared/Middleware/RateLimit.Mid
 import { streamChat, type ChatMessage } from '@/lib/ai/Providers';
 import { MascotChatSchema } from './Mascot.Schemas';
 import { BuildMascotSystemPromptCached } from './Mascot.Service';
-import { BuildCacheKey, CheckCache, BumpCacheHit, SaveToCache, GetPageKey } from '@/Lib/Ai/Cache.Service';
+import { BuildCacheKey, CheckCache, BumpCacheHit, SaveToCache, GetPageKey } from '@/lib/ai/Cache.Service';
 
 const GUEST_RATE_LIMIT = { MaxRequests: 10, WindowMs: 60_000 };
 

@@ -11,7 +11,7 @@ import {
   GetConceptById,
   GetFullGraph,
   GetStudentGraphState,
-} from '@/Lib/Graph/Graph.Service';
+} from '@/lib/Graph/Graph.Service';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 

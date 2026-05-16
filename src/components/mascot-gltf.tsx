@@ -277,9 +277,16 @@ function GltfCanvas({
     >
       <RobotLighting />
       <GltfModelInner mood={mood} walking={walking} cfg={cfg} />
-      {orbitControls && (
-        <OrbitControls target={camTarget} enableZoom enableRotate enablePan={false} minDistance={2} maxDistance={20} />
-      )}
+      {/* Always render OrbitControls to set camera lookAt (target) correctly.
+          enableZoom/enableRotate controlled by orbitControls prop. */}
+      <OrbitControls
+        target={camTarget}
+        enableZoom={orbitControls}
+        enableRotate={orbitControls}
+        enablePan={false}
+        minDistance={2}
+        maxDistance={20}
+      />
     </Canvas>
   );
 }

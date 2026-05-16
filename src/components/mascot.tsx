@@ -7,7 +7,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { getDir, isRTL } from "@/lib/i18n/locale-utils";
 import { X, MessageCircle } from "lucide-react";
 import { MascotDialogue } from "@/components/mascot-dialogue";
-import { ZakiRobot } from "@/components/mascot-3d";
+import { XbotExpressive } from "@/components/mascot-gltf";
 import { streamClient } from "@/lib/api/stream-client";
 
 type Mood = "idle" | "happy" | "thinking" | "talking";
@@ -409,7 +409,7 @@ export function Mascot() {
       <motion.div
         data-mascot="true"
         className="fixed z-40"
-        style={{ width: 80, height: 100 }}
+        style={{ width: 100, height: 130 }}
         animate={{ left: `${pos.x}%`, top: `${pos.y}%` }}
         transition={{ duration: walkDuration, ease: "linear" }}
       >
@@ -510,7 +510,7 @@ export function Mascot() {
             animate={prefersReduced ? {} : { scaleX: isWalking ? [1, 0.75, 1] : [1, 0.7, 1] }}
             transition={prefersReduced ? {} : { repeat: Infinity, duration: isWalking ? 0.32 : 2.6 }}
           />
-          <ZakiRobot mood={mood} walking={isWalking} />
+          <XbotExpressive mood={mood} walking={isWalking} width={100} height={130} />
 
           {/* Chat badge — shows when chat is closed */}
           <AnimatePresence>

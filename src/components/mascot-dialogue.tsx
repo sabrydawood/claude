@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getDir, isRTL } from '@/lib/i18n/locale-utils';
 import { X, Send, Loader2, RotateCcw } from 'lucide-react';
 import { streamClient } from '@/lib/api/stream-client';
-import { ZakiPortrait } from '@/components/mascot-3d';
+import { XbotPortrait } from '@/components/mascot-gltf';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -365,7 +365,7 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
             className="absolute bottom-0 left-4 z-20 pointer-events-none"
             style={{ width: 150, height: 270 }}
           >
-            <ZakiPortrait mood={portraitMood} talking={isStreaming} width={150} height={270} />
+            <XbotPortrait mood={portraitMood} width={150} height={270} />
           </div>
 
           {/* ── Dialogue box ── */}

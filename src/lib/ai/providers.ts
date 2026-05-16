@@ -5,13 +5,13 @@
  * Adding a new provider = add one entry to the PROVIDERS array below.
  */
 
-import OpenAI from 'openai';
-import Anthropic from '@anthropic-ai/sdk';
-import { APP_URL } from '@/lib/utils';
+import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
+import { APP_URL } from "@/lib/utils";
 
 /** Chat message shape shared across all providers. */
 export interface ChatMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 }
 
@@ -27,7 +27,11 @@ interface IAIProvider {
   Name: string;
   IsAvailable: () => boolean;
   /** Yields text chunks. Sets debug counters on the tracker object when available. */
-  GenerateStream: (System: string, Messages: ChatMessage[], debug: DebugTracker) => AsyncGenerator<string>;
+  GenerateStream: (
+    System: string,
+    Messages: ChatMessage[],
+    debug: DebugTracker,
+  ) => AsyncGenerator<string>;
 }
 
 /** Mutable tracker — providers write token counts here during streaming. */
@@ -40,26 +44,27 @@ interface DebugTracker {
 
 /** OpenRouter provider — preferred because it supports many models and regions. */
 const OpenRouterProvider: IAIProvider = {
-  Name: 'OpenRouter',
+  Name: "OpenRouter",
   IsAvailable: () => !!process.env.OPENROUTER_API_KEY,
   async *GenerateStream(System, Messages, debug) {
     const Client = new OpenAI({
       apiKey: process.env.OPENROUTER_API_KEY,
-      baseURL: 'https://openrouter.ai/api/v1',
+      baseURL: "https://openrouter.ai/api/v1",
       defaultHeaders: {
-        'HTTP-Referer': APP_URL,
-        'X-Title': 'Zkawi',
+        "HTTP-Referer": APP_URL,
+        "X-Title": "Zkawi",
       },
     });
 
     const Stream = await Client.chat.completions.create({
-      model: 'google/gemini-2.0-flash-lite-001',
-      messages: [{ role: 'system', content: System }, ...Messages],
+      // model: 'google/gemini-2.0-flash-lite-001',
+      model: "openrouter/free",
+      messages: [{ role: "system", content: System }, ...Messages],
       stream: true,
       stream_options: { include_usage: true },
       max_tokens: 512,
     });
-
+    console.log("Stream: ", Stream);
     for await (const Chunk of Stream) {
       const Text = Chunk.choices[0]?.delta?.content;
       if (Text) yield Text;
@@ -75,17 +80,17 @@ const OpenRouterProvider: IAIProvider = {
 
 /** Google Gemini provider — second in fallback chain. */
 const GeminiProvider: IAIProvider = {
-  Name: 'Gemini',
+  Name: "Gemini",
   IsAvailable: () => !!process.env.GEMINI_API_KEY,
   async *GenerateStream(System, Messages, debug) {
     const Client = new OpenAI({
       apiKey: process.env.GEMINI_API_KEY,
-      baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
     });
 
     const Stream = await Client.chat.completions.create({
-      model: 'gemini-2.0-flash-lite',
-      messages: [{ role: 'system', content: System }, ...Messages],
+      model: "gemini-2.0-flash-lite",
+      messages: [{ role: "system", content: System }, ...Messages],
       stream: true,
       stream_options: { include_usage: true },
       max_tokens: 512,
@@ -106,14 +111,14 @@ const GeminiProvider: IAIProvider = {
 
 /** OpenAI provider — third in fallback chain. */
 const OpenAIProvider: IAIProvider = {
-  Name: 'OpenAI',
+  Name: "OpenAI",
   IsAvailable: () => !!process.env.OPENAI_API_KEY,
   async *GenerateStream(System, Messages, debug) {
     const Client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const Stream = await Client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'system', content: System }, ...Messages],
+      model: "gpt-4o-mini",
+      messages: [{ role: "system", content: System }, ...Messages],
       stream: true,
       stream_options: { include_usage: true },
       max_tokens: 512,
@@ -134,13 +139,13 @@ const OpenAIProvider: IAIProvider = {
 
 /** Anthropic Claude provider — last resort fallback. */
 const AnthropicProvider: IAIProvider = {
-  Name: 'Anthropic',
+  Name: "Anthropic",
   IsAvailable: () => !!process.env.ANTHROPIC_API_KEY,
   async *GenerateStream(System, Messages, debug) {
     const Client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const Stream = await Client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 512,
       system: System,
       messages: Messages,
@@ -148,13 +153,16 @@ const AnthropicProvider: IAIProvider = {
     });
 
     for await (const Event of Stream) {
-      if (Event.type === 'content_block_delta' && Event.delta.type === 'text_delta') {
+      if (
+        Event.type === "content_block_delta" &&
+        Event.delta.type === "text_delta"
+      ) {
         yield Event.delta.text;
       }
-      if (Event.type === 'message_delta' && Event.usage) {
+      if (Event.type === "message_delta" && Event.usage) {
         debug.outputTokens = Event.usage.output_tokens ?? 0;
       }
-      if (Event.type === 'message_start' && Event.message.usage) {
+      if (Event.type === "message_start" && Event.message.usage) {
         debug.inputTokens = Event.message.usage.input_tokens ?? 0;
       }
     }
@@ -191,7 +199,7 @@ export async function* StreamChat(
 
   if (Available.length === 0) {
     throw new Error(
-      'No AI provider configured. Set at least one of: OPENROUTER_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY',
+      "No AI provider configured. Set at least one of: OPENROUTER_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY",
     );
   }
 
@@ -199,14 +207,21 @@ export async function* StreamChat(
     const debug: DebugTracker = { inputTokens: 0, outputTokens: 0 };
     try {
       yield* Provider.GenerateStream(System, Messages, debug);
-      onDebug?.({ provider: Provider.Name, inputTokens: debug.inputTokens, outputTokens: debug.outputTokens });
+      onDebug?.({
+        provider: Provider.Name,
+        inputTokens: debug.inputTokens,
+        outputTokens: debug.outputTokens,
+      });
       return;
     } catch (Err) {
-      console.error(`[AI] ${Provider.Name} failed, trying next:`, (Err as Error).message);
+      console.error(
+        `[AI] ${Provider.Name} failed, trying next:`,
+        (Err as Error).message,
+      );
     }
   }
 
-  throw new Error('All AI providers failed');
+  throw new Error("All AI providers failed");
 }
 
 /** @deprecated Use StreamChat (PascalCase) for new code. Kept for backward compatibility. */

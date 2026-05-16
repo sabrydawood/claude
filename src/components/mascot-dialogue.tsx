@@ -344,6 +344,9 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
 
   // ── Render ────────────────────────────────────────────────────────────────
 
+  const lastAiMsg = [...messages].reverse().find(m => m.role === 'assistant');
+  const hasHistory = messages.length > 1;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -353,195 +356,181 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="fixed bottom-0 left-0 right-0 z-50 flex"
+          className="fixed bottom-0 left-0 right-0 z-50"
           dir={dir}
-          style={{
-            minHeight: 260,
-            maxHeight: '45vh',
-            background: 'rgba(15, 5, 35, 0.97)',
-            backdropFilter: 'blur(20px)',
-            borderTop: '3px solid #7C3AED',
-            boxShadow: '0 -4px 40px rgba(124, 58, 237, 0.35)',
-          }}
+          style={{ height: 230 }}
         >
-          {/* ── Portrait column ─────────────────────────────── */}
+          {/* ── Character portrait — overlaps above the box ── */}
           <div
-            className="flex-shrink-0 flex items-center justify-center"
-            style={{
-              width: 110,
-              borderInlineEnd: '1px solid rgba(124, 58, 237, 0.3)',
-              background: 'rgba(109, 40, 217, 0.08)',
-            }}
+            className="absolute bottom-0 left-4 z-20 pointer-events-none"
+            style={{ width: 150, height: 270 }}
           >
-            <ZakiPortrait mood={portraitMood} talking={isStreaming} />
+            <ZakiPortrait mood={portraitMood} talking={isStreaming} width={150} height={270} />
           </div>
 
-          {/* ── Chat column ─────────────────────────────────── */}
-          <div className="flex-1 flex flex-col min-w-0">
-            {/* Header */}
-            <div
-              className="flex items-center gap-3 px-4 py-2 flex-shrink-0"
-              style={{ borderBottom: '1px solid rgba(124, 58, 237, 0.25)' }}
-            >
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                {/* Streaming indicator dot */}
-                <motion.div
-                  className="w-2 h-2 rounded-full flex-shrink-0"
-                  style={{ background: isStreaming ? '#34D399' : '#7C3AED' }}
-                  animate={
-                    isStreaming
-                      ? { opacity: [1, 0.3, 1] }
-                      : { opacity: 1 }
-                  }
-                  transition={
-                    isStreaming
-                      ? { repeat: Infinity, duration: 0.8 }
-                      : {}
-                  }
-                />
-                <p className="font-black text-white text-sm leading-none">
-                  ذكي · Zaki
-                </p>
-                <p
-                  className="text-xs truncate"
-                  style={{ color: 'rgba(196, 181, 253, 0.7)' }}
-                >
-                  {isStreaming ? t('typing') : t('guide')}
-                </p>
-              </div>
+          {/* ── Dialogue box ── */}
+          <div
+            className="absolute bottom-0 left-0 right-0"
+            style={{
+              height: 230,
+              background: 'rgba(4, 2, 18, 0.96)',
+              backdropFilter: 'blur(28px)',
+              borderTop: '2px solid rgba(124, 58, 237, 0.55)',
+              boxShadow: '0 -10px 80px rgba(80, 30, 200, 0.3), inset 0 1px 0 rgba(167,139,250,0.08)',
+              paddingLeft: 168,
+            }}
+          >
+            <div className="h-full flex flex-col px-5 py-3" dir={dir}>
 
-              {/* Action buttons */}
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <button
-                  onClick={handleReset}
-                  className="p-1.5 rounded-xl transition-colors hover:bg-white/10"
-                  title={t('newChat')}
-                  aria-label={t('newChat')}
-                >
-                  <RotateCcw size={14} color="rgba(196,181,253,0.7)" />
-                </button>
-                <button
-                  onClick={onClose}
-                  className="p-1.5 rounded-xl transition-colors hover:bg-white/10"
-                  aria-label={locale === 'ar' ? 'إغلاق' : 'Close'}
-                >
-                  <X size={16} color="rgba(255,255,255,0.8)" />
-                </button>
-              </div>
-            </div>
-
-            {/* Messages area */}
-            <div
-              className="flex-1 overflow-y-auto px-4 py-3 space-y-3"
-              style={{ maxHeight: 'calc(45vh - 130px)' }}
-            >
-              <AnimatePresence initial={false}>
-                {messages.map((msg, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex gap-2 ${
-                      msg.role === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    <div className="max-w-[80%] flex flex-col gap-1">
-                      <div
-                        className="rounded-2xl px-3 py-2 text-sm leading-relaxed"
-                        style={
-                          msg.role === 'user'
-                            ? {
-                                background: '#7C3AED',
-                                color: '#fff',
-                                borderEndEndRadius: 4,
-                              }
-                            : {
-                                background: 'rgba(109, 40, 217, 0.18)',
-                                color: 'rgba(255,255,255,0.92)',
-                                border: '1px solid rgba(124, 58, 237, 0.35)',
-                                borderStartStartRadius: 4,
-                              }
-                        }
-                      >
-                        {msg.streaming && msg.content === '' ? (
-                          <TypingDots />
-                        ) : (
-                          <>
-                            {msg.content}
-                            {msg.streaming && (
-                              <motion.span
-                                animate={{ opacity: [1, 0] }}
-                                transition={{
-                                  repeat: Infinity,
-                                  duration: 0.6,
-                                }}
-                                className="inline-block w-0.5 h-3.5 bg-current ms-0.5 align-middle"
-                              />
-                            )}
-                          </>
-                        )}
-                      </div>
-                      {msg.role === 'assistant' && msg.debug && (
-                        <p
-                          className="text-[10px] px-1"
-                          style={{ color: 'rgba(196,181,253,0.5)' }}
-                        >
-                          {msg.debug.provider} · ↑{msg.debug.inputTokens} ↓
-                          {msg.debug.outputTokens} tokens
-                        </p>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input row */}
-            <div
-              className="flex items-end gap-2 px-4 py-3 flex-shrink-0"
-              style={{ borderTop: '1px solid rgba(124, 58, 237, 0.25)' }}
-            >
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={t('placeholder')}
-                rows={1}
-                disabled={isStreaming}
-                className="flex-1 resize-none rounded-xl px-3 py-2 text-sm outline-none"
-                style={{
-                  background: 'rgba(255,255,255,0.07)',
-                  border: '1px solid rgba(124, 58, 237, 0.4)',
-                  color: 'rgba(255,255,255,0.9)',
-                  maxHeight: 80,
-                  lineHeight: '1.4',
-                }}
-              />
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={handleSend}
-                disabled={!input.trim() || isStreaming}
-                className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-opacity"
-                style={{
-                  background: '#7C3AED',
-                  opacity: !input.trim() || isStreaming ? 0.4 : 1,
-                }}
-                aria-label={locale === 'ar' ? 'إرسال' : 'Send'}
-              >
-                {isStreaming ? (
-                  <Loader2 size={15} color="white" className="animate-spin" />
-                ) : (
-                  <Send
-                    size={15}
-                    color="white"
+              {/* ── Character name row ── */}
+              <div className="flex items-center gap-3 mb-1 flex-shrink-0">
+                <div className="flex-1 min-w-0">
+                  <span
                     style={{
-                      transform: isRTL(locale) ? 'scaleX(-1)' : undefined,
+                      color: '#C4B5FD',
+                      fontWeight: 900,
+                      fontSize: 12,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
                     }}
-                  />
+                  >
+                    ذكي · Zaki
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {hasHistory && (
+                    <button
+                      onClick={handleReset}
+                      className="p-1 rounded-lg hover:bg-white/10 transition-colors opacity-60 hover:opacity-100"
+                      title={t('newChat')}
+                    >
+                      <RotateCcw size={12} color="rgba(196,181,253,0.8)" />
+                    </button>
+                  )}
+                  <button
+                    onClick={onClose}
+                    className="p-1 rounded-lg hover:bg-white/10 transition-colors opacity-60 hover:opacity-100"
+                    aria-label={locale === 'ar' ? 'إغلاق' : 'Close'}
+                  >
+                    <X size={14} color="rgba(255,255,255,0.8)" />
+                  </button>
+                </div>
+              </div>
+
+              {/* ── Separator ── */}
+              <div
+                className="mb-2 flex-shrink-0"
+                style={{ height: 1, background: 'linear-gradient(90deg, rgba(124,58,237,0.5), transparent)' }}
+              />
+
+              {/* ── Message display area ── */}
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {/* History (collapsed, only user messages shown small) */}
+                {hasHistory && (
+                  <div className="mb-2 space-y-1">
+                    {messages.slice(0, -1).filter(m => m.role === 'user').slice(-2).map((msg, i) => (
+                      <p
+                        key={i}
+                        className="text-xs truncate"
+                        style={{ color: 'rgba(196,181,253,0.45)' }}
+                      >
+                        ↪ {msg.content.slice(0, 80)}{msg.content.length > 80 ? '…' : ''}
+                      </p>
+                    ))}
+                  </div>
                 )}
-              </motion.button>
+
+                {/* Latest AI message — RPG dialogue style */}
+                {lastAiMsg && (
+                  <motion.p
+                    key={messages.length}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{
+                      color: 'rgba(255,255,255,0.94)',
+                      fontSize: 15,
+                      lineHeight: 1.65,
+                      fontWeight: 400,
+                    }}
+                  >
+                    {lastAiMsg.streaming && lastAiMsg.content === '' ? (
+                      <TypingDots />
+                    ) : (
+                      <>
+                        {lastAiMsg.content}
+                        {lastAiMsg.streaming && (
+                          <motion.span
+                            animate={{ opacity: [1, 0] }}
+                            transition={{ repeat: Infinity, duration: 0.5 }}
+                            className="inline-block w-px h-4 bg-white/80 ms-0.5 align-middle"
+                          />
+                        )}
+                        {lastAiMsg.debug && (
+                          <span
+                            className="ms-2 text-[10px]"
+                            style={{ color: 'rgba(196,181,253,0.35)' }}
+                          >
+                            [{lastAiMsg.debug.provider} ↑{lastAiMsg.debug.inputTokens} ↓{lastAiMsg.debug.outputTokens}]
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </motion.p>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* ── ▼ Continue indicator ── */}
+              {!isStreaming && lastAiMsg && !lastAiMsg.streaming && (
+                <motion.div
+                  className="flex justify-end mb-1 flex-shrink-0"
+                  animate={{ y: [0, 4, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
+                  style={{ color: '#A78BFA', fontSize: 11 }}
+                >
+                  ▼
+                </motion.div>
+              )}
+
+              {/* ── Input row ── */}
+              <div className="flex items-end gap-2 flex-shrink-0" style={{ borderTop: '1px solid rgba(124,58,237,0.2)', paddingTop: 8 }}>
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={t('placeholder')}
+                  rows={1}
+                  disabled={isStreaming}
+                  className="flex-1 resize-none rounded-lg px-3 py-1.5 text-sm outline-none"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(124,58,237,0.3)',
+                    color: 'rgba(255,255,255,0.88)',
+                    maxHeight: 56,
+                    lineHeight: '1.4',
+                  }}
+                />
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleSend}
+                  disabled={!input.trim() || isStreaming}
+                  className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #7C3AED, #5B21B6)',
+                    opacity: !input.trim() || isStreaming ? 0.35 : 1,
+                    boxShadow: input.trim() && !isStreaming ? '0 0 14px rgba(124,58,237,0.5)' : 'none',
+                  }}
+                  aria-label={locale === 'ar' ? 'إرسال' : 'Send'}
+                >
+                  {isStreaming ? (
+                    <Loader2 size={13} color="white" className="animate-spin" />
+                  ) : (
+                    <Send size={13} color="white" style={{ transform: isRTL(locale) ? 'scaleX(-1)' : undefined }} />
+                  )}
+                </motion.button>
+              </div>
+
             </div>
           </div>
         </motion.div>

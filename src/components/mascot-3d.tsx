@@ -16,6 +16,8 @@ interface ZakiRobotProps {
 interface ZakiPortraitProps {
   mood: 'idle' | 'happy' | 'thinking' | 'talking';
   talking: boolean;
+  width?: number;
+  height?: number;
 }
 
 // ─── Materials (constants, not recreated per frame) ─────────────────────────
@@ -318,12 +320,12 @@ export function ZakiRobot({ mood, walking, scale = 1 }: ZakiRobotProps) {
  * Small portrait canvas for the RPG dialogue box — shows head + upper body.
  * Fixed at 90×110px.
  */
-export function ZakiPortrait({ mood, talking }: ZakiPortraitProps) {
+export function ZakiPortrait({ mood, talking, width = 90, height = 110 }: ZakiPortraitProps) {
   return (
     <Canvas
       gl={{ antialias: true, alpha: true }}
       camera={{ position: [0, 0.2, 2.8], fov: 40 }}
-      style={{ width: 90, height: 110, background: 'transparent' }}
+      style={{ width, height, background: 'transparent' }}
     >
       <ambientLight intensity={0.7} />
       <directionalLight position={[2, 4, 3]} intensity={1.1} color="#ffffff" />

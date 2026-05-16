@@ -318,6 +318,7 @@ export const EncryptedKeys = pgTable('EncryptedKeys', {
   UserId:       uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   EncryptedKey: text('EncryptedKey').notNull(),
   KeyHint:      text('KeyHint').notNull(),
+  Provider:     text('Provider').notNull().default('anthropic'),
   CreatedAt:    timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
   UpdatedAt:    timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
 });

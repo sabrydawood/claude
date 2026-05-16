@@ -287,6 +287,13 @@ function GltfModelInner({
 
   // Crossfade when mood / walking changes
   useEffect(() => {
+    console.log({
+      mood,
+      walking,
+      cfg,
+      activeAnim: activeAnim.current,
+      target: walking ? cfg.animMap["walking"] : cfg.animMap[mood],
+    })
     const target = walking ? cfg.animMap["walking"] : cfg.animMap[mood];
     if (!target || target === activeAnim.current) return;
     const prev = activeAnim.current;
@@ -395,14 +402,14 @@ function GltfCanvas({
 }
 
 // ─── Xbot (Mixamo humanoid) ────────────────────────────────────────────────────
-// Available: agree · headShake · idle · run · sad_pose · sneak_pose · walk
+// Available: agree · headShake · idle · run · sad_pose · headshake · walk
 
 const XBOT_CFG: GltfConfig = {
   modelPath: "/models/Xbot.glb",
   animMap: {
     idle: "idle",        // standing idle breathing
     happy: "agree",      // enthusiastic nodding = happy/excited
-    thinking: "sneak_pose", // looking around = more "thinking" than sad
+    thinking: "headshake", // looking around = more "thinking" than sad
     talking: "agree",    // nodding while speaking
     walking: "walk",
   },

@@ -58,16 +58,16 @@
         "0": "Hi! Tap me!"
       },
       "pool": {
-        "0":  "Ready to learn something new today? 🚀",
-        "1":  "Every lesson brings you closer to your goal!",
-        "2":  "Tap me if you need help 😊",
-        "3":  "I'm Zaki, your learning guide!",
-        "4":  "Start and don't stop — every step counts!",
-        "5":  "Earn XP and climb the leaderboard!",
-        "6":  "Got questions? Chat with me anytime 💬",
-        "7":  "Try all the lessons — each one is unique!",
-        "8":  "Coding isn't hard, it just takes time 💪",
-        "9":  "Check out the sandbox and experiment!",
+        "0": "Ready to learn something new today? 🚀",
+        "1": "Every lesson brings you closer to your goal!",
+        "2": "Tap me if you need help 😊",
+        "3": "I'm Zaki, your learning guide!",
+        "4": "Start and don't stop — every step counts!",
+        "5": "Earn XP and climb the leaderboard!",
+        "6": "Got questions? Chat with me anytime 💬",
+        "7": "Try all the lessons — each one is unique!",
+        "8": "Coding isn't hard, it just takes time 💪",
+        "9": "Check out the sandbox and experiment!",
         "10": "Your achievements are adding up — keep going! ⭐"
       }
     }
@@ -100,17 +100,27 @@
   },
   "sandbox": {
     "title": "Zkawi Sandbox",
-    "subtitle": "Chat with Claude using your own key",
+    "subtitle": "Chat with AI and experiment freely",
     "addKey": "Add API Key",
-    "keyLabel": "Anthropic API Key (starts with sk-ant-)",
+    "keyLabel": "Your API Key",
+    "providerLabel": "Choose Provider",
+    "providers": {
+      "anthropic": "Anthropic",
+      "openai": "OpenAI",
+      "gemini": "Google Gemini",
+      "openrouter": "OpenRouter"
+    },
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
-    "greeting": "Hi! I'm Zkawi",
-    "greetingSubtitle": "Ask me anything about AI",
+    "greeting": "Hi! I am Zkawi",
+    "greetingSubtitle": "Ask me anything and I will help you",
     "placeholder": "Type your message...",
-    "noKeyError": "Add your API key first",
-    "connectionError": "Connection failed"
+    "noKeyError": "Connection failed",
+    "connectionError": "Connection failed",
+    "userKeyFailed": "Your API key stopped working — it may have run out of credits or expired",
+    "deleteKeyToRecover": "Delete key to use system providers",
+    "systemMode": "System Provider"
   },
   "home": {
     "hero": {

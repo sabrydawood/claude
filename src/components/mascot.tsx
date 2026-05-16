@@ -44,28 +44,28 @@ const WAYPOINT_POOL: Waypoint[] = [
   // Left column
   { x: 6,  y: 20, mood: "happy",    stayMs: 3500, message: "patrol.pool.0" },
   { x: 8,  y: 38, mood: "idle",     stayMs: 4000, message: null },
-  { x: 5,  y: 55, mood: "thinking", stayMs: 4500, message: "patrol.pool.1" },
+  { x: 5,  y: 55, mood: "idle", stayMs: 4500, message: "patrol.pool.1" },
   { x: 9,  y: 72, mood: "idle",     stayMs: 3500, message: null },
   { x: 7,  y: 85, mood: "happy",    stayMs: 3000, message: "patrol.pool.2" },
   // Center-left
-  { x: 24, y: 18, mood: "thinking", stayMs: 4000, message: null },
+  { x: 24, y: 18, mood: "idle", stayMs: 4000, message: null },
   { x: 22, y: 40, mood: "happy",    stayMs: 4500, message: "patrol.pool.3" },
   { x: 26, y: 62, mood: "idle",     stayMs: 3500, message: null },
-  { x: 20, y: 80, mood: "thinking", stayMs: 4000, message: "patrol.pool.4" },
+  { x: 20, y: 80, mood: "idle", stayMs: 4000, message: "patrol.pool.4" },
   // Center
   { x: 44, y: 22, mood: "happy",    stayMs: 4000, message: "patrol.pool.5" },
   { x: 42, y: 50, mood: "idle",     stayMs: 3500, message: null },
-  { x: 46, y: 70, mood: "thinking", stayMs: 4500, message: "patrol.pool.6" },
+  { x: 46, y: 70, mood: "idle", stayMs: 4500, message: "patrol.pool.6" },
   { x: 40, y: 84, mood: "idle",     stayMs: 3000, message: null },
   // Center-right
   { x: 63, y: 16, mood: "idle",     stayMs: 3500, message: "patrol.pool.7" },
   { x: 65, y: 38, mood: "happy",    stayMs: 4000, message: null },
-  { x: 61, y: 60, mood: "thinking", stayMs: 4500, message: "patrol.pool.8" },
+  { x: 61, y: 60, mood: "idle", stayMs: 4500, message: "patrol.pool.8" },
   { x: 67, y: 78, mood: "idle",     stayMs: 3500, message: null },
   // Right column
   { x: 80, y: 25, mood: "happy",    stayMs: 4000, message: "patrol.pool.9" },
   { x: 82, y: 50, mood: "idle",     stayMs: 3500, message: null },
-  { x: 78, y: 75, mood: "thinking", stayMs: 4000, message: "patrol.pool.10" },
+  { x: 78, y: 75, mood: "idle", stayMs: 4000, message: "patrol.pool.10" },
 ];
 
 /** Fisher-Yates in-place shuffle */

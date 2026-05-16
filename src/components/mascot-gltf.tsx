@@ -86,9 +86,8 @@ function RobotExpressiveInner({ mood, walking }: RobotProps) {
 
     const next = actions[target];
     if (next) {
-      next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1);
-      next.clampWhenFinished = false;
-      next.fadeIn(FADE).play();
+      // clampWhenFinished defaults to false in Three.js — no need to set it
+      next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(FADE).play();
     }
   }, [mood, walking, actions]);
 

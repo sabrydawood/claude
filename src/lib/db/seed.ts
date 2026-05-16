@@ -19,6 +19,7 @@ import {
   SystemPrompts,
   Subjects, SubjectTranslations,
   Providers, ProviderModels, RoutingRules,
+  Concepts, ConceptEdges,
 } from './Schema';
 import { EncryptApiKey } from '../Ai/Crypto';
 import { seedProgramming } from './seeds/programming.seed';
@@ -240,6 +241,97 @@ async function Seed() {
     console.log('  ✓ 2 providers, 3 models, 6 routing rules');
   } else {
     console.log('  ⏭  Providers already seeded — skipping');
+  }
+
+  // ─── Knowledge Graph — Initial Concepts (D-011, D-027, D-026) ───────────────
+  const existingConcepts = await db.select({ Id: Concepts.Id }).from(Concepts).limit(1);
+
+  if (existingConcepts.length === 0) {
+    // Programming track (D-011) — age 8-12 foundational concepts
+    const programmingConceptDefs = [
+      { NameAr: 'التفكير الخوارزمي', NameEn: 'Algorithmic Thinking', Difficulty: 1, Type: 'conceptual' },
+      { NameAr: 'التسلسل',            NameEn: 'Sequencing',            Difficulty: 1, Type: 'procedural' },
+      { NameAr: 'الحلقات',            NameEn: 'Loops',                 Difficulty: 2, Type: 'procedural' },
+      { NameAr: 'الشروط',             NameEn: 'Conditionals',          Difficulty: 2, Type: 'procedural' },
+      { NameAr: 'المتغيرات',           NameEn: 'Variables',             Difficulty: 2, Type: 'factual'    },
+      { NameAr: 'الدوال',             NameEn: 'Functions',             Difficulty: 3, Type: 'procedural' },
+    ] as const;
+
+    // Math track (D-027) — age 8-12 foundational concepts
+    const mathConceptDefs = [
+      { NameAr: 'الأعداد الصحيحة',   NameEn: 'Integers',                    Difficulty: 1, Type: 'factual'    },
+      { NameAr: 'الجمع والطرح',       NameEn: 'Addition & Subtraction',      Difficulty: 1, Type: 'procedural' },
+      { NameAr: 'الضرب والقسمة',      NameEn: 'Multiplication & Division',   Difficulty: 2, Type: 'procedural' },
+      { NameAr: 'الكسور',             NameEn: 'Fractions',                   Difficulty: 3, Type: 'conceptual' },
+      { NameAr: 'الهندسة الأساسية',   NameEn: 'Basic Geometry',              Difficulty: 2, Type: 'conceptual' },
+    ] as const;
+
+    // Arabic track (D-026) — age 8-12 foundational concepts
+    const arabicConceptDefs = [
+      { NameAr: 'الحروف الهجائية',    NameEn: 'Arabic Alphabet',             Difficulty: 1, Type: 'factual'    },
+      { NameAr: 'الكلمات الأساسية',   NameEn: 'Basic Vocabulary',            Difficulty: 1, Type: 'factual'    },
+      { NameAr: 'الجملة البسيطة',     NameEn: 'Simple Sentences',            Difficulty: 2, Type: 'procedural' },
+      { NameAr: 'القراءة والفهم',     NameEn: 'Reading Comprehension',       Difficulty: 3, Type: 'conceptual' },
+    ] as const;
+
+    // Insert all concepts and collect their generated Ids
+    const insertConcept = async (def: { NameAr: string; NameEn: string; Difficulty: number; Type: string }) => {
+      const [row] = await db.insert(Concepts).values({
+        Id:         uuidv7(),
+        NameAr:     def.NameAr,
+        NameEn:     def.NameEn,
+        Difficulty: def.Difficulty,
+        Type:       def.Type,
+        IsDeleted:  false,
+      }).returning({ Id: Concepts.Id });
+      return row.Id;
+    };
+
+    const [
+      algThinking, sequencing, loops, conditionals, variables, functions,
+    ] = await Promise.all(programmingConceptDefs.map(insertConcept));
+
+    const [
+      integers, addSub, mulDiv, fractions, geometry,
+    ] = await Promise.all(mathConceptDefs.map(insertConcept));
+
+    const [
+      alphabet, vocabulary, sentences, readingComp,
+    ] = await Promise.all(arabicConceptDefs.map(insertConcept));
+
+    const totalConcepts = programmingConceptDefs.length + mathConceptDefs.length + arabicConceptDefs.length;
+    console.log(`  ✓ ${totalConcepts} knowledge graph concepts`);
+
+    // ── ConceptEdges (prerequisite graph) ─────────────────────────────────────
+    // RelationType: 'PREREQUISITE_OF' | 'BUILDS_ON' | 'RELATED_TO' | 'EXAMPLE_OF'
+    const edges: { FromConceptId: string; ToConceptId: string; RelationType: string }[] = [
+      // Programming prerequisites
+      { FromConceptId: algThinking, ToConceptId: sequencing,   RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: sequencing,  ToConceptId: loops,         RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: sequencing,  ToConceptId: conditionals,  RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: variables,   ToConceptId: loops,         RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: variables,   ToConceptId: conditionals,  RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: loops,       ToConceptId: functions,     RelationType: 'BUILDS_ON'       },
+      { FromConceptId: conditionals,ToConceptId: functions,     RelationType: 'BUILDS_ON'       },
+      // Math prerequisites
+      { FromConceptId: integers,    ToConceptId: addSub,        RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: addSub,      ToConceptId: mulDiv,        RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: mulDiv,      ToConceptId: fractions,     RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: integers,    ToConceptId: geometry,      RelationType: 'PREREQUISITE_OF' },
+      // Arabic prerequisites
+      { FromConceptId: alphabet,    ToConceptId: vocabulary,    RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: vocabulary,  ToConceptId: sentences,     RelationType: 'PREREQUISITE_OF' },
+      { FromConceptId: sentences,   ToConceptId: readingComp,   RelationType: 'PREREQUISITE_OF' },
+      // Cross-track — algorithmic thinking relates to math
+      { FromConceptId: algThinking, ToConceptId: mulDiv,        RelationType: 'RELATED_TO'      },
+    ];
+
+    await db.insert(ConceptEdges).values(
+      edges.map(E => ({ Id: uuidv7(), ...E })),
+    );
+    console.log(`  ✓ ${edges.length} concept edges`);
+  } else {
+    console.log('  ⏭  Knowledge graph concepts already seeded — skipping');
   }
 
   console.log('\n✅ Seed complete!\n');

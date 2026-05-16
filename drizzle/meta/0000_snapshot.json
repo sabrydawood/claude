@@ -1,5 +1,5 @@
 {
-  "id": "707e1915-2aeb-41a7-8b0b-904460df9879",
+  "id": "dc948819-00ce-4173-859b-ed37556d9f49",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -309,6 +309,455 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.ConceptChunks": {
+      "name": "ConceptChunks",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ConceptId": {
+          "name": "ConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Content": {
+          "name": "Content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ar'"
+        },
+        "EmbeddingText": {
+          "name": "EmbeddingText",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_ConceptChunks_ConceptId": {
+          "name": "Idx_ConceptChunks_ConceptId",
+          "columns": [
+            {
+              "expression": "ConceptId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ConceptChunks_ConceptId_Concepts_Id_fk": {
+          "name": "ConceptChunks_ConceptId_Concepts_Id_fk",
+          "tableFrom": "ConceptChunks",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "ConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ConceptRelations": {
+      "name": "ConceptRelations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "FromConceptId": {
+          "name": "FromConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ToConceptId": {
+          "name": "ToConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "RelationType": {
+          "name": "RelationType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_ConceptRelations_From": {
+          "name": "Idx_ConceptRelations_From",
+          "columns": [
+            {
+              "expression": "FromConceptId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_ConceptRelations_To": {
+          "name": "Idx_ConceptRelations_To",
+          "columns": [
+            {
+              "expression": "ToConceptId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ConceptRelations_FromConceptId_Concepts_Id_fk": {
+          "name": "ConceptRelations_FromConceptId_Concepts_Id_fk",
+          "tableFrom": "ConceptRelations",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "FromConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ConceptRelations_ToConceptId_Concepts_Id_fk": {
+          "name": "ConceptRelations_ToConceptId_Concepts_Id_fk",
+          "tableFrom": "ConceptRelations",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "ToConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Concepts": {
+      "name": "Concepts",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "NameAr": {
+          "name": "NameAr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "NameEn": {
+          "name": "NameEn",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Difficulty": {
+          "name": "Difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "Type": {
+          "name": "Type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ConversationMessages": {
+      "name": "ConversationMessages",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ConversationId": {
+          "name": "ConversationId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Role": {
+          "name": "Role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Content": {
+          "name": "Content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Provider": {
+          "name": "Provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_ConvMsg_ConvId": {
+          "name": "Idx_ConvMsg_ConvId",
+          "columns": [
+            {
+              "expression": "ConversationId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ConversationMessages_ConversationId_Conversations_Id_fk": {
+          "name": "ConversationMessages_ConversationId_Conversations_Id_fk",
+          "tableFrom": "ConversationMessages",
+          "tableTo": "Conversations",
+          "columnsFrom": [
+            "ConversationId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Conversations": {
+      "name": "Conversations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Source": {
+          "name": "Source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Route": {
+          "name": "Route",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Title": {
+          "name": "Title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_Conversations_UserId_Source": {
+          "name": "Idx_Conversations_UserId_Source",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "Source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_Conversations_UserId_Route": {
+          "name": "Idx_Conversations_UserId_Route",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "Route",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Conversations_UserId_users_id_fk": {
+          "name": "Conversations_UserId_users_id_fk",
+          "tableFrom": "Conversations",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.CourseTranslations": {
       "name": "CourseTranslations",
       "schema": "",
@@ -500,6 +949,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "Provider": {
+          "name": "Provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'anthropic'"
         },
         "CreatedAt": {
           "name": "CreatedAt",
@@ -999,6 +1455,115 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.LearningSignals": {
+      "name": "LearningSignals",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ConceptId": {
+          "name": "ConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "SignalType": {
+          "name": "SignalType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Value": {
+          "name": "Value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_LearningSignals_UserId": {
+          "name": "Idx_LearningSignals_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_LearningSignals_ConceptId": {
+          "name": "Idx_LearningSignals_ConceptId",
+          "columns": [
+            {
+              "expression": "ConceptId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "LearningSignals_UserId_users_id_fk": {
+          "name": "LearningSignals_UserId_users_id_fk",
+          "tableFrom": "LearningSignals",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "LearningSignals_ConceptId_Concepts_Id_fk": {
+          "name": "LearningSignals_ConceptId_Concepts_Id_fk",
+          "tableFrom": "LearningSignals",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "ConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.LessonTranslations": {
       "name": "LessonTranslations",
       "schema": "",
@@ -1191,6 +1756,150 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ProviderModels": {
+      "name": "ProviderModels",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ProviderId": {
+          "name": "ProviderId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ModelName": {
+          "name": "ModelName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "InputCostPerM": {
+          "name": "InputCostPerM",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "OutputCostPerM": {
+          "name": "OutputCostPerM",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "MaxTokens": {
+          "name": "MaxTokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 8192
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ProviderModels_ProviderId_Providers_Id_fk": {
+          "name": "ProviderModels_ProviderId_Providers_Id_fk",
+          "tableFrom": "ProviderModels",
+          "tableTo": "Providers",
+          "columnsFrom": [
+            "ProviderId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Providers": {
+      "name": "Providers",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "BaseUrl": {
+          "name": "BaseUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ApiKeyEnc": {
+          "name": "ApiKeyEnc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1461,6 +2170,72 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.RoutingRules": {
+      "name": "RoutingRules",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "TaskType": {
+          "name": "TaskType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ModelId": {
+          "name": "ModelId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Priority": {
+          "name": "Priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "RoutingRules_ModelId_ProviderModels_Id_fk": {
+          "name": "RoutingRules_ModelId_ProviderModels_Id_fk",
+          "tableFrom": "RoutingRules",
+          "tableTo": "ProviderModels",
+          "columnsFrom": [
+            "ModelId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.SandboxSessions": {
       "name": "SandboxSessions",
       "schema": "",
@@ -1540,6 +2315,279 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.SemanticCache": {
+      "name": "SemanticCache",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "QuestionHash": {
+          "name": "QuestionHash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Question": {
+          "name": "Question",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Answer": {
+          "name": "Answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "PageKey": {
+          "name": "PageKey",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ar'"
+        },
+        "HitCount": {
+          "name": "HitCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_SemanticCache_Hash": {
+          "name": "Idx_SemanticCache_Hash",
+          "columns": [
+            {
+              "expression": "QuestionHash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_SemanticCache_PageKey": {
+          "name": "Idx_SemanticCache_PageKey",
+          "columns": [
+            {
+              "expression": "PageKey",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.StudentInsights": {
+      "name": "StudentInsights",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Insights": {
+          "name": "Insights",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "StudentInsights_UserId_users_id_fk": {
+          "name": "StudentInsights_UserId_users_id_fk",
+          "tableFrom": "StudentInsights",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "StudentInsights_UserId_unique": {
+          "name": "StudentInsights_UserId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.StudentMastery": {
+      "name": "StudentMastery",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ConceptId": {
+          "name": "ConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Score": {
+          "name": "Score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "Attempts": {
+          "name": "Attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "LastTested": {
+          "name": "LastTested",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_StudentMastery_UserId": {
+          "name": "Idx_StudentMastery_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "StudentMastery_UserId_users_id_fk": {
+          "name": "StudentMastery_UserId_users_id_fk",
+          "tableFrom": "StudentMastery",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "StudentMastery_ConceptId_Concepts_Id_fk": {
+          "name": "StudentMastery_ConceptId_Concepts_Id_fk",
+          "tableFrom": "StudentMastery",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "ConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uniq_StudentMastery_UserConcept": {
+          "name": "Uniq_StudentMastery_UserConcept",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId",
+            "ConceptId"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

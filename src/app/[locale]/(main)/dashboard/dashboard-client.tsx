@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { AgeAdaptiveNavigation } from "@/components/navigation";
 import { Link } from "@/lib/i18n/navigation";
 import { motion } from "framer-motion";
 import Header from "@/components/layout/header";
@@ -70,6 +71,7 @@ export default function DashboardClient({
   const t = useTranslations("dashboard");
   const tL = useTranslations("lessons");
   const tS = useTranslations("subjects");
+  const locale = useLocale();
   const [mounted] = useState(true);
 
   if (!mounted) return null;
@@ -109,6 +111,26 @@ export default function DashboardClient({
                 <p className="text-pink-200 text-sm">{t("motivational")}</p>
               </div>
             </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mb-6"
+          >
+            <AgeAdaptiveNavigation
+              ageGroup="explorer"
+              locale={locale}
+              items={[
+                { id: 'programming', titleAr: 'برمجة', titleEn: 'Programming', isUnlocked: true, isCompleted: false, href: '/subjects/programming' },
+                { id: 'math', titleAr: 'رياضيات', titleEn: 'Mathematics', isUnlocked: true, isCompleted: false, href: '/subjects/math' },
+                { id: 'arabic', titleAr: 'عربية', titleEn: 'Arabic', isUnlocked: true, isCompleted: false, href: '/subjects/arabic' },
+                { id: 'ai', titleAr: 'ذكاء اصطناعي', titleEn: 'AI', isUnlocked: false, isCompleted: false, href: '/subjects/ai' },
+                { id: 'science', titleAr: 'علوم', titleEn: 'Science', isUnlocked: false, isCompleted: false, href: '/subjects/science' },
+                { id: 'english', titleAr: 'إنجليزية', titleEn: 'English', isUnlocked: false, isCompleted: false, href: '/subjects/english' },
+              ]}
+            />
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

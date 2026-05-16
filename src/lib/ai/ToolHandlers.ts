@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 import { db } from '@/lib/db/Index';
 import { and, eq, inArray } from 'drizzle-orm';
 import { Concepts, ConceptChunks, ConceptEdges, StudentMastery, StudentInsights, LearningSignals } from '@/lib/db/Schema';
+import { CheckConceptCache, SaveConceptCache, BumpCacheHit } from '@/lib/ai/Cache.Service';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -63,6 +64,14 @@ export async function HandleTool(
  * with fallback to the concept's own NameAr/NameEn fields.
  */
 async function HandleGetConcept(ConceptId: string, DetailLevel: 'brief' | 'full'): Promise<ToolResult> {
+  // Check concept cache first (D-001: concept-centric cache)
+  const Locale = 'ar'; // default locale for cache key — actual locale passed via context in future
+  const Cached = await CheckConceptCache(ConceptId, Locale, DetailLevel);
+  if (Cached) {
+    BumpCacheHit(Cached.Id);
+    return { content: Cached.Answer };
+  }
+
   const Limit = DetailLevel === 'brief' ? 1 : 3;
 
   const Chunks = await db
@@ -72,7 +81,10 @@ async function HandleGetConcept(ConceptId: string, DetailLevel: 'brief' | 'full'
     .limit(Limit);
 
   if (Chunks.length > 0) {
-    return { content: Chunks.map(C => C.Content).join('\n\n') };
+    const Content = Chunks.map(C => C.Content).join('\n\n');
+    // Save to concept cache for future requests
+    SaveConceptCache(ConceptId, Locale, DetailLevel, Content);
+    return { content: Content };
   }
 
   // Fallback: return the concept names directly from the Concepts table
@@ -84,7 +96,9 @@ async function HandleGetConcept(ConceptId: string, DetailLevel: 'brief' | 'full'
 
   if (!Concept) return { content: 'المفهوم غير موجود', error: true };
 
-  return { content: `${Concept.NameAr} (${Concept.NameEn})` };
+  const Result = `${Concept.NameAr} (${Concept.NameEn})`;
+  SaveConceptCache(ConceptId, Locale, DetailLevel, Result);
+  return { content: Result };
 }
 
 /**

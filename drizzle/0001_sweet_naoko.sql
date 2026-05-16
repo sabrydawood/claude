@@ -1,1 +1,0 @@
-ALTER TABLE "EncryptedKeys" ADD COLUMN "Provider" text DEFAULT 'anthropic' NOT NULL;

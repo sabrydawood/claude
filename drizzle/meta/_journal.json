@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1778888022526,
-      "tag": "0000_wandering_wendell_rand",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1778942783119,
-      "tag": "0001_sweet_naoko",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1778944900527,
-      "tag": "0002_slim_tomorrow_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1778952939453,
-      "tag": "0003_remarkable_baron_zemo",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1778970522615,
-      "tag": "0004_petite_mystique",
+      "when": 1778975337825,
+      "tag": "0000_furry_raider",
       "breakpoints": true
     }
   ]

@@ -37,6 +37,54 @@ CREATE TABLE "Agents" (
 	CONSTRAINT "Agents_Slug_unique" UNIQUE("Slug")
 );
 --> statement-breakpoint
+CREATE TABLE "ConceptChunks" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"ConceptId" uuid NOT NULL,
+	"Content" text NOT NULL,
+	"Locale" text DEFAULT 'ar' NOT NULL,
+	"EmbeddingText" text,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "ConceptRelations" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"FromConceptId" uuid NOT NULL,
+	"ToConceptId" uuid NOT NULL,
+	"RelationType" text NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "Concepts" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"NameAr" text NOT NULL,
+	"NameEn" text NOT NULL,
+	"Difficulty" integer DEFAULT 1 NOT NULL,
+	"Type" text NOT NULL,
+	"IsDeleted" boolean DEFAULT false NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "ConversationMessages" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"ConversationId" uuid NOT NULL,
+	"Role" text NOT NULL,
+	"Content" text NOT NULL,
+	"Provider" text,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "Conversations" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"UserId" uuid NOT NULL,
+	"Source" text NOT NULL,
+	"Route" text,
+	"Title" text,
+	"IsDeleted" boolean DEFAULT false NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "CourseTranslations" (
 	"Id" uuid PRIMARY KEY NOT NULL,
 	"CourseId" uuid NOT NULL,
@@ -62,6 +110,7 @@ CREATE TABLE "EncryptedKeys" (
 	"UserId" uuid NOT NULL,
 	"EncryptedKey" text NOT NULL,
 	"KeyHint" text NOT NULL,
+	"Provider" text DEFAULT 'anthropic' NOT NULL,
 	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL,
 	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "EncryptedKeys_UserId_unique" UNIQUE("UserId")
@@ -113,6 +162,15 @@ CREATE TABLE "LearningPaths" (
 	"GeneratedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "LearningSignals" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"UserId" uuid NOT NULL,
+	"ConceptId" uuid NOT NULL,
+	"SignalType" text NOT NULL,
+	"Value" integer DEFAULT 1 NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "LessonTranslations" (
 	"Id" uuid PRIMARY KEY NOT NULL,
 	"LessonId" uuid NOT NULL,
@@ -132,6 +190,28 @@ CREATE TABLE "Lessons" (
 	"EstimatedMinutes" integer DEFAULT 5 NOT NULL,
 	"Difficulty" integer DEFAULT 1,
 	"IsDeleted" boolean DEFAULT false NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "ProviderModels" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"ProviderId" uuid NOT NULL,
+	"ModelName" text NOT NULL,
+	"InputCostPerM" text DEFAULT '0' NOT NULL,
+	"OutputCostPerM" text DEFAULT '0' NOT NULL,
+	"MaxTokens" integer DEFAULT 8192 NOT NULL,
+	"IsActive" boolean DEFAULT true NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "Providers" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"Name" text NOT NULL,
+	"Description" text,
+	"BaseUrl" text NOT NULL,
+	"ApiKeyEnc" text NOT NULL,
+	"IsActive" boolean DEFAULT true NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "QuizOptionTranslations" (
@@ -165,6 +245,15 @@ CREATE TABLE "QuizQuestions" (
 	"IsDeleted" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "RoutingRules" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"TaskType" text NOT NULL,
+	"ModelId" uuid NOT NULL,
+	"Priority" integer DEFAULT 1 NOT NULL,
+	"IsActive" boolean DEFAULT true NOT NULL,
+	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "SandboxSessions" (
 	"Id" uuid PRIMARY KEY NOT NULL,
 	"UserId" uuid NOT NULL,
@@ -172,6 +261,37 @@ CREATE TABLE "SandboxSessions" (
 	"MessagesCount" integer DEFAULT 0 NOT NULL,
 	"TokensUsed" integer DEFAULT 0 NOT NULL,
 	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "SemanticCache" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"QuestionHash" text NOT NULL,
+	"Question" text NOT NULL,
+	"Answer" text NOT NULL,
+	"PageKey" text,
+	"Locale" text DEFAULT 'ar' NOT NULL,
+	"HitCount" integer DEFAULT 0 NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "StudentInsights" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"UserId" uuid NOT NULL,
+	"Insights" text DEFAULT '{}' NOT NULL,
+	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "StudentInsights_UserId_unique" UNIQUE("UserId")
+);
+--> statement-breakpoint
+CREATE TABLE "StudentMastery" (
+	"Id" uuid PRIMARY KEY NOT NULL,
+	"UserId" uuid NOT NULL,
+	"ConceptId" uuid NOT NULL,
+	"Score" integer DEFAULT 0 NOT NULL,
+	"Attempts" integer DEFAULT 0 NOT NULL,
+	"LastTested" timestamp with time zone,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "Uniq_StudentMastery_UserConcept" UNIQUE("UserId","ConceptId")
 );
 --> statement-breakpoint
 CREATE TABLE "SubjectTranslations" (
@@ -328,6 +448,11 @@ CREATE TABLE "verification_tokens" (
 --> statement-breakpoint
 ALTER TABLE "AchievementTranslations" ADD CONSTRAINT "AchievementTranslations_AchievementId_Achievements_Id_fk" FOREIGN KEY ("AchievementId") REFERENCES "public"."Achievements"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "AgentTranslations" ADD CONSTRAINT "AgentTranslations_AgentId_Agents_Id_fk" FOREIGN KEY ("AgentId") REFERENCES "public"."Agents"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ConceptChunks" ADD CONSTRAINT "ConceptChunks_ConceptId_Concepts_Id_fk" FOREIGN KEY ("ConceptId") REFERENCES "public"."Concepts"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ConceptRelations" ADD CONSTRAINT "ConceptRelations_FromConceptId_Concepts_Id_fk" FOREIGN KEY ("FromConceptId") REFERENCES "public"."Concepts"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ConceptRelations" ADD CONSTRAINT "ConceptRelations_ToConceptId_Concepts_Id_fk" FOREIGN KEY ("ToConceptId") REFERENCES "public"."Concepts"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ConversationMessages" ADD CONSTRAINT "ConversationMessages_ConversationId_Conversations_Id_fk" FOREIGN KEY ("ConversationId") REFERENCES "public"."Conversations"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Conversations" ADD CONSTRAINT "Conversations_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "CourseTranslations" ADD CONSTRAINT "CourseTranslations_CourseId_Courses_Id_fk" FOREIGN KEY ("CourseId") REFERENCES "public"."Courses"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Courses" ADD CONSTRAINT "Courses_SubjectId_Subjects_Id_fk" FOREIGN KEY ("SubjectId") REFERENCES "public"."Subjects"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "EncryptedKeys" ADD CONSTRAINT "EncryptedKeys_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -339,14 +464,21 @@ ALTER TABLE "Exercises" ADD CONSTRAINT "Exercises_CourseId_Courses_Id_fk" FOREIG
 ALTER TABLE "LearningPaths" ADD CONSTRAINT "LearningPaths_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "LearningPaths" ADD CONSTRAINT "LearningPaths_TrackId_Tracks_Id_fk" FOREIGN KEY ("TrackId") REFERENCES "public"."Tracks"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "LearningPaths" ADD CONSTRAINT "LearningPaths_CurrentLessonId_Lessons_Id_fk" FOREIGN KEY ("CurrentLessonId") REFERENCES "public"."Lessons"("Id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "LearningSignals" ADD CONSTRAINT "LearningSignals_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "LearningSignals" ADD CONSTRAINT "LearningSignals_ConceptId_Concepts_Id_fk" FOREIGN KEY ("ConceptId") REFERENCES "public"."Concepts"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "LessonTranslations" ADD CONSTRAINT "LessonTranslations_LessonId_Lessons_Id_fk" FOREIGN KEY ("LessonId") REFERENCES "public"."Lessons"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Lessons" ADD CONSTRAINT "Lessons_AgentId_Agents_Id_fk" FOREIGN KEY ("AgentId") REFERENCES "public"."Agents"("Id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Lessons" ADD CONSTRAINT "Lessons_CourseId_Courses_Id_fk" FOREIGN KEY ("CourseId") REFERENCES "public"."Courses"("Id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ProviderModels" ADD CONSTRAINT "ProviderModels_ProviderId_Providers_Id_fk" FOREIGN KEY ("ProviderId") REFERENCES "public"."Providers"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "QuizOptionTranslations" ADD CONSTRAINT "QuizOptionTranslations_OptionId_QuizOptions_Id_fk" FOREIGN KEY ("OptionId") REFERENCES "public"."QuizOptions"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "QuizOptions" ADD CONSTRAINT "QuizOptions_QuestionId_QuizQuestions_Id_fk" FOREIGN KEY ("QuestionId") REFERENCES "public"."QuizQuestions"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "QuizQuestionTranslations" ADD CONSTRAINT "QuizQuestionTranslations_QuestionId_QuizQuestions_Id_fk" FOREIGN KEY ("QuestionId") REFERENCES "public"."QuizQuestions"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "QuizQuestions" ADD CONSTRAINT "QuizQuestions_LessonId_Lessons_Id_fk" FOREIGN KEY ("LessonId") REFERENCES "public"."Lessons"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "RoutingRules" ADD CONSTRAINT "RoutingRules_ModelId_ProviderModels_Id_fk" FOREIGN KEY ("ModelId") REFERENCES "public"."ProviderModels"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "SandboxSessions" ADD CONSTRAINT "SandboxSessions_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "StudentInsights" ADD CONSTRAINT "StudentInsights_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "StudentMastery" ADD CONSTRAINT "StudentMastery_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "StudentMastery" ADD CONSTRAINT "StudentMastery_ConceptId_Concepts_Id_fk" FOREIGN KEY ("ConceptId") REFERENCES "public"."Concepts"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "SubjectTranslations" ADD CONSTRAINT "SubjectTranslations_SubjectId_Subjects_Id_fk" FOREIGN KEY ("SubjectId") REFERENCES "public"."Subjects"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TrackTranslations" ADD CONSTRAINT "TrackTranslations_TrackId_Tracks_Id_fk" FOREIGN KEY ("TrackId") REFERENCES "public"."Tracks"("Id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UserAchievements" ADD CONSTRAINT "UserAchievements_UserId_users_id_fk" FOREIGN KEY ("UserId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -362,16 +494,27 @@ ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY
 CREATE INDEX "Idx_AchTrans_AchievementId" ON "AchievementTranslations" USING btree ("AchievementId");--> statement-breakpoint
 CREATE INDEX "Idx_AgentTranslations_Locale" ON "AgentTranslations" USING btree ("Locale");--> statement-breakpoint
 CREATE INDEX "Idx_AgentTranslations_AgentId" ON "AgentTranslations" USING btree ("AgentId");--> statement-breakpoint
+CREATE INDEX "Idx_ConceptChunks_ConceptId" ON "ConceptChunks" USING btree ("ConceptId");--> statement-breakpoint
+CREATE INDEX "Idx_ConceptRelations_From" ON "ConceptRelations" USING btree ("FromConceptId");--> statement-breakpoint
+CREATE INDEX "Idx_ConceptRelations_To" ON "ConceptRelations" USING btree ("ToConceptId");--> statement-breakpoint
+CREATE INDEX "Idx_ConvMsg_ConvId" ON "ConversationMessages" USING btree ("ConversationId");--> statement-breakpoint
+CREATE INDEX "Idx_Conversations_UserId_Source" ON "Conversations" USING btree ("UserId","Source");--> statement-breakpoint
+CREATE INDEX "Idx_Conversations_UserId_Route" ON "Conversations" USING btree ("UserId","Route");--> statement-breakpoint
 CREATE INDEX "Idx_CourseTrans_CourseId" ON "CourseTranslations" USING btree ("CourseId");--> statement-breakpoint
 CREATE INDEX "Idx_ExSub_UserId" ON "ExerciseSubmissions" USING btree ("UserId");--> statement-breakpoint
 CREATE INDEX "Idx_ExSub_ExerciseId" ON "ExerciseSubmissions" USING btree ("ExerciseId");--> statement-breakpoint
 CREATE INDEX "Idx_ExTrans_ExerciseId" ON "ExerciseTranslations" USING btree ("ExerciseId");--> statement-breakpoint
 CREATE INDEX "Idx_LearningPaths_UserActive" ON "LearningPaths" USING btree ("UserId","IsActive");--> statement-breakpoint
+CREATE INDEX "Idx_LearningSignals_UserId" ON "LearningSignals" USING btree ("UserId");--> statement-breakpoint
+CREATE INDEX "Idx_LearningSignals_ConceptId" ON "LearningSignals" USING btree ("ConceptId");--> statement-breakpoint
 CREATE INDEX "Idx_LessonTranslations_Locale" ON "LessonTranslations" USING btree ("Locale");--> statement-breakpoint
 CREATE INDEX "Idx_LessonTranslations_LessonId" ON "LessonTranslations" USING btree ("LessonId");--> statement-breakpoint
 CREATE INDEX "Idx_QOTrans_OptionId" ON "QuizOptionTranslations" USING btree ("OptionId");--> statement-breakpoint
 CREATE INDEX "Idx_QQTrans_QuestionId" ON "QuizQuestionTranslations" USING btree ("QuestionId");--> statement-breakpoint
 CREATE INDEX "Idx_SandboxSessions_UserId" ON "SandboxSessions" USING btree ("UserId");--> statement-breakpoint
+CREATE INDEX "Idx_SemanticCache_Hash" ON "SemanticCache" USING btree ("QuestionHash");--> statement-breakpoint
+CREATE INDEX "Idx_SemanticCache_PageKey" ON "SemanticCache" USING btree ("PageKey");--> statement-breakpoint
+CREATE INDEX "Idx_StudentMastery_UserId" ON "StudentMastery" USING btree ("UserId");--> statement-breakpoint
 CREATE INDEX "Idx_SubjectTrans_SubjectId" ON "SubjectTranslations" USING btree ("SubjectId");--> statement-breakpoint
 CREATE INDEX "Idx_TrackTranslations_TrackId" ON "TrackTranslations" USING btree ("TrackId");--> statement-breakpoint
 CREATE INDEX "Idx_UserAchievements_UserId" ON "UserAchievements" USING btree ("UserId");--> statement-breakpoint

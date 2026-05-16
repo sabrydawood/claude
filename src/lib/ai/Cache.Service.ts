@@ -73,10 +73,56 @@ export function SaveToCache(
 }
 
 // Get cache statistics for the dev dashboard
-export async function GetCacheStats(): Promise<{ TotalEntries: number; TotalHits: number }> {
-  const Rows = await db.select({ HitCount: SemanticCache.HitCount }).from(SemanticCache);
+export async function GetCacheStats(): Promise<{
+  TotalEntries: number;
+  TotalHits: number;
+  ConceptEntries: number;
+  ConceptHits: number;
+}> {
+  const Rows = await db.select({ HitCount: SemanticCache.HitCount, QuestionHash: SemanticCache.QuestionHash }).from(SemanticCache);
+  const ConceptRows = Rows.filter(r => r.QuestionHash.startsWith('concept::'));
   return {
     TotalEntries: Rows.length,
+    TotalHits: Rows.reduce((sum, r) => sum + r.HitCount, 0),
+    ConceptEntries: ConceptRows.length,
+    ConceptHits: ConceptRows.reduce((sum, r) => sum + r.HitCount, 0),
+  };
+}
+
+// ─── Concept-centric Cache (D-001) ────────────────────────────────────────────
+// Caches concept explanations by concept_id, not by question text.
+// Hit rate target: 40-60% (vs 1-5% for question-based cache).
+
+export function BuildConceptCacheKey(ConceptId: string, Locale: string, DetailLevel: string): string {
+  return `concept::${ConceptId}::${Locale}::${DetailLevel}`;
+}
+
+export async function CheckConceptCache(
+  ConceptId: string,
+  Locale: string,
+  DetailLevel: string,
+): Promise<ICacheEntry | null> {
+  const Key = BuildConceptCacheKey(ConceptId, Locale, DetailLevel);
+  return CheckCache(Key);
+}
+
+export function SaveConceptCache(
+  ConceptId: string,
+  Locale: string,
+  DetailLevel: string,
+  Answer: string,
+): void {
+  const Key = BuildConceptCacheKey(ConceptId, Locale, DetailLevel);
+  SaveToCache(Key, `concept:${ConceptId}`, Answer, `concept:${ConceptId}`, Locale);
+}
+
+export async function GetConceptCacheStats(): Promise<{ Entries: number; TotalHits: number }> {
+  const Rows = await db
+    .select({ HitCount: SemanticCache.HitCount })
+    .from(SemanticCache)
+    .where(sql`${SemanticCache.QuestionHash} LIKE 'concept::%'`);
+  return {
+    Entries: Rows.length,
     TotalHits: Rows.reduce((sum, r) => sum + r.HitCount, 0),
   };
 }

@@ -1,14 +1,16 @@
 {
-  "name": "ذكاوي — تعلم الذكاء الاصطناعي",
+  "name": "ذكاوي — تعلم وابتكر",
   "short_name": "ذكاوي",
-  "description": "منصة تعليمية تفاعلية للأطفال والكبار لتعلم الذكاء الاصطناعي",
-  "start_url": "/",
+  "description": "منصة تعليمية ذكية للأطفال العرب — تعلّم البرمجة والرياضيات والعربية بأسلوب تكيفي",
+  "start_url": "/ar/dashboard",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#FFF9F0",
   "theme_color": "#7C3AED",
   "orientation": "portrait-primary",
   "lang": "ar",
   "dir": "rtl",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/logo-icon.svg",
@@ -17,5 +19,12 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["education", "kids"]
+  "categories": ["education", "kids"],
+  "shortcuts": [
+    {
+      "name": "لوحة التحكم",
+      "url": "/ar/dashboard",
+      "description": "الصفحة الرئيسية"
+    }
+  ]
 }

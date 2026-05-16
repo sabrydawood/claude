@@ -31,7 +31,7 @@
 - Schema كامل (18 جدول)، Seed data، 5 دروس Claude + Quiz + XP
 
 ### ✅ Dark Mode + Onboarding (جلسة 3)
-- CSS custom properties كـ semantic tokens (--bg, --surface, --text, --zkawi-purple, إلخ)
+- CSS custom properties كـ semantic tokens (--bg, --surface, --text, --zkawi-pink, إلخ)
 - Onboarding Wizard 5 خطوات + Learning Tracks
 
 ### ✅ ربط التقدم بـ DB (جلسة 4)
@@ -165,7 +165,7 @@ ADMIN_EMAILS=admin@example.com,...  # comma-separated — للـ Admin Panel
 1. **عامية مصرية بسيطة** — لا فصحى في الـ UI
 2. **Dark mode هو الافتراضي** دائماً
 3. **Translation Table pattern** — كل النصوص في `translations`
-4. **CSS vars** — `--bg`, `--text`, `--zkawi-purple` إلخ
+4. **CSS vars** — `--bg`, `--text`, `--zkawi-pink` إلخ
 5. **بعد كل تغيير:** `bun run build` ثم commit + push
 6. **Branch:** `claude/multilingual-portfolio-arabic-y4s8P` فقط
 

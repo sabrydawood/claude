@@ -1,29 +1,66 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/i18n/navigation';
-import { DynamicIcon } from '@/components/ui/dynamic-icon';
-import { Badge } from '@/components/ui/badge';
-import { BookOpen, ChevronRight, Sparkles } from 'lucide-react';
-import type { SubjectRow } from '@/lib/db/queries/content';
-import type { GuestPrefs } from '@/components/home/onboarding-wizard';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
+import { Badge } from "@/components/ui/badge";
+import { BookOpen, ChevronRight, Sparkles } from "lucide-react";
+import type { SubjectRow } from "@/lib/db/queries/content";
+import type { GuestPrefs } from "@/components/home/onboarding-wizard";
 
 // Keywords per interest that map to subject slugs/names/descriptions
 const INTEREST_KEYWORDS: Record<string, string[]> = {
-  programming: ['programming', 'python', 'javascript', 'code', 'برمجة', 'بايثون', 'كود', 'لغة'],
-  web: ['web', 'html', 'css', 'ويب', 'تصميم', 'موقع', 'design'],
-  databases: ['database', 'sql', 'data', 'قواعد', 'بيانات'],
-  ai: ['ai', 'artificial', 'intelligence', 'prompt', 'ذكاء', 'اصطناعي', 'برومبت', 'نماذج'],
-  logic: ['problem', 'solving', 'algorithm', 'logic', 'منطق', 'مشكلة', 'خوارزم', 'تفكير'],
-  projects: ['project', 'build', 'software', 'design', 'pattern', 'مشروع', 'بناء', 'برامج'],
+  programming: [
+    "programming",
+    "python",
+    "javascript",
+    "code",
+    "برمجة",
+    "بايثون",
+    "كود",
+    "لغة",
+  ],
+  web: ["web", "html", "css", "ويب", "تصميم", "موقع", "design"],
+  databases: ["database", "sql", "data", "قواعد", "بيانات"],
+  ai: [
+    "ai",
+    "artificial",
+    "intelligence",
+    "prompt",
+    "ذكاء",
+    "اصطناعي",
+    "برومبت",
+    "نماذج",
+  ],
+  logic: [
+    "problem",
+    "solving",
+    "algorithm",
+    "logic",
+    "منطق",
+    "مشكلة",
+    "خوارزم",
+    "تفكير",
+  ],
+  projects: [
+    "project",
+    "build",
+    "software",
+    "design",
+    "pattern",
+    "مشروع",
+    "بناء",
+    "برامج",
+  ],
 };
 
 function isRecommended(subject: SubjectRow, interest: string): boolean {
   const kws = INTEREST_KEYWORDS[interest] ?? [];
-  const haystack = `${subject.slug} ${subject.name} ${subject.description}`.toLowerCase();
-  return kws.some(k => haystack.includes(k.toLowerCase()));
+  const haystack =
+    `${subject.slug} ${subject.name} ${subject.description}`.toLowerCase();
+  return kws.some((k) => haystack.includes(k.toLowerCase()));
 }
 
 interface Props {
@@ -32,14 +69,16 @@ interface Props {
 }
 
 export default function SubjectsClient({ subjects, locale: _locale }: Props) {
-  const t = useTranslations('subjects');
+  const t = useTranslations("subjects");
   const [prefs, setPrefs] = useState<GuestPrefs | null>(null);
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('zkawi_guest_prefs');
+      const raw = localStorage.getItem("zkawi_guest_prefs");
       if (raw) setPrefs(JSON.parse(raw) as GuestPrefs);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   // Sort: recommended subjects first when we have prefs
@@ -55,7 +94,7 @@ export default function SubjectsClient({ subjects, locale: _locale }: Props) {
     return (
       <div className="text-center py-20">
         <BookOpen size={52} className="mx-auto mb-4 text-[var(--text-muted)]" />
-        <p className="text-[var(--text-muted)]">{t('empty')}</p>
+        <p className="text-[var(--text-muted)]">{t("empty")}</p>
       </div>
     );
   }
@@ -65,72 +104,79 @@ export default function SubjectsClient({ subjects, locale: _locale }: Props) {
       {sorted.map((subject, i) => {
         const recommended = !!prefs && isRecommended(subject, prefs.interest);
         return (
-        <motion.div
-          key={subject.id}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.07 }}
-          whileHover={{ scale: 1.04, y: -4 }}
-        >
-          <Link href={`/subjects/${subject.slug}`} className="block h-full">
-            <div
-              className="relative rounded-3xl border-2 p-6 cursor-pointer transition-all h-full flex flex-col"
-              style={{
-                borderColor: recommended ? 'var(--zkawi-purple)' : subject.color + '40',
-                background: recommended ? 'var(--zkawi-purple)/5' : subject.color + '08',
-              }}
-            >
-              {/* Recommended badge */}
-              {recommended && (
-                <div
-                  className="absolute top-3 end-3 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
-                  style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
-                >
-                  <Sparkles size={10} />
-                  {t('recommended')}
-                </div>
-              )}
-
-              {/* Icon */}
+          <motion.div
+            key={subject.id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.07 }}
+            whileHover={{ scale: 1.04, y: -4 }}
+          >
+            <Link href={`/subjects/${subject.slug}`} className="block h-full">
               <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 shadow-sm"
-                style={{ background: subject.color + '20', color: subject.color }}
+                className="relative rounded-3xl border-2 p-6 cursor-pointer transition-all h-full flex flex-col"
+                style={{
+                  borderColor: recommended
+                    ? "var(--zkawi-pink)"
+                    : subject.color + "40",
+                  background: recommended
+                    ? "var(--zkawi-pink)/5"
+                    : subject.color + "08",
+                }}
               >
-                <DynamicIcon name={subject.icon} size={28} />
-              </div>
+                {/* Recommended badge */}
+                {recommended && (
+                  <div
+                    className="absolute top-3 end-3 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                    style={{ background: "var(--zkawi-pink)", color: "#fff" }}
+                  >
+                    <Sparkles size={10} />
+                    {t("recommended")}
+                  </div>
+                )}
 
-              {/* Name */}
-              <h3 className="font-black text-xl text-[var(--text)] mb-2 leading-tight">
-                {subject.name}
-              </h3>
-
-              {/* Description */}
-              <p className="text-sm text-[var(--text-muted)] mb-4 flex-1 leading-relaxed line-clamp-3">
-                {subject.description}
-              </p>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between">
-                <Badge
-                  className="text-xs font-bold"
+                {/* Icon */}
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 shadow-sm"
                   style={{
-                    background: subject.color + '20',
+                    background: subject.color + "20",
                     color: subject.color,
-                    border: `1px solid ${subject.color}30`,
                   }}
                 >
-                  {subject.courseCount} {t('courses')}
-                </Badge>
-                <ChevronRight
-                  size={18}
-                  className="flip-rtl"
-                  style={{ color: subject.color }}
-                />
+                  <DynamicIcon name={subject.icon} size={28} />
+                </div>
+
+                {/* Name */}
+                <h3 className="font-black text-xl text-[var(--text)] mb-2 leading-tight">
+                  {subject.name}
+                </h3>
+
+                {/* Description */}
+                <p className="text-sm text-[var(--text-muted)] mb-4 flex-1 leading-relaxed line-clamp-3">
+                  {subject.description}
+                </p>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between">
+                  <Badge
+                    className="text-xs font-bold"
+                    style={{
+                      background: subject.color + "20",
+                      color: subject.color,
+                      border: `1px solid ${subject.color}30`,
+                    }}
+                  >
+                    {subject.courseCount} {t("courses")}
+                  </Badge>
+                  <ChevronRight
+                    size={18}
+                    className="flip-rtl"
+                    style={{ color: subject.color }}
+                  />
+                </div>
               </div>
-            </div>
-          </Link>
-        </motion.div>
-      );
+            </Link>
+          </motion.div>
+        );
       })}
     </div>
   );

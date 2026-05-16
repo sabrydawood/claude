@@ -1,16 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
-import { Link, usePathname, useRouter } from '@/lib/i18n/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, LogOut, LayoutDashboard, Home, User, Globe, Trophy, MessageSquare, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Logo } from '@/components/ui/logo';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { signOut, useSession } from '@/lib/auth-client';
-import { getInitials } from '@/lib/utils';
+import { useState, useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { Link, usePathname, useRouter } from "@/lib/i18n/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Menu,
+  X,
+  LogOut,
+  LayoutDashboard,
+  Home,
+  User,
+  Globe,
+  Trophy,
+  MessageSquare,
+  Settings,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Logo } from "@/components/ui/logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { signOut, useSession } from "@/lib/auth-client";
+import { getInitials } from "@/lib/utils";
 
 export default function Header() {
   const t = useTranslations();
@@ -22,38 +33,53 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Use null before mount so server & client initial render match (prevents hydration mismatch)
   const activeSession = mounted ? session : null;
 
   const switchLocale = () => {
-    router.push(pathname, { locale: locale === 'ar' ? 'en' : 'ar' });
+    router.push(pathname, { locale: locale === "ar" ? "en" : "ar" });
   };
 
   const handleSignOut = async () => {
     await signOut();
-    router.push('/');
+    router.push("/");
     router.refresh();
   };
 
   const navLinks = activeSession
     ? [
-        { href: '/dashboard', label: t('nav.dashboard'), icon: <LayoutDashboard size={16} /> },
-        { href: '/leaderboard', label: t('nav.leaderboard'), icon: <Trophy size={16} /> },
-        { href: '/sandbox', label: t('nav.sandbox'), icon: <MessageSquare size={16} /> },
+        {
+          href: "/dashboard",
+          label: t("nav.dashboard"),
+          icon: <LayoutDashboard size={16} />,
+        },
+        {
+          href: "/leaderboard",
+          label: t("nav.leaderboard"),
+          icon: <Trophy size={16} />,
+        },
+        {
+          href: "/sandbox",
+          label: t("nav.sandbox"),
+          icon: <MessageSquare size={16} />,
+        },
       ]
-    : [{ href: '/', label: t('nav.home'), icon: <Home size={16} /> }];
+    : [{ href: "/", label: t("nav.home"), icon: <Home size={16} /> }];
 
   return (
-    <header className="
+    <header
+      className="
       sticky top-0 z-50 backdrop-blur-md border-b
       bg-[var(--header-bg)] border-[var(--border)]
       transition-colors duration-300
-    ">
+    "
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-
           {/* Logo */}
           <Link href="/" className="group hover:opacity-90 transition-opacity">
             <Logo size={40} showText textClassName="text-xl" />
@@ -67,7 +93,7 @@ export default function Header() {
                 href={link.href}
                 className="
                   flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold
-                  text-[var(--text-muted)] hover:text-[var(--zkawi-purple)]
+                  text-[var(--text-muted)] hover:text-[var(--zkawi-pink)]
                   hover:bg-[var(--bg-secondary)] transition-all
                 "
               >
@@ -79,7 +105,6 @@ export default function Header() {
 
           {/* Right controls */}
           <div className="flex items-center gap-2">
-
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -88,13 +113,13 @@ export default function Header() {
               onClick={switchLocale}
               className="
                 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold
-                text-[var(--zkawi-purple)] border border-[var(--border)]
-                hover:bg-[var(--bg-secondary)] hover:border-[var(--zkawi-purple-light)]
+                text-[var(--zkawi-pink)] border border-[var(--border)]
+                hover:bg-[var(--bg-secondary)] hover:border-[var(--zkawi-pink-light)]
                 transition-all hover:scale-105
               "
             >
               <Globe size={14} />
-              {t('nav.language')}
+              {t("nav.language")}
             </button>
 
             {/* User menu or auth buttons */}
@@ -105,8 +130,8 @@ export default function Header() {
                   className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-[var(--bg-secondary)] transition-all"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs bg-[var(--zkawi-purple)] text-white">
-                      {getInitials(activeSession.user?.name ?? 'U')}
+                    <AvatarFallback className="text-xs bg-[var(--zkawi-pink)] text-white">
+                      {getInitials(activeSession.user?.name ?? "U")}
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden sm:block text-sm font-semibold text-[var(--text)] max-w-24 truncate">
@@ -117,7 +142,10 @@ export default function Header() {
                 <AnimatePresence>
                   {userMenuOpen && (
                     <>
-                      <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setUserMenuOpen(false)}
+                      />
                       <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: -8 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -127,23 +155,23 @@ export default function Header() {
                           absolute end-0 mt-2 w-48 rounded-2xl shadow-xl z-20 py-2
                           bg-[var(--surface)] border border-[var(--border)]
                         "
-                        style={{ boxShadow: 'var(--card-shadow)' }}
+                        style={{ boxShadow: "var(--card-shadow)" }}
                       >
                         <Link
                           href="/dashboard"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--bg-secondary)] hover:text-[var(--zkawi-purple)] transition-colors"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--bg-secondary)] hover:text-[var(--zkawi-pink)] transition-colors"
                         >
                           <LayoutDashboard size={16} />
-                          {t('nav.dashboard')}
+                          {t("nav.dashboard")}
                         </Link>
                         <Link
                           href="/settings"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--bg-secondary)] hover:text-[var(--zkawi-purple)] transition-colors"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--bg-secondary)] hover:text-[var(--zkawi-pink)] transition-colors"
                         >
                           <Settings size={16} />
-                          {t('nav.settings')}
+                          {t("nav.settings")}
                         </Link>
                         <hr className="my-1 border-[var(--border)]" />
                         <button
@@ -151,7 +179,7 @@ export default function Header() {
                           className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors"
                         >
                           <LogOut size={16} />
-                          {t('nav.logout')}
+                          {t("nav.logout")}
                         </button>
                       </motion.div>
                     </>
@@ -161,10 +189,12 @@ export default function Header() {
             ) : (
               <div className="hidden md:flex items-center gap-2">
                 <Link href="/login">
-                  <Button variant="outline" size="sm">{t('nav.login')}</Button>
+                  <Button variant="outline" size="sm">
+                    {t("nav.login")}
+                  </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm">{t('nav.register')}</Button>
+                  <Button size="sm">{t("nav.register")}</Button>
                 </Link>
               </div>
             )}
@@ -184,7 +214,7 @@ export default function Header() {
           {mobileOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden border-t border-[var(--border)] py-3 space-y-1"
             >
@@ -193,7 +223,7 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--zkawi-purple)] hover:bg-[var(--bg-secondary)] transition-all"
+                  className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--zkawi-pink)] hover:bg-[var(--bg-secondary)] transition-all"
                 >
                   {link.icon}
                   {link.label}
@@ -203,12 +233,13 @@ export default function Header() {
                 <>
                   <Link href="/login" onClick={() => setMobileOpen(false)}>
                     <div className="px-4 py-3 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:bg-[var(--bg-secondary)] flex items-center gap-2">
-                      <User size={16} />{t('nav.login')}
+                      <User size={16} />
+                      {t("nav.login")}
                     </div>
                   </Link>
                   <Link href="/register" onClick={() => setMobileOpen(false)}>
-                    <div className="mx-2 px-4 py-3 rounded-xl text-sm font-bold bg-[var(--zkawi-purple)] text-white text-center hover:opacity-90 transition-all">
-                      {t('nav.register')}
+                    <div className="mx-2 px-4 py-3 rounded-xl text-sm font-bold bg-[var(--zkawi-pink)] text-white text-center hover:opacity-90 transition-all">
+                      {t("nav.register")}
                     </div>
                   </Link>
                 </>

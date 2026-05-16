@@ -1,55 +1,68 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-2xl font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--zkawi-purple)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 btn-press select-none',
+  "inline-flex items-center justify-center gap-2 rounded-2xl font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--zkawi-pink)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 btn-press select-none",
   {
     variants: {
       variant: {
         default:
-          'bg-[var(--zkawi-purple)] text-white hover:bg-[var(--zkawi-purple-dark)] shadow-lg shadow-[var(--zkawi-purple)]/20 hover:shadow-[var(--zkawi-purple)]/30 hover:scale-105 active:scale-95',
+          "bg-[var(--zkawi-pink)] text-white hover:bg-[var(--zkawi-pink-dark)] shadow-lg shadow-[var(--zkawi-pink)]/20 hover:shadow-[var(--zkawi-pink)]/30 hover:scale-105 active:scale-95",
         secondary:
-          'bg-amber-400 text-amber-900 hover:bg-amber-500 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:scale-105 active:scale-95',
+          "bg-amber-400 text-amber-900 hover:bg-amber-500 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:scale-105 active:scale-95",
         outline:
-          'border-2 border-[var(--zkawi-purple)] text-[var(--zkawi-purple)] hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95',
+          "border-2 border-[var(--zkawi-pink)] text-[var(--zkawi-pink)] hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95",
         ghost:
-          'text-[var(--zkawi-purple)] hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95',
+          "text-[var(--zkawi-pink)] hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95",
         success:
-          'bg-[var(--zkawi-green)] text-white hover:opacity-90 shadow-lg shadow-[var(--zkawi-green)]/20 hover:scale-105 active:scale-95',
+          "bg-[var(--zkawi-green)] text-white hover:opacity-90 shadow-lg shadow-[var(--zkawi-green)]/20 hover:scale-105 active:scale-95",
         danger:
-          'bg-[var(--zkawi-red)] text-white hover:opacity-90 shadow-lg shadow-[var(--zkawi-red)]/20 hover:scale-105 active:scale-95',
+          "bg-[var(--zkawi-red)] text-white hover:opacity-90 shadow-lg shadow-[var(--zkawi-red)]/20 hover:scale-105 active:scale-95",
         glass:
-          'bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 hover:scale-105 active:scale-95',
+          "bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 hover:scale-105 active:scale-95",
       },
       size: {
-        sm: 'h-9 px-4 text-sm',
-        default: 'h-11 px-6 text-base',
-        lg: 'h-14 px-8 text-lg',
-        xl: 'h-16 px-10 text-xl',
-        icon: 'h-10 w-10 p-0',
+        sm: "h-9 px-4 text-sm",
+        default: "h-11 px-6 text-base",
+        lg: "h-14 px-8 text-lg",
+        xl: "h-16 px-10 text-xl",
+        icon: "h-10 w-10 p-0",
       },
     },
     defaultVariants: {
-      variant: 'default',
-      size: 'default',
+      variant: "default",
+      size: "default",
     },
-  }
+  },
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading, children, disabled, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button';
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      loading,
+      children,
+      disabled,
+      ...props
+    },
+    ref,
+  ) => {
+    const Comp = asChild ? Slot : "button";
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -67,8 +80,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
       </Comp>
     );
-  }
+  },
 );
-Button.displayName = 'Button';
+Button.displayName = "Button";
 
 export { Button, buttonVariants };

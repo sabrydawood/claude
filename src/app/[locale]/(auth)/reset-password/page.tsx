@@ -1,45 +1,57 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
-import { Link } from '@/lib/i18n/navigation';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Logo } from '@/components/ui/logo';
-import { authClient } from '@/lib/auth-client';
-import { Lock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { Link } from "@/lib/i18n/navigation";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Logo } from "@/components/ui/logo";
+import { authClient } from "@/lib/auth-client";
+import { Lock, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function ResetPasswordPage() {
-  const t = useTranslations('auth.resetPassword');
+  const t = useTranslations("auth.resetPassword");
   const searchParams = useSearchParams();
-  const token = searchParams.get('token') ?? '';
+  const token = searchParams.get("token") ?? "";
 
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
-    if (newPassword.length < 8) { setError(t('minLength')); return; }
-    if (newPassword !== confirmPassword) { setError(t('mismatch')); return; }
-    if (!token) { setError(t('invalidToken')); return; }
+    if (newPassword.length < 8) {
+      setError(t("minLength"));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError(t("mismatch"));
+      return;
+    }
+    if (!token) {
+      setError(t("invalidToken"));
+      return;
+    }
 
     setLoading(true);
     try {
-      const res = await authClient.resetPassword({ newPassword, token } as Parameters<typeof authClient.resetPassword>[0]);
+      const res = await authClient.resetPassword({
+        newPassword,
+        token,
+      } as Parameters<typeof authClient.resetPassword>[0]);
       if (res.error) {
-        setError(t('invalidToken'));
+        setError(t("invalidToken"));
       } else {
         setSuccess(true);
       }
     } catch {
-      setError(t('invalidToken'));
+      setError(t("invalidToken"));
     } finally {
       setLoading(false);
     }
@@ -50,9 +62,12 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <div className="text-center p-8">
           <AlertCircle size={48} className="mx-auto mb-4 text-red-500" />
-          <p className="font-bold text-[var(--text)]">{t('invalidToken')}</p>
-          <Link href="/login" className="mt-4 inline-block text-[var(--zkawi-purple)] font-bold">
-            {t('goToLogin')}
+          <p className="font-bold text-[var(--text)]">{t("invalidToken")}</p>
+          <Link
+            href="/login"
+            className="mt-4 inline-block text-[var(--zkawi-pink)] font-bold"
+          >
+            {t("goToLogin")}
           </Link>
         </div>
       </div>
@@ -67,9 +82,16 @@ export default function ResetPasswordPage() {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <Logo size={48} showText textClassName="text-2xl" className="justify-center mb-4" />
-          <h1 className="text-2xl font-black text-[var(--text)]">{t('title')}</h1>
-          <p className="text-[var(--text-muted)] mt-1">{t('subtitle')}</p>
+          <Logo
+            size={48}
+            showText
+            textClassName="text-2xl"
+            className="justify-center mb-4"
+          />
+          <h1 className="text-2xl font-black text-[var(--text)]">
+            {t("title")}
+          </h1>
+          <p className="text-[var(--text-muted)] mt-1">{t("subtitle")}</p>
         </div>
 
         {success ? (
@@ -78,11 +100,18 @@ export default function ResetPasswordPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-[var(--surface)] border border-[var(--zkawi-green)]/30 rounded-3xl p-8 text-center"
           >
-            <CheckCircle2 size={52} className="mx-auto mb-4 text-[var(--zkawi-green)]" />
-            <h2 className="text-xl font-black text-[var(--text)] mb-2">{t('success')}</h2>
-            <p className="text-[var(--text-muted)] mb-6">{t('successSubtitle')}</p>
+            <CheckCircle2
+              size={52}
+              className="mx-auto mb-4 text-[var(--zkawi-green)]"
+            />
+            <h2 className="text-xl font-black text-[var(--text)] mb-2">
+              {t("success")}
+            </h2>
+            <p className="text-[var(--text-muted)] mb-6">
+              {t("successSubtitle")}
+            </p>
             <Link href="/login">
-              <Button className="w-full">{t('goToLogin')}</Button>
+              <Button className="w-full">{t("goToLogin")}</Button>
             </Link>
           </motion.div>
         ) : (
@@ -91,22 +120,26 @@ export default function ResetPasswordPage() {
             className="bg-[var(--surface)] border border-[var(--border)] rounded-3xl p-8 flex flex-col gap-5"
           >
             <div>
-              <label className="block text-sm font-bold mb-2 text-[var(--text)]">{t('newPassword')}</label>
+              <label className="block text-sm font-bold mb-2 text-[var(--text)]">
+                {t("newPassword")}
+              </label>
               <Input
                 type="password"
                 value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
+                onChange={(e) => setNewPassword(e.target.value)}
                 icon={<Lock size={16} />}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2 text-[var(--text)]">{t('confirmPassword')}</label>
+              <label className="block text-sm font-bold mb-2 text-[var(--text)]">
+                {t("confirmPassword")}
+              </label>
               <Input
                 type="password"
                 value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 icon={<Lock size={16} />}
                 required
               />
@@ -120,7 +153,7 @@ export default function ResetPasswordPage() {
             )}
 
             <Button type="submit" loading={loading} className="w-full">
-              {loading ? t('submitting') : t('submit')}
+              {loading ? t("submitting") : t("submit")}
             </Button>
           </form>
         )}

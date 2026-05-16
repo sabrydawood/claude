@@ -45,7 +45,7 @@
 ### ✅ مكتمل (v0.2 — جديد)
 
 **Dark/Light Mode (كامل)**
-- CSS custom properties (`--bg`, `--surface`, `--text`, `--border`, `--zkawi-purple`, إلخ)
+- CSS custom properties (`--bg`, `--surface`, `--text`, `--border`, `--zkawi-pink`, إلخ)
 - تحديث جميع المكونات: Button، Card، Input، Badge، Progress
 - تحديث جميع الصفحات: Home، Auth، Dashboard، Agent، Lesson، Quiz
 - Wave SVG في Hero يتكيف مع dark/light

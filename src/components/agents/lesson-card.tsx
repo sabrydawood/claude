@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/i18n/navigation';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Lock, Clock, Zap, Play, BookOpen } from 'lucide-react';
-import type { LessonRow } from '@/lib/db/queries/content';
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Lock, Clock, Zap, Play, BookOpen } from "lucide-react";
+import type { LessonRow } from "@/lib/db/queries/content";
 
 interface LessonCardProps {
   lesson: LessonRow;
@@ -15,8 +15,14 @@ interface LessonCardProps {
   score?: number;
 }
 
-export default function LessonCard({ lesson, index, isCompleted, isLocked, score }: LessonCardProps) {
-  const t = useTranslations('lessons');
+export default function LessonCard({
+  lesson,
+  index,
+  isCompleted,
+  isLocked,
+  score,
+}: LessonCardProps) {
+  const t = useTranslations("lessons");
 
   const card = (
     <motion.div
@@ -26,33 +32,39 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
       whileHover={!isLocked ? { y: -3, scale: 1.01 } : {}}
       className={`relative bg-[var(--surface)] rounded-3xl border-2 p-5 transition-all ${
         isCompleted
-          ? 'border-[var(--zkawi-green)]/40 bg-[var(--zkawi-green)]/5'
+          ? "border-[var(--zkawi-green)]/40 bg-[var(--zkawi-green)]/5"
           : isLocked
-          ? 'border-[var(--border)] opacity-60 cursor-not-allowed'
-          : 'border-[var(--zkawi-purple)]/25 hover:border-[var(--zkawi-purple)] hover:shadow-lg hover:shadow-[var(--zkawi-purple)]/10 cursor-pointer'
+            ? "border-[var(--border)] opacity-60 cursor-not-allowed"
+            : "border-[var(--zkawi-pink)]/25 hover:border-[var(--zkawi-pink)] hover:shadow-lg hover:shadow-[var(--zkawi-pink)]/10 cursor-pointer"
       }`}
     >
       <div className="flex items-start gap-4">
         {/* Lesson number & emoji */}
         <div className="flex flex-col items-center gap-1 flex-shrink-0">
-          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
-            isCompleted
-              ? 'bg-[var(--zkawi-green)]/15 text-[var(--zkawi-green)]'
-              : isLocked
-              ? 'bg-[var(--surface-2)] text-[var(--text-muted)]'
-              : 'bg-[var(--zkawi-purple)]/15 text-[var(--zkawi-purple)]'
-          }`}>
+          <div
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
+              isCompleted
+                ? "bg-[var(--zkawi-green)]/15 text-[var(--zkawi-green)]"
+                : isLocked
+                  ? "bg-[var(--surface-2)] text-[var(--text-muted)]"
+                  : "bg-[var(--zkawi-pink)]/15 text-[var(--zkawi-pink)]"
+            }`}
+          >
             {isLocked ? <Lock size={20} /> : <BookOpen size={20} />}
           </div>
-          <span className="text-xs font-bold text-[var(--text-muted)]">#{index + 1}</span>
+          <span className="text-xs font-bold text-[var(--text-muted)]">
+            #{index + 1}
+          </span>
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 className={`font-black text-base leading-tight ${
-              isLocked ? 'text-[var(--text-muted)]' : 'text-[var(--text)]'
-            }`}>
+            <h3
+              className={`font-black text-base leading-tight ${
+                isLocked ? "text-[var(--text-muted)]" : "text-[var(--text)]"
+              }`}
+            >
               {lesson.title}
             </h3>
             {isCompleted && score !== undefined && (
@@ -62,23 +74,33 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
             )}
           </div>
 
-          <p className={`text-sm mb-3 line-clamp-2 ${
-            isLocked ? 'text-[var(--border)]' : 'text-[var(--text-muted)]'
-          }`}>
+          <p
+            className={`text-sm mb-3 line-clamp-2 ${
+              isLocked ? "text-[var(--border)]" : "text-[var(--text-muted)]"
+            }`}
+          >
             {lesson.description}
           </p>
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
               <Clock size={12} />
-              <span>{lesson.estimatedMinutes} {t('minutes')}</span>
+              <span>
+                {lesson.estimatedMinutes} {t("minutes")}
+              </span>
             </div>
             <div className="flex items-center gap-1">
-              <Zap size={12} className="text-[var(--zkawi-purple)]" fill="currentColor" />
-              <span className="text-xs font-bold text-[var(--zkawi-purple)]">+{lesson.xpReward} XP</span>
+              <Zap
+                size={12}
+                className="text-[var(--zkawi-pink)]"
+                fill="currentColor"
+              />
+              <span className="text-xs font-bold text-[var(--zkawi-pink)]">
+                +{lesson.xpReward} XP
+              </span>
             </div>
             <div className="text-xs text-[var(--text-muted)]">
-              {t('questions')}
+              {t("questions")}
             </div>
           </div>
         </div>
@@ -90,7 +112,7 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
           ) : isLocked ? (
             <Lock size={18} className="text-[var(--text-muted)]" />
           ) : (
-            <div className="w-9 h-9 bg-[var(--zkawi-purple)] rounded-xl flex items-center justify-center shadow-md shadow-[var(--zkawi-purple)]/20">
+            <div className="w-9 h-9 bg-[var(--zkawi-pink)] rounded-xl flex items-center justify-center shadow-md shadow-[var(--zkawi-pink)]/20">
               <Play size={14} className="text-white fill-white" />
             </div>
           )}
@@ -110,9 +132,5 @@ export default function LessonCard({ lesson, index, isCompleted, isLocked, score
 
   if (isLocked) return card;
 
-  return (
-    <Link href={`/agents/claude/lessons/${lesson.id}`}>
-      {card}
-    </Link>
-  );
+  return <Link href={`/agents/claude/lessons/${lesson.id}`}>{card}</Link>;
 }

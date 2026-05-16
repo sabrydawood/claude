@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/i18n/navigation';
-import { Button } from '@/components/ui/button';
-import { Zap, Rocket } from 'lucide-react';
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { Zap, Rocket } from "lucide-react";
 
 export default function HomeCta({ locale }: { locale: string }) {
-  const t = useTranslations('home.cta');
+  const t = useTranslations("home.cta");
 
   return (
     <section className="py-20 bg-[var(--bg)]">
@@ -16,7 +16,7 @@ export default function HomeCta({ locale }: { locale: string }) {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-10 md:p-16 text-center text-white relative overflow-hidden shadow-2xl shadow-purple-300"
+          className="bg-gradient-to-br from-pink-600 to-indigo-700 rounded-3xl p-10 md:p-16 text-center text-white relative overflow-hidden shadow-2xl shadow-pink-300"
         >
           {/* Background decorations */}
           <div className="absolute top-0 end-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -25,10 +25,10 @@ export default function HomeCta({ locale }: { locale: string }) {
           <div className="relative">
             <Rocket size={52} className="mx-auto mb-4 opacity-90" />
             <h2 className="text-3xl md:text-4xl font-black mb-4">
-              {t('title')}
+              {t("title")}
             </h2>
-            <p className="text-lg text-purple-200 mb-8 max-w-xl mx-auto">
-              {t('subtitle')}
+            <p className="text-lg text-pink-200 mb-8 max-w-xl mx-auto">
+              {t("subtitle")}
             </p>
             <Link href="/register">
               <Button
@@ -37,7 +37,7 @@ export default function HomeCta({ locale }: { locale: string }) {
                 className="text-amber-900 font-black shadow-xl hover:shadow-2xl"
               >
                 <Zap size={20} fill="currentColor" />
-                {t('button')}
+                {t("button")}
               </Button>
             </Link>
           </div>

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
-import { motion, AnimatePresence } from 'framer-motion';
-import { getDir, isRTL } from '@/lib/i18n/locale-utils';
-import { X, Send, Loader2, MessageCircle, RotateCcw } from 'lucide-react';
-import { streamClient } from '@/lib/api/stream-client';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import { getDir, isRTL } from "@/lib/i18n/locale-utils";
+import { X, Send, Loader2, MessageCircle, RotateCcw } from "lucide-react";
+import { streamClient } from "@/lib/api/stream-client";
 
 interface DebugInfo {
   provider: string;
@@ -15,7 +15,7 @@ interface DebugInfo {
 }
 
 interface Message {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   streaming?: boolean;
   debug?: DebugInfo;
@@ -29,7 +29,13 @@ interface Props {
 // Small inline robot avatar for chat bubbles
 function ZakiAvatar({ size = 28 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none" className="flex-shrink-0">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 80 80"
+      fill="none"
+      className="flex-shrink-0"
+    >
       <rect width="80" height="80" rx="16" fill="url(#chat-grad)" />
       <defs>
         <radialGradient id="chat-grad" cx="40%" cy="30%" r="70%">
@@ -45,7 +51,13 @@ function ZakiAvatar({ size = 28 }: { size?: number }) {
       <circle cx="54" cy="32" r="3.5" fill="white" opacity="0.9" />
       <circle cx="52" cy="34" r="2.5" fill="#1D4ED8" />
       {/* Smile */}
-      <path d="M31 46 Q40 53 49 46" stroke="rgba(255,255,255,0.85)" strokeWidth="3" strokeLinecap="round" fill="none" />
+      <path
+        d="M31 46 Q40 53 49 46"
+        stroke="rgba(255,255,255,0.85)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+      />
       {/* Antenna */}
       <rect x="37" y="8" width="6" height="10" rx="3" fill="#7C3AED" />
       <circle cx="40" cy="8" r="5" fill="#FCD34D" />
@@ -61,9 +73,14 @@ function TypingDots() {
         <motion.div
           key={i}
           className="w-2 h-2 rounded-full"
-          style={{ background: 'var(--zkawi-purple)' }}
+          style={{ background: "var(--zkawi-pink)" }}
           animate={{ y: [0, -5, 0] }}
-          transition={{ repeat: Infinity, duration: 0.7, delay: i * 0.15, ease: 'easeInOut' }}
+          transition={{
+            repeat: Infinity,
+            duration: 0.7,
+            delay: i * 0.15,
+            ease: "easeInOut",
+          }}
         />
       ))}
     </div>
@@ -78,25 +95,29 @@ function loadChatHistory(pathname: string): Message[] {
   try {
     const raw = localStorage.getItem(chatKey(pathname));
     return raw ? (JSON.parse(raw) as Message[]) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function saveChatHistory(pathname: string, messages: Message[]) {
   try {
-    const toSave = messages.filter(m => !m.streaming).slice(-20);
+    const toSave = messages.filter((m) => !m.streaming).slice(-20);
     if (toSave.length > 0) {
       localStorage.setItem(chatKey(pathname), JSON.stringify(toSave));
     }
-  } catch { /* ignore quota errors */ }
+  } catch {
+    /* ignore quota errors */
+  }
 }
 
 export function MascotChat({ isOpen, onClose }: Props) {
   const pathname = usePathname();
   const locale = useLocale();
-  const t = useTranslations('mascot');
+  const t = useTranslations("mascot");
 
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
@@ -107,7 +128,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
 
   // Auto-scroll to latest message
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   // Focus input when opened
@@ -117,117 +138,150 @@ export function MascotChat({ isOpen, onClose }: Props) {
     }
   }, [isOpen]);
 
-  const streamResponse = useCallback(async (history: Message[], isGreeting = false) => {
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
+  const streamResponse = useCallback(
+    async (history: Message[], isGreeting = false) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
 
-    setIsStreaming(true);
+      setIsStreaming(true);
 
-    // Add placeholder assistant message
-    setMessages(prev => [
-      ...(isGreeting ? [] : prev),
-      ...(isGreeting ? history.slice(0, -1) : []), // hide internal greeting prompt
-      { role: 'assistant', content: '', streaming: true },
-    ]);
+      // Add placeholder assistant message
+      setMessages((prev) => [
+        ...(isGreeting ? [] : prev),
+        ...(isGreeting ? history.slice(0, -1) : []), // hide internal greeting prompt
+        { role: "assistant", content: "", streaming: true },
+      ]);
 
-    try {
-      await streamClient.sse<{ text?: string; error?: string; debug?: DebugInfo }>(
-        '/api/v1/mascot',
-        { Messages: history, Pathname: pathname, Locale: locale },
-        {
-          signal: controller.signal,
-          onEvent: (event) => {
-            if (event.text) {
-              setMessages(prev => {
-                const updated = [...prev];
-                const last = updated[updated.length - 1];
-                if (last?.role === 'assistant') {
-                  updated[updated.length - 1] = { ...last, content: last.content + event.text, streaming: true };
-                }
-                return updated;
-              });
-            }
-            if (event.debug) {
-              setMessages(prev => {
-                const updated = [...prev];
-                const last = updated[updated.length - 1];
-                if (last?.role === 'assistant') {
-                  updated[updated.length - 1] = { ...last, debug: event.debug };
-                }
-                return updated;
-              });
-            }
+      try {
+        await streamClient.sse<{
+          text?: string;
+          error?: string;
+          debug?: DebugInfo;
+        }>(
+          "/api/v1/mascot",
+          { Messages: history, Pathname: pathname, Locale: locale },
+          {
+            signal: controller.signal,
+            onEvent: (event) => {
+              if (event.text) {
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const last = updated[updated.length - 1];
+                  if (last?.role === "assistant") {
+                    updated[updated.length - 1] = {
+                      ...last,
+                      content: last.content + event.text,
+                      streaming: true,
+                    };
+                  }
+                  return updated;
+                });
+              }
+              if (event.debug) {
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const last = updated[updated.length - 1];
+                  if (last?.role === "assistant") {
+                    updated[updated.length - 1] = {
+                      ...last,
+                      debug: event.debug,
+                    };
+                  }
+                  return updated;
+                });
+              }
+            },
           },
-        },
-      );
-    } catch (err) {
-      if ((err as Error).name !== 'AbortError') {
-        setMessages(prev => {
+        );
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            if (last?.role === "assistant" && last.streaming) {
+              updated[updated.length - 1] = {
+                ...last,
+                content: last.content || t("errorMsg"),
+              };
+            }
+            return updated;
+          });
+        }
+      } finally {
+        setMessages((prev) => {
           const updated = [...prev];
           const last = updated[updated.length - 1];
-          if (last?.role === 'assistant' && last.streaming) {
-            updated[updated.length - 1] = { ...last, content: last.content || t('errorMsg') };
+          if (last?.role === "assistant") {
+            updated[updated.length - 1] = { ...last, streaming: false };
           }
           return updated;
         });
+        setIsStreaming(false);
       }
-    } finally {
-      setMessages(prev => {
-        const updated = [...prev];
-        const last = updated[updated.length - 1];
-        if (last?.role === 'assistant') {
-          updated[updated.length - 1] = { ...last, streaming: false };
-        }
-        return updated;
-      });
-      setIsStreaming(false);
-    }
-  }, [pathname, locale, t]);
+    },
+    [pathname, locale, t],
+  );
 
   // Send proactive greeting on first open
   useEffect(() => {
     if (isOpen && !initialized && messages.length === 0) {
       setInitialized(true);
-      streamResponse([{
-        role: 'user',
-        content: locale === 'ar'
-          ? 'قدّم نفسك وقول إيه اللي تقدر تساعدني بيه في الصفحة دي.'
-          : 'Introduce yourself and tell me how you can help me on this page.',
-      }], true);
+      streamResponse(
+        [
+          {
+            role: "user",
+            content:
+              locale === "ar"
+                ? "قدّم نفسك وقول إيه اللي تقدر تساعدني بيه في الصفحة دي."
+                : "Introduce yourself and tell me how you can help me on this page.",
+          },
+        ],
+        true,
+      );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialized]);
 
   // Listen for platform events and proactively respond
   useEffect(() => {
     const onLessonStart = (e: Event) => {
-      const { lessonTitle } = (e as CustomEvent<{ lessonTitle: string }>).detail ?? {};
+      const { lessonTitle } =
+        (e as CustomEvent<{ lessonTitle: string }>).detail ?? {};
       if (isStreaming) return;
-      const prompt = locale === 'ar'
-        ? `المستخدم بدأ درس "${lessonTitle}". شجّعه ببضع كلمات وادّيله نصيحة واحدة عشان يستفيد من الدرس.`
-        : `The user just started the lesson "${lessonTitle}". Give a short encouraging message and one tip to get the most from it.`;
-      const newHistory: Message[] = [...messages, { role: 'user', content: prompt }];
+      const prompt =
+        locale === "ar"
+          ? `المستخدم بدأ درس "${lessonTitle}". شجّعه ببضع كلمات وادّيله نصيحة واحدة عشان يستفيد من الدرس.`
+          : `The user just started the lesson "${lessonTitle}". Give a short encouraging message and one tip to get the most from it.`;
+      const newHistory: Message[] = [
+        ...messages,
+        { role: "user", content: prompt },
+      ];
       streamResponse(newHistory, true);
     };
 
     const onQuizComplete = (e: Event) => {
-      const { score, xpEarned } = (e as CustomEvent<{ score: number; xpEarned: number }>).detail ?? {};
+      const { score, xpEarned } =
+        (e as CustomEvent<{ score: number; xpEarned: number }>).detail ?? {};
       if (isStreaming) return;
-      const prompt = locale === 'ar'
-        ? `المستخدم خلّص الكويز وجاب ${score}% وكسب ${xpEarned} XP. علّق على نتيجته وشجّعه.`
-        : `The user just completed the quiz with ${score}% and earned ${xpEarned} XP. Comment briefly on their result.`;
-      const newHistory: Message[] = [...messages, { role: 'user', content: prompt }];
+      const prompt =
+        locale === "ar"
+          ? `المستخدم خلّص الكويز وجاب ${score}% وكسب ${xpEarned} XP. علّق على نتيجته وشجّعه.`
+          : `The user just completed the quiz with ${score}% and earned ${xpEarned} XP. Comment briefly on their result.`;
+      const newHistory: Message[] = [
+        ...messages,
+        { role: "user", content: prompt },
+      ];
       streamResponse(newHistory, true);
     };
 
-    window.addEventListener('zkawi:lesson_start', onLessonStart);
-    window.addEventListener('zkawi:quiz_complete', onQuizComplete);
+    window.addEventListener("zkawi:lesson_start", onLessonStart);
+    window.addEventListener("zkawi:quiz_complete", onQuizComplete);
     return () => {
-      window.removeEventListener('zkawi:lesson_start', onLessonStart);
-      window.removeEventListener('zkawi:quiz_complete', onQuizComplete);
+      window.removeEventListener("zkawi:lesson_start", onLessonStart);
+      window.removeEventListener("zkawi:quiz_complete", onQuizComplete);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStreaming, messages, locale]);
 
   // Persist messages to localStorage after each update (skip streaming messages)
@@ -244,7 +298,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
     const history = loadChatHistory(pathname);
     setMessages(history);
     setInitialized(history.length > 0); // skip greeting if history exists
-    setInput('');
+    setInput("");
     setIsStreaming(false);
   }, [pathname]);
 
@@ -252,15 +306,17 @@ export function MascotChat({ isOpen, onClose }: Props) {
     const text = input.trim();
     if (!text || isStreaming) return;
 
-    const userMsg: Message = { role: 'user', content: text };
-    const updatedHistory = [...messages.filter(m => !m.streaming), userMsg];
+    const userMsg: Message = { role: "user", content: text };
+    const updatedHistory = [...messages.filter((m) => !m.streaming), userMsg];
     setMessages(updatedHistory);
-    setInput('');
-    streamResponse(updatedHistory.map(({ role, content }) => ({ role, content })));
+    setInput("");
+    streamResponse(
+      updatedHistory.map(({ role, content }) => ({ role, content })),
+    );
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -271,7 +327,11 @@ export function MascotChat({ isOpen, onClose }: Props) {
     setMessages([]);
     setInitialized(false);
     setIsStreaming(false);
-    try { localStorage.removeItem(chatKey(pathname)); } catch { /* ignore */ }
+    try {
+      localStorage.removeItem(chatKey(pathname));
+    } catch {
+      /* ignore */
+    }
   };
 
   return (
@@ -282,33 +342,33 @@ export function MascotChat({ isOpen, onClose }: Props) {
           initial={{ opacity: 0, y: 20, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.92 }}
-          transition={{ type: 'spring', damping: 22, stiffness: 320 }}
+          transition={{ type: "spring", damping: 22, stiffness: 320 }}
           className="fixed bottom-24 end-4 z-50 w-80 flex flex-col rounded-3xl overflow-hidden shadow-2xl"
           style={{
-            border: '1px solid var(--border)',
-            maxHeight: '70vh',
+            border: "1px solid var(--border)",
+            maxHeight: "70vh",
           }}
           dir={getDir(locale)}
         >
           {/* Header */}
           <div
             className="flex items-center gap-3 px-4 py-3 flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #6D28D9, #4C1D95)' }}
+            style={{ background: "linear-gradient(135deg, #6D28D9, #4C1D95)" }}
           >
             <ZakiAvatar size={36} />
             <div className="flex-1 min-w-0">
-              <p className="font-black text-white text-sm leading-none">ذكي · Zaki</p>
-              <p className="text-purple-200 text-xs mt-0.5">
-                {isStreaming
-                  ? t('typing')
-                  : t('guide')}
+              <p className="font-black text-white text-sm leading-none">
+                ذكي · Zaki
+              </p>
+              <p className="text-pink-200 text-xs mt-0.5">
+                {isStreaming ? t("typing") : t("guide")}
               </p>
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={handleReset}
                 className="p-1.5 rounded-xl hover:bg-white/10 transition-colors"
-                title={t('newChat')}
+                title={t("newChat")}
               >
                 <RotateCcw size={14} color="rgba(255,255,255,0.7)" />
               </button>
@@ -324,7 +384,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
           {/* Messages */}
           <div
             className="flex-1 overflow-y-auto p-4 space-y-3"
-            style={{ background: 'var(--bg)', minHeight: 0 }}
+            style={{ background: "var(--bg)", minHeight: 0 }}
           >
             <AnimatePresence initial={false}>
               {messages.map((msg, i) => (
@@ -332,29 +392,29 @@ export function MascotChat({ isOpen, onClose }: Props) {
                   key={i}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {msg.role === 'assistant' && <ZakiAvatar size={24} />}
+                  {msg.role === "assistant" && <ZakiAvatar size={24} />}
 
                   <div className="max-w-[78%] flex flex-col gap-1">
                     <div
                       className="rounded-2xl px-3 py-2 text-sm leading-relaxed"
                       style={
-                        msg.role === 'user'
+                        msg.role === "user"
                           ? {
-                              background: 'var(--zkawi-purple)',
-                              color: '#fff',
+                              background: "var(--zkawi-pink)",
+                              color: "#fff",
                               borderEndEndRadius: 4,
                             }
                           : {
-                              background: 'var(--surface)',
-                              color: 'var(--text)',
-                              border: '1px solid var(--border)',
+                              background: "var(--surface)",
+                              color: "var(--text)",
+                              border: "1px solid var(--border)",
                               borderStartStartRadius: 4,
                             }
                       }
                     >
-                      {msg.streaming && msg.content === '' ? (
+                      {msg.streaming && msg.content === "" ? (
                         <TypingDots />
                       ) : (
                         <>
@@ -369,9 +429,13 @@ export function MascotChat({ isOpen, onClose }: Props) {
                         </>
                       )}
                     </div>
-                    {msg.role === 'assistant' && msg.debug && (
-                      <p className="text-[10px] px-1" style={{ color: 'var(--text-muted)', opacity: 0.7 }}>
-                        {msg.debug.provider} · ↑{msg.debug.inputTokens} ↓{msg.debug.outputTokens} tokens
+                    {msg.role === "assistant" && msg.debug && (
+                      <p
+                        className="text-[10px] px-1"
+                        style={{ color: "var(--text-muted)", opacity: 0.7 }}
+                      >
+                        {msg.debug.provider} · ↑{msg.debug.inputTokens} ↓
+                        {msg.debug.outputTokens} tokens
                       </p>
                     )}
                   </div>
@@ -384,23 +448,26 @@ export function MascotChat({ isOpen, onClose }: Props) {
           {/* Input */}
           <div
             className="flex items-end gap-2 px-3 py-3 flex-shrink-0"
-            style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}
+            style={{
+              background: "var(--surface)",
+              borderTop: "1px solid var(--border)",
+            }}
           >
             <textarea
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={t('placeholder')}
+              placeholder={t("placeholder")}
               rows={1}
               disabled={isStreaming}
               className="flex-1 resize-none rounded-xl px-3 py-2 text-sm outline-none"
               style={{
-                background: 'var(--bg)',
-                border: '1px solid var(--border)',
-                color: 'var(--text)',
+                background: "var(--bg)",
+                border: "1px solid var(--border)",
+                color: "var(--text)",
                 maxHeight: 80,
-                lineHeight: '1.4',
+                lineHeight: "1.4",
               }}
             />
             <motion.button
@@ -409,14 +476,21 @@ export function MascotChat({ isOpen, onClose }: Props) {
               disabled={!input.trim() || isStreaming}
               className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-opacity"
               style={{
-                background: 'var(--zkawi-purple)',
+                background: "var(--zkawi-pink)",
                 opacity: !input.trim() || isStreaming ? 0.4 : 1,
               }}
             >
-              {isStreaming
-                ? <Loader2 size={15} color="white" className="animate-spin" />
-                : <Send size={15} color="white" style={{ transform: isRTL(locale) ? 'scaleX(-1)' : undefined }} />
-              }
+              {isStreaming ? (
+                <Loader2 size={15} color="white" className="animate-spin" />
+              ) : (
+                <Send
+                  size={15}
+                  color="white"
+                  style={{
+                    transform: isRTL(locale) ? "scaleX(-1)" : undefined,
+                  }}
+                />
+              )}
             </motion.button>
           </div>
         </motion.div>
@@ -427,7 +501,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
 
 // Small trigger button to open chat (used separately from mascot)
 export function MascotChatTrigger({ onClick }: { onClick: () => void }) {
-  const t = useTranslations('mascot');
+  const t = useTranslations("mascot");
 
   return (
     <motion.button
@@ -436,13 +510,13 @@ export function MascotChatTrigger({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="fixed bottom-6 end-24 z-40 flex items-center gap-2 px-4 py-2.5 rounded-2xl shadow-lg font-bold text-sm"
       style={{
-        background: 'var(--zkawi-purple)',
-        color: '#fff',
-        boxShadow: '0 4px 20px rgba(109,40,217,0.4)',
+        background: "var(--zkawi-pink)",
+        color: "#fff",
+        boxShadow: "0 4px 20px rgba(109,40,217,0.4)",
       }}
     >
       <MessageCircle size={15} />
-      {t('askZaki')}
+      {t("askZaki")}
     </motion.button>
   );
 }

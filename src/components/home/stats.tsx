@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { motion, useInView } from 'framer-motion';
-import { useRef, useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Users, BookOpen, Gamepad2 } from 'lucide-react';
+import { motion, useInView } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Users, BookOpen, Gamepad2 } from "lucide-react";
 
 function CountUp({ end, duration = 2 }: { end: number; duration?: number }) {
   const [count, setCount] = useState(0);
@@ -26,36 +26,36 @@ function CountUp({ end, duration = 2 }: { end: number; duration?: number }) {
     return () => clearInterval(timer);
   }, [inView, end, duration]);
 
-  return <span ref={ref}>{count.toLocaleString('ar-EG')}</span>;
+  return <span ref={ref}>{count.toLocaleString("ar-EG")}</span>;
 }
 
 export default function HomeStats({ locale }: { locale: string }) {
-  const t = useTranslations('home.stats');
+  const t = useTranslations("home.stats");
 
   const stats = [
     {
       icon: <Users size={28} />,
       value: 1200,
-      label: t('studentsLabel'),
-      color: 'text-[var(--zkawi-purple)]',
-      bg: 'bg-[var(--zkawi-purple)]/15',
-      suffix: '+',
+      label: t("studentsLabel"),
+      color: "text-[var(--zkawi-pink)]",
+      bg: "bg-[var(--zkawi-pink)]/15",
+      suffix: "+",
     },
     {
       icon: <BookOpen size={28} />,
       value: 25,
-      label: t('lessonsLabel'),
-      color: 'text-[var(--zkawi-gold)]',
-      bg: 'bg-[var(--zkawi-gold)]/15',
-      suffix: '+',
+      label: t("lessonsLabel"),
+      color: "text-[var(--zkawi-gold)]",
+      bg: "bg-[var(--zkawi-gold)]/15",
+      suffix: "+",
     },
     {
       icon: <Gamepad2 size={28} />,
       value: 50,
-      label: t('activitiesLabel'),
-      color: 'text-[var(--zkawi-green)]',
-      bg: 'bg-[var(--zkawi-green)]/15',
-      suffix: '+',
+      label: t("activitiesLabel"),
+      color: "text-[var(--zkawi-green)]",
+      bg: "bg-[var(--zkawi-green)]/15",
+      suffix: "+",
     },
   ];
 
@@ -69,7 +69,7 @@ export default function HomeStats({ locale }: { locale: string }) {
           className="text-center mb-10"
         >
           <h2 className="text-2xl md:text-3xl font-black text-[var(--text)]">
-            {t('title')}
+            {t("title")}
           </h2>
         </motion.div>
 
@@ -83,14 +83,20 @@ export default function HomeStats({ locale }: { locale: string }) {
               transition={{ delay: i * 0.1 }}
               className="bg-[var(--surface)] rounded-3xl p-6 md:p-8 text-center shadow-sm border border-[var(--border)] card-hover"
             >
-              <div className={`${stat.bg} ${stat.color} w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+              <div
+                className={`${stat.bg} ${stat.color} w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4`}
+              >
                 {stat.icon}
               </div>
-              <div className={`text-3xl md:text-4xl font-black ${stat.color} mb-2`}>
+              <div
+                className={`text-3xl md:text-4xl font-black ${stat.color} mb-2`}
+              >
                 <CountUp end={stat.value} />
                 <span>{stat.suffix}</span>
               </div>
-              <p className="text-sm md:text-base text-[var(--text-muted)] font-medium">{stat.label}</p>
+              <p className="text-sm md:text-base text-[var(--text-muted)] font-medium">
+                {stat.label}
+              </p>
             </motion.div>
           ))}
         </div>

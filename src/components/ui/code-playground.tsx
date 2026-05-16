@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * code-playground.tsx
@@ -6,21 +6,23 @@
  * UI strings come from the 'playground' i18n namespace — no hardcoded text.
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
-import dynamic from 'next/dynamic';
-import { Play, RotateCcw, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { getDir } from '@/lib/i18n/locale-utils';
-import { runJS, runPython } from '@/lib/playground/runners';
-import type { Extension } from '@codemirror/state';
+import { useState, useCallback, useRef, useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import dynamic from "next/dynamic";
+import { Play, RotateCcw, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { getDir } from "@/lib/i18n/locale-utils";
+import { runJS, runPython } from "@/lib/playground/runners";
+import type { Extension } from "@codemirror/state";
 
 // Lazy-load CodeMirror to avoid SSR issues and reduce initial bundle
-const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false });
+const CodeMirror = dynamic(() => import("@uiw/react-codemirror"), {
+  ssr: false,
+});
 
 export interface CodePlaygroundProps {
   starterCode: string;
-  language: 'javascript' | 'python';
+  language: "javascript" | "python";
   expectedOutput?: string;
   testCases?: { input: string; expected: string }[];
   hint?: string;
@@ -28,8 +30,8 @@ export interface CodePlaygroundProps {
   readOnly?: boolean;
 }
 
-type RunState = 'idle' | 'running' | 'loading-python';
-type Verdict = 'none' | 'pass' | 'fail';
+type RunState = "idle" | "running" | "loading-python";
+type Verdict = "none" | "pass" | "fail";
 
 export default function CodePlayground({
   starterCode,
@@ -39,15 +41,15 @@ export default function CodePlayground({
   onPass,
   readOnly = false,
 }: CodePlaygroundProps) {
-  const t = useTranslations('playground');
+  const t = useTranslations("playground");
   const locale = useLocale();
   const dir = getDir(locale);
 
   const [code, setCode] = useState(starterCode);
-  const [output, setOutput] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const [runState, setRunState] = useState<RunState>('idle');
-  const [verdict, setVerdict] = useState<Verdict>('none');
+  const [output, setOutput] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [runState, setRunState] = useState<RunState>("idle");
+  const [verdict, setVerdict] = useState<Verdict>("none");
   const [hintOpen, setHintOpen] = useState(false);
 
   // Extensions are loaded lazily to avoid SSR
@@ -55,70 +57,72 @@ export default function CodePlayground({
 
   const getExtensions = useCallback(async (): Promise<Extension[]> => {
     if (extensionsRef.current) return extensionsRef.current;
-    if (language === 'javascript') {
-      const { javascript } = await import('@codemirror/lang-javascript');
+    if (language === "javascript") {
+      const { javascript } = await import("@codemirror/lang-javascript");
       extensionsRef.current = [javascript()];
     } else {
-      const { python } = await import('@codemirror/lang-python');
+      const { python } = await import("@codemirror/lang-python");
       extensionsRef.current = [python()];
     }
     return extensionsRef.current;
   }, [language]);
 
   // Pre-load extensions on mount (fire-and-forget)
-  useEffect(() => { getExtensions(); }, [getExtensions]);
+  useEffect(() => {
+    getExtensions();
+  }, [getExtensions]);
 
   const handleRun = useCallback(async () => {
-    if (runState !== 'idle') return;
+    if (runState !== "idle") return;
 
-    setVerdict('none');
-    setErrorMsg('');
+    setVerdict("none");
+    setErrorMsg("");
 
-    if (language === 'python') {
-      setRunState('loading-python');
+    if (language === "python") {
+      setRunState("loading-python");
     } else {
-      setRunState('running');
+      setRunState("running");
     }
 
     try {
       const result =
-        language === 'javascript'
-          ? await runJS(code)
-          : await runPython(code);
+        language === "javascript" ? await runJS(code) : await runPython(code);
 
-      const rawOutput = result.output ?? '';
+      const rawOutput = result.output ?? "";
       setOutput(rawOutput);
 
       if (result.error) {
-        if (result.error === 'TIMEOUT') {
-          setErrorMsg(t('timeoutError'));
-        } else if (result.error === 'LOAD_PYODIDE_ERROR') {
-          setErrorMsg(t('loadPyodideError'));
+        if (result.error === "TIMEOUT") {
+          setErrorMsg(t("timeoutError"));
+        } else if (result.error === "LOAD_PYODIDE_ERROR") {
+          setErrorMsg(t("loadPyodideError"));
         } else {
           setErrorMsg(result.error);
         }
-        setVerdict('none');
+        setVerdict("none");
       } else if (expectedOutput !== undefined) {
         const passed = rawOutput.trim() === expectedOutput.trim();
-        setVerdict(passed ? 'pass' : 'fail');
+        setVerdict(passed ? "pass" : "fail");
         if (passed) onPass?.(code);
       }
     } finally {
-      setRunState('idle');
+      setRunState("idle");
     }
   }, [runState, language, code, expectedOutput, onPass, t]);
 
   const handleReset = useCallback(() => {
     setCode(starterCode);
-    setOutput('');
-    setErrorMsg('');
-    setVerdict('none');
-    setRunState('idle');
+    setOutput("");
+    setErrorMsg("");
+    setVerdict("none");
+    setRunState("idle");
   }, [starterCode]);
 
-  const languageLabel = language === 'javascript' ? t('javascript') : t('python');
-  const languageDot = language === 'javascript' ? 'bg-yellow-400' : 'bg-blue-400';
-  const isRunning = runState !== 'idle';
+  const languageLabel =
+    language === "javascript" ? t("javascript") : t("python");
+  const languageDot =
+    language === "javascript" ? "bg-yellow-400" : "bg-blue-400";
+  const isRunning = runState !== "idle";
 
   return (
     <div
@@ -128,34 +132,42 @@ export default function CodePlayground({
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-[var(--border)] bg-[var(--bg)]">
         <div className="flex items-center gap-2">
-          <span className={cn('inline-block w-3 h-3 rounded-full', languageDot)} />
-          <span className="text-sm font-semibold text-[var(--fg)]">{languageLabel}</span>
+          <span
+            className={cn("inline-block w-3 h-3 rounded-full", languageDot)}
+          />
+          <span className="text-sm font-semibold text-[var(--fg)]">
+            {languageLabel}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleReset}
             disabled={isRunning || readOnly}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-xl border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--zkawi-purple)] hover:text-[var(--zkawi-purple)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            aria-label={t('reset')}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-xl border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--zkawi-pink)] hover:text-[var(--zkawi-pink)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            aria-label={t("reset")}
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>{t('reset')}</span>
+            <span>{t("reset")}</span>
           </button>
           <button
             onClick={handleRun}
             disabled={isRunning || readOnly}
-            className="flex items-center gap-1.5 px-4 py-1.5 text-sm font-bold rounded-xl bg-[var(--zkawi-purple)] text-white hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
-            aria-label={t('runCode')}
+            className="flex items-center gap-1.5 px-4 py-1.5 text-sm font-bold rounded-xl bg-[var(--zkawi-pink)] text-white hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+            aria-label={t("runCode")}
           >
             {isRunning ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>{runState === 'loading-python' ? t('loadingPython') : t('running')}</span>
+                <span>
+                  {runState === "loading-python"
+                    ? t("loadingPython")
+                    : t("running")}
+                </span>
               </>
             ) : (
               <>
                 <Play className="w-3.5 h-3.5" />
-                <span>{t('runCode')}</span>
+                <span>{t("runCode")}</span>
               </>
             )}
           </button>
@@ -175,37 +187,47 @@ export default function CodePlayground({
 
       {/* Output panel */}
       <div className="border-t border-[var(--border)] bg-[var(--bg)] px-4 py-3 min-h-[80px]">
-        <p className="text-xs font-semibold text-[var(--fg-muted)] mb-1">{t('output')}</p>
+        <p className="text-xs font-semibold text-[var(--fg-muted)] mb-1">
+          {t("output")}
+        </p>
 
-        {runState !== 'idle' && !output && !errorMsg && (
+        {runState !== "idle" && !output && !errorMsg && (
           <div className="flex items-center gap-2 text-sm text-[var(--fg-muted)]">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            <span>{runState === 'loading-python' ? t('loadingPython') : t('running')}</span>
+            <span>
+              {runState === "loading-python"
+                ? t("loadingPython")
+                : t("running")}
+            </span>
           </div>
         )}
 
         {errorMsg && (
           <p className="text-sm text-red-400 whitespace-pre-wrap font-mono">
-            <span className="font-bold">{t('errorLabel')} </span>{errorMsg}
+            <span className="font-bold">{t("errorLabel")} </span>
+            {errorMsg}
           </p>
         )}
 
         {output && !errorMsg && (
-          <pre className="text-sm text-[var(--fg)] whitespace-pre-wrap font-mono" dir="ltr">
+          <pre
+            className="text-sm text-[var(--fg)] whitespace-pre-wrap font-mono"
+            dir="ltr"
+          >
             {output}
           </pre>
         )}
 
         {/* Verdict */}
-        {verdict !== 'none' && (
+        {verdict !== "none" && (
           <div
             className={cn(
-              'mt-2 flex items-center gap-1.5 text-sm font-bold',
-              verdict === 'pass' ? 'text-[var(--zkawi-green)]' : 'text-red-400',
+              "mt-2 flex items-center gap-1.5 text-sm font-bold",
+              verdict === "pass" ? "text-[var(--zkawi-green)]" : "text-red-400",
             )}
           >
-            <span>{verdict === 'pass' ? '✅' : '❌'}</span>
-            <span>{verdict === 'pass' ? t('pass') : t('fail')}</span>
+            <span>{verdict === "pass" ? "✅" : "❌"}</span>
+            <span>{verdict === "pass" ? t("pass") : t("fail")}</span>
           </div>
         )}
       </div>
@@ -218,9 +240,9 @@ export default function CodePlayground({
             className="w-full flex items-center gap-2 px-4 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
           >
             <span>💡</span>
-            <span className="font-semibold">{t('hint')}</span>
+            <span className="font-semibold">{t("hint")}</span>
             <span className="text-xs text-[var(--fg-muted)]">
-              {hintOpen ? t('hideHint') : t('showHint')}
+              {hintOpen ? t("hideHint") : t("showHint")}
             </span>
             {hintOpen ? (
               <ChevronUp className="w-3.5 h-3.5 ms-auto" />
@@ -244,17 +266,25 @@ export default function CodePlayground({
 interface EditorProps {
   code: string;
   onChange: (v: string) => void;
-  language: 'javascript' | 'python';
+  language: "javascript" | "python";
   readOnly: boolean;
   getExtensions: () => Promise<Extension[]>;
 }
 
-function CodeMirrorEditor({ code, onChange, language, readOnly, getExtensions }: EditorProps) {
+function CodeMirrorEditor({
+  code,
+  onChange,
+  language,
+  readOnly,
+  getExtensions,
+}: EditorProps) {
   const [extensions, setExtensions] = useState<Extension[]>([]);
 
   // Load extensions once on mount
   useEffect(() => {
-    getExtensions().then(setExtensions).catch(() => {});
+    getExtensions()
+      .then(setExtensions)
+      .catch(() => {});
   }, [getExtensions]);
 
   return (
@@ -271,7 +301,7 @@ function CodeMirrorEditor({ code, onChange, language, readOnly, getExtensions }:
         dropCursor: false,
         allowMultipleSelections: false,
         indentOnInput: true,
-        tabSize: language === 'python' ? 4 : 2,
+        tabSize: language === "python" ? 4 : 2,
       }}
       className="text-sm [&_.cm-editor]:bg-[#1e1e2e] [&_.cm-gutters]:bg-[#1a1a2a] [&_.cm-gutters]:border-e-[var(--border)]"
     />

@@ -1,43 +1,44 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Bot } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Download, Bot } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
 export function PwaInstallBanner() {
-  const t = useTranslations('pwa');
-  const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
+  const t = useTranslations("pwa");
+  const [promptEvent, setPromptEvent] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (localStorage.getItem('pwa-dismissed')) return;
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("pwa-dismissed")) return;
 
     const handler = (e: Event) => {
       e.preventDefault();
       setPromptEvent(e as BeforeInstallPromptEvent);
     };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
   if (!promptEvent || dismissed) return null;
 
   const dismiss = () => {
-    localStorage.setItem('pwa-dismissed', '1');
+    localStorage.setItem("pwa-dismissed", "1");
     setDismissed(true);
   };
 
   const install = async () => {
     await promptEvent.prompt();
     const { outcome } = await promptEvent.userChoice;
-    if (outcome === 'accepted') dismiss();
+    if (outcome === "accepted") dismiss();
   };
 
   return (
@@ -50,26 +51,39 @@ export function PwaInstallBanner() {
       >
         <div
           className="rounded-2xl p-4 flex items-center gap-3 shadow-2xl"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+          }}
         >
-          <Bot size={28} className="flex-shrink-0 text-[var(--zkawi-purple)]" />
+          <Bot size={28} className="flex-shrink-0 text-[var(--zkawi-pink)]" />
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
-              {t('install')}
+            <p
+              className="font-semibold text-sm"
+              style={{ color: "var(--text)" }}
+            >
+              {t("install")}
             </p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-              {t('offline')}
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {t("offline")}
             </p>
           </div>
           <button
             onClick={install}
             className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold"
-            style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
+            style={{ background: "var(--zkawi-pink)", color: "#fff" }}
           >
             <Download size={12} />
-            {t('button')}
+            {t("button")}
           </button>
-          <button onClick={dismiss} className="flex-shrink-0 p-1 rounded-lg" style={{ color: 'var(--text-muted)' }}>
+          <button
+            onClick={dismiss}
+            className="flex-shrink-0 p-1 rounded-lg"
+            style={{ color: "var(--text-muted)" }}
+          >
             <X size={16} />
           </button>
         </div>

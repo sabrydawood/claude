@@ -23,7 +23,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "flex h-12 w-full rounded-2xl border-2 bg-[var(--input-bg)] px-4 py-3 text-base text-[var(--text)] transition-all duration-200",
             "placeholder:text-[var(--text-muted)]",
             "rtl:text-right ltr:text-left",
-            "focus:outline-none focus:border-[var(--zkawi-purple)] focus:ring-2 focus:ring-[var(--zkawi-purple)]/10",
+            "focus:outline-none focus:border-[var(--zkawi-pink)] focus:ring-2 focus:ring-[var(--zkawi-pink)]/10",
             error ? "border-[var(--zkawi-red)]" : "border-[var(--border)]",
             icon && "ps-10",
             className,

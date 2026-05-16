@@ -1,119 +1,130 @@
 export interface QuizOption {
- id: string;
- textAr: string;
- textEn: string;
- isCorrect: boolean;
+  id: string;
+  textAr: string;
+  textEn: string;
+  isCorrect: boolean;
 }
 
 export interface QuizQuestion {
- id: string;
- questionAr: string;
- questionEn: string;
- type: 'multiple_choice' | 'true_false';
- options: QuizOption[];
+  id: string;
+  questionAr: string;
+  questionEn: string;
+  type: "multiple_choice" | "true_false";
+  options: QuizOption[];
 }
 
 export interface Lesson {
- id: number;
- slug: string;
- agentSlug: string;
- titleAr: string;
- titleEn: string;
- descriptionAr: string;
- descriptionEn: string;
- contentAr: string;
- contentEn: string;
- order: number;
- xpReward: number;
- estimatedMinutes: number;
- quiz: QuizQuestion[];
- activity?: {
- titleAr: string;
- titleEn: string;
- descriptionAr: string;
- descriptionEn: string;
- type: 'improve_prompt' | 'match' | 'fill';
- data?: unknown;
- };
+  id: number;
+  slug: string;
+  agentSlug: string;
+  titleAr: string;
+  titleEn: string;
+  descriptionAr: string;
+  descriptionEn: string;
+  contentAr: string;
+  contentEn: string;
+  order: number;
+  xpReward: number;
+  estimatedMinutes: number;
+  quiz: QuizQuestion[];
+  activity?: {
+    titleAr: string;
+    titleEn: string;
+    descriptionAr: string;
+    descriptionEn: string;
+    type: "improve_prompt" | "match" | "fill";
+    data?: unknown;
+  };
 }
 
 export interface Agent {
- id: number;
- slug: string;
- nameAr: string;
- nameEn: string;
- descriptionAr: string;
- descriptionEn: string;
- fullDescriptionAr: string;
- fullDescriptionEn: string;
- color: string;
- gradient: string;
- icon: string;
- isActive: boolean;
- order: number;
+  id: number;
+  slug: string;
+  nameAr: string;
+  nameEn: string;
+  descriptionAr: string;
+  descriptionEn: string;
+  fullDescriptionAr: string;
+  fullDescriptionEn: string;
+  color: string;
+  gradient: string;
+  icon: string;
+  isActive: boolean;
+  order: number;
 }
 
 export const agents: Agent[] = [
- {
- id: 1,
- slug: 'claude',
- nameAr: 'كلود',
- nameEn: 'Claude',
- descriptionAr: 'مساعد ذكي من شركة Anthropic. بيساعدك في الكتابة والكود والأسئلة الصعبة بطريقة واضحة.',
- descriptionEn: 'A smart AI assistant from Anthropic that helps with writing, coding, and tough questions.',
- fullDescriptionAr: 'Claude هو مساعد ذكاء اصطناعي متطور من شركة Anthropic الأمريكية. بيتميز بإنه بيتكلم بطريقة طبيعية ومحترمة، وبيساعد في حاجات كتير زي الكتابة والبرمجة والرياضيات وشرح المواضيع الصعبة بطريقة سهلة ومبسطة.',
- fullDescriptionEn: 'Claude is an advanced AI assistant from Anthropic. Known for its natural and respectful communication, it helps with writing, coding, math, and explaining complex topics simply.',
- color: '#7C3AED',
- gradient: 'from-purple-500 to-purple-700',
- icon: 'Bot',
- isActive: true,
- order: 1,
- },
- {
- id: 2,
- slug: 'chatgpt',
- nameAr: 'ChatGPT',
- nameEn: 'ChatGPT',
- descriptionAr: 'مساعد ذكي من شركة OpenAI. واحد من أشهر مساعدات الذكاء الاصطناعي في العالم.',
- descriptionEn: 'A smart AI assistant from OpenAI. One of the most famous AI assistants in the world.',
- fullDescriptionAr: 'ChatGPT هو مساعد ذكاء اصطناعي من شركة OpenAI. اتعرف عليه العالم كله في 2022 وبقى أشهر AI في التاريخ.',
- fullDescriptionEn: 'ChatGPT is an AI assistant from OpenAI, which became world-famous in 2022.',
- color: '#10B981',
- gradient: 'from-emerald-400 to-teal-500',
- icon: 'MessageCircle',
- isActive: false,
- order: 2,
- },
- {
- id: 3,
- slug: 'gemini',
- nameAr: 'Gemini',
- nameEn: 'Gemini',
- descriptionAr: 'مساعد ذكي من Google. بيفهم النصوص والصور والصوت معاً.',
- descriptionEn: 'A smart AI assistant from Google that understands text, images, and audio together.',
- fullDescriptionAr: 'Gemini هو مساعد الذكاء الاصطناعي من Google. بيتميز بقدرته على فهم أنواع مختلفة من المحتوى.',
- fullDescriptionEn: 'Gemini is Google\'s AI assistant known for understanding multiple content types.',
- color: '#3B82F6',
- gradient: 'from-blue-400 to-blue-600',
- icon: 'Sparkles',
- isActive: false,
- order: 3,
- },
+  {
+    id: 1,
+    slug: "claude",
+    nameAr: "كلود",
+    nameEn: "Claude",
+    descriptionAr:
+      "مساعد ذكي من شركة Anthropic. بيساعدك في الكتابة والكود والأسئلة الصعبة بطريقة واضحة.",
+    descriptionEn:
+      "A smart AI assistant from Anthropic that helps with writing, coding, and tough questions.",
+    fullDescriptionAr:
+      "Claude هو مساعد ذكاء اصطناعي متطور من شركة Anthropic الأمريكية. بيتميز بإنه بيتكلم بطريقة طبيعية ومحترمة، وبيساعد في حاجات كتير زي الكتابة والبرمجة والرياضيات وشرح المواضيع الصعبة بطريقة سهلة ومبسطة.",
+    fullDescriptionEn:
+      "Claude is an advanced AI assistant from Anthropic. Known for its natural and respectful communication, it helps with writing, coding, math, and explaining complex topics simply.",
+    color: "#7C3AED",
+    gradient: "from-pink-500 to-pink-700",
+    icon: "Bot",
+    isActive: true,
+    order: 1,
+  },
+  {
+    id: 2,
+    slug: "chatgpt",
+    nameAr: "ChatGPT",
+    nameEn: "ChatGPT",
+    descriptionAr:
+      "مساعد ذكي من شركة OpenAI. واحد من أشهر مساعدات الذكاء الاصطناعي في العالم.",
+    descriptionEn:
+      "A smart AI assistant from OpenAI. One of the most famous AI assistants in the world.",
+    fullDescriptionAr:
+      "ChatGPT هو مساعد ذكاء اصطناعي من شركة OpenAI. اتعرف عليه العالم كله في 2022 وبقى أشهر AI في التاريخ.",
+    fullDescriptionEn:
+      "ChatGPT is an AI assistant from OpenAI, which became world-famous in 2022.",
+    color: "#10B981",
+    gradient: "from-emerald-400 to-teal-500",
+    icon: "MessageCircle",
+    isActive: false,
+    order: 2,
+  },
+  {
+    id: 3,
+    slug: "gemini",
+    nameAr: "Gemini",
+    nameEn: "Gemini",
+    descriptionAr: "مساعد ذكي من Google. بيفهم النصوص والصور والصوت معاً.",
+    descriptionEn:
+      "A smart AI assistant from Google that understands text, images, and audio together.",
+    fullDescriptionAr:
+      "Gemini هو مساعد الذكاء الاصطناعي من Google. بيتميز بقدرته على فهم أنواع مختلفة من المحتوى.",
+    fullDescriptionEn:
+      "Gemini is Google's AI assistant known for understanding multiple content types.",
+    color: "#3B82F6",
+    gradient: "from-blue-400 to-blue-600",
+    icon: "Sparkles",
+    isActive: false,
+    order: 3,
+  },
 ];
 
 export const claudeLessons: Lesson[] = [
- {
- id: 1,
- slug: 'welcome-to-claude',
- agentSlug: 'claude',
- titleAr: 'مرحبا بـ Claude',
- titleEn: 'Welcome to Claude',
- descriptionAr: 'اتعرف على Claude - صديقك الذكي الجديد!',
- descriptionEn: 'Get to know Claude - your new smart friend!',
- order: 1,
- xpReward: 50,
- estimatedMinutes: 5,
- contentAr: `
+  {
+    id: 1,
+    slug: "welcome-to-claude",
+    agentSlug: "claude",
+    titleAr: "مرحبا بـ Claude",
+    titleEn: "Welcome to Claude",
+    descriptionAr: "اتعرف على Claude - صديقك الذكي الجديد!",
+    descriptionEn: "Get to know Claude - your new smart friend!",
+    order: 1,
+    xpReward: 50,
+    estimatedMinutes: 5,
+    contentAr: `
 ## Claude إيه ده؟ 
 
 تخيل إن عندك صاحب ذكي جداً، بيعرف حاجات كتير في مواضيع كتير، وهو متاح ليك في أي وقت وفي أي مكان. ده بالظبط Claude!
@@ -142,7 +153,7 @@ Claude هو **مساعد ذكاء اصطناعي** من شركة اسمها **An
 
 لأن Claude وغيره من مساعدات الذكاء الاصطناعي هيبقوا جزء مهم من حياتنا كلنا. اللي بيعرف يستخدمهم صح هيقدر يعمل حاجات مذهلة!
  `,
- contentEn: `
+    contentEn: `
 ## What is Claude? 
 
 Imagine having a very smart friend who knows a lot about many topics, available anytime, anywhere. That's exactly Claude!
@@ -171,55 +182,86 @@ Not exactly! Claude isn't a robot that repeats pre-set answers. It actually unde
 
 Because Claude and other AI assistants will become an important part of all our lives. Those who know how to use them properly will be able to do amazing things!
  `,
- quiz: [
- {
- id: 'q1-1',
- questionAr: 'Claude من أي شركة؟',
- questionEn: 'Which company made Claude?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'Google', textEn: 'Google', isCorrect: false },
- { id: 'o2', textAr: 'Anthropic', textEn: 'Anthropic', isCorrect: true },
- { id: 'o3', textAr: 'OpenAI', textEn: 'OpenAI', isCorrect: false },
- { id: 'o4', textAr: 'Microsoft', textEn: 'Microsoft', isCorrect: false },
- ],
- },
- {
- id: 'q1-2',
- questionAr: 'Claude بيقدر يتكلم بالعربية',
- questionEn: 'Claude can speak Arabic',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- {
- id: 'q1-3',
- questionAr: 'إيه اللي Claude مش بيعمله؟',
- questionEn: "What does Claude NOT do?",
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'بيكتب قصص', textEn: 'Writes stories', isCorrect: false },
- { id: 'o2', textAr: 'بيشرح الرياضيات', textEn: 'Explains math', isCorrect: false },
- { id: 'o3', textAr: 'بيطبخ الأكل', textEn: 'Cooks food', isCorrect: true },
- { id: 'o4', textAr: 'بيساعد في البرمجة', textEn: 'Helps with coding', isCorrect: false },
- ],
- },
- ],
- },
- {
- id: 2,
- slug: 'how-to-talk-to-claude',
- agentSlug: 'claude',
- titleAr: 'إزاي تتكلم مع Claude؟',
- titleEn: 'How to Talk to Claude?',
- descriptionAr: 'تعلم إزاي تبدأ محادثة مع Claude وتحصل على أفضل إجابات!',
- descriptionEn: 'Learn how to start a conversation with Claude and get the best answers!',
- order: 2,
- xpReward: 60,
- estimatedMinutes: 7,
- contentAr: `
+    quiz: [
+      {
+        id: "q1-1",
+        questionAr: "Claude من أي شركة؟",
+        questionEn: "Which company made Claude?",
+        type: "multiple_choice",
+        options: [
+          { id: "o1", textAr: "Google", textEn: "Google", isCorrect: false },
+          {
+            id: "o2",
+            textAr: "Anthropic",
+            textEn: "Anthropic",
+            isCorrect: true,
+          },
+          { id: "o3", textAr: "OpenAI", textEn: "OpenAI", isCorrect: false },
+          {
+            id: "o4",
+            textAr: "Microsoft",
+            textEn: "Microsoft",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q1-2",
+        questionAr: "Claude بيقدر يتكلم بالعربية",
+        questionEn: "Claude can speak Arabic",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+      {
+        id: "q1-3",
+        questionAr: "إيه اللي Claude مش بيعمله؟",
+        questionEn: "What does Claude NOT do?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "بيكتب قصص",
+            textEn: "Writes stories",
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr: "بيشرح الرياضيات",
+            textEn: "Explains math",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "بيطبخ الأكل",
+            textEn: "Cooks food",
+            isCorrect: true,
+          },
+          {
+            id: "o4",
+            textAr: "بيساعد في البرمجة",
+            textEn: "Helps with coding",
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 2,
+    slug: "how-to-talk-to-claude",
+    agentSlug: "claude",
+    titleAr: "إزاي تتكلم مع Claude؟",
+    titleEn: "How to Talk to Claude?",
+    descriptionAr: "تعلم إزاي تبدأ محادثة مع Claude وتحصل على أفضل إجابات!",
+    descriptionEn:
+      "Learn how to start a conversation with Claude and get the best answers!",
+    order: 2,
+    xpReward: 60,
+    estimatedMinutes: 7,
+    contentAr: `
 ## التكلم مع Claude سهل! 
 
 التكلم مع Claude سهل جداً - زي ما بتبعت رسالة لصاحبك على الواتساب! بس في حاجات صغيرة لو عملتها هتفرق كتير في جودة الإجابة اللي هتاخدها.
@@ -274,7 +316,7 @@ Because Claude and other AI assistants will become an important part of all our 
 
 ⭐ **مش لازم تكون رسمي** - اتكلم بطريقتك العادية، هيفهمك!
  `,
- contentEn: `
+    contentEn: `
 ## Talking to Claude is Easy! 
 
 Talking to Claude is very easy - just like sending a message to a friend on WhatsApp! But there are small things that, if you do them, will make a big difference in the quality of your answers.
@@ -327,55 +369,109 @@ The difference? In the second request you said:
 
 ⭐ **Don't be formal** - talk in your normal way, it will understand you!
  `,
- quiz: [
- {
- id: 'q2-1',
- questionAr: 'إيه اللي بيخلي طلبك أفضل وبتاخد إجابة أحسن؟',
- questionEn: 'What makes your request better and gets you a better answer?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'إنك تكتب بالإنجليزي', textEn: 'Writing in English', isCorrect: false },
- { id: 'o2', textAr: 'إنك تكون واضح ومحدد في طلبك', textEn: 'Being clear and specific in your request', isCorrect: true },
- { id: 'o3', textAr: 'إنك تكتب كتير', textEn: 'Writing a lot', isCorrect: false },
- { id: 'o4', textAr: 'إنك تستخدم كلمات صعبة', textEn: 'Using difficult words', isCorrect: false },
- ],
- },
- {
- id: 'q2-2',
- questionAr: 'لو Claude قالك حاجة مش فاهمها، المفروض تعمل إيه؟',
- questionEn: "If Claude tells you something you don't understand, what should you do?",
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'تقوله يشرح بطريقة أبسط', textEn: 'Ask it to explain more simply', isCorrect: true },
- { id: 'o2', textAr: 'تسيبه وتمشي', textEn: 'Leave and go', isCorrect: false },
- ],
- },
- {
- id: 'q2-3',
- questionAr: 'أنهي طلب أفضل؟',
- questionEn: 'Which request is better?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: '"اكتبلي عن التاريخ"', textEn: '"Write about history"', isCorrect: false },
- { id: 'o2', textAr: '"اكتبلي 5 أسطر عن حياة صلاح الدين الأيوبي لطفل في المدرسة"', textEn: '"Write me 5 lines about the life of Saladin for a school child"', isCorrect: true },
- { id: 'o3', textAr: '"تاريخ"', textEn: '"History"', isCorrect: false },
- { id: 'o4', textAr: '"كتابة تاريخية من فضلك يا Claude الغالي"', textEn: '"Historical writing please dear Claude"', isCorrect: false },
- ],
- },
- ],
- },
- {
- id: 3,
- slug: 'what-claude-can-do',
- agentSlug: 'claude',
- titleAr: 'Claude يعمل إيه؟',
- titleEn: 'What Can Claude Do?',
- descriptionAr: 'اكتشف كل الحاجات الرائعة اللي Claude يقدر يساعدك بيها!',
- descriptionEn: 'Discover all the amazing things Claude can help you with!',
- order: 3,
- xpReward: 60,
- estimatedMinutes: 8,
- contentAr: `
+    quiz: [
+      {
+        id: "q2-1",
+        questionAr: "إيه اللي بيخلي طلبك أفضل وبتاخد إجابة أحسن؟",
+        questionEn:
+          "What makes your request better and gets you a better answer?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "إنك تكتب بالإنجليزي",
+            textEn: "Writing in English",
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr: "إنك تكون واضح ومحدد في طلبك",
+            textEn: "Being clear and specific in your request",
+            isCorrect: true,
+          },
+          {
+            id: "o3",
+            textAr: "إنك تكتب كتير",
+            textEn: "Writing a lot",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "إنك تستخدم كلمات صعبة",
+            textEn: "Using difficult words",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q2-2",
+        questionAr: "لو Claude قالك حاجة مش فاهمها، المفروض تعمل إيه؟",
+        questionEn:
+          "If Claude tells you something you don't understand, what should you do?",
+        type: "true_false",
+        options: [
+          {
+            id: "o1",
+            textAr: "تقوله يشرح بطريقة أبسط",
+            textEn: "Ask it to explain more simply",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "تسيبه وتمشي",
+            textEn: "Leave and go",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q2-3",
+        questionAr: "أنهي طلب أفضل؟",
+        questionEn: "Which request is better?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: '"اكتبلي عن التاريخ"',
+            textEn: '"Write about history"',
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr:
+              '"اكتبلي 5 أسطر عن حياة صلاح الدين الأيوبي لطفل في المدرسة"',
+            textEn:
+              '"Write me 5 lines about the life of Saladin for a school child"',
+            isCorrect: true,
+          },
+          {
+            id: "o3",
+            textAr: '"تاريخ"',
+            textEn: '"History"',
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: '"كتابة تاريخية من فضلك يا Claude الغالي"',
+            textEn: '"Historical writing please dear Claude"',
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 3,
+    slug: "what-claude-can-do",
+    agentSlug: "claude",
+    titleAr: "Claude يعمل إيه؟",
+    titleEn: "What Can Claude Do?",
+    descriptionAr: "اكتشف كل الحاجات الرائعة اللي Claude يقدر يساعدك بيها!",
+    descriptionEn: "Discover all the amazing things Claude can help you with!",
+    order: 3,
+    xpReward: 60,
+    estimatedMinutes: 8,
+    contentAr: `
 ## Claude بيعمل حاجات كتير جداً! 
 
 هتتفاجأ بكمية الحاجات اللي Claude بيقدر يساعدك بيها. خلينا نتعرف عليها!
@@ -438,7 +534,7 @@ Claude بيترجم بين أكتر من 50 لغة بدقة عالية!
 - مش بيعرف الأخبار الجديدة بعد تاريخ تدريبه
 - مش بيتذكر المحادثات القديمة (كل محادثة جديدة)
  `,
- contentEn: `
+    contentEn: `
 ## Claude Does So Many Things! 
 
 You'll be amazed at how many things Claude can help you with. Let's explore!
@@ -499,55 +595,96 @@ Know its limits:
 - Doesn't know news after its training cutoff date
 - Doesn't remember old conversations (each is new)
  `,
- quiz: [
- {
- id: 'q3-1',
- questionAr: 'إيه من اللي Claude بيقدر يعمله؟',
- questionEn: 'Which of the following can Claude do?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'يطبخ الأكل', textEn: 'Cook food', isCorrect: false },
- { id: 'o2', textAr: 'يكتب قصص ويشرح درس', textEn: 'Write stories and explain lessons', isCorrect: true },
- { id: 'o3', textAr: 'يلعب فيديو جيم معاك', textEn: 'Play video games with you', isCorrect: false },
- { id: 'o4', textAr: 'يجيب لك حاجات من النت', textEn: 'Order things for you online', isCorrect: false },
- ],
- },
- {
- id: 'q3-2',
- questionAr: 'Claude بيتذكر المحادثات القديمة',
- questionEn: 'Claude remembers old conversations',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: true },
- ],
- },
- {
- id: 'q3-3',
- questionAr: 'Claude بيترجم بين أكتر من كام لغة؟',
- questionEn: 'Claude translates between more than how many languages?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: '10 لغات', textEn: '10 languages', isCorrect: false },
- { id: 'o2', textAr: '25 لغة', textEn: '25 languages', isCorrect: false },
- { id: 'o3', textAr: '50 لغة', textEn: '50 languages', isCorrect: true },
- { id: 'o4', textAr: '5 لغات بس', textEn: 'Only 5 languages', isCorrect: false },
- ],
- },
- ],
- },
- {
- id: 4,
- slug: 'write-good-prompts',
- agentSlug: 'claude',
- titleAr: 'اكتب طلب صح',
- titleEn: 'Write a Good Request',
- descriptionAr: 'اتعلم سر كيفية كتابة طلبات ممتازة تجيبلك نتايج مذهلة!',
- descriptionEn: 'Learn the secret to writing excellent requests that get you amazing results!',
- order: 4,
- xpReward: 75,
- estimatedMinutes: 10,
- contentAr: `
+    quiz: [
+      {
+        id: "q3-1",
+        questionAr: "إيه من اللي Claude بيقدر يعمله؟",
+        questionEn: "Which of the following can Claude do?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "يطبخ الأكل",
+            textEn: "Cook food",
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr: "يكتب قصص ويشرح درس",
+            textEn: "Write stories and explain lessons",
+            isCorrect: true,
+          },
+          {
+            id: "o3",
+            textAr: "يلعب فيديو جيم معاك",
+            textEn: "Play video games with you",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "يجيب لك حاجات من النت",
+            textEn: "Order things for you online",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q3-2",
+        questionAr: "Claude بيتذكر المحادثات القديمة",
+        questionEn: "Claude remembers old conversations",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: false },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: true },
+        ],
+      },
+      {
+        id: "q3-3",
+        questionAr: "Claude بيترجم بين أكتر من كام لغة؟",
+        questionEn: "Claude translates between more than how many languages?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "10 لغات",
+            textEn: "10 languages",
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr: "25 لغة",
+            textEn: "25 languages",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "50 لغة",
+            textEn: "50 languages",
+            isCorrect: true,
+          },
+          {
+            id: "o4",
+            textAr: "5 لغات بس",
+            textEn: "Only 5 languages",
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 4,
+    slug: "write-good-prompts",
+    agentSlug: "claude",
+    titleAr: "اكتب طلب صح",
+    titleEn: "Write a Good Request",
+    descriptionAr: "اتعلم سر كيفية كتابة طلبات ممتازة تجيبلك نتايج مذهلة!",
+    descriptionEn:
+      "Learn the secret to writing excellent requests that get you amazing results!",
+    order: 4,
+    xpReward: 75,
+    estimatedMinutes: 10,
+    contentAr: `
 ## سر الـ Prompt الممتاز 
 
 الـ "Prompt" هو الطلب أو السؤال اللي بتبعته لـ Claude. وفي فرق كبير بين prompt كويس وprompt مش كويس!
@@ -604,7 +741,7 @@ Know its limits:
 
 Claude هيساعدك تكتب الطلب المناسب! 
  `,
- contentEn: `
+    contentEn: `
 ## The Secret of a Great Prompt 
 
 A "prompt" is the request or question you send to Claude. And there's a big difference between a good prompt and a bad one!
@@ -661,73 +798,108 @@ If you don't know how to phrase your request correctly, ask Claude himself:
 
 Claude will help you write the right request! 
  `,
- quiz: [
- {
- id: 'q4-1',
- questionAr: 'إيه معنى "Prompt"؟',
- questionEn: 'What does "Prompt" mean?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'إجابة Claude', textEn: "Claude's answer", isCorrect: false },
- { id: 'o2', textAr: 'الطلب أو السؤال اللي بتبعته لـ Claude', textEn: 'The request or question you send to Claude', isCorrect: true },
- { id: 'o3', textAr: 'اسم برنامج تاني', textEn: 'Another program name', isCorrect: false },
- { id: 'o4', textAr: 'لغة برمجة', textEn: 'A programming language', isCorrect: false },
- ],
- },
- {
- id: 'q4-2',
- questionAr: 'ذكر الجمهور (مين هيقرأ) في الطلب بيحسن الإجابة',
- questionEn: 'Mentioning the audience (who will read) in the request improves the answer',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- {
- id: 'q4-3',
- questionAr: 'أنهي عنصر مش ضروري في الطلب الممتاز؟',
- questionEn: "Which element is NOT necessary in a great request?",
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'التحديد', textEn: 'Specificity', isCorrect: false },
- { id: 'o2', textAr: 'السياق', textEn: 'Context', isCorrect: false },
- { id: 'o3', textAr: 'إنك تكتب بالإنجليزي', textEn: 'Writing in English', isCorrect: true },
- { id: 'o4', textAr: 'الجمهور', textEn: 'Audience', isCorrect: false },
- ],
- },
- ],
- activity: {
- titleAr: 'حسّن الطلب ده! ',
- titleEn: 'Improve This Request! ',
- descriptionAr: 'الطلب ده ضعيف: "اكتبلي عن الحيوانات" - حاول تحسنه باستخدام عناصر الطلب الممتاز اللي اتعلمتها!',
- descriptionEn: 'This request is weak: "Write about animals" - try to improve it using the elements you learned!',
- type: 'improve_prompt',
- data: {
- badPrompt: 'اكتبلي عن الحيوانات',
- badPromptEn: 'Write about animals',
- hints: [
- 'أي حيوان تحديداً؟',
- 'كام سطر تقريباً؟',
- 'لمين (أطفال، كبار)؟',
- 'بأي أسلوب؟',
- ],
- exampleGoodPrompt: 'اكتبلي 5 حقائق ممتعة عن الدلافين بطريقة مسلية لأطفال عمرهم 9 سنين',
- },
- },
- },
- {
- id: 5,
- slug: 'claude-at-school',
- agentSlug: 'claude',
- titleAr: 'Claude في المدرسة',
- titleEn: 'Claude at School',
- descriptionAr: 'اكتشف إزاي Claude بيقدر يساعدك في مذاكرتك ودروسك!',
- descriptionEn: 'Discover how Claude can help you with your studies and schoolwork!',
- order: 5,
- xpReward: 75,
- estimatedMinutes: 8,
- contentAr: `
+    quiz: [
+      {
+        id: "q4-1",
+        questionAr: 'إيه معنى "Prompt"؟',
+        questionEn: 'What does "Prompt" mean?',
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "إجابة Claude",
+            textEn: "Claude's answer",
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr: "الطلب أو السؤال اللي بتبعته لـ Claude",
+            textEn: "The request or question you send to Claude",
+            isCorrect: true,
+          },
+          {
+            id: "o3",
+            textAr: "اسم برنامج تاني",
+            textEn: "Another program name",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "لغة برمجة",
+            textEn: "A programming language",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q4-2",
+        questionAr: "ذكر الجمهور (مين هيقرأ) في الطلب بيحسن الإجابة",
+        questionEn:
+          "Mentioning the audience (who will read) in the request improves the answer",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+      {
+        id: "q4-3",
+        questionAr: "أنهي عنصر مش ضروري في الطلب الممتاز؟",
+        questionEn: "Which element is NOT necessary in a great request?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "التحديد",
+            textEn: "Specificity",
+            isCorrect: false,
+          },
+          { id: "o2", textAr: "السياق", textEn: "Context", isCorrect: false },
+          {
+            id: "o3",
+            textAr: "إنك تكتب بالإنجليزي",
+            textEn: "Writing in English",
+            isCorrect: true,
+          },
+          { id: "o4", textAr: "الجمهور", textEn: "Audience", isCorrect: false },
+        ],
+      },
+    ],
+    activity: {
+      titleAr: "حسّن الطلب ده! ",
+      titleEn: "Improve This Request! ",
+      descriptionAr:
+        'الطلب ده ضعيف: "اكتبلي عن الحيوانات" - حاول تحسنه باستخدام عناصر الطلب الممتاز اللي اتعلمتها!',
+      descriptionEn:
+        'This request is weak: "Write about animals" - try to improve it using the elements you learned!',
+      type: "improve_prompt",
+      data: {
+        badPrompt: "اكتبلي عن الحيوانات",
+        badPromptEn: "Write about animals",
+        hints: [
+          "أي حيوان تحديداً؟",
+          "كام سطر تقريباً؟",
+          "لمين (أطفال، كبار)؟",
+          "بأي أسلوب؟",
+        ],
+        exampleGoodPrompt:
+          "اكتبلي 5 حقائق ممتعة عن الدلافين بطريقة مسلية لأطفال عمرهم 9 سنين",
+      },
+    },
+  },
+  {
+    id: 5,
+    slug: "claude-at-school",
+    agentSlug: "claude",
+    titleAr: "Claude في المدرسة",
+    titleEn: "Claude at School",
+    descriptionAr: "اكتشف إزاي Claude بيقدر يساعدك في مذاكرتك ودروسك!",
+    descriptionEn:
+      "Discover how Claude can help you with your studies and schoolwork!",
+    order: 5,
+    xpReward: 75,
+    estimatedMinutes: 8,
+    contentAr: `
 ## Claude أفضل مساعد في المذاكرة! 
 
 كتير من الطلاب بيستخدموا Claude في المذاكرة، وبيقولوا إنه غيّر طريقة تعلمهم كلياً! هنا هتعرف إزاي تستخدمه صح.
@@ -785,7 +957,7 @@ Claude أداة تعليمية رائعة لما بيتستخدم صح. هو ب�
 أي مادة بتستصعبها دلوقتي؟ روح على Claude وقوله:
 > "أنا طالب في [صفك]، مش فاهم [الموضوع]. ممكن تشرح بطريقة سهلة وبعدين اسألني سؤال عشان أتأكد إني فاهم؟"
  `,
- contentEn: `
+    contentEn: `
 ## Claude is the Best Study Assistant! 
 
 Many students use Claude for studying and say it completely changed their learning! Here you'll learn how to use it correctly.
@@ -839,58 +1011,100 @@ If Claude does your homework:
 What subject do you find difficult right now? Go to Claude and say:
 > "I'm a student in [your grade], I don't understand [topic]. Can you explain simply and then ask me a question to make sure I understand?"
  `,
- quiz: [
- {
- id: 'q5-1',
- questionAr: 'إيه الاستخدام الصح لـ Claude في المدرسة؟',
- questionEn: 'What is the correct use of Claude at school?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'يكتب الواجب عنك', textEn: 'Write your homework for you', isCorrect: false },
- { id: 'o2', textAr: 'يساعدك تفهم الدرس وتتعلم', textEn: 'Help you understand the lesson and learn', isCorrect: true },
- { id: 'o3', textAr: 'يجاوب على أسئلة الامتحان', textEn: 'Answer exam questions', isCorrect: false },
- { id: 'o4', textAr: 'مش مناسب للمدرسة خالص', textEn: 'Not suitable for school at all', isCorrect: false },
- ],
- },
- {
- id: 'q5-2',
- questionAr: 'لو Claude عمل الواجب عنك، هتتعلم كويس',
- questionEn: 'If Claude does your homework for you, you will learn well',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: true },
- ],
- },
- {
- id: 'q5-3',
- questionAr: 'إزاي تستخدم Claude في الرياضيات بطريقة ذكية؟',
- questionEn: 'How do you use Claude for math in a smart way?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'تقوله يحل المسألة مباشرة', textEn: 'Tell it to solve the problem directly', isCorrect: false },
- { id: 'o2', textAr: 'تطلب منه يشرح الخطوات من غير ما يديك الإجابة أول', textEn: 'Ask it to explain the steps without giving you the answer first', isCorrect: true },
- { id: 'o3', textAr: 'تنسخ الإجابة وتسلمها للأستاذ', textEn: 'Copy the answer and submit it to the teacher', isCorrect: false },
- { id: 'o4', textAr: 'ما تستخدمهوش في الرياضيات خالص', textEn: "Don't use it for math at all", isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q5-1",
+        questionAr: "إيه الاستخدام الصح لـ Claude في المدرسة؟",
+        questionEn: "What is the correct use of Claude at school?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "يكتب الواجب عنك",
+            textEn: "Write your homework for you",
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr: "يساعدك تفهم الدرس وتتعلم",
+            textEn: "Help you understand the lesson and learn",
+            isCorrect: true,
+          },
+          {
+            id: "o3",
+            textAr: "يجاوب على أسئلة الامتحان",
+            textEn: "Answer exam questions",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "مش مناسب للمدرسة خالص",
+            textEn: "Not suitable for school at all",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q5-2",
+        questionAr: "لو Claude عمل الواجب عنك، هتتعلم كويس",
+        questionEn: "If Claude does your homework for you, you will learn well",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: false },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: true },
+        ],
+      },
+      {
+        id: "q5-3",
+        questionAr: "إزاي تستخدم Claude في الرياضيات بطريقة ذكية؟",
+        questionEn: "How do you use Claude for math in a smart way?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "تقوله يحل المسألة مباشرة",
+            textEn: "Tell it to solve the problem directly",
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr: "تطلب منه يشرح الخطوات من غير ما يديك الإجابة أول",
+            textEn:
+              "Ask it to explain the steps without giving you the answer first",
+            isCorrect: true,
+          },
+          {
+            id: "o3",
+            textAr: "تنسخ الإجابة وتسلمها للأستاذ",
+            textEn: "Copy the answer and submit it to the teacher",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "ما تستخدمهوش في الرياضيات خالص",
+            textEn: "Don't use it for math at all",
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export const promptEngineeringLessons: Lesson[] = [
- {
- id: 6,
- slug: 'what-is-a-prompt',
- agentSlug: 'claude',
- titleAr: 'إيه هو الـ Prompt؟',
- titleEn: 'What is a Prompt?',
- descriptionAr: 'تعلّم أساس أساس التعامل مع الذكاء الاصطناعي — الطلب الصح.',
- descriptionEn: 'Learn the foundation of working with AI — the right request.',
- order: 6,
- xpReward: 75,
- estimatedMinutes: 8,
- contentAr: `## إيه هو الـ Prompt؟
+  {
+    id: 6,
+    slug: "what-is-a-prompt",
+    agentSlug: "claude",
+    titleAr: "إيه هو الـ Prompt؟",
+    titleEn: "What is a Prompt?",
+    descriptionAr: "تعلّم أساس أساس التعامل مع الذكاء الاصطناعي — الطلب الصح.",
+    descriptionEn:
+      "Learn the foundation of working with AI — the right request.",
+    order: 6,
+    xpReward: 75,
+    estimatedMinutes: 8,
+    contentAr: `## إيه هو الـ Prompt؟
 
 الـ **Prompt** هو ببساطة الكلام اللي بتكتبه لـ Claude أو أي AI.
 
@@ -936,7 +1150,7 @@ export const promptEngineeringLessons: Lesson[] = [
 
 الفرق ضخم جداً في جودة النتيجة! `,
 
- contentEn: `## What is a Prompt?
+    contentEn: `## What is a Prompt?
 
 A **Prompt** is simply the text you write to Claude or any AI.
 
@@ -982,58 +1196,121 @@ Anything you don't want? Any specific limits?
 
 The difference in output quality is huge! `,
 
- quiz: [
- {
- id: 'q6-1',
- questionAr: 'إيه هو الـ Prompt؟',
- questionEn: 'What is a Prompt?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'الكلام اللي بتكتبه للـ AI', textEn: 'The text you write to the AI', isCorrect: true },
- { id: 'o2', textAr: 'برنامج كمبيوتر خاص', textEn: 'A special computer program', isCorrect: false },
- { id: 'o3', textAr: 'نوع من أنواع الكود', textEn: 'A type of code', isCorrect: false },
- { id: 'o4', textAr: 'اسم شركة AI', textEn: 'The name of an AI company', isCorrect: false },
- ],
- },
- {
- id: 'q6-2',
- questionAr: 'أنهي Prompt هو الأقوى؟',
- questionEn: 'Which prompt is stronger?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: '"اكتب موضوع"', textEn: '"Write a topic"', isCorrect: false },
- { id: 'o2', textAr: '"اكتب موضوع إنشاء عربي لطالب في الصف الأول الإعدادي عن فوائد القراءة، 200 كلمة"', textEn: '"Write an Arabic essay for a 7th grader on benefits of reading, 200 words"', isCorrect: true },
- { id: 'o3', textAr: '"موضوع كويس"', textEn: '"Good topic"', isCorrect: false },
- { id: 'o4', textAr: '"موضوع إنشاء"', textEn: '"Essay topic"', isCorrect: false },
- ],
- },
- {
- id: 'q6-3',
- questionAr: 'من مكونات الـ Prompt الكويس؟',
- questionEn: 'Which is a component of a good prompt?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'الهدف + السياق + الشكل + القيود', textEn: 'Goal + Context + Format + Constraints', isCorrect: true },
- { id: 'o2', textAr: 'الاسم + العمر + البلد', textEn: 'Name + Age + Country', isCorrect: false },
- { id: 'o3', textAr: 'الكود + البرمجة + الداتا', textEn: 'Code + Programming + Data', isCorrect: false },
- { id: 'o4', textAr: 'السرعة + الدقة + السعر', textEn: 'Speed + Accuracy + Price', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q6-1",
+        questionAr: "إيه هو الـ Prompt؟",
+        questionEn: "What is a Prompt?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "الكلام اللي بتكتبه للـ AI",
+            textEn: "The text you write to the AI",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "برنامج كمبيوتر خاص",
+            textEn: "A special computer program",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "نوع من أنواع الكود",
+            textEn: "A type of code",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "اسم شركة AI",
+            textEn: "The name of an AI company",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q6-2",
+        questionAr: "أنهي Prompt هو الأقوى؟",
+        questionEn: "Which prompt is stronger?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: '"اكتب موضوع"',
+            textEn: '"Write a topic"',
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr:
+              '"اكتب موضوع إنشاء عربي لطالب في الصف الأول الإعدادي عن فوائد القراءة، 200 كلمة"',
+            textEn:
+              '"Write an Arabic essay for a 7th grader on benefits of reading, 200 words"',
+            isCorrect: true,
+          },
+          {
+            id: "o3",
+            textAr: '"موضوع كويس"',
+            textEn: '"Good topic"',
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: '"موضوع إنشاء"',
+            textEn: '"Essay topic"',
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q6-3",
+        questionAr: "من مكونات الـ Prompt الكويس؟",
+        questionEn: "Which is a component of a good prompt?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "الهدف + السياق + الشكل + القيود",
+            textEn: "Goal + Context + Format + Constraints",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "الاسم + العمر + البلد",
+            textEn: "Name + Age + Country",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "الكود + البرمجة + الداتا",
+            textEn: "Code + Programming + Data",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "السرعة + الدقة + السعر",
+            textEn: "Speed + Accuracy + Price",
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  },
 
- {
- id: 7,
- slug: 'zero-shot-prompting',
- agentSlug: 'claude',
- titleAr: 'Zero-shot: اسأل مباشرة',
- titleEn: 'Zero-shot: Ask Directly',
- descriptionAr: 'أبسط طريقة — اسأل Claude مباشرة من غير ما تدي أمثلة.',
- descriptionEn: 'The simplest technique — ask Claude directly without giving examples.',
- order: 7,
- xpReward: 75,
- estimatedMinutes: 8,
- contentAr: `## Zero-shot Prompting
+  {
+    id: 7,
+    slug: "zero-shot-prompting",
+    agentSlug: "claude",
+    titleAr: "Zero-shot: اسأل مباشرة",
+    titleEn: "Zero-shot: Ask Directly",
+    descriptionAr: "أبسط طريقة — اسأل Claude مباشرة من غير ما تدي أمثلة.",
+    descriptionEn:
+      "The simplest technique — ask Claude directly without giving examples.",
+    order: 7,
+    xpReward: 75,
+    estimatedMinutes: 8,
+    contentAr: `## Zero-shot Prompting
 
 الـ **Zero-shot** معناها "صفر أمثلة" — بتسأل Claude مباشرة من غير ما تدي أي مثال أو توضيح إضافي.
 
@@ -1082,7 +1359,7 @@ The difference in output quality is huge! `,
 
 لو Claude مش بيفهم المطلوب منه بالظبط، يبقى وقت تجرب الـ **Few-shot** — وهي الدرس الجاي! `,
 
- contentEn: `## Zero-shot Prompting
+    contentEn: `## Zero-shot Prompting
 
 **Zero-shot** means "zero examples" — you ask Claude directly without giving any examples or extra clarification.
 
@@ -1131,56 +1408,98 @@ Even in Zero-shot, the clearer your request, the better the result.
 
 If Claude doesn't fully understand what you need, it's time to try **Few-shot** — that's the next lesson! `,
 
- quiz: [
- {
- id: 'q7-1',
- questionAr: 'إيه معنى "Zero-shot"؟',
- questionEn: 'What does "Zero-shot" mean?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'سؤال مباشر من غير أمثلة', textEn: 'A direct question without examples', isCorrect: true },
- { id: 'o2', textAr: 'سؤال فيه صفر كلمات', textEn: 'A question with zero words', isCorrect: false },
- { id: 'o3', textAr: 'سؤال بيتطلب إجابة قصيرة', textEn: 'A question requiring a short answer', isCorrect: false },
- { id: 'o4', textAr: 'نوع من البرمجة', textEn: 'A type of programming', isCorrect: false },
- ],
- },
- {
- id: 'q7-2',
- questionAr: 'الـ Zero-shot بتشتغل كويس في؟',
- questionEn: 'Zero-shot works well for?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'الترجمة والتلخيص والتصنيف', textEn: 'Translation, summarization, and classification', isCorrect: true },
- { id: 'o2', textAr: 'المهام المعقدة جداً', textEn: 'Very complex tasks only', isCorrect: false },
- { id: 'o3', textAr: 'البرمجة المتقدمة فقط', textEn: 'Advanced programming only', isCorrect: false },
- { id: 'o4', textAr: 'الصور والفيديو', textEn: 'Images and video', isCorrect: false },
- ],
- },
- {
- id: 'q7-3',
- questionAr: 'صح ولا غلط: لو Claude مش فاهم، الأحسن تجرب Few-shot',
- questionEn: 'True or False: If Claude doesn\'t understand, it\'s better to try Few-shot',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q7-1",
+        questionAr: 'إيه معنى "Zero-shot"؟',
+        questionEn: 'What does "Zero-shot" mean?',
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "سؤال مباشر من غير أمثلة",
+            textEn: "A direct question without examples",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "سؤال فيه صفر كلمات",
+            textEn: "A question with zero words",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "سؤال بيتطلب إجابة قصيرة",
+            textEn: "A question requiring a short answer",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "نوع من البرمجة",
+            textEn: "A type of programming",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q7-2",
+        questionAr: "الـ Zero-shot بتشتغل كويس في؟",
+        questionEn: "Zero-shot works well for?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "الترجمة والتلخيص والتصنيف",
+            textEn: "Translation, summarization, and classification",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "المهام المعقدة جداً",
+            textEn: "Very complex tasks only",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "البرمجة المتقدمة فقط",
+            textEn: "Advanced programming only",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "الصور والفيديو",
+            textEn: "Images and video",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q7-3",
+        questionAr: "صح ولا غلط: لو Claude مش فاهم، الأحسن تجرب Few-shot",
+        questionEn:
+          "True or False: If Claude doesn't understand, it's better to try Few-shot",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 
- {
- id: 8,
- slug: 'few-shot-prompting',
- agentSlug: 'claude',
- titleAr: 'Few-shot: علّم بالمثال',
- titleEn: 'Few-shot: Teach by Example',
- descriptionAr: 'دي المفروض تعرفها — إزاي تدي Claude أمثلة يتعلم منها.',
- descriptionEn: 'The must-know technique — how to give Claude examples to learn from.',
- order: 8,
- xpReward: 80,
- estimatedMinutes: 10,
- contentAr: `## Few-shot Prompting
+  {
+    id: 8,
+    slug: "few-shot-prompting",
+    agentSlug: "claude",
+    titleAr: "Few-shot: علّم بالمثال",
+    titleEn: "Few-shot: Teach by Example",
+    descriptionAr: "دي المفروض تعرفها — إزاي تدي Claude أمثلة يتعلم منها.",
+    descriptionEn:
+      "The must-know technique — how to give Claude examples to learn from.",
+    order: 8,
+    xpReward: 80,
+    estimatedMinutes: 10,
+    contentAr: `## Few-shot Prompting
 
 الـ **Few-shot** معناها "أمثلة قليلة" — بتدي Claude مثال واحد أو أكتر قبل ما تطلب منه المهمة.
 
@@ -1240,7 +1559,7 @@ Claude هيكمل: **يوسف، خالد**
 
 مش لازم تشرح القاعدة — بس وري الأمثلة وسيب Claude يفهم الباقي. الـ AI ذكي كفاية يستنتج النمط! `,
 
- contentEn: `## Few-shot Prompting
+    contentEn: `## Few-shot Prompting
 
 **Few-shot** means "a few examples" — you give Claude one or more examples before asking for the task.
 
@@ -1300,56 +1619,103 @@ Claude will complete: **Youssef, Khaled**
 
 You don't need to explain the rule — just show the examples and let Claude figure out the rest. AI is smart enough to infer the pattern! `,
 
- quiz: [
- {
- id: 'q8-1',
- questionAr: 'Few-shot بتنفع أكتر في؟',
- questionEn: 'Few-shot is most useful for?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'المهام اللي محتاجة نمط أو أسلوب معين', textEn: 'Tasks that need a specific pattern or style', isCorrect: true },
- { id: 'o2', textAr: 'الأسئلة البسيطة جداً', textEn: 'Very simple questions', isCorrect: false },
- { id: 'o3', textAr: 'ترجمة كلمة واحدة', textEn: 'Translating a single word', isCorrect: false },
- { id: 'o4', textAr: 'إنشاء صور', textEn: 'Generating images', isCorrect: false },
- ],
- },
- {
- id: 'q8-2',
- questionAr: 'كام مثال الأنسب في الـ Few-shot؟',
- questionEn: 'How many examples are ideal for Few-shot?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: '2 إلى 5 أمثلة', textEn: '2 to 5 examples', isCorrect: true },
- { id: 'o2', textAr: 'مثال واحد فقط دايماً', textEn: 'Always exactly one example', isCorrect: false },
- { id: 'o3', textAr: '50 مثال على الأقل', textEn: 'At least 50 examples', isCorrect: false },
- { id: 'o4', textAr: 'مش مهم العدد خالص', textEn: 'The number doesn\'t matter at all', isCorrect: false },
- ],
- },
- {
- id: 'q8-3',
- questionAr: 'صح ولا غلط: في الـ Few-shot لازم تشرح القاعدة بالتفصيل',
- questionEn: 'True or False: In Few-shot you must explain the rule in detail',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
- { id: 'o2', textAr: 'غلط — الأمثلة بتكفي', textEn: 'False — examples are enough', isCorrect: true },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q8-1",
+        questionAr: "Few-shot بتنفع أكتر في؟",
+        questionEn: "Few-shot is most useful for?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "المهام اللي محتاجة نمط أو أسلوب معين",
+            textEn: "Tasks that need a specific pattern or style",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "الأسئلة البسيطة جداً",
+            textEn: "Very simple questions",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "ترجمة كلمة واحدة",
+            textEn: "Translating a single word",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "إنشاء صور",
+            textEn: "Generating images",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q8-2",
+        questionAr: "كام مثال الأنسب في الـ Few-shot؟",
+        questionEn: "How many examples are ideal for Few-shot?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "2 إلى 5 أمثلة",
+            textEn: "2 to 5 examples",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "مثال واحد فقط دايماً",
+            textEn: "Always exactly one example",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "50 مثال على الأقل",
+            textEn: "At least 50 examples",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "مش مهم العدد خالص",
+            textEn: "The number doesn't matter at all",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q8-3",
+        questionAr: "صح ولا غلط: في الـ Few-shot لازم تشرح القاعدة بالتفصيل",
+        questionEn:
+          "True or False: In Few-shot you must explain the rule in detail",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: false },
+          {
+            id: "o2",
+            textAr: "غلط — الأمثلة بتكفي",
+            textEn: "False — examples are enough",
+            isCorrect: true,
+          },
+        ],
+      },
+    ],
+  },
 
- {
- id: 9,
- slug: 'chain-of-thought',
- agentSlug: 'claude',
- titleAr: 'Chain of Thought: فكّر خطوة خطوة',
- titleEn: 'Chain of Thought: Think Step by Step',
- descriptionAr: 'اطلب من Claude يفكر بصوت عالٍ — هتلاقي الإجابات أدق بكتير.',
- descriptionEn: 'Ask Claude to think out loud — you\'ll find the answers much more accurate.',
- order: 9,
- xpReward: 85,
- estimatedMinutes: 10,
- contentAr: `## Chain of Thought Prompting
+  {
+    id: 9,
+    slug: "chain-of-thought",
+    agentSlug: "claude",
+    titleAr: "Chain of Thought: فكّر خطوة خطوة",
+    titleEn: "Chain of Thought: Think Step by Step",
+    descriptionAr: "اطلب من Claude يفكر بصوت عالٍ — هتلاقي الإجابات أدق بكتير.",
+    descriptionEn:
+      "Ask Claude to think out loud — you'll find the answers much more accurate.",
+    order: 9,
+    xpReward: 85,
+    estimatedMinutes: 10,
+    contentAr: `## Chain of Thought Prompting
 
 الـ **Chain of Thought (CoT)** معناها "سلسلة التفكير" — بتطلب من Claude يوضح خطوات تفكيره قبل ما يوصل للإجابة.
 
@@ -1415,7 +1781,7 @@ Claude هيقول:
 
 الجملة دي وحدها بتحسن دقة Claude في المسائل المعقدة بنسبة كبيرة!`,
 
- contentEn: `## Chain of Thought Prompting
+    contentEn: `## Chain of Thought Prompting
 
 **Chain of Thought (CoT)** means asking Claude to show its thinking steps before reaching an answer.
 
@@ -1480,56 +1846,103 @@ Situation: My company is losing customers due to slow service
 
 This phrase alone significantly improves Claude's accuracy on complex problems!`,
 
- quiz: [
- {
- id: 'q9-1',
- questionAr: 'إيه الهدف من Chain of Thought؟',
- questionEn: 'What is the goal of Chain of Thought?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'جعل Claude يشرح خطوات تفكيره', textEn: 'Making Claude explain its thinking steps', isCorrect: true },
- { id: 'o2', textAr: 'جعل الإجابة أقصر', textEn: 'Making the answer shorter', isCorrect: false },
- { id: 'o3', textAr: 'تقليل استهلاك الـ tokens', textEn: 'Reducing token usage', isCorrect: false },
- { id: 'o4', textAr: 'جعل Claude يكتب شعر', textEn: 'Making Claude write poetry', isCorrect: false },
- ],
- },
- {
- id: 'q9-2',
- questionAr: 'أنهي جملة بتفعّل Chain of Thought؟',
- questionEn: 'Which phrase activates Chain of Thought?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: '"فكّر خطوة خطوة"', textEn: '"Think step by step"', isCorrect: true },
- { id: 'o2', textAr: '"كن سريعاً"', textEn: '"Be fast"', isCorrect: false },
- { id: 'o3', textAr: '"رد باختصار"', textEn: '"Reply briefly"', isCorrect: false },
- { id: 'o4', textAr: '"اكتب كود"', textEn: '"Write code"', isCorrect: false },
- ],
- },
- {
- id: 'q9-3',
- questionAr: 'صح ولا غلط: CoT مفيد في ترجمة الكلمات البسيطة',
- questionEn: 'True or False: CoT is useful for translating simple words',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
- { id: 'o2', textAr: 'غلط — مش محتاجه في المهام البسيطة', textEn: 'False — not needed for simple tasks', isCorrect: true },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q9-1",
+        questionAr: "إيه الهدف من Chain of Thought؟",
+        questionEn: "What is the goal of Chain of Thought?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "جعل Claude يشرح خطوات تفكيره",
+            textEn: "Making Claude explain its thinking steps",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "جعل الإجابة أقصر",
+            textEn: "Making the answer shorter",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "تقليل استهلاك الـ tokens",
+            textEn: "Reducing token usage",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "جعل Claude يكتب شعر",
+            textEn: "Making Claude write poetry",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q9-2",
+        questionAr: "أنهي جملة بتفعّل Chain of Thought؟",
+        questionEn: "Which phrase activates Chain of Thought?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: '"فكّر خطوة خطوة"',
+            textEn: '"Think step by step"',
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: '"كن سريعاً"',
+            textEn: '"Be fast"',
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: '"رد باختصار"',
+            textEn: '"Reply briefly"',
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: '"اكتب كود"',
+            textEn: '"Write code"',
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q9-3",
+        questionAr: "صح ولا غلط: CoT مفيد في ترجمة الكلمات البسيطة",
+        questionEn: "True or False: CoT is useful for translating simple words",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: false },
+          {
+            id: "o2",
+            textAr: "غلط — مش محتاجه في المهام البسيطة",
+            textEn: "False — not needed for simple tasks",
+            isCorrect: true,
+          },
+        ],
+      },
+    ],
+  },
 
- {
- id: 10,
- slug: 'role-prompting',
- agentSlug: 'claude',
- titleAr: 'Role Prompting: العب دور',
- titleEn: 'Role Prompting: Play a Role',
- descriptionAr: 'بدّل شخصية Claude وشوف كيف تتغير الإجابات — تقنية قوية جداً.',
- descriptionEn: 'Change Claude\'s persona and watch how answers transform — a very powerful technique.',
- order: 10,
- xpReward: 80,
- estimatedMinutes: 9,
- contentAr: `## Role Prompting
+  {
+    id: 10,
+    slug: "role-prompting",
+    agentSlug: "claude",
+    titleAr: "Role Prompting: العب دور",
+    titleEn: "Role Prompting: Play a Role",
+    descriptionAr:
+      "بدّل شخصية Claude وشوف كيف تتغير الإجابات — تقنية قوية جداً.",
+    descriptionEn:
+      "Change Claude's persona and watch how answers transform — a very powerful technique.",
+    order: 10,
+    xpReward: 80,
+    estimatedMinutes: 9,
+    contentAr: `## Role Prompting
 
 الـ **Role Prompting** معناها إنك بتقول لـ Claude "تصرف كأنك [شخص معين]" قبل ما تطلب منه أي حاجة.
 
@@ -1580,7 +1993,7 @@ Claude عنده معرفة واسعة جداً في مجالات مختلفة. �
 
 الـ Role بيأثر على **الأسلوب والتركيز**، مش على **الحقائق**. Claude لسه بيقدم معلومات دقيقة حتى لو بيلعب دور. مش بيكدب عشان "هو في الدور"!`,
 
- contentEn: `## Role Prompting
+    contentEn: `## Role Prompting
 
 **Role Prompting** means telling Claude "act as [a specific person]" before making any request.
 
@@ -1631,58 +2044,109 @@ Your audience is [who will read this].
 
 The role affects **style and focus**, not **facts**. Claude still provides accurate information even when playing a role. It doesn't lie because it's "in character"!`,
 
- quiz: [
- {
- id: 'q10-1',
- questionAr: 'إيه هو الـ Role Prompting؟',
- questionEn: 'What is Role Prompting?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'تحديد شخصية أو دور معين لـ Claude', textEn: 'Assigning Claude a specific persona or role', isCorrect: true },
- { id: 'o2', textAr: 'طلب من Claude يكتب مسرحية', textEn: 'Asking Claude to write a play', isCorrect: false },
- { id: 'o3', textAr: 'إعطاء Claude اسم جديد', textEn: 'Giving Claude a new name', isCorrect: false },
- { id: 'o4', textAr: 'تغيير لغة الإجابة', textEn: 'Changing the answer language', isCorrect: false },
- ],
- },
- {
- id: 'q10-2',
- questionAr: 'الـ Role بيأثر على؟',
- questionEn: 'The role affects?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'الأسلوب والتركيز فقط', textEn: 'Style and focus only', isCorrect: true },
- { id: 'o2', textAr: 'الحقائق والمعلومات', textEn: 'Facts and information', isCorrect: false },
- { id: 'o3', textAr: 'سرعة الإجابة', textEn: 'Answer speed', isCorrect: false },
- { id: 'o4', textAr: 'طول الإجابة دايماً', textEn: 'Answer length always', isCorrect: false },
- ],
- },
- {
- id: 'q10-3',
- questionAr: 'أنهي دور من الأمثلة دي الأنسب لسؤال عن الاستثمار؟',
- questionEn: 'Which role is most suitable for an investment question?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'مستشار مالي', textEn: 'Financial advisor', isCorrect: true },
- { id: 'o2', textAr: 'طباخ', textEn: 'Chef', isCorrect: false },
- { id: 'o3', textAr: 'رياضي محترف', textEn: 'Professional athlete', isCorrect: false },
- { id: 'o4', textAr: 'طفل', textEn: 'Child', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q10-1",
+        questionAr: "إيه هو الـ Role Prompting؟",
+        questionEn: "What is Role Prompting?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "تحديد شخصية أو دور معين لـ Claude",
+            textEn: "Assigning Claude a specific persona or role",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "طلب من Claude يكتب مسرحية",
+            textEn: "Asking Claude to write a play",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "إعطاء Claude اسم جديد",
+            textEn: "Giving Claude a new name",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "تغيير لغة الإجابة",
+            textEn: "Changing the answer language",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q10-2",
+        questionAr: "الـ Role بيأثر على؟",
+        questionEn: "The role affects?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "الأسلوب والتركيز فقط",
+            textEn: "Style and focus only",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "الحقائق والمعلومات",
+            textEn: "Facts and information",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "سرعة الإجابة",
+            textEn: "Answer speed",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "طول الإجابة دايماً",
+            textEn: "Answer length always",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q10-3",
+        questionAr: "أنهي دور من الأمثلة دي الأنسب لسؤال عن الاستثمار؟",
+        questionEn: "Which role is most suitable for an investment question?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "مستشار مالي",
+            textEn: "Financial advisor",
+            isCorrect: true,
+          },
+          { id: "o2", textAr: "طباخ", textEn: "Chef", isCorrect: false },
+          {
+            id: "o3",
+            textAr: "رياضي محترف",
+            textEn: "Professional athlete",
+            isCorrect: false,
+          },
+          { id: "o4", textAr: "طفل", textEn: "Child", isCorrect: false },
+        ],
+      },
+    ],
+  },
 
- {
- id: 11,
- slug: 'output-formatting',
- agentSlug: 'claude',
- titleAr: 'تنسيق الإجابة: شكّل الناتج',
- titleEn: 'Output Formatting: Shape the Output',
- descriptionAr: 'تعلّم إزاي تطلب إجابات بشكل محدد — JSON، جدول، نقط، وأكتر.',
- descriptionEn: 'Learn how to request answers in a specific format — JSON, tables, bullets, and more.',
- order: 11,
- xpReward: 85,
- estimatedMinutes: 10,
- contentAr: `## تنسيق الإجابة
+  {
+    id: 11,
+    slug: "output-formatting",
+    agentSlug: "claude",
+    titleAr: "تنسيق الإجابة: شكّل الناتج",
+    titleEn: "Output Formatting: Shape the Output",
+    descriptionAr: "تعلّم إزاي تطلب إجابات بشكل محدد — JSON، جدول، نقط، وأكتر.",
+    descriptionEn:
+      "Learn how to request answers in a specific format — JSON, tables, bullets, and more.",
+    order: 11,
+    xpReward: 85,
+    estimatedMinutes: 10,
+    contentAr: `## تنسيق الإجابة
 
 من أهم مهارات الـ Prompting إنك تحدد **شكل الإجابة** اللي عايزها — مش بس المحتوى.
 
@@ -1751,7 +2215,7 @@ The role affects **style and focus**, not **facts**. Claude still provides accur
 
 > "**أنت مستشار تسويق** (Role). حلّل منافسينا الثلاثة **خطوة خطوة** (CoT). النتيجة في **جدول** فيه: الاسم، نقاط القوة، نقاط الضعف، الفرصة." (Format)`,
 
- contentEn: `## Output Formatting
+    contentEn: `## Output Formatting
 
 One of the most important prompting skills is specifying the **format** of the answer you want — not just the content.
 
@@ -1820,56 +2284,92 @@ Combining formatting with other techniques gives excellent results:
 
 > "**You are a marketing consultant** (Role). Analyze our three competitors **step by step** (CoT). Result in a **table** with: Name, Strengths, Weaknesses, Opportunity." (Format)`,
 
- quiz: [
- {
- id: 'q11-1',
- questionAr: 'لو عايز Claude يرجع بيانات منظمة لبرنامج، أحسن تنسيق هو؟',
- questionEn: 'If you want Claude to return structured data for a program, the best format is?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'JSON', textEn: 'JSON', isCorrect: true },
- { id: 'o2', textAr: 'نثر حر', textEn: 'Free prose', isCorrect: false },
- { id: 'o3', textAr: 'شعر', textEn: 'Poetry', isCorrect: false },
- { id: 'o4', textAr: 'نقط فقط', textEn: 'Bullet points only', isCorrect: false },
- ],
- },
- {
- id: 'q11-2',
- questionAr: 'إزاي بتحدد طول الإجابة؟',
- questionEn: 'How do you control the answer length?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'بتحدد في الـ prompt: "في 3 نقط" أو "في 200 كلمة"', textEn: 'You specify in the prompt: "in 3 points" or "in 200 words"', isCorrect: true },
- { id: 'o2', textAr: 'Claude بيحدده وحده دايماً', textEn: 'Claude always decides it automatically', isCorrect: false },
- { id: 'o3', textAr: 'مفيش طريقة لتحديد الطول', textEn: 'There\'s no way to control length', isCorrect: false },
- { id: 'o4', textAr: 'بتستخدم كود خاص', textEn: 'You use special code', isCorrect: false },
- ],
- },
- {
- id: 'q11-3',
- questionAr: 'صح ولا غلط: ممكن تدمج تنسيق الإجابة مع Role Prompting في نفس الـ Prompt',
- questionEn: 'True or False: You can combine output formatting with Role Prompting in the same prompt',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q11-1",
+        questionAr: "لو عايز Claude يرجع بيانات منظمة لبرنامج، أحسن تنسيق هو؟",
+        questionEn:
+          "If you want Claude to return structured data for a program, the best format is?",
+        type: "multiple_choice",
+        options: [
+          { id: "o1", textAr: "JSON", textEn: "JSON", isCorrect: true },
+          {
+            id: "o2",
+            textAr: "نثر حر",
+            textEn: "Free prose",
+            isCorrect: false,
+          },
+          { id: "o3", textAr: "شعر", textEn: "Poetry", isCorrect: false },
+          {
+            id: "o4",
+            textAr: "نقط فقط",
+            textEn: "Bullet points only",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q11-2",
+        questionAr: "إزاي بتحدد طول الإجابة؟",
+        questionEn: "How do you control the answer length?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: 'بتحدد في الـ prompt: "في 3 نقط" أو "في 200 كلمة"',
+            textEn:
+              'You specify in the prompt: "in 3 points" or "in 200 words"',
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "Claude بيحدده وحده دايماً",
+            textEn: "Claude always decides it automatically",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "مفيش طريقة لتحديد الطول",
+            textEn: "There's no way to control length",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "بتستخدم كود خاص",
+            textEn: "You use special code",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q11-3",
+        questionAr:
+          "صح ولا غلط: ممكن تدمج تنسيق الإجابة مع Role Prompting في نفس الـ Prompt",
+        questionEn:
+          "True or False: You can combine output formatting with Role Prompting in the same prompt",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 
- {
- id: 12,
- slug: 'system-prompt',
- agentSlug: 'claude',
- titleAr: 'System Prompt: البرمجة الخفية',
- titleEn: 'System Prompt: The Hidden Programming',
- descriptionAr: 'اكتشف الـ System Prompt — الكود اللي بيحدد شخصية الـ AI قبل ما تكلمه.',
- descriptionEn: 'Discover the System Prompt — the code that defines AI\'s personality before you talk to it.',
- order: 12,
- xpReward: 90,
- estimatedMinutes: 11,
- contentAr: `## الـ System Prompt
+  {
+    id: 12,
+    slug: "system-prompt",
+    agentSlug: "claude",
+    titleAr: "System Prompt: البرمجة الخفية",
+    titleEn: "System Prompt: The Hidden Programming",
+    descriptionAr:
+      "اكتشف الـ System Prompt — الكود اللي بيحدد شخصية الـ AI قبل ما تكلمه.",
+    descriptionEn:
+      "Discover the System Prompt — the code that defines AI's personality before you talk to it.",
+    order: 12,
+    xpReward: 90,
+    estimatedMinutes: 11,
+    contentAr: `## الـ System Prompt
 
 الـ **System Prompt** هو تعليمات مخفية بتتبعث لـ Claude **قبل** ما تبدأ المحادثة. المستخدم مش شايفها، بس Claude بيطبقها طول الوقت.
 
@@ -1939,7 +2439,7 @@ Combining formatting with other techniques gives excellent results:
 
 وبعدين اسأله أي سؤال تاني مش عن الطبخ — هتشوف كيف بيحافظ على الشخصية!`,
 
- contentEn: `## The System Prompt
+    contentEn: `## The System Prompt
 
 The **System Prompt** is a hidden set of instructions sent to Claude **before** the conversation starts. The user doesn't see it, but Claude follows it throughout the entire conversation.
 
@@ -2009,56 +2509,107 @@ Open the Sandbox on the platform and write:
 
 Then ask it a question about something else — watch how it maintains the persona!`,
 
- quiz: [
- {
- id: 'q12-1',
- questionAr: 'مين اللي بيكتب الـ System Prompt عادةً؟',
- questionEn: 'Who usually writes the System Prompt?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'المطوّر أو صاحب التطبيق', textEn: 'The developer or app owner', isCorrect: true },
- { id: 'o2', textAr: 'المستخدم العادي', textEn: 'The regular user', isCorrect: false },
- { id: 'o3', textAr: 'Claude نفسه', textEn: 'Claude itself', isCorrect: false },
- { id: 'o4', textAr: 'شركة Anthropic بس', textEn: 'Anthropic only', isCorrect: false },
- ],
- },
- {
- id: 'q12-2',
- questionAr: 'هل المستخدم بيشوف الـ System Prompt؟',
- questionEn: 'Does the user see the System Prompt?',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'أيوه دايماً', textEn: 'Yes always', isCorrect: false },
- { id: 'o2', textAr: 'لا، بيكون مخفي', textEn: 'No, it\'s hidden', isCorrect: true },
- ],
- },
- {
- id: 'q12-3',
- questionAr: 'الـ System Prompt بيُستخدم في؟',
- questionEn: 'The System Prompt is used for?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'تحديد شخصية وقواعد الـ AI في التطبيق', textEn: 'Defining the AI\'s persona and rules in the app', isCorrect: true },
- { id: 'o2', textAr: 'سرعة الإجابات', textEn: 'Speeding up responses', isCorrect: false },
- { id: 'o3', textAr: 'تخفيض تكلفة الـ API', textEn: 'Reducing API costs', isCorrect: false },
- { id: 'o4', textAr: 'إنشاء صور', textEn: 'Generating images', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q12-1",
+        questionAr: "مين اللي بيكتب الـ System Prompt عادةً؟",
+        questionEn: "Who usually writes the System Prompt?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "المطوّر أو صاحب التطبيق",
+            textEn: "The developer or app owner",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "المستخدم العادي",
+            textEn: "The regular user",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "Claude نفسه",
+            textEn: "Claude itself",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "شركة Anthropic بس",
+            textEn: "Anthropic only",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q12-2",
+        questionAr: "هل المستخدم بيشوف الـ System Prompt؟",
+        questionEn: "Does the user see the System Prompt?",
+        type: "true_false",
+        options: [
+          {
+            id: "o1",
+            textAr: "أيوه دايماً",
+            textEn: "Yes always",
+            isCorrect: false,
+          },
+          {
+            id: "o2",
+            textAr: "لا، بيكون مخفي",
+            textEn: "No, it's hidden",
+            isCorrect: true,
+          },
+        ],
+      },
+      {
+        id: "q12-3",
+        questionAr: "الـ System Prompt بيُستخدم في؟",
+        questionEn: "The System Prompt is used for?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "تحديد شخصية وقواعد الـ AI في التطبيق",
+            textEn: "Defining the AI's persona and rules in the app",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "سرعة الإجابات",
+            textEn: "Speeding up responses",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "تخفيض تكلفة الـ API",
+            textEn: "Reducing API costs",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "إنشاء صور",
+            textEn: "Generating images",
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  },
 
- {
- id: 13,
- slug: 'prompt-engineering-review',
- agentSlug: 'claude',
- titleAr: 'مراجعة: دمج التقنيات',
- titleEn: 'Review: Combining Techniques',
- descriptionAr: 'دمّج كل التقنيات اللي اتعلمتها وابني prompts احترافية.',
- descriptionEn: 'Combine all the techniques you\'ve learned and build professional prompts.',
- order: 13,
- xpReward: 100,
- estimatedMinutes: 12,
- contentAr: `## دمج التقنيات — المستوى الاحترافي
+  {
+    id: 13,
+    slug: "prompt-engineering-review",
+    agentSlug: "claude",
+    titleAr: "مراجعة: دمج التقنيات",
+    titleEn: "Review: Combining Techniques",
+    descriptionAr: "دمّج كل التقنيات اللي اتعلمتها وابني prompts احترافية.",
+    descriptionEn:
+      "Combine all the techniques you've learned and build professional prompts.",
+    order: 13,
+    xpReward: 100,
+    estimatedMinutes: 12,
+    contentAr: `## دمج التقنيات — المستوى الاحترافي
 
 وصلت للدرس الأخير في Prompt Engineering! جه الوقت تدمج كل حاجة اتعلمتها.
 
@@ -2133,7 +2684,7 @@ Then ask it a question about something else — watch how it maintains the perso
 
 جرّب كل اللي اتعلمته في **الـ Sandbox** واكتشف قوتك الحقيقية! `,
 
- contentEn: `## Combining Techniques — Professional Level
+    contentEn: `## Combining Techniques — Professional Level
 
 You've reached the last lesson in Prompt Engineering! Time to combine everything you've learned.
 
@@ -2208,58 +2759,102 @@ You've completed the full **Prompt Engineering track**! You now have:
 
 Try everything you've learned in the **Sandbox** and discover your true power! `,
 
- quiz: [
- {
- id: 'q13-1',
- questionAr: 'الـ Prompt الاحترافي بيدمج؟',
- questionEn: 'A professional prompt combines?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'أكتر من تقنية مع بعض', textEn: 'Multiple techniques together', isCorrect: true },
- { id: 'o2', textAr: 'تقنية واحدة فقط', textEn: 'Only one technique', isCorrect: false },
- { id: 'o3', textAr: 'لا تقنيات خالص', textEn: 'No techniques at all', isCorrect: false },
- { id: 'o4', textAr: 'أطول prompt ممكن', textEn: 'The longest prompt possible', isCorrect: false },
- ],
- },
- {
- id: 'q13-2',
- questionAr: 'من الأخطاء الشائعة في كتابة الـ Prompts؟',
- questionEn: 'Which is a common mistake in writing prompts?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'سياق ناقص + تنسيق مش محدد', textEn: 'Missing context + unspecified format', isCorrect: true },
- { id: 'o2', textAr: 'استخدام Role Prompting', textEn: 'Using Role Prompting', isCorrect: false },
- { id: 'o3', textAr: 'طلب إجابة منظمة', textEn: 'Requesting a structured answer', isCorrect: false },
- { id: 'o4', textAr: 'تحديد الجمهور المستهدف', textEn: 'Specifying the target audience', isCorrect: false },
- ],
- },
- {
- id: 'q13-3',
- questionAr: 'صح ولا غلط: تعلمت في الـ track ده Zero-shot, Few-shot, CoT, Role, Format, و System Prompt',
- questionEn: 'True or False: In this track you learned Zero-shot, Few-shot, CoT, Role, Format, and System Prompt',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح ', textEn: 'True ', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q13-1",
+        questionAr: "الـ Prompt الاحترافي بيدمج؟",
+        questionEn: "A professional prompt combines?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "أكتر من تقنية مع بعض",
+            textEn: "Multiple techniques together",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "تقنية واحدة فقط",
+            textEn: "Only one technique",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "لا تقنيات خالص",
+            textEn: "No techniques at all",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "أطول prompt ممكن",
+            textEn: "The longest prompt possible",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q13-2",
+        questionAr: "من الأخطاء الشائعة في كتابة الـ Prompts؟",
+        questionEn: "Which is a common mistake in writing prompts?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "سياق ناقص + تنسيق مش محدد",
+            textEn: "Missing context + unspecified format",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "استخدام Role Prompting",
+            textEn: "Using Role Prompting",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "طلب إجابة منظمة",
+            textEn: "Requesting a structured answer",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "تحديد الجمهور المستهدف",
+            textEn: "Specifying the target audience",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q13-3",
+        questionAr:
+          "صح ولا غلط: تعلمت في الـ track ده Zero-shot, Few-shot, CoT, Role, Format, و System Prompt",
+        questionEn:
+          "True or False: In this track you learned Zero-shot, Few-shot, CoT, Role, Format, and System Prompt",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح ", textEn: "True ", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 ];
 
 export const claudeApiLessons: Lesson[] = [
- {
- id: 14,
- slug: 'claude-api-intro',
- agentSlug: 'claude',
- titleAr: 'Claude API — المقدمة',
- titleEn: 'Claude API — Introduction',
- descriptionAr: 'ابدأ رحلتك كمطور مع Claude API — المفتاح، الـ SDK، وأول request.',
- descriptionEn: 'Start your developer journey with Claude API — the key, SDK, and first request.',
- order: 14,
- xpReward: 90,
- estimatedMinutes: 10,
- contentAr: `## Claude API — المقدمة
+  {
+    id: 14,
+    slug: "claude-api-intro",
+    agentSlug: "claude",
+    titleAr: "Claude API — المقدمة",
+    titleEn: "Claude API — Introduction",
+    descriptionAr:
+      "ابدأ رحلتك كمطور مع Claude API — المفتاح، الـ SDK، وأول request.",
+    descriptionEn:
+      "Start your developer journey with Claude API — the key, SDK, and first request.",
+    order: 14,
+    xpReward: 90,
+    estimatedMinutes: 10,
+    contentAr: `## Claude API — المقدمة
 
 الـ **Claude API** هو الطريقة اللي بتخلي برنامجك يتكلم مع Claude مباشرة — من غير ما تفتح متصفح أو تكتب يدوياً.
 
@@ -2357,7 +2952,7 @@ import os
 client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 \`\`\``,
 
- contentEn: `## Claude API — Introduction
+    contentEn: `## Claude API — Introduction
 
 The **Claude API** lets your program talk to Claude directly — without opening a browser or typing manually.
 
@@ -2455,58 +3050,119 @@ import os
 client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 \`\`\``,
 
- quiz: [
- {
- id: 'q14-1',
- questionAr: 'الـ Claude API بيعمل إيه؟',
- questionEn: 'What does the Claude API do?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'بيخلي برامجك تتواصل مع Claude مباشرة', textEn: 'Lets your programs communicate with Claude directly', isCorrect: true },
- { id: 'o2', textAr: 'بيفتح متصفح ويكتب تلقائياً', textEn: 'Opens a browser and types automatically', isCorrect: false },
- { id: 'o3', textAr: 'بيتيح تحميل Claude على جهازك', textEn: 'Allows downloading Claude to your device', isCorrect: false },
- { id: 'o4', textAr: 'بيعمل ترجمة فقط', textEn: 'Only does translation', isCorrect: false },
- ],
- },
- {
- id: 'q14-2',
- questionAr: 'الطريقة الصح لحفظ الـ API Key في الكود؟',
- questionEn: 'The correct way to store the API Key in code?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'متغير بيئة (Environment Variable)', textEn: 'Environment Variable', isCorrect: true },
- { id: 'o2', textAr: 'مباشرة في الكود كـ string', textEn: 'Directly in code as a string', isCorrect: false },
- { id: 'o3', textAr: 'في ملف README', textEn: 'In a README file', isCorrect: false },
- { id: 'o4', textAr: 'في اسم الـ variable', textEn: 'In the variable name', isCorrect: false },
- ],
- },
- {
- id: 'q14-3',
- questionAr: 'الـ max_tokens بيتحكم في؟',
- questionEn: 'max_tokens controls?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'أقصى طول للرد', textEn: 'Maximum length of the response', isCorrect: true },
- { id: 'o2', textAr: 'سرعة الاستجابة', textEn: 'Response speed', isCorrect: false },
- { id: 'o3', textAr: 'عدد الطلبات في اليوم', textEn: 'Number of requests per day', isCorrect: false },
- { id: 'o4', textAr: 'سعر الطلب', textEn: 'Request price', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q14-1",
+        questionAr: "الـ Claude API بيعمل إيه؟",
+        questionEn: "What does the Claude API do?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "بيخلي برامجك تتواصل مع Claude مباشرة",
+            textEn: "Lets your programs communicate with Claude directly",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "بيفتح متصفح ويكتب تلقائياً",
+            textEn: "Opens a browser and types automatically",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "بيتيح تحميل Claude على جهازك",
+            textEn: "Allows downloading Claude to your device",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "بيعمل ترجمة فقط",
+            textEn: "Only does translation",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q14-2",
+        questionAr: "الطريقة الصح لحفظ الـ API Key في الكود؟",
+        questionEn: "The correct way to store the API Key in code?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "متغير بيئة (Environment Variable)",
+            textEn: "Environment Variable",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "مباشرة في الكود كـ string",
+            textEn: "Directly in code as a string",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "في ملف README",
+            textEn: "In a README file",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "في اسم الـ variable",
+            textEn: "In the variable name",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q14-3",
+        questionAr: "الـ max_tokens بيتحكم في؟",
+        questionEn: "max_tokens controls?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "أقصى طول للرد",
+            textEn: "Maximum length of the response",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "سرعة الاستجابة",
+            textEn: "Response speed",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "عدد الطلبات في اليوم",
+            textEn: "Number of requests per day",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "سعر الطلب",
+            textEn: "Request price",
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  },
 
- {
- id: 15,
- slug: 'messages-api',
- agentSlug: 'claude',
- titleAr: 'Messages API — المحادثة',
- titleEn: 'Messages API — Conversation',
- descriptionAr: 'إزاي تبني محادثة متعددة الأدوار مع Claude في كودك.',
- descriptionEn: 'How to build a multi-turn conversation with Claude in your code.',
- order: 15,
- xpReward: 90,
- estimatedMinutes: 11,
- contentAr: `## Messages API
+  {
+    id: 15,
+    slug: "messages-api",
+    agentSlug: "claude",
+    titleAr: "Messages API — المحادثة",
+    titleEn: "Messages API — Conversation",
+    descriptionAr: "إزاي تبني محادثة متعددة الأدوار مع Claude في كودك.",
+    descriptionEn:
+      "How to build a multi-turn conversation with Claude in your code.",
+    order: 15,
+    xpReward: 90,
+    estimatedMinutes: 11,
+    contentAr: `## Messages API
 
 الـ **Messages API** هو القلب النابض لـ Claude API. كل طلب بتبعته بيكون على شكل قائمة رسائل بـ \`role\` و \`content\`.
 
@@ -2616,7 +3272,7 @@ messages = [{
 
 لو المحادثة طويلة جداً، بتحتاج تعمل تلخيص أو truncation للرسائل القديمة.`,
 
- contentEn: `## Messages API
+    contentEn: `## Messages API
 
 The **Messages API** is the core of Claude API. Every request you send is a list of messages with \`role\` and \`content\`.
 
@@ -2726,56 +3382,100 @@ messages = [{
 
 If the conversation gets too long, you'll need to summarize or truncate old messages.`,
 
- quiz: [
- {
- id: 'q15-1',
- questionAr: 'ليه بنبعت كل تاريخ المحادثة في كل request؟',
- questionEn: 'Why do we send the entire conversation history in every request?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'عشان Claude مش بيحتفظ بذاكرة بين الـ requests', textEn: 'Because Claude has no memory between requests', isCorrect: true },
- { id: 'o2', textAr: 'عشان ده أسرع', textEn: 'Because it\'s faster', isCorrect: false },
- { id: 'o3', textAr: 'متطلب من الـ API مش مهم', textEn: 'An API requirement that doesn\'t matter', isCorrect: false },
- { id: 'o4', textAr: 'عشان نوفر tokens', textEn: 'To save tokens', isCorrect: false },
- ],
- },
- {
- id: 'q15-2',
- questionAr: 'الـ stop_reason بيوضح؟',
- questionEn: 'The stop_reason indicates?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'ليه Claude وقف الرد', textEn: 'Why Claude stopped the response', isCorrect: true },
- { id: 'o2', textAr: 'سرعة الرد', textEn: 'Response speed', isCorrect: false },
- { id: 'o3', textAr: 'عدد الأخطاء', textEn: 'Number of errors', isCorrect: false },
- { id: 'o4', textAr: 'حجم الملف', textEn: 'File size', isCorrect: false },
- ],
- },
- {
- id: 'q15-3',
- questionAr: 'صح ولا غلط: الـ content في الرسالة ممكن يحتوي على صورة ونص معاً',
- questionEn: 'True or False: The content in a message can contain both image and text',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q15-1",
+        questionAr: "ليه بنبعت كل تاريخ المحادثة في كل request؟",
+        questionEn:
+          "Why do we send the entire conversation history in every request?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "عشان Claude مش بيحتفظ بذاكرة بين الـ requests",
+            textEn: "Because Claude has no memory between requests",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "عشان ده أسرع",
+            textEn: "Because it's faster",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "متطلب من الـ API مش مهم",
+            textEn: "An API requirement that doesn't matter",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "عشان نوفر tokens",
+            textEn: "To save tokens",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q15-2",
+        questionAr: "الـ stop_reason بيوضح؟",
+        questionEn: "The stop_reason indicates?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "ليه Claude وقف الرد",
+            textEn: "Why Claude stopped the response",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "سرعة الرد",
+            textEn: "Response speed",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "عدد الأخطاء",
+            textEn: "Number of errors",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "حجم الملف",
+            textEn: "File size",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q15-3",
+        questionAr:
+          "صح ولا غلط: الـ content في الرسالة ممكن يحتوي على صورة ونص معاً",
+        questionEn:
+          "True or False: The content in a message can contain both image and text",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 
- {
- id: 16,
- slug: 'streaming-api',
- agentSlug: 'claude',
- titleAr: 'Streaming — الرد الفوري',
- titleEn: 'Streaming — Real-time Response',
- descriptionAr: 'اعمل تجربة ChatGPT في تطبيقك — الكلام يظهر كلمة كلمة.',
- descriptionEn: 'Build a ChatGPT-like experience in your app — words appear one by one.',
- order: 16,
- xpReward: 95,
- estimatedMinutes: 11,
- contentAr: `## Streaming
+  {
+    id: 16,
+    slug: "streaming-api",
+    agentSlug: "claude",
+    titleAr: "Streaming — الرد الفوري",
+    titleEn: "Streaming — Real-time Response",
+    descriptionAr: "اعمل تجربة ChatGPT في تطبيقك — الكلام يظهر كلمة كلمة.",
+    descriptionEn:
+      "Build a ChatGPT-like experience in your app — words appear one by one.",
+    order: 16,
+    xpReward: 95,
+    estimatedMinutes: 11,
+    contentAr: `## Streaming
 
 الـ **Streaming** بيخلي الرد يظهر تدريجياً — كلمة كلمة — بدل ما تستنى الرد كله قبل ما يظهر.
 
@@ -2884,7 +3584,7 @@ export async function POST(req: Request) {
 
 دايماً استخدم Streaming في تطبيقاتك — المستخدمين بيكرهوا الانتظار. حتى لو الرد بطيء، لما يشوف الكلمات بتتكتب، بيحس إن الـ app سريع!`,
 
- contentEn: `## Streaming
+    contentEn: `## Streaming
 
 **Streaming** makes the response appear progressively — word by word — instead of waiting for the entire response before it shows.
 
@@ -2993,56 +3693,103 @@ export async function POST(req: Request) {
 
 Always use Streaming in your apps — users hate waiting. Even if the response is slow, seeing words appearing makes the app feel fast!`,
 
- quiz: [
- {
- id: 'q16-1',
- questionAr: 'الميزة الرئيسية للـ Streaming؟',
- questionEn: 'The main benefit of Streaming?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'الرد يظهر تدريجياً فوراً بدل الانتظار', textEn: 'Response appears progressively instead of waiting', isCorrect: true },
- { id: 'o2', textAr: 'يوفر تكلفة الـ API', textEn: 'Saves API cost', isCorrect: false },
- { id: 'o3', textAr: 'يجعل Claude أذكى', textEn: 'Makes Claude smarter', isCorrect: false },
- { id: 'o4', textAr: 'يزيد عدد الـ tokens', textEn: 'Increases token count', isCorrect: false },
- ],
- },
- {
- id: 'q16-2',
- questionAr: 'أنهي event فيه النص الجديد في الـ Stream؟',
- questionEn: 'Which event contains the new text in the Stream?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'content_block_delta', textEn: 'content_block_delta', isCorrect: true },
- { id: 'o2', textAr: 'message_start', textEn: 'message_start', isCorrect: false },
- { id: 'o3', textAr: 'message_stop', textEn: 'message_stop', isCorrect: false },
- { id: 'o4', textAr: 'content_block_stop', textEn: 'content_block_stop', isCorrect: false },
- ],
- },
- {
- id: 'q16-3',
- questionAr: 'صح ولا غلط: Streaming بيغير جودة الرد',
- questionEn: 'True or False: Streaming changes the quality of the response',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
- { id: 'o2', textAr: 'غلط — بس طريقة التسليم اللي بتتغير', textEn: 'False — only the delivery method changes', isCorrect: true },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q16-1",
+        questionAr: "الميزة الرئيسية للـ Streaming؟",
+        questionEn: "The main benefit of Streaming?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "الرد يظهر تدريجياً فوراً بدل الانتظار",
+            textEn: "Response appears progressively instead of waiting",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "يوفر تكلفة الـ API",
+            textEn: "Saves API cost",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "يجعل Claude أذكى",
+            textEn: "Makes Claude smarter",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "يزيد عدد الـ tokens",
+            textEn: "Increases token count",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q16-2",
+        questionAr: "أنهي event فيه النص الجديد في الـ Stream؟",
+        questionEn: "Which event contains the new text in the Stream?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "content_block_delta",
+            textEn: "content_block_delta",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "message_start",
+            textEn: "message_start",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "message_stop",
+            textEn: "message_stop",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "content_block_stop",
+            textEn: "content_block_stop",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q16-3",
+        questionAr: "صح ولا غلط: Streaming بيغير جودة الرد",
+        questionEn:
+          "True or False: Streaming changes the quality of the response",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: false },
+          {
+            id: "o2",
+            textAr: "غلط — بس طريقة التسليم اللي بتتغير",
+            textEn: "False — only the delivery method changes",
+            isCorrect: true,
+          },
+        ],
+      },
+    ],
+  },
 
- {
- id: 17,
- slug: 'tool-use',
- agentSlug: 'claude',
- titleAr: 'Tool Use — اديه أدوات',
- titleEn: 'Tool Use — Give It Tools',
- descriptionAr: 'اربط Claude بدوال في كودك — كالك يجيب بيانات حقيقية.',
- descriptionEn: 'Connect Claude to functions in your code — let it fetch real data.',
- order: 17,
- xpReward: 100,
- estimatedMinutes: 13,
- contentAr: `## Tool Use
+  {
+    id: 17,
+    slug: "tool-use",
+    agentSlug: "claude",
+    titleAr: "Tool Use — اديه أدوات",
+    titleEn: "Tool Use — Give It Tools",
+    descriptionAr: "اربط Claude بدوال في كودك — كالك يجيب بيانات حقيقية.",
+    descriptionEn:
+      "Connect Claude to functions in your code — let it fetch real data.",
+    order: 17,
+    xpReward: 100,
+    estimatedMinutes: 13,
+    contentAr: `## Tool Use
 
 الـ **Tool Use** (أو Function Calling) بيخلي Claude يطلب من برنامجك ينفذ دالة معينة ويرجعله النتيجة.
 
@@ -3153,7 +3900,7 @@ while True:
  لما محتاج يعمل حسابات دقيقة جداً
  للمهام الإبداعية البحتة (كتابة، ترجمة)`,
 
- contentEn: `## Tool Use
+    contentEn: `## Tool Use
 
 **Tool Use** (or Function Calling) lets Claude ask your program to execute a specific function and return the result.
 
@@ -3264,56 +4011,104 @@ while True:
  When it needs very precise calculations
  For purely creative tasks (writing, translation)`,
 
- quiz: [
- {
- id: 'q17-1',
- questionAr: 'الـ Tool Use بيحل مشكلة إيه؟',
- questionEn: 'What problem does Tool Use solve?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'يخلي Claude يوصل لبيانات خارجية ويتفاعل مع الأنظمة', textEn: 'Lets Claude access external data and interact with systems', isCorrect: true },
- { id: 'o2', textAr: 'يجعل Claude أسرع', textEn: 'Makes Claude faster', isCorrect: false },
- { id: 'o3', textAr: 'يقلل تكلفة الـ API', textEn: 'Reduces API cost', isCorrect: false },
- { id: 'o4', textAr: 'يترجم بشكل أحسن', textEn: 'Translates better', isCorrect: false },
- ],
- },
- {
- id: 'q17-2',
- questionAr: 'لما الـ stop_reason يكون "tool_use"، معناه؟',
- questionEn: 'When stop_reason is "tool_use", it means?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'Claude محتاج ينفذ tool قبل ما يكمل الإجابة', textEn: 'Claude needs to execute a tool before continuing the answer', isCorrect: true },
- { id: 'o2', textAr: 'الإجابة اكتملت', textEn: 'The answer is complete', isCorrect: false },
- { id: 'o3', textAr: 'في خطأ في الـ API', textEn: 'There\'s an API error', isCorrect: false },
- { id: 'o4', textAr: 'وصل لـ max_tokens', textEn: 'Reached max_tokens', isCorrect: false },
- ],
- },
- {
- id: 'q17-3',
- questionAr: 'صح ولا غلط: Tool Use مفيد لمهام الكتابة الإبداعية البحتة',
- questionEn: 'True or False: Tool Use is useful for purely creative writing tasks',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
- { id: 'o2', textAr: 'غلط — مفيش داعي للـ tools في المهام الإبداعية', textEn: 'False — no need for tools in creative tasks', isCorrect: true },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q17-1",
+        questionAr: "الـ Tool Use بيحل مشكلة إيه؟",
+        questionEn: "What problem does Tool Use solve?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "يخلي Claude يوصل لبيانات خارجية ويتفاعل مع الأنظمة",
+            textEn:
+              "Lets Claude access external data and interact with systems",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "يجعل Claude أسرع",
+            textEn: "Makes Claude faster",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "يقلل تكلفة الـ API",
+            textEn: "Reduces API cost",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "يترجم بشكل أحسن",
+            textEn: "Translates better",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q17-2",
+        questionAr: 'لما الـ stop_reason يكون "tool_use"، معناه؟',
+        questionEn: 'When stop_reason is "tool_use", it means?',
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "Claude محتاج ينفذ tool قبل ما يكمل الإجابة",
+            textEn:
+              "Claude needs to execute a tool before continuing the answer",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "الإجابة اكتملت",
+            textEn: "The answer is complete",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "في خطأ في الـ API",
+            textEn: "There's an API error",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "وصل لـ max_tokens",
+            textEn: "Reached max_tokens",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q17-3",
+        questionAr: "صح ولا غلط: Tool Use مفيد لمهام الكتابة الإبداعية البحتة",
+        questionEn:
+          "True or False: Tool Use is useful for purely creative writing tasks",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: false },
+          {
+            id: "o2",
+            textAr: "غلط — مفيش داعي للـ tools في المهام الإبداعية",
+            textEn: "False — no need for tools in creative tasks",
+            isCorrect: true,
+          },
+        ],
+      },
+    ],
+  },
 
- {
- id: 18,
- slug: 'prompt-caching',
- agentSlug: 'claude',
- titleAr: 'Prompt Caching — وفّر فلوس',
- titleEn: 'Prompt Caching — Save Money',
- descriptionAr: 'خلي Claude يحفظ الـ context الطويل ووفّر 90% من التكلفة.',
- descriptionEn: 'Let Claude cache long context and save 90% of the cost.',
- order: 18,
- xpReward: 95,
- estimatedMinutes: 10,
- contentAr: `## Prompt Caching
+  {
+    id: 18,
+    slug: "prompt-caching",
+    agentSlug: "claude",
+    titleAr: "Prompt Caching — وفّر فلوس",
+    titleEn: "Prompt Caching — Save Money",
+    descriptionAr: "خلي Claude يحفظ الـ context الطويل ووفّر 90% من التكلفة.",
+    descriptionEn: "Let Claude cache long context and save 90% of the cost.",
+    order: 18,
+    xpReward: 95,
+    estimatedMinutes: 10,
+    contentAr: `## Prompt Caching
 
 الـ **Prompt Caching** بيخلي Claude يحتفظ بأجزاء من الـ prompt في الذاكرة — عشان متبعتش نفس المحتوى الطويل في كل request.
 
@@ -3391,7 +4186,7 @@ response = client.messages.create(
 
 لو عندك تطبيق بـ 1000 request/يوم مع system prompt طويل، الـ caching ممكن يوفر عليك آلاف الدولارات شهرياً!`,
 
- contentEn: `## Prompt Caching
+    contentEn: `## Prompt Caching
 
 **Prompt Caching** lets Claude keep parts of the prompt in memory — so you don't resend the same long content in every request.
 
@@ -3469,58 +4264,109 @@ response = client.messages.create(
 
 If you have an app with 1000 requests/day with a long system prompt, caching can save you thousands of dollars monthly!`,
 
- quiz: [
- {
- id: 'q18-1',
- questionAr: 'الـ Prompt Caching بيوفر على التكلفة إزاي؟',
- questionEn: 'How does Prompt Caching save on cost?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'بيحسب الـ cached tokens بـ 10% من سعرهم الأصلي', textEn: 'Charges cached tokens at 10% of their original price', isCorrect: true },
- { id: 'o2', textAr: 'بيلغي فلوس الـ output tokens', textEn: 'Eliminates output token charges', isCorrect: false },
- { id: 'o3', textAr: 'بيخلي الـ API مجاناً', textEn: 'Makes the API free', isCorrect: false },
- { id: 'o4', textAr: 'بيقلل حجم الـ response', textEn: 'Reduces response size', isCorrect: false },
- ],
- },
- {
- id: 'q18-2',
- questionAr: 'الـ ephemeral cache بيعيش قد إيه؟',
- questionEn: 'How long does the ephemeral cache last?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: '5 دقايق من آخر استخدام', textEn: '5 minutes from last use', isCorrect: true },
- { id: 'o2', textAr: '24 ساعة', textEn: '24 hours', isCorrect: false },
- { id: 'o3', textAr: '30 ثانية', textEn: '30 seconds', isCorrect: false },
- { id: 'o4', textAr: 'للأبد', textEn: 'Forever', isCorrect: false },
- ],
- },
- {
- id: 'q18-3',
- questionAr: 'أنهي حالة من دول الأنسب للـ Caching؟',
- questionEn: 'Which scenario is best suited for Caching?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'Chatbot بـ System Prompt طويل بيتكرر في كل request', textEn: 'Chatbot with long System Prompt repeated in every request', isCorrect: true },
- { id: 'o2', textAr: 'سؤال واحد بسيط', textEn: 'A single simple question', isCorrect: false },
- { id: 'o3', textAr: 'ترجمة كلمة', textEn: 'Translating a word', isCorrect: false },
- { id: 'o4', textAr: 'توليد صورة', textEn: 'Generating an image', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q18-1",
+        questionAr: "الـ Prompt Caching بيوفر على التكلفة إزاي؟",
+        questionEn: "How does Prompt Caching save on cost?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "بيحسب الـ cached tokens بـ 10% من سعرهم الأصلي",
+            textEn: "Charges cached tokens at 10% of their original price",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "بيلغي فلوس الـ output tokens",
+            textEn: "Eliminates output token charges",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "بيخلي الـ API مجاناً",
+            textEn: "Makes the API free",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "بيقلل حجم الـ response",
+            textEn: "Reduces response size",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q18-2",
+        questionAr: "الـ ephemeral cache بيعيش قد إيه؟",
+        questionEn: "How long does the ephemeral cache last?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "5 دقايق من آخر استخدام",
+            textEn: "5 minutes from last use",
+            isCorrect: true,
+          },
+          { id: "o2", textAr: "24 ساعة", textEn: "24 hours", isCorrect: false },
+          {
+            id: "o3",
+            textAr: "30 ثانية",
+            textEn: "30 seconds",
+            isCorrect: false,
+          },
+          { id: "o4", textAr: "للأبد", textEn: "Forever", isCorrect: false },
+        ],
+      },
+      {
+        id: "q18-3",
+        questionAr: "أنهي حالة من دول الأنسب للـ Caching؟",
+        questionEn: "Which scenario is best suited for Caching?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "Chatbot بـ System Prompt طويل بيتكرر في كل request",
+            textEn: "Chatbot with long System Prompt repeated in every request",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "سؤال واحد بسيط",
+            textEn: "A single simple question",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "ترجمة كلمة",
+            textEn: "Translating a word",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "توليد صورة",
+            textEn: "Generating an image",
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  },
 
- {
- id: 19,
- slug: 'api-best-practices',
- agentSlug: 'claude',
- titleAr: 'أفضل الممارسات — API',
- titleEn: 'Best Practices — API',
- descriptionAr: 'نصائح الـ pro لبناء تطبيقات Claude محترفة وآمنة واقتصادية.',
- descriptionEn: 'Pro tips for building professional, secure, and cost-efficient Claude apps.',
- order: 19,
- xpReward: 100,
- estimatedMinutes: 12,
- contentAr: `## أفضل الممارسات — Claude API
+  {
+    id: 19,
+    slug: "api-best-practices",
+    agentSlug: "claude",
+    titleAr: "أفضل الممارسات — API",
+    titleEn: "Best Practices — API",
+    descriptionAr: "نصائح الـ pro لبناء تطبيقات Claude محترفة وآمنة واقتصادية.",
+    descriptionEn:
+      "Pro tips for building professional, secure, and cost-efficient Claude apps.",
+    order: 19,
+    xpReward: 100,
+    estimatedMinutes: 12,
+    contentAr: `## أفضل الممارسات — Claude API
 
 وصلت لآخر درس في track الـ API! دي أهم النصائح اللي هتفرق بين مطور مبتدئ ومحترف.
 
@@ -3647,7 +4493,7 @@ Anthropic عنده حدود على عدد الـ requests:
 
 الخطوة الجاية؟ ابني تطبيقك الأول! `,
 
- contentEn: `## Best Practices — Claude API
+    contentEn: `## Best Practices — Claude API
 
 You've reached the last lesson in the API track! These are the most important tips that separate a beginner from a pro developer.
 
@@ -3774,58 +4620,101 @@ You now have all the skills needed to build real apps with Claude:
 
 Next step? Build your first real app! `,
 
- quiz: [
- {
- id: 'q19-1',
- questionAr: 'لو وصلت لـ Rate Limit، إيه أحسن حل؟',
- questionEn: 'If you hit a Rate Limit, what\'s the best solution?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'Exponential Backoff — انتظر وجرب تاني', textEn: 'Exponential Backoff — wait and retry', isCorrect: true },
- { id: 'o2', textAr: 'ابعت أكتر requests بسرعة', textEn: 'Send more requests faster', isCorrect: false },
- { id: 'o3', textAr: 'غيّر الـ API Key', textEn: 'Change the API Key', isCorrect: false },
- { id: 'o4', textAr: 'وقّف التطبيق', textEn: 'Stop the application', isCorrect: false },
- ],
- },
- {
- id: 'q19-2',
- questionAr: 'للمهام البسيطة زي التصنيف، أحسن نموذج؟',
- questionEn: 'For simple tasks like classification, the best model is?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'claude-haiku-4-5 (أرخص وأسرع)', textEn: 'claude-haiku-4-5 (cheaper and faster)', isCorrect: true },
- { id: 'o2', textAr: 'claude-opus-4-7 دايماً', textEn: 'claude-opus-4-7 always', isCorrect: false },
- { id: 'o3', textAr: 'أي نموذج سواء', textEn: 'Any model is fine', isCorrect: false },
- { id: 'o4', textAr: 'مفيش فرق في التكلفة', textEn: 'No difference in cost', isCorrect: false },
- ],
- },
- {
- id: 'q19-3',
- questionAr: 'صح ولا غلط: من الأفضل حفظ الـ API Key في ملف .env وإضافته لـ .gitignore',
- questionEn: 'True or False: It\'s best to store the API Key in a .env file and add it to .gitignore',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح ', textEn: 'True ', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q19-1",
+        questionAr: "لو وصلت لـ Rate Limit، إيه أحسن حل؟",
+        questionEn: "If you hit a Rate Limit, what's the best solution?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "Exponential Backoff — انتظر وجرب تاني",
+            textEn: "Exponential Backoff — wait and retry",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "ابعت أكتر requests بسرعة",
+            textEn: "Send more requests faster",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "غيّر الـ API Key",
+            textEn: "Change the API Key",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "وقّف التطبيق",
+            textEn: "Stop the application",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q19-2",
+        questionAr: "للمهام البسيطة زي التصنيف، أحسن نموذج؟",
+        questionEn: "For simple tasks like classification, the best model is?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "claude-haiku-4-5 (أرخص وأسرع)",
+            textEn: "claude-haiku-4-5 (cheaper and faster)",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "claude-opus-4-7 دايماً",
+            textEn: "claude-opus-4-7 always",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "أي نموذج سواء",
+            textEn: "Any model is fine",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "مفيش فرق في التكلفة",
+            textEn: "No difference in cost",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q19-3",
+        questionAr:
+          "صح ولا غلط: من الأفضل حفظ الـ API Key في ملف .env وإضافته لـ .gitignore",
+        questionEn:
+          "True or False: It's best to store the API Key in a .env file and add it to .gitignore",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح ", textEn: "True ", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 ];
 
 export const developerLessons: Lesson[] = [
- {
- id: 20,
- slug: 'build-a-chatbot',
- agentSlug: 'claude',
- titleAr: 'ابني Chatbot من الصفر',
- titleEn: 'Build a Chatbot from Scratch',
- descriptionAr: 'خطوة بخطوة — ابني chatbot كامل بـ Python في أقل من 50 سطر.',
- descriptionEn: 'Step by step — build a complete chatbot in Python in under 50 lines.',
- order: 20,
- xpReward: 100,
- estimatedMinutes: 15,
- contentAr: `## ابني Chatbot من الصفر
+  {
+    id: 20,
+    slug: "build-a-chatbot",
+    agentSlug: "claude",
+    titleAr: "ابني Chatbot من الصفر",
+    titleEn: "Build a Chatbot from Scratch",
+    descriptionAr: "خطوة بخطوة — ابني chatbot كامل بـ Python في أقل من 50 سطر.",
+    descriptionEn:
+      "Step by step — build a complete chatbot in Python in under 50 lines.",
+    order: 20,
+    xpReward: 100,
+    estimatedMinutes: 15,
+    contentAr: `## ابني Chatbot من الصفر
 
 في الدرس ده هتبني chatbot كامل يشتغل في الـ terminal بـ Python — محادثة حقيقية متعددة الأدوار!
 
@@ -3955,7 +4844,7 @@ print() # سطر جديد
 2. يحفظ المحادثة في ملف JSON
 3. يستخدم Streaming`,
 
- contentEn: `## Build a Chatbot from Scratch
+    contentEn: `## Build a Chatbot from Scratch
 
 In this lesson you'll build a complete chatbot that runs in the terminal using Python — a real multi-turn conversation!
 
@@ -4078,56 +4967,98 @@ Modify this chatbot to:
 2. Save conversation to JSON file
 3. Use Streaming`,
 
- quiz: [
- {
- id: 'q20-1',
- questionAr: 'ليه بنحتفظ بالـ conversation list؟',
- questionEn: 'Why do we maintain the conversation list?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'عشان Claude يتذكر المحادثة السابقة', textEn: 'So Claude remembers the previous conversation', isCorrect: true },
- { id: 'o2', textAr: 'عشان نوفر tokens', textEn: 'To save tokens', isCorrect: false },
- { id: 'o3', textAr: 'متطلب من Python', textEn: 'Required by Python', isCorrect: false },
- { id: 'o4', textAr: 'لمنع الـ errors', textEn: 'To prevent errors', isCorrect: false },
- ],
- },
- {
- id: 'q20-2',
- questionAr: 'ليه استخدمنا claude-haiku-4-5 في الـ Chatbot؟',
- questionEn: 'Why did we use claude-haiku-4-5 in the Chatbot?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'أرخص وأسرع للمحادثات اليومية', textEn: 'Cheaper and faster for everyday conversations', isCorrect: true },
- { id: 'o2', textAr: 'الوحيد المتاح', textEn: 'The only available model', isCorrect: false },
- { id: 'o3', textAr: 'الأذكى دايماً', textEn: 'Always the smartest', isCorrect: false },
- { id: 'o4', textAr: 'بيدعم العربية بس هو', textEn: 'Only one supporting Arabic', isCorrect: false },
- ],
- },
- {
- id: 'q20-3',
- questionAr: 'صح ولا غلط: ممكن تضيف Streaming لأي chatbot بتبنيه',
- questionEn: 'True or False: You can add Streaming to any chatbot you build',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q20-1",
+        questionAr: "ليه بنحتفظ بالـ conversation list؟",
+        questionEn: "Why do we maintain the conversation list?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "عشان Claude يتذكر المحادثة السابقة",
+            textEn: "So Claude remembers the previous conversation",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "عشان نوفر tokens",
+            textEn: "To save tokens",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "متطلب من Python",
+            textEn: "Required by Python",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "لمنع الـ errors",
+            textEn: "To prevent errors",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q20-2",
+        questionAr: "ليه استخدمنا claude-haiku-4-5 في الـ Chatbot؟",
+        questionEn: "Why did we use claude-haiku-4-5 in the Chatbot?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "أرخص وأسرع للمحادثات اليومية",
+            textEn: "Cheaper and faster for everyday conversations",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "الوحيد المتاح",
+            textEn: "The only available model",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "الأذكى دايماً",
+            textEn: "Always the smartest",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "بيدعم العربية بس هو",
+            textEn: "Only one supporting Arabic",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q20-3",
+        questionAr: "صح ولا غلط: ممكن تضيف Streaming لأي chatbot بتبنيه",
+        questionEn:
+          "True or False: You can add Streaming to any chatbot you build",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 
- {
- id: 21,
- slug: 'document-qa',
- agentSlug: 'claude',
- titleAr: 'Document Q&A — اسأل على المستندات',
- titleEn: 'Document Q&A — Ask About Documents',
- descriptionAr: 'ابني نظام يجاوب على أسئلة من ملفات PDF و Word بـ Claude.',
- descriptionEn: 'Build a system that answers questions from PDF and Word files using Claude.',
- order: 21,
- xpReward: 100,
- estimatedMinutes: 14,
- contentAr: `## Document Q&A
+  {
+    id: 21,
+    slug: "document-qa",
+    agentSlug: "claude",
+    titleAr: "Document Q&A — اسأل على المستندات",
+    titleEn: "Document Q&A — Ask About Documents",
+    descriptionAr: "ابني نظام يجاوب على أسئلة من ملفات PDF و Word بـ Claude.",
+    descriptionEn:
+      "Build a system that answers questions from PDF and Word files using Claude.",
+    order: 21,
+    xpReward: 100,
+    estimatedMinutes: 14,
+    contentAr: `## Document Q&A
 
 من أقوى تطبيقات الـ AI — نظام بيقرأ مستندات ويجاوب على أسئلة عنها.
 
@@ -4268,7 +5199,7 @@ def extract_word_text(docx_path: str) -> str:
 - **أكاديمي:** اسأل على أبحاث ودراسات
 - **موارد بشرية:** قارن بين CVs`,
 
- contentEn: `## Document Q&A
+    contentEn: `## Document Q&A
 
 One of the most powerful AI applications — a system that reads documents and answers questions about them.
 
@@ -4401,56 +5332,105 @@ def extract_word_text(docx_path: str) -> str:
 - **Academic:** Ask about research papers
 - **HR:** Compare CVs`,
 
- quiz: [
- {
- id: 'q21-1',
- questionAr: 'إيه الخطوة الأولى في بناء Document Q&A؟',
- questionEn: 'What is the first step in building Document Q&A?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'استخراج النص من الملف', textEn: 'Extracting text from the file', isCorrect: true },
- { id: 'o2', textAr: 'إرسال الملف مباشرة لـ Claude', textEn: 'Sending the file directly to Claude', isCorrect: false },
- { id: 'o3', textAr: 'تشغيل الـ chatbot', textEn: 'Running the chatbot', isCorrect: false },
- { id: 'o4', textAr: 'إنشاء قاعدة بيانات', textEn: 'Creating a database', isCorrect: false },
- ],
- },
- {
- id: 'q21-2',
- questionAr: 'لو المستند أكبر من الـ context window، إيه الحل؟',
- questionEn: 'If the document exceeds the context window, what\'s the solution?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'تقسيم النص لأجزاء (chunking)', textEn: 'Split text into chunks (chunking)', isCorrect: true },
- { id: 'o2', textAr: 'استخدام نموذج مختلف', textEn: 'Use a different model', isCorrect: false },
- { id: 'o3', textAr: 'تصغير الملف', textEn: 'Compress the file', isCorrect: false },
- { id: 'o4', textAr: 'مش ممكن تحل المشكلة دي', textEn: 'This problem can\'t be solved', isCorrect: false },
- ],
- },
- {
- id: 'q21-3',
- questionAr: 'صح ولا غلط: Claude يقدر يجاوب على أسئلة من ملفات PDF و Word',
- questionEn: 'True or False: Claude can answer questions from PDF and Word files',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح — بعد استخراج النص منهم', textEn: 'True — after extracting text from them', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q21-1",
+        questionAr: "إيه الخطوة الأولى في بناء Document Q&A؟",
+        questionEn: "What is the first step in building Document Q&A?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "استخراج النص من الملف",
+            textEn: "Extracting text from the file",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "إرسال الملف مباشرة لـ Claude",
+            textEn: "Sending the file directly to Claude",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "تشغيل الـ chatbot",
+            textEn: "Running the chatbot",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "إنشاء قاعدة بيانات",
+            textEn: "Creating a database",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q21-2",
+        questionAr: "لو المستند أكبر من الـ context window، إيه الحل؟",
+        questionEn:
+          "If the document exceeds the context window, what's the solution?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "تقسيم النص لأجزاء (chunking)",
+            textEn: "Split text into chunks (chunking)",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "استخدام نموذج مختلف",
+            textEn: "Use a different model",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "تصغير الملف",
+            textEn: "Compress the file",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "مش ممكن تحل المشكلة دي",
+            textEn: "This problem can't be solved",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q21-3",
+        questionAr:
+          "صح ولا غلط: Claude يقدر يجاوب على أسئلة من ملفات PDF و Word",
+        questionEn:
+          "True or False: Claude can answer questions from PDF and Word files",
+        type: "true_false",
+        options: [
+          {
+            id: "o1",
+            textAr: "صح — بعد استخراج النص منهم",
+            textEn: "True — after extracting text from them",
+            isCorrect: true,
+          },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 
- {
- id: 22,
- slug: 'content-moderation',
- agentSlug: 'claude',
- titleAr: 'Content Moderation — مراقبة المحتوى',
- titleEn: 'Content Moderation — Monitor Content',
- descriptionAr: 'استخدم Claude عشان تصنّف وتراقب محتوى المستخدمين تلقائياً.',
- descriptionEn: 'Use Claude to automatically classify and moderate user content.',
- order: 22,
- xpReward: 95,
- estimatedMinutes: 12,
- contentAr: `## Content Moderation
+  {
+    id: 22,
+    slug: "content-moderation",
+    agentSlug: "claude",
+    titleAr: "Content Moderation — مراقبة المحتوى",
+    titleEn: "Content Moderation — Monitor Content",
+    descriptionAr: "استخدم Claude عشان تصنّف وتراقب محتوى المستخدمين تلقائياً.",
+    descriptionEn:
+      "Use Claude to automatically classify and moderate user content.",
+    order: 22,
+    xpReward: 95,
+    estimatedMinutes: 12,
+    contentAr: `## Content Moderation
 
 الـ **Content Moderation** هو تصنيف المحتوى تلقائياً — هل ده آمن؟ مسيء؟ سبام؟
 
@@ -4557,7 +5537,7 @@ Confidence 0.6-0.9 → مراجعة بشرية
 Confidence < 0.6 → مراجعة بشرية دايماً
 \`\`\``,
 
- contentEn: `## Content Moderation
+    contentEn: `## Content Moderation
 
 **Content Moderation** is automatically classifying content — is it safe? Abusive? Spam?
 
@@ -4663,56 +5643,101 @@ Confidence 0.6-0.9 → Human review
 Confidence < 0.6 → Always human review
 \`\`\``,
 
- quiz: [
- {
- id: 'q22-1',
- questionAr: 'ليه Claude أحسن من أدوات الـ moderation التقليدية في كتير من الحالات؟',
- questionEn: 'Why is Claude better than traditional moderation tools in many cases?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'لأنه بيفهم السياق مش بس الكلمات', textEn: 'Because it understands context, not just keywords', isCorrect: true },
- { id: 'o2', textAr: 'لأنه أسرع', textEn: 'Because it\'s faster', isCorrect: false },
- { id: 'o3', textAr: 'لأنه مجاني', textEn: 'Because it\'s free', isCorrect: false },
- { id: 'o4', textAr: 'لأنه بيدعم أكتر من 100 لغة', textEn: 'Because it supports over 100 languages', isCorrect: false },
- ],
- },
- {
- id: 'q22-2',
- questionAr: 'لما الـ confidence يكون 0.7، إيه المناسب؟',
- questionEn: 'When confidence is 0.7, what\'s appropriate?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'مراجعة بشرية', textEn: 'Human review', isCorrect: true },
- { id: 'o2', textAr: 'قرار تلقائي فوري', textEn: 'Immediate automatic decision', isCorrect: false },
- { id: 'o3', textAr: 'تجاهل التعليق', textEn: 'Ignore the comment', isCorrect: false },
- { id: 'o4', textAr: 'حذف تلقائي', textEn: 'Automatic deletion', isCorrect: false },
- ],
- },
- {
- id: 'q22-3',
- questionAr: 'صح ولا غلط: Batch Moderation بتوفر تكلفة وتبعت كل التعليقات في request واحد',
- questionEn: 'True or False: Batch Moderation saves cost by sending all comments in one request',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q22-1",
+        questionAr:
+          "ليه Claude أحسن من أدوات الـ moderation التقليدية في كتير من الحالات؟",
+        questionEn:
+          "Why is Claude better than traditional moderation tools in many cases?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "لأنه بيفهم السياق مش بس الكلمات",
+            textEn: "Because it understands context, not just keywords",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "لأنه أسرع",
+            textEn: "Because it's faster",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "لأنه مجاني",
+            textEn: "Because it's free",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "لأنه بيدعم أكتر من 100 لغة",
+            textEn: "Because it supports over 100 languages",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q22-2",
+        questionAr: "لما الـ confidence يكون 0.7، إيه المناسب؟",
+        questionEn: "When confidence is 0.7, what's appropriate?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "مراجعة بشرية",
+            textEn: "Human review",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "قرار تلقائي فوري",
+            textEn: "Immediate automatic decision",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "تجاهل التعليق",
+            textEn: "Ignore the comment",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "حذف تلقائي",
+            textEn: "Automatic deletion",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q22-3",
+        questionAr:
+          "صح ولا غلط: Batch Moderation بتوفر تكلفة وتبعت كل التعليقات في request واحد",
+        questionEn:
+          "True or False: Batch Moderation saves cost by sending all comments in one request",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 
- {
- id: 23,
- slug: 'structured-data-extraction',
- agentSlug: 'claude',
- titleAr: 'استخراج البيانات المنظمة',
- titleEn: 'Structured Data Extraction',
- descriptionAr: 'حوّل أي نص غير منظم لـ JSON نظيف — فواتير، CVs، عقود.',
- descriptionEn: 'Convert any unstructured text to clean JSON — invoices, CVs, contracts.',
- order: 23,
- xpReward: 95,
- estimatedMinutes: 12,
- contentAr: `## استخراج البيانات المنظمة
+  {
+    id: 23,
+    slug: "structured-data-extraction",
+    agentSlug: "claude",
+    titleAr: "استخراج البيانات المنظمة",
+    titleEn: "Structured Data Extraction",
+    descriptionAr: "حوّل أي نص غير منظم لـ JSON نظيف — فواتير، CVs، عقود.",
+    descriptionEn:
+      "Convert any unstructured text to clean JSON — invoices, CVs, contracts.",
+    order: 23,
+    xpReward: 95,
+    estimatedMinutes: 12,
+    contentAr: `## استخراج البيانات المنظمة
 
 من أهم تطبيقات الـ AI في الأعمال — تحويل النصوص الحرة لبيانات منظمة يقدر الكمبيوتر يتعامل معها.
 
@@ -4821,7 +5846,7 @@ def safe_extract(text: str, extract_fn) -> dict | None:
  return None
 \`\`\``,
 
- contentEn: `## Structured Data Extraction
+    contentEn: `## Structured Data Extraction
 
 One of the most important AI applications in business — converting free-form text into structured data that computers can process.
 
@@ -4930,56 +5955,99 @@ def safe_extract(text: str, extract_fn) -> dict | None:
  return None
 \`\`\``,
 
- quiz: [
- {
- id: 'q23-1',
- questionAr: 'إيه الهدف من Structured Data Extraction؟',
- questionEn: 'What is the goal of Structured Data Extraction?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'تحويل النصوص الحرة لبيانات منظمة (JSON/DB)', textEn: 'Converting free-form text to structured data (JSON/DB)', isCorrect: true },
- { id: 'o2', textAr: 'ترجمة النصوص', textEn: 'Translating text', isCorrect: false },
- { id: 'o3', textAr: 'تلخيص المستندات', textEn: 'Summarizing documents', isCorrect: false },
- { id: 'o4', textAr: 'إنشاء تقارير PDF', textEn: 'Creating PDF reports', isCorrect: false },
- ],
- },
- {
- id: 'q23-2',
- questionAr: 'ليه لازم نستخدم try/except مع JSON extraction؟',
- questionEn: 'Why should we use try/except with JSON extraction?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'لأن Claude ممكن يغلط أحياناً في الـ JSON format', textEn: 'Because Claude might sometimes make JSON format mistakes', isCorrect: true },
- { id: 'o2', textAr: 'متطلب من Python', textEn: 'Required by Python', isCorrect: false },
- { id: 'o3', textAr: 'عشان نوفر tokens', textEn: 'To save tokens', isCorrect: false },
- { id: 'o4', textAr: 'عشان الـ API بطيء', textEn: 'Because the API is slow', isCorrect: false },
- ],
- },
- {
- id: 'q23-3',
- questionAr: 'صح ولا غلط: ممكن نستخدم نفس التقنية لاستخراج بيانات من فواتير وعقود وـ CVs',
- questionEn: 'True or False: We can use the same technique for invoices, contracts, and CVs',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: true },
- { id: 'o2', textAr: 'غلط', textEn: 'False', isCorrect: false },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q23-1",
+        questionAr: "إيه الهدف من Structured Data Extraction؟",
+        questionEn: "What is the goal of Structured Data Extraction?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "تحويل النصوص الحرة لبيانات منظمة (JSON/DB)",
+            textEn: "Converting free-form text to structured data (JSON/DB)",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "ترجمة النصوص",
+            textEn: "Translating text",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "تلخيص المستندات",
+            textEn: "Summarizing documents",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "إنشاء تقارير PDF",
+            textEn: "Creating PDF reports",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q23-2",
+        questionAr: "ليه لازم نستخدم try/except مع JSON extraction؟",
+        questionEn: "Why should we use try/except with JSON extraction?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "لأن Claude ممكن يغلط أحياناً في الـ JSON format",
+            textEn: "Because Claude might sometimes make JSON format mistakes",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "متطلب من Python",
+            textEn: "Required by Python",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "عشان نوفر tokens",
+            textEn: "To save tokens",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "عشان الـ API بطيء",
+            textEn: "Because the API is slow",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q23-3",
+        questionAr:
+          "صح ولا غلط: ممكن نستخدم نفس التقنية لاستخراج بيانات من فواتير وعقود وـ CVs",
+        questionEn:
+          "True or False: We can use the same technique for invoices, contracts, and CVs",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: true },
+          { id: "o2", textAr: "غلط", textEn: "False", isCorrect: false },
+        ],
+      },
+    ],
+  },
 
- {
- id: 24,
- slug: 'ai-agent-basics',
- agentSlug: 'claude',
- titleAr: 'AI Agent — الوكيل الذكي',
- titleEn: 'AI Agent — The Smart Agent',
- descriptionAr: 'ابني AI Agent بيخطط وينفذ مهام معقدة من تلقاء نفسه.',
- descriptionEn: 'Build an AI Agent that plans and executes complex tasks on its own.',
- order: 24,
- xpReward: 110,
- estimatedMinutes: 15,
- contentAr: `## AI Agent
+  {
+    id: 24,
+    slug: "ai-agent-basics",
+    agentSlug: "claude",
+    titleAr: "AI Agent — الوكيل الذكي",
+    titleEn: "AI Agent — The Smart Agent",
+    descriptionAr: "ابني AI Agent بيخطط وينفذ مهام معقدة من تلقاء نفسه.",
+    descriptionEn:
+      "Build an AI Agent that plans and executes complex tasks on its own.",
+    order: 24,
+    xpReward: 110,
+    estimatedMinutes: 15,
+    contentAr: `## AI Agent
 
 الـ **AI Agent** هو برنامج بيستخدم الـ AI عشان يخطط وينفذ مهام معقدة بشكل مستقل — من غير تدخل بشري في كل خطوة.
 
@@ -5103,7 +6171,7 @@ run_agent("ابحث عن أحدث أخبار الذكاء الاصطناعي و�
  قيمة المهمة تبرر التكلفة والوقت
  مهام بسيطة تكفيها API call واحدة`,
 
- contentEn: `## AI Agent
+    contentEn: `## AI Agent
 
 An **AI Agent** is a program that uses AI to plan and execute complex tasks independently — without human intervention at every step.
 
@@ -5221,55 +6289,109 @@ run_agent("Search for latest AI news and save a summary")
  Task value justifies cost and time
  Simple tasks that need just one API call`,
 
- quiz: [
- {
- id: 'q24-1',
- questionAr: 'الفرق الرئيسي بين Chatbot وـ AI Agent؟',
- questionEn: 'The main difference between a Chatbot and an AI Agent?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'الـ Agent بينفذ مهام متعددة الخطوات بشكل مستقل', textEn: 'The Agent executes multi-step tasks independently', isCorrect: true },
- { id: 'o2', textAr: 'الـ Agent أسرع من الـ Chatbot', textEn: 'The Agent is faster than the Chatbot', isCorrect: false },
- { id: 'o3', textAr: 'الـ Agent أرخص تكلفة', textEn: 'The Agent is cheaper', isCorrect: false },
- { id: 'o4', textAr: 'مفيش فرق جوهري', textEn: 'No fundamental difference', isCorrect: false },
- ],
- },
- {
- id: 'q24-2',
- questionAr: 'الـ Agent Loop بيتوقف لما؟',
- questionEn: 'The Agent Loop stops when?',
- type: 'multiple_choice',
- options: [
- { id: 'o1', textAr: 'stop_reason يكون "end_turn" أو يوصل لـ max_steps', textEn: 'stop_reason is "end_turn" or reaches max_steps', isCorrect: true },
- { id: 'o2', textAr: 'بعد 3 خطوات دايماً', textEn: 'Always after 3 steps', isCorrect: false },
- { id: 'o3', textAr: 'لما المستخدم يكتب "stop"', textEn: 'When user types "stop"', isCorrect: false },
- { id: 'o4', textAr: 'بعد استدعاء tool واحد', textEn: 'After one tool call', isCorrect: false },
- ],
- },
- {
- id: 'q24-3',
- questionAr: 'صح ولا غلط: مهمة بسيطة زي ترجمة كلمة تستاهل نبني ليها Agent',
- questionEn: 'True or False: A simple task like translating a word is worth building an Agent for',
- type: 'true_false',
- options: [
- { id: 'o1', textAr: 'صح', textEn: 'True', isCorrect: false },
- { id: 'o2', textAr: 'غلط — API call واحدة أكفأ', textEn: 'False — one API call is more efficient', isCorrect: true },
- ],
- },
- ],
- },
+    quiz: [
+      {
+        id: "q24-1",
+        questionAr: "الفرق الرئيسي بين Chatbot وـ AI Agent؟",
+        questionEn: "The main difference between a Chatbot and an AI Agent?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: "الـ Agent بينفذ مهام متعددة الخطوات بشكل مستقل",
+            textEn: "The Agent executes multi-step tasks independently",
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "الـ Agent أسرع من الـ Chatbot",
+            textEn: "The Agent is faster than the Chatbot",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: "الـ Agent أرخص تكلفة",
+            textEn: "The Agent is cheaper",
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "مفيش فرق جوهري",
+            textEn: "No fundamental difference",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q24-2",
+        questionAr: "الـ Agent Loop بيتوقف لما؟",
+        questionEn: "The Agent Loop stops when?",
+        type: "multiple_choice",
+        options: [
+          {
+            id: "o1",
+            textAr: 'stop_reason يكون "end_turn" أو يوصل لـ max_steps',
+            textEn: 'stop_reason is "end_turn" or reaches max_steps',
+            isCorrect: true,
+          },
+          {
+            id: "o2",
+            textAr: "بعد 3 خطوات دايماً",
+            textEn: "Always after 3 steps",
+            isCorrect: false,
+          },
+          {
+            id: "o3",
+            textAr: 'لما المستخدم يكتب "stop"',
+            textEn: 'When user types "stop"',
+            isCorrect: false,
+          },
+          {
+            id: "o4",
+            textAr: "بعد استدعاء tool واحد",
+            textEn: "After one tool call",
+            isCorrect: false,
+          },
+        ],
+      },
+      {
+        id: "q24-3",
+        questionAr:
+          "صح ولا غلط: مهمة بسيطة زي ترجمة كلمة تستاهل نبني ليها Agent",
+        questionEn:
+          "True or False: A simple task like translating a word is worth building an Agent for",
+        type: "true_false",
+        options: [
+          { id: "o1", textAr: "صح", textEn: "True", isCorrect: false },
+          {
+            id: "o2",
+            textAr: "غلط — API call واحدة أكفأ",
+            textEn: "False — one API call is more efficient",
+            isCorrect: true,
+          },
+        ],
+      },
+    ],
+  },
 ];
 
-const allLessons: Lesson[] = [...claudeLessons, ...promptEngineeringLessons, ...claudeApiLessons, ...developerLessons];
+const allLessons: Lesson[] = [
+  ...claudeLessons,
+  ...promptEngineeringLessons,
+  ...claudeApiLessons,
+  ...developerLessons,
+];
 
 export function getLessonsByAgent(agentSlug: string): Lesson[] {
- return allLessons.filter((l) => l.agentSlug === agentSlug).sort((a, b) => a.order - b.order);
+  return allLessons
+    .filter((l) => l.agentSlug === agentSlug)
+    .sort((a, b) => a.order - b.order);
 }
 
 export function getLessonById(id: number): Lesson | undefined {
- return allLessons.find((l) => l.id === id);
+  return allLessons.find((l) => l.id === id);
 }
 
 export function getAgentBySlug(slug: string): Agent | undefined {
- return agents.find((a) => a.slug === slug);
+  return agents.find((a) => a.slug === slug);
 }

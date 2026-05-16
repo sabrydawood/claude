@@ -1,16 +1,27 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/i18n/navigation';
-import { DynamicIcon } from '@/components/ui/dynamic-icon';
-import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
+import { Badge } from "@/components/ui/badge";
 import {
-  ChevronLeft, BookOpen, Clock, Zap, CheckCircle2, Lock, Play,
-  Construction, Trophy,
-} from 'lucide-react';
-import type { CourseRow, LessonRow, SubjectRow } from '@/lib/db/queries/content';
+  ChevronLeft,
+  BookOpen,
+  Clock,
+  Zap,
+  CheckCircle2,
+  Lock,
+  Play,
+  Construction,
+  Trophy,
+} from "lucide-react";
+import type {
+  CourseRow,
+  LessonRow,
+  SubjectRow,
+} from "@/lib/db/queries/content";
 
 // Progress is stored in localStorage, same pattern as agent-page-client.tsx
 interface UserProgress {
@@ -19,12 +30,16 @@ interface UserProgress {
 }
 
 function getStoredProgress(): UserProgress {
-  if (typeof window === 'undefined') return { completedLessons: [], scores: {} };
+  if (typeof window === "undefined")
+    return { completedLessons: [], scores: {} };
   try {
-    const stored = localStorage.getItem('zkawi_progress');
+    const stored = localStorage.getItem("zkawi_progress");
     if (stored) {
       const p = JSON.parse(stored);
-      return { completedLessons: p.completedLessons ?? [], scores: p.scores ?? {} };
+      return {
+        completedLessons: p.completedLessons ?? [],
+        scores: p.scores ?? {},
+      };
     }
   } catch {
     // ignore parse errors
@@ -33,9 +48,9 @@ function getStoredProgress(): UserProgress {
 }
 
 const DIFFICULTY_COLORS: Record<number, string> = {
-  1: 'var(--zkawi-green)',
-  2: 'var(--zkawi-gold)',
-  3: '#ef4444',
+  1: "var(--zkawi-green)",
+  2: "var(--zkawi-gold)",
+  3: "#ef4444",
 };
 
 interface Props {
@@ -44,10 +59,17 @@ interface Props {
   locale: string;
 }
 
-export default function CoursePageClient({ course, lessons, locale: _locale }: Props) {
-  const t = useTranslations('courses');
-  const tL = useTranslations('lessons');
-  const [progress, setProgress] = useState<UserProgress>({ completedLessons: [], scores: {} });
+export default function CoursePageClient({
+  course,
+  lessons,
+  locale: _locale,
+}: Props) {
+  const t = useTranslations("courses");
+  const tL = useTranslations("lessons");
+  const [progress, setProgress] = useState<UserProgress>({
+    completedLessons: [],
+    scores: {},
+  });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -55,10 +77,15 @@ export default function CoursePageClient({ course, lessons, locale: _locale }: P
     setProgress(getStoredProgress());
   }, []);
 
-  const completedCount = mounted ? progress.completedLessons.filter((id) => lessons.some((l) => l.id === id)).length : 0;
-  const progressPercent = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
-  const difficultyKey = course.difficulty.toString() as '1' | '2' | '3';
-  const difficultyColor = DIFFICULTY_COLORS[course.difficulty] ?? DIFFICULTY_COLORS[1];
+  const completedCount = mounted
+    ? progress.completedLessons.filter((id) => lessons.some((l) => l.id === id))
+        .length
+    : 0;
+  const progressPercent =
+    lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
+  const difficultyKey = course.difficulty.toString() as "1" | "2" | "3";
+  const difficultyColor =
+    DIFFICULTY_COLORS[course.difficulty] ?? DIFFICULTY_COLORS[1];
   const subjectColor = course.subject.color;
 
   return (
@@ -72,15 +99,27 @@ export default function CoursePageClient({ course, lessons, locale: _locale }: P
         }}
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 end-0 w-48 h-48 rounded-full opacity-10" style={{ background: subjectColor, transform: 'translate(4rem, -4rem)' }} />
-          <div className="absolute bottom-0 start-0 w-32 h-32 rounded-full opacity-5" style={{ background: subjectColor, transform: 'translate(-2rem, 2rem)' }} />
+          <div
+            className="absolute top-0 end-0 w-48 h-48 rounded-full opacity-10"
+            style={{
+              background: subjectColor,
+              transform: "translate(4rem, -4rem)",
+            }}
+          />
+          <div
+            className="absolute bottom-0 start-0 w-32 h-32 rounded-full opacity-5"
+            style={{
+              background: subjectColor,
+              transform: "translate(-2rem, 2rem)",
+            }}
+          />
         </div>
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link href={`/subjects/${course.subject.slug}`}>
             <div className="inline-flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--text)] mb-6 text-sm font-medium transition-colors">
               <ChevronLeft size={16} className="flip-rtl" />
-              {t('back')}
+              {t("back")}
             </div>
           </Link>
 
@@ -88,9 +127,9 @@ export default function CoursePageClient({ course, lessons, locale: _locale }: P
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ type: 'spring' }}
+              transition={{ type: "spring" }}
               className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0"
-              style={{ background: subjectColor + '20', color: subjectColor }}
+              style={{ background: subjectColor + "20", color: subjectColor }}
             >
               <DynamicIcon name={course.subject.icon} size={32} />
             </motion.div>
@@ -131,17 +170,21 @@ export default function CoursePageClient({ course, lessons, locale: _locale }: P
               >
                 <span
                   className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full"
-                  style={{ background: difficultyColor + '18', color: difficultyColor, border: `1px solid ${difficultyColor}30` }}
+                  style={{
+                    background: difficultyColor + "18",
+                    color: difficultyColor,
+                    border: `1px solid ${difficultyColor}30`,
+                  }}
                 >
                   {t(`difficulty.${difficultyKey}`)}
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-xs text-[var(--text-muted)] bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20">
                   <Clock size={12} />
-                  {course.estimatedHours} {t('hours')}
+                  {course.estimatedHours} {t("hours")}
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-xs text-[var(--text-muted)] bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20">
                   <BookOpen size={12} />
-                  {lessons.length} {t('lessons')}
+                  {lessons.length} {t("lessons")}
                 </span>
               </motion.div>
             </div>
@@ -156,7 +199,9 @@ export default function CoursePageClient({ course, lessons, locale: _locale }: P
               className="mt-6 bg-[var(--surface)]/50 backdrop-blur-sm rounded-2xl p-4 border border-[var(--border)]"
             >
               <div className="flex justify-between text-sm font-bold mb-2 text-[var(--text)]">
-                <span>{completedCount} / {lessons.length} {tL('tabLesson')}</span>
+                <span>
+                  {completedCount} / {lessons.length} {tL("tabLesson")}
+                </span>
                 <span>{Math.round(progressPercent)}%</span>
               </div>
               <div className="h-2 bg-[var(--border)] rounded-full overflow-hidden">
@@ -177,26 +222,32 @@ export default function CoursePageClient({ course, lessons, locale: _locale }: P
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="flex items-center gap-2 text-xl font-black text-[var(--text)]">
-            <BookOpen size={20} className="text-[var(--zkawi-purple)]" />
-            {tL('tabLesson')}
+            <BookOpen size={20} className="text-[var(--zkawi-pink)]" />
+            {tL("tabLesson")}
           </h2>
-          {mounted && completedCount === lessons.length && lessons.length > 0 && (
-            <Badge variant="achievement">
-              <Trophy size={12} />
-              {tL('completed')}
-            </Badge>
-          )}
+          {mounted &&
+            completedCount === lessons.length &&
+            lessons.length > 0 && (
+              <Badge variant="achievement">
+                <Trophy size={12} />
+                {tL("completed")}
+              </Badge>
+            )}
         </div>
 
         {lessons.length === 0 ? (
           <div className="text-center py-16">
-            <Construction size={52} className="mx-auto mb-4 text-[var(--text-muted)]" />
-            <p className="text-[var(--text-muted)]">{t('empty')}</p>
+            <Construction
+              size={52}
+              className="mx-auto mb-4 text-[var(--text-muted)]"
+            />
+            <p className="text-[var(--text-muted)]">{t("empty")}</p>
           </div>
         ) : (
           <div className="space-y-4">
             {lessons.map((lesson, i) => {
-              const isCompleted = mounted && progress.completedLessons.includes(lesson.id);
+              const isCompleted =
+                mounted && progress.completedLessons.includes(lesson.id);
               const isLocked = false;
               const score = mounted ? progress.scores[lesson.id] : undefined;
 
@@ -209,57 +260,81 @@ export default function CoursePageClient({ course, lessons, locale: _locale }: P
                   whileHover={!isLocked ? { y: -3, scale: 1.01 } : {}}
                   className={`relative bg-[var(--surface)] rounded-3xl border-2 p-5 transition-all ${
                     isCompleted
-                      ? 'border-[var(--zkawi-green)]/40 bg-[var(--zkawi-green)]/5'
+                      ? "border-[var(--zkawi-green)]/40 bg-[var(--zkawi-green)]/5"
                       : isLocked
-                      ? 'border-[var(--border)] opacity-60 cursor-not-allowed'
-                      : 'border-[var(--zkawi-purple)]/25 hover:border-[var(--zkawi-purple)] hover:shadow-lg hover:shadow-[var(--zkawi-purple)]/10 cursor-pointer'
+                        ? "border-[var(--border)] opacity-60 cursor-not-allowed"
+                        : "border-[var(--zkawi-pink)]/25 hover:border-[var(--zkawi-pink)] hover:shadow-lg hover:shadow-[var(--zkawi-pink)]/10 cursor-pointer"
                   }`}
                 >
                   <div className="flex items-start gap-4">
                     <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
-                        isCompleted
-                          ? 'bg-[var(--zkawi-green)]/15 text-[var(--zkawi-green)]'
-                          : isLocked
-                          ? 'bg-[var(--surface-2)] text-[var(--text-muted)]'
-                          : 'bg-[var(--zkawi-purple)]/15 text-[var(--zkawi-purple)]'
-                      }`}>
+                      <div
+                        className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
+                          isCompleted
+                            ? "bg-[var(--zkawi-green)]/15 text-[var(--zkawi-green)]"
+                            : isLocked
+                              ? "bg-[var(--surface-2)] text-[var(--text-muted)]"
+                              : "bg-[var(--zkawi-pink)]/15 text-[var(--zkawi-pink)]"
+                        }`}
+                      >
                         {isLocked ? <Lock size={20} /> : <BookOpen size={20} />}
                       </div>
-                      <span className="text-xs font-bold text-[var(--text-muted)]">#{i + 1}</span>
+                      <span className="text-xs font-bold text-[var(--text-muted)]">
+                        #{i + 1}
+                      </span>
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className={`font-black text-base leading-tight ${isLocked ? 'text-[var(--text-muted)]' : 'text-[var(--text)]'}`}>
+                        <h3
+                          className={`font-black text-base leading-tight ${isLocked ? "text-[var(--text-muted)]" : "text-[var(--text)]"}`}
+                        >
                           {lesson.title}
                         </h3>
                         {isCompleted && score !== undefined && (
-                          <Badge variant="success" className="flex-shrink-0 text-xs">{score}%</Badge>
+                          <Badge
+                            variant="success"
+                            className="flex-shrink-0 text-xs"
+                          >
+                            {score}%
+                          </Badge>
                         )}
                       </div>
-                      <p className={`text-sm mb-3 line-clamp-2 ${isLocked ? 'text-[var(--border)]' : 'text-[var(--text-muted)]'}`}>
+                      <p
+                        className={`text-sm mb-3 line-clamp-2 ${isLocked ? "text-[var(--border)]" : "text-[var(--text-muted)]"}`}
+                      >
                         {lesson.description}
                       </p>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
                           <Clock size={12} />
-                          <span>{lesson.estimatedMinutes} {tL('minutes')}</span>
+                          <span>
+                            {lesson.estimatedMinutes} {tL("minutes")}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Zap size={12} className="text-[var(--zkawi-purple)]" fill="currentColor" />
-                          <span className="text-xs font-bold text-[var(--zkawi-purple)]">+{lesson.xpReward} XP</span>
+                          <Zap
+                            size={12}
+                            className="text-[var(--zkawi-pink)]"
+                            fill="currentColor"
+                          />
+                          <span className="text-xs font-bold text-[var(--zkawi-pink)]">
+                            +{lesson.xpReward} XP
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex-shrink-0">
                       {isCompleted ? (
-                        <CheckCircle2 size={22} className="text-[var(--zkawi-green)]" />
+                        <CheckCircle2
+                          size={22}
+                          className="text-[var(--zkawi-green)]"
+                        />
                       ) : isLocked ? (
                         <Lock size={18} className="text-[var(--text-muted)]" />
                       ) : (
-                        <div className="w-9 h-9 bg-[var(--zkawi-purple)] rounded-xl flex items-center justify-center shadow-md shadow-[var(--zkawi-purple)]/20">
+                        <div className="w-9 h-9 bg-[var(--zkawi-pink)] rounded-xl flex items-center justify-center shadow-md shadow-[var(--zkawi-pink)]/20">
                           <Play size={14} className="text-white fill-white" />
                         </div>
                       )}

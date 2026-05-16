@@ -1,10 +1,10 @@
-import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/i18n/navigation';
-import { Logo } from '@/components/ui/logo';
-import { Heart } from 'lucide-react';
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
+import { Logo } from "@/components/ui/logo";
+import { Heart } from "lucide-react";
 
 export default function Footer() {
-  const t = useTranslations('common');
+  const t = useTranslations("common");
 
   return (
     <footer className="bg-[var(--surface)] border-t border-[var(--border)] mt-auto">
@@ -16,16 +16,22 @@ export default function Footer() {
               <Logo size={32} showText textClassName="text-lg" />
             </Link>
             <p className="text-sm text-[var(--text-muted)] text-center md:text-start">
-              {t('tagline')}
+              {t("tagline")}
             </p>
           </div>
 
           {/* Links */}
           <div className="flex items-center gap-6 text-sm text-[var(--text-muted)]">
-            <Link href="/" className="hover:text-[var(--zkawi-purple)] transition-colors font-medium">
+            <Link
+              href="/"
+              className="hover:text-[var(--zkawi-pink)] transition-colors font-medium"
+            >
               الرئيسية
             </Link>
-            <Link href="/dashboard" className="hover:text-[var(--zkawi-purple)] transition-colors font-medium">
+            <Link
+              href="/dashboard"
+              className="hover:text-[var(--zkawi-pink)] transition-colors font-medium"
+            >
               لوحتي
             </Link>
           </div>

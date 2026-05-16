@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface LogoProps {
-  variant?: 'icon' | 'white-icon';
+  variant?: "icon" | "white-icon";
   size?: number;
   className?: string;
   showText?: boolean;
@@ -12,17 +12,16 @@ interface LogoProps {
 }
 
 export function Logo({
-  variant = 'icon',
+  variant = "icon",
   size = 40,
   className,
   showText = false,
   textClassName,
 }: LogoProps) {
-  const src =
-    variant === 'white-icon' ? '/logo-white.svg' : '/logo-icon.svg';
+  const src = variant === "white-icon" ? "/logo-white.svg" : "/logo-icon.svg";
 
   return (
-    <span className={cn('inline-flex items-center gap-2.5', className)}>
+    <span className={cn("inline-flex items-center gap-2.5", className)}>
       <Image
         src={src}
         alt="ذكاوي"
@@ -34,8 +33,8 @@ export function Logo({
       {showText && (
         <span
           className={cn(
-            'font-black tracking-tight leading-none',
-            variant === 'white-icon' ? 'text-white' : 'text-purple-700',
+            "font-black tracking-tight leading-none",
+            variant === "white-icon" ? "text-white" : "text-pink-700",
             textClassName,
           )}
         >

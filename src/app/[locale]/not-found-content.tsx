@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Home, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link } from '@/lib/i18n/navigation';
+import { motion } from "framer-motion";
+import { Home, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/lib/i18n/navigation";
 
 interface NotFoundContentProps {
   title: string;
@@ -11,7 +11,11 @@ interface NotFoundContentProps {
   goHomeText: string;
 }
 
-export function NotFoundContent({ title, description, goHomeText }: NotFoundContentProps) {
+export function NotFoundContent({
+  title,
+  description,
+  goHomeText,
+}: NotFoundContentProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -34,19 +38,24 @@ export function NotFoundContent({ title, description, goHomeText }: NotFoundCont
             transition={{
               duration: 2,
               repeat: Infinity,
-              ease: 'easeInOut',
+              ease: "easeInOut",
             }}
           >
             <Search
-              className="w-32 h-32 text-[var(--zkawi-purple)] opacity-20 mx-auto"
+              className="w-32 h-32 text-[var(--zkawi-pink)] opacity-20 mx-auto"
               strokeWidth={1.5}
             />
           </motion.div>
           <motion.h1
-            className="text-9xl font-bold text-[var(--zkawi-purple)] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            className="text-9xl font-bold text-[var(--zkawi-pink)] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.3 }}
+            transition={{
+              type: "spring",
+              stiffness: 200,
+              damping: 15,
+              delay: 0.3,
+            }}
           >
             404
           </motion.h1>
@@ -98,7 +107,7 @@ export function NotFoundContent({ title, description, goHomeText }: NotFoundCont
         {[...Array(5)].map((_, i) => (
           <motion.div
             key={i}
-            className="w-2 h-2 rounded-full bg-[var(--zkawi-purple)] opacity-30"
+            className="w-2 h-2 rounded-full bg-[var(--zkawi-pink)] opacity-30"
             animate={{
               scale: [1, 1.5, 1],
               opacity: [0.3, 0.6, 0.3],

@@ -403,7 +403,6 @@ export function Mascot() {
     setBubbleOpen(false);
     setChatOpen((prev) => !prev);
   };
-
   return (
     <>
       <motion.div

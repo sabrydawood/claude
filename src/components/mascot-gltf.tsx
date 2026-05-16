@@ -268,19 +268,20 @@ function GltfModelInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Play idle when actions first become available (actions populate after first render,
+  // so [] deps would miss them — depend on actions to retry)
   useEffect(() => {
     const first = cfg.animMap["idle"];
     const a = actions[first];
-    if (a) {
+    if (a && !activeAnim.current) {
       a.play();
       activeAnim.current = first;
     }
-    return () => {
-      mixer.stopAllAction();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  console.log("mood: ", mood);
+    return () => { mixer.stopAllAction(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actions]);
+
+  // Crossfade when mood / walking changes
   useEffect(() => {
     const target = walking ? cfg.animMap["walking"] : cfg.animMap[mood];
     if (!target || target === activeAnim.current) return;
@@ -289,12 +290,7 @@ function GltfModelInner({
     if (prev && actions[prev]) actions[prev]!.fadeOut(0.35);
     const next = actions[target];
     if (next) {
-      next
-        .reset()
-        .setEffectiveTimeScale(1)
-        .setEffectiveWeight(1)
-        .fadeIn(0.35)
-        .play();
+      next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(0.35).play();
     }
   }, [mood, walking, actions, cfg]);
 
@@ -362,17 +358,18 @@ function GltfCanvas({
 }
 
 // ─── Xbot (Mixamo humanoid) ────────────────────────────────────────────────────
+// Available: agree · headShake · idle · run · sad_pose · sneak_pose · walk
 
 const XBOT_CFG: GltfConfig = {
   modelPath: "/models/Xbot.glb",
   animMap: {
-    idle: "idle",
-    happy: "agree",
-    thinking: "sad_pose",
-    talking: "agree",
+    idle: "idle",        // standing idle breathing
+    happy: "agree",      // enthusiastic nodding = happy/excited
+    thinking: "sneak_pose", // looking around = more "thinking" than sad
+    talking: "agree",    // nodding while speaking
     walking: "walk",
   },
-  scale: 1.0,
+  scale: 2.0,
   positionY: -1.75,
   rotationY: Math.PI,
   tint: "#7C3AED", // Zkawi purple

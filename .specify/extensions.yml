@@ -1,0 +1,16 @@
+version: "1.0"
+
+hooks:
+  after_implement:
+    - extension: "zkawi-auto-verify"
+      optional: false
+      description: "تشغيل typecheck + verify بعد كل تنفيذ"
+      command: "zkawi-verify"
+      prompt: "Run bun run typecheck and bun run verify. If errors found, attempt auto-fix up to 3 times. Report result."
+
+  after_tasks:
+    - extension: "zkawi-constitution-check"
+      optional: true
+      description: "التحقق من توافق المهام مع Constitution ذكاوي"
+      command: "speckit-checklist"
+      prompt: "Verify tasks comply with .specify/memory/constitution.md: COPPA rules, RTL, Mobile-First, Provider-Agnostic, ALI-First."

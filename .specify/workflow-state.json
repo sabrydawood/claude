@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "started_at": null,
+  "last_updated": null,
+  "current_feature": null,
+  "completed": [],
+  "failed": [],
+  "skipped": [],
+  "in_progress": null,
+  "total_features": 16,
+  "auto_fix_attempts": {}
+}

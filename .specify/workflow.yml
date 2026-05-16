@@ -1,0 +1,179 @@
+name: "ذكاوي Full Automation Workflow"
+version: "1.0.0"
+description: "تنفيذ كامل لكل قرارات DECISIONS.md + ROADMAP من Phase 1 fixes حتى اكتمال المنصة"
+
+settings:
+  dev_server: "bun dev"
+  dev_server_port: 3000
+  dev_server_wait_seconds: 8
+  typecheck_command: "bun run typecheck"
+  verify_command: "bun run verify"
+  auto_fix_attempts: 3
+  on_failure: "auto_fix_then_notify"  # auto_fix_then_notify | stop | skip
+
+features:
+
+  # ─── Phase 1 Fixes ───────────────────────────────────────────────
+  - id: "001-phase1-ai-fixes"
+    name: "Phase 1 AI Fixes"
+    status: "planned"            # planned | in_progress | done | failed
+    decisions: ["D-032", "D-033", "D-034"]
+    spec: ".specify/specs/001-phase1-ai-fixes/spec.md"
+    plan: ".specify/specs/001-phase1-ai-fixes/plan.md"
+    tasks: ".specify/specs/001-phase1-ai-fixes/tasks.md"
+    tests:
+      - url: "/ar/admin/providers"
+        assert: "Providers table visible"
+      - url: "/api/v1/admin/providers"
+        assert_json: "{ Success: true }"
+      - url: "/api/v1/admin/routing-rules"
+        assert_json: "{ Success: true }"
+
+  # ─── Phase 2 Core ─────────────────────────────────────────────────
+  - id: "002-concept-cache"
+    name: "Concept-level Semantic Cache"
+    status: "planned"
+    decisions: ["D-001"]
+    description: "تحويل Cache من SHA-256 exact match إلى Concept-level cache. hit rate 1-5% → 40-60%"
+    tests:
+      - url: "/api/v1/cache/stats"
+        assert_json: "{ Success: true, Data: { HitRate: number } }"
+
+  - id: "003-age-adaptive-navigation"
+    name: "Age-Adaptive Navigation"
+    status: "planned"
+    decisions: ["D-009"]
+    description: "Spark (6-9) خطي + Explorer (9-12) جزر + Builder (12-14) Skill Map. حسب age_group في الـ profile"
+    tests:
+      - url: "/ar/dashboard"
+        assert: "Navigation renders based on age group"
+
+  - id: "004-parent-portal"
+    name: "Parent Portal"
+    status: "planned"
+    decisions: ["D-014", "D-015", "D-016"]
+    description: "لوحة تحكم الوالد: ملخص يومي + أسبوعي + شهري + بيانات كاملة. COPPA compliant. ربط حسابات الأطفال."
+    tests:
+      - url: "/ar/parent/dashboard"
+        assert: "Parent dashboard renders"
+      - url: "/api/v1/parent/children"
+        assert_json: "{ Success: true }"
+      - url: "/api/v1/parent/reports/weekly"
+        assert_json: "{ Success: true }"
+
+  - id: "005-onboarding-flow"
+    name: "Onboarding Flow"
+    status: "planned"
+    decisions: ["D-016", "D-010"]
+    description: "الوالد أولاً (5 خطوات) ← الطفل (5 خطوات). اختيار الشخصية + Placement مُقنَّع كلعبة. أول إنجاز خلال 3 دقائق."
+    tests:
+      - url: "/ar/onboarding"
+        assert: "Onboarding step 1 visible"
+      - url: "/api/v1/onboarding/parent"
+        assert_json: "{ Success: true }"
+
+  - id: "006-offline-pwa"
+    name: "Offline Mode + PWA"
+    status: "planned"
+    decisions: ["D-019"]
+    description: "PWA + Service Workers + IndexedDB. pre-generate محتوى الجلسة (5-25MB/درس). Background Sync عند عودة الإنترنت."
+    tests:
+      - url: "/ar/dashboard"
+        assert: "PWA manifest present"
+      - assert: "Service Worker registered"
+
+  - id: "007-voice-guided-tts"
+    name: "Voice-Guided TTS"
+    status: "planned"
+    decisions: ["D-020"]
+    description: "Xbot يتكلم ويوجّه الطفل بالصوت (TTS). جُمل ≤ 7 كلمات. Repeat button. Microsoft Azure TTS أو ElevenLabs."
+    tests:
+      - url: "/ar/dashboard"
+        assert: "Voice guidance button present for young age groups"
+
+  - id: "008-spaced-repetition"
+    name: "Spaced Repetition Engine"
+    status: "planned"
+    decisions: ["D-035"]
+    description: "SM-2 algorithm. LastTested + Score في StudentMastery. إذا Score < 60% + LastTested > 3 أيام → مراجعة."
+    tests:
+      - url: "/api/v1/student/review-queue"
+        assert_json: "{ Success: true, Data: [] }"
+
+  - id: "009-signal-insight-extraction"
+    name: "Signal → Insight Extraction"
+    status: "planned"
+    decisions: ["D-036"]
+    description: "Background job يُحوّل LearningSignals → StudentInsights تلقائياً. learning_style + weak_concepts + preferred_explanation_type."
+    tests:
+      - url: "/api/v1/student/insights"
+        assert_json: "{ Success: true }"
+
+  # ─── Phase 3 Features ──────────────────────────────────────────────
+  - id: "010-interactive-activities"
+    name: "Interactive Activities"
+    status: "planned"
+    decisions: ["D-023"]
+    description: "Match (Drag-and-Drop + dnd-kit) + Fill (Word Bank) + صحّح هذا (Error Detection). XP متدرج حسب Hints."
+    tests:
+      - url: "/ar/lessons/[id]/activities"
+        assert: "Match activity renders"
+      - url: "/ar/lessons/[id]/activities"
+        assert: "Fill activity renders"
+
+  - id: "011-block-editor"
+    name: "Block-based Programming Editor"
+    status: "planned"
+    decisions: ["D-018"]
+    description: "Block Editor خاص بذكاوي فوق Blockly engine. عربي RTL. مسار 4-7 بصري → 8-12 Dual View → 12+ Python."
+    tests:
+      - url: "/ar/sandbox/blocks"
+        assert: "Block editor renders"
+
+  - id: "012-prompt-gallery"
+    name: "Prompt Gallery"
+    status: "planned"
+    decisions: ["D-024"]
+    description: "Gallery مجهولة للـ 10+. Username مستعار. Upvote فقط. Pre-moderation < 8 ساعات. Try this Prompt → /sandbox?prompt=."
+    tests:
+      - url: "/ar/ai/gallery"
+        assert: "Prompt gallery renders"
+      - url: "/api/v1/prompts"
+        assert_json: "{ Success: true }"
+
+  - id: "013-ai-tools-track"
+    name: "AI Tools Track"
+    status: "planned"
+    decisions: ["D-030", "D-025"]
+    description: "مسار AI شامل: نظري (8-10) + Pattern Recognition (10-12) + Prompt Eng (12-14) + Python ML (14-16) + AI Tools."
+    tests:
+      - url: "/ar/tracks/ai"
+        assert: "AI track renders"
+
+  # ─── Content Generation ────────────────────────────────────────────
+  - id: "014-content-programming"
+    name: "Programming Track Content"
+    status: "planned"
+    decisions: ["D-011", "D-027", "D-026"]
+    description: "AI يُولّد محتوى مسار البرمجة للفئة 8-12: Computational Thinking + Python أساسي. Knowledge Graph + ConceptChunks."
+    tests:
+      - url: "/api/v1/concepts?track=programming&age=8-12"
+        assert_json: "{ Success: true, Data: { length > 0 } }"
+
+  - id: "015-content-math"
+    name: "Math Track Content"
+    status: "planned"
+    decisions: ["D-011", "D-027", "D-026"]
+    description: "AI يُولّد محتوى مسار الرياضيات للفئة 8-12: أساسيات + عمليات + هندسة."
+    tests:
+      - url: "/api/v1/concepts?track=math&age=8-12"
+        assert_json: "{ Success: true, Data: { length > 0 } }"
+
+  - id: "016-content-arabic"
+    name: "Arabic Language Track Content"
+    status: "planned"
+    decisions: ["D-011", "D-027", "D-026"]
+    description: "AI يُولّد محتوى مسار العربية. Spark (4-7) + Explorer (7-10) مع TTS."
+    tests:
+      - url: "/api/v1/concepts?track=arabic&age=4-7"
+        assert_json: "{ Success: true, Data: { length > 0 } }"

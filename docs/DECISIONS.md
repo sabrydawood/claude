@@ -816,6 +816,164 @@ Creator  (14-16) → Python + ML + مشاريع حقيقية
 
 ---
 
+---
+
+## [D-032] Bug Fix — BumpCacheHit في Cache.Service.ts
+
+**التاريخ:** 2026-05-17
+**الحالة:** ✅ متفق عليه — يُصلح فوراً
+**المصدر البحثي:** `docs/RESEARCH/4.md` القسم 8.2
+
+### المشكلة
+
+```typescript
+// الكود الحالي — خاطئ
+.set({ HitCount: 1 })  // يُعيّن 1 دائماً
+
+// الصح
+.set({ HitCount: sql`${SemanticCache.HitCount} + 1` })
+```
+
+**الأثر:** كل إحصاءات الـ Cache (hit rate، أكثر الأسئلة تكراراً) غير موثوقة.
+**الجهد:** سطر واحد.
+
+---
+
+## [D-033] Tool Calling Layer — ترقية معمارية في Mascot
+
+**التاريخ:** 2026-05-17
+**الحالة:** ✅ متفق عليه — يُنفَّذ مع Phase 1 fixes
+**المصدر البحثي:** `docs/RESEARCH/4.md` القسم 2
+
+### المتفق عليه ✅
+
+**بدل حقن ~750 token من محتوى الدرس في كل request → Tools:**
+
+```typescript
+// System prompt صغير (~200 token) + tools definitions
+const tools = [
+  "get_concept",           // جلب شرح مفهوم من Knowledge Graph
+  "get_prerequisites",     // المفاهيم اللازمة قبل هذا المفهوم
+  "check_student_mastery", // مستوى إتقان الطالب (0-100)
+  "get_student_profile",   // أسلوب تعلم الطالب (ملخص، ليس محادثات)
+  "get_related_examples",  // أمثلة من الحياة حسب العمر
+  "record_signal",         // تسجيل signal في LearningSignals
+]
+```
+
+**التوفير المتوقع:** من 3,500 → 800 token/request = **77% توفير في input tokens**
+
+**جانب:** تفعيل ConceptChunks في RAG flow (موجود في DB، غير مستخدم) — يُنجز ضمن نفس المهمة.
+
+---
+
+## [D-034] Provider Management System — نظام إدارة نماذج AI
+
+**التاريخ:** 2026-05-17
+**الحالة:** ✅ متفق عليه
+**المصدر البحثي:** `docs/RESEARCH/4.md` القسم 5
+
+### المتفق عليه ✅
+
+**نظام كامل لإدارة AI Providers من Admin Dashboard:**
+
+**Schema الجديد (DB):**
+```typescript
+Providers:
+  Id, Name, Description, BaseUrl
+  ApiKey (encrypted), IsActive
+  CreatedAt, UpdatedAt
+
+ProviderModels:
+  Id, ProviderId (→ Providers)
+  ModelName          // "gemini-2.0-flash", "claude-sonnet-4-5"
+  InputCostPerM      // $0.10 (per million tokens)
+  OutputCostPerM     // $0.40
+  IsActive, MaxTokens
+
+RoutingRules:
+  Id, TaskType       // "simple_chat" | "socratic" | "assessment" | "content_gen" | "translation"
+  ModelId (→ ProviderModels)
+  Priority           // ترتيب التفضيل (1 = الأول)
+  IsActive
+```
+
+**Routing Logic:**
+
+```
+كل request → تحديد TaskType → جلب RoutingRules (مرتبة بـ Priority) → أول Provider IsActive
+```
+
+**Admin Dashboard:**
+- إضافة/تعديل/حذف Providers وNodels
+- تعديل Routing Rules لكل TaskType
+- عرض التكلفة الفعلية (tokens consumed × سعر)
+- تفعيل/تعطيل Provider فوراً
+
+**Hot-swap بدون Deploy:**
+- Config يُقرأ من DB في كل request (cached in-memory لـ 60 ثانية لتجنب DB overhead)
+- تغيير في Dashboard → يُطبَّق خلال 60 ثانية بدون restart
+
+**Providers الأولية:**
+- Anthropic (Claude Haiku، Sonnet)
+- Google (Gemini Flash، Gemini Pro)
+- OpenAI (GPT-4o-mini، GPT-4o)
+- OpenRouter (gateway لكل النماذج)
+
+**TaskTypes الأولية:**
+| Task | النموذج الافتراضي | السبب |
+|------|-----------------|-------|
+| simple_chat | Gemini Flash | $0.10/M — تحيات، أسئلة عامة |
+| explanation | Claude Haiku | $1/M — شرح مفاهيم |
+| socratic | Claude Sonnet | $3/M — حوار سقراطي + تقييم |
+| assessment | Claude Sonnet | $3/M — تقييم إجابات |
+| content_gen | Claude Sonnet | $3/M — توليد محتوى المناهج |
+| translation | Gemini Flash | رخيص وجيد للعربية |
+
+---
+
+## [D-035] Spaced Repetition — مراجعة المفاهيم
+
+**التاريخ:** 2026-05-17
+**الحالة:** ✅ متفق عليه — يُنفَّذ في Phase 2 مع المحتوى
+**المصدر البحثي:** `docs/RESEARCH/4.md` القسم 3.3 + 6.2
+
+### المتفق عليه ✅
+
+- **الخوارزمية:** SM-2 (تستخدمها Anki) أو Half-Life Regression (تستخدمها Duolingo)
+- **الـ Infrastructure جاهز:** `LastTested` + `Score` موجودان في StudentMastery
+- **المنطق:**
+  - إذا `Score < 60%` + `LastTested > 3 أيام` → أولوية مراجعة عالية
+  - إذا `Score 60-80%` + `LastTested > 7 أيام` → مراجعة متوسطة
+  - إذا `Score > 80%` + `LastTested > 14 أيام` → مراجعة خفيفة
+
+---
+
+## [D-036] AI Architecture Upgrades — خارطة التطوير
+
+**التاريخ:** 2026-05-17
+**الحالة:** ✅ متفق عليه
+**المصدر البحثي:** `docs/RESEARCH/4.md` القسم 8 + 9
+
+### المتفق عليه ✅
+
+**ترتيب التنفيذ حسب الأثر:**
+
+| الأولوية | المهمة | المرحلة | التوفير/الأثر |
+|---------|-------|---------|--------------|
+| 🔴 فوري | Bug Fix: BumpCacheHit (D-032) | الآن | إحصاءات صحيحة |
+| 🔴 فوري | Tool Calling + ConceptChunks (D-033) | Phase 1 fixes | 77% توفير tokens |
+| 🔴 فوري | Provider Management System (D-034) | Phase 1 fixes | تحكم كامل + 60-80% توفير |
+| 🟡 Phase 2 | Spaced Repetition (D-035) | مع المحتوى | +retention |
+| 🟡 Phase 2 | Signal → Insight extraction (background job) | Phase 2 | Data Flywheel يعمل |
+| 🟢 Phase 3 | Hybrid Semantic Cache (Vector + Graph) | Phase 3 | hit rate 50-65% |
+| 🟢 Phase 3 | LangGraph للـ Classroom | Phase 3 | Multi-agent orchestration |
+
+**pgvector يبقى** — الـ Stack الحالي صحيح. Neo4j لاحقاً عند scale كبير.
+**Embedding للعربية:** `multilingual-e5-large-instruct` (open-source) أو `Cohere embed-v4.0` عند التوسع.
+
+---
+
 ## سجل القرارات المعلقة
 
 *لا يوجد قرارات معلقة حالياً — جميع القرارات مكتملة.*

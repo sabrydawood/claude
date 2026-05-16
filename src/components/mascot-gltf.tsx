@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * mascot-gltf.tsx
@@ -14,15 +14,15 @@
  *    can only live in ONE scene at a time).
  */
 
-import { useEffect, useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, useAnimations, OrbitControls } from '@react-three/drei';
-import { SkeletonUtils } from 'three-stdlib';
-import * as THREE from 'three';
+import { useEffect, useRef, useMemo } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF, useAnimations, OrbitControls } from "@react-three/drei";
+import { SkeletonUtils } from "three-stdlib";
+import * as THREE from "three";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type RobotMood = 'idle' | 'happy' | 'thinking' | 'talking' | 'walking';
+export type RobotMood = "idle" | "happy" | "thinking" | "talking" | "walking";
 
 interface RobotProps {
   mood: RobotMood;
@@ -32,11 +32,11 @@ interface RobotProps {
 // ─── Mood → animation name ────────────────────────────────────────────────────
 
 const MOOD_ANIM: Record<RobotMood, string> = {
-  idle:     'Idle',
-  happy:    'Wave',
-  thinking: 'ThumbsUp',
-  talking:  'Yes',
-  walking:  'Walking',
+  idle: "Idle",
+  happy: "Wave",
+  thinking: "ThumbsUp",
+  talking: "Yes",
+  walking: "Walking",
 };
 
 const FADE = 0.35; // crossfade seconds
@@ -44,7 +44,7 @@ const FADE = 0.35; // crossfade seconds
 // ─── Inner robot (must be inside Canvas for useFrame / useAnimations) ─────────
 
 function RobotExpressiveInner({ mood, walking }: RobotProps) {
-  const { scene, animations } = useGLTF('/models/RobotExpressive.glb');
+  const { scene, animations } = useGLTF("/models/RobotExpressive.glb");
 
   // SkeletonUtils.clone() deep-clones skinned mesh + remaps skeleton refs
   // so every instance has its own independent bone hierarchy.
@@ -59,19 +59,24 @@ function RobotExpressiveInner({ mood, walking }: RobotProps) {
   const clonedRef = useRef<THREE.Group>(clonedScene);
 
   const { actions, mixer } = useAnimations(animations, clonedRef);
-  const activeAnim = useRef('');
+  const activeAnim = useRef("");
 
   // Play Idle on mount; clean up mixer on unmount
   useEffect(() => {
-    const idle = actions['Idle'];
-    if (idle) { idle.play(); activeAnim.current = 'Idle'; }
-    return () => { mixer.stopAllAction(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    const idle = actions["Idle"];
+    if (idle) {
+      idle.play();
+      activeAnim.current = "Idle";
+    }
+    return () => {
+      mixer.stopAllAction();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Crossfade to new animation when mood / walking changes
   useEffect(() => {
-    const target = walking ? 'Walking' : MOOD_ANIM[mood];
+    const target = walking ? "Walking" : MOOD_ANIM[mood];
     if (target === activeAnim.current) return;
 
     const prev = activeAnim.current;
@@ -90,8 +95,9 @@ function RobotExpressiveInner({ mood, walking }: RobotProps) {
   // Gentle float in idle / talking modes
   useFrame(({ clock }) => {
     if (!clonedRef.current) return;
-    if (!walking && (mood === 'idle' || mood === 'talking')) {
-      clonedRef.current.position.y = Math.sin(clock.elapsedTime * 1.2) * 0.05 - 1.1;
+    if (!walking && (mood === "idle" || mood === "talking")) {
+      clonedRef.current.position.y =
+        Math.sin(clock.elapsedTime * 1.2) * 0.05 - 1.1;
     } else {
       clonedRef.current.position.y = -1.1;
     }
@@ -157,12 +163,19 @@ export function RobotExpressive({
     <Canvas
       gl={{ antialias: true, alpha: true }}
       camera={{ position: [0, 0.2, 7.5], fov: 40 }}
-      style={{ width, height, display: 'block', background: 'transparent' }}
+      style={{ width, height, display: "block", background: "transparent" }}
     >
       <RobotLighting />
       <RobotExpressiveInner mood={mood} walking={walking} />
       {orbitControls && (
-        <OrbitControls target={[0, 0, 0]} enableZoom enableRotate enablePan={false} minDistance={3} maxDistance={20} />
+        <OrbitControls
+          target={[0, 0, 0]}
+          enableZoom
+          enableRotate
+          enablePan={false}
+          minDistance={3}
+          maxDistance={20}
+        />
       )}
     </Canvas>
   );
@@ -183,19 +196,24 @@ export function RobotExpressivePortrait({
     <Canvas
       gl={{ antialias: true, alpha: true }}
       camera={{ position: [0, 0.8, 2.8], fov: 32 }}
-      style={{ width, height, display: 'block', background: 'transparent' }}
+      style={{ width, height, display: "block", background: "transparent" }}
     >
       <RobotLighting />
       <RobotExpressiveInner mood={mood} walking={false} />
       {orbitControls && (
-        <OrbitControls target={[0, 0.8, 0]} enableZoom enableRotate enablePan={false} />
+        <OrbitControls
+          target={[0, 0.8, 0]}
+          enableZoom
+          enableRotate
+          enablePan={false}
+        />
       )}
     </Canvas>
   );
 }
 
 // Preload so the first render doesn't stall
-useGLTF.preload('/models/RobotExpressive.glb');
+useGLTF.preload("/models/RobotExpressive.glb");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Generic GLTF character — parameterised model path + animation map
@@ -207,9 +225,17 @@ interface GltfConfig {
   scale?: number;
   positionY?: number;
   rotationY?: number;
+  /** Optional hex color to tint all mesh materials */
+  tint?: string;
+  /** If true, skip the sin-wave float (GLTF models with their own idle anim don't need it) */
+  noFloat?: boolean;
 }
 
-function GltfModelInner({ mood, walking, cfg }: RobotProps & { cfg: GltfConfig }) {
+function GltfModelInner({
+  mood,
+  walking,
+  cfg,
+}: RobotProps & { cfg: GltfConfig }) {
   const { scene, animations } = useGLTF(cfg.modelPath);
   const clonedScene = useMemo(
     () => SkeletonUtils.clone(scene) as THREE.Group,
@@ -218,32 +244,68 @@ function GltfModelInner({ mood, walking, cfg }: RobotProps & { cfg: GltfConfig }
   );
   const clonedRef = useRef<THREE.Group>(clonedScene);
   const { actions, mixer } = useAnimations(animations, clonedRef);
-  const activeAnim = useRef('');
+  const activeAnim = useRef("");
 
+  // Apply tint color to all mesh materials on mount
   useEffect(() => {
-    const first = cfg.animMap['idle'];
-    const a = actions[first];
-    if (a) { a.play(); activeAnim.current = first; }
-    return () => { mixer.stopAllAction(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!cfg.tint) return;
+    const color = new THREE.Color(cfg.tint);
+    clonedScene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        const mats = Array.isArray(mesh.material)
+          ? mesh.material
+          : [mesh.material];
+        mats.forEach((m: THREE.Material) => {
+          const sm = m as THREE.MeshStandardMaterial;
+          if (sm.color) sm.color.set(color);
+          sm.metalness = 0.3;
+          sm.roughness = 0.5;
+          sm.needsUpdate = true;
+        });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const target = walking ? cfg.animMap['walking'] : cfg.animMap[mood];
+    const first = cfg.animMap["idle"];
+    const a = actions[first];
+    if (a) {
+      a.play();
+      activeAnim.current = first;
+    }
+    return () => {
+      mixer.stopAllAction();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  console.log("mood: ", mood);
+  useEffect(() => {
+    const target = walking ? cfg.animMap["walking"] : cfg.animMap[mood];
     if (!target || target === activeAnim.current) return;
     const prev = activeAnim.current;
     activeAnim.current = target;
     if (prev && actions[prev]) actions[prev]!.fadeOut(0.35);
     const next = actions[target];
-    if (next) { next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(0.35).play(); }
+    if (next) {
+      next
+        .reset()
+        .setEffectiveTimeScale(1)
+        .setEffectiveWeight(1)
+        .fadeIn(0.35)
+        .play();
+    }
   }, [mood, walking, actions, cfg]);
 
+  // Only add float for models without their own idle motion
   useFrame(({ clock }) => {
-    if (!clonedRef.current) return;
+    if (cfg.noFloat || !clonedRef.current) return;
     const baseY = cfg.positionY ?? 0;
-    clonedRef.current.position.y = !walking && (mood === 'idle' || mood === 'talking')
-      ? baseY + Math.sin(clock.elapsedTime * 1.2) * 0.04
-      : baseY;
+    clonedRef.current.position.y =
+      !walking && (mood === "idle" || mood === "talking")
+        ? baseY + Math.sin(clock.elapsedTime * 1.2) * 0.04
+        : baseY;
   });
 
   return (
@@ -259,11 +321,19 @@ function GltfModelInner({ mood, walking, cfg }: RobotProps & { cfg: GltfConfig }
 }
 
 function GltfCanvas({
-  mood, walking = false, cfg, width = 200, height = 280,
-  camPos, camTarget, fov, orbitControls = false,
+  mood,
+  walking = false,
+  cfg,
+  width = 200,
+  height = 280,
+  camPos,
+  camTarget,
+  fov,
+  orbitControls = false,
 }: RobotProps & {
   cfg: GltfConfig;
-  width?: number; height?: number;
+  width?: number;
+  height?: number;
   camPos: [number, number, number];
   camTarget: [number, number, number];
   fov: number;
@@ -273,7 +343,7 @@ function GltfCanvas({
     <Canvas
       gl={{ antialias: true, alpha: true }}
       camera={{ position: camPos, fov }}
-      style={{ width, height, display: 'block', background: 'transparent' }}
+      style={{ width, height, display: "block", background: "transparent" }}
     >
       <RobotLighting />
       <GltfModelInner mood={mood} walking={walking} cfg={cfg} />
@@ -294,34 +364,107 @@ function GltfCanvas({
 // ─── Xbot (Mixamo humanoid) ────────────────────────────────────────────────────
 
 const XBOT_CFG: GltfConfig = {
-  modelPath: '/models/Xbot.glb',
-  animMap: { idle: 'idle', happy: 'agree', thinking: 'sad_pose', talking: 'agree', walking: 'walk' },
+  modelPath: "/models/Xbot.glb",
+  animMap: {
+    idle: "idle",
+    happy: "agree",
+    thinking: "sad_pose",
+    talking: "agree",
+    walking: "walk",
+  },
   scale: 1.0,
   positionY: -1.75,
   rotationY: Math.PI,
+  tint: "#7C3AED", // Zkawi purple
+  noFloat: true, // Xbot has its own idle animation, no extra float needed
 };
 
-export function XbotExpressive({ mood, walking = false, width = 200, height = 280, orbitControls = false }: CanvasProps) {
-  return <GltfCanvas mood={mood} walking={walking} cfg={XBOT_CFG} width={width} height={height} camPos={[0, 0.2, 7.5]} camTarget={[0, 0, 0]} fov={40} orbitControls={orbitControls} />;
+// Full body: fov tighter (32) + camera moved back (z=9) for better full-body framing
+export function XbotExpressive({
+  mood,
+  walking = false,
+  width = 200,
+  height = 280,
+  orbitControls = false,
+}: CanvasProps) {
+  return (
+    <GltfCanvas
+      mood={mood}
+      walking={walking}
+      cfg={XBOT_CFG}
+      width={width}
+      height={height}
+      camPos={[0, 0, 9]}
+      camTarget={[0, 0, 0]}
+      fov={32}
+      orbitControls={orbitControls}
+    />
+  );
 }
 
-export function XbotPortrait({ mood, width = 150, height = 270, orbitControls = false }: { mood: RobotMood; width?: number; height?: number; orbitControls?: boolean }) {
-  return <GltfCanvas mood={mood} cfg={XBOT_CFG} width={width} height={height} camPos={[0, 0.8, 2.8]} camTarget={[0, 0.8, 0]} fov={32} orbitControls={orbitControls} />;
+// Portrait: head + chest — cam higher (y=0.8) and close (z=3)
+export function XbotPortrait({
+  mood,
+  width = 150,
+  height = 270,
+  orbitControls = false,
+}: {
+  mood: RobotMood;
+  width?: number;
+  height?: number;
+  orbitControls?: boolean;
+}) {
+  return (
+    <GltfCanvas
+      mood={mood}
+      cfg={XBOT_CFG}
+      width={width}
+      height={height}
+      camPos={[0, 0.8, 3]}
+      camTarget={[0, 0.8, 0]}
+      fov={28}
+      orbitControls={orbitControls}
+    />
+  );
 }
 
 // ─── Soldier ──────────────────────────────────────────────────────────────────
 
 const SOLDIER_CFG: GltfConfig = {
-  modelPath: '/models/Soldier.glb',
-  animMap: { idle: 'Idle', happy: 'Idle', thinking: 'Idle', talking: 'Idle', walking: 'Walk' },
+  modelPath: "/models/Soldier.glb",
+  animMap: {
+    idle: "Idle",
+    happy: "Idle",
+    thinking: "Idle",
+    talking: "Idle",
+    walking: "Walk",
+  },
   scale: 1.0,
   positionY: -1.75,
   rotationY: Math.PI,
 };
 
-export function SoldierExpressive({ mood, walking = false, width = 200, height = 280, orbitControls = false }: CanvasProps) {
-  return <GltfCanvas mood={mood} walking={walking} cfg={SOLDIER_CFG} width={width} height={height} camPos={[0, 0.2, 7.5]} camTarget={[0, 0, 0]} fov={40} orbitControls={orbitControls} />;
+export function SoldierExpressive({
+  mood,
+  walking = false,
+  width = 200,
+  height = 280,
+  orbitControls = false,
+}: CanvasProps) {
+  return (
+    <GltfCanvas
+      mood={mood}
+      walking={walking}
+      cfg={SOLDIER_CFG}
+      width={width}
+      height={height}
+      camPos={[0, 0.2, 7.5]}
+      camTarget={[0, 0, 0]}
+      fov={40}
+      orbitControls={orbitControls}
+    />
+  );
 }
 
-useGLTF.preload('/models/Xbot.glb');
-useGLTF.preload('/models/Soldier.glb');
+useGLTF.preload("/models/Xbot.glb");
+useGLTF.preload("/models/Soldier.glb");

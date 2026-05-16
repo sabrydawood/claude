@@ -409,7 +409,7 @@ export function Mascot() {
       <motion.div
         data-mascot="true"
         className="fixed z-40"
-        style={{ width: 100, height: 130 }}
+        style={{ width: 140, height: 180 }}
         animate={{ left: `${pos.x}%`, top: `${pos.y}%` }}
         transition={{ duration: walkDuration, ease: "linear" }}
       >
@@ -506,11 +506,11 @@ export function Mascot() {
           {/* Ground shadow */}
           <motion.div
             className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
-            style={{ width: 46, height: 8, background: "rgba(109,40,217,0.3)", filter: "blur(6px)" }}
+            style={{ width: 60, height: 10, background: "rgba(109,40,217,0.3)", filter: "blur(8px)" }}
             animate={prefersReduced ? {} : { scaleX: isWalking ? [1, 0.75, 1] : [1, 0.7, 1] }}
             transition={prefersReduced ? {} : { repeat: Infinity, duration: isWalking ? 0.32 : 2.6 }}
           />
-          <XbotExpressive mood={mood} walking={isWalking} width={100} height={130} />
+          <XbotExpressive mood={mood} walking={isWalking} width={140} height={180} />
 
           {/* Chat badge — shows when chat is closed */}
           <AnimatePresence>

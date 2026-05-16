@@ -136,6 +136,7 @@ function RobotLighting() {
 interface CanvasProps extends RobotProps {
   width?: number;
   height?: number;
+  facingLeft?: boolean;
   /** Allow user to rotate/zoom — useful for dev preview pages */
   orbitControls?: boolean;
 }
@@ -235,7 +236,8 @@ function GltfModelInner({
   mood,
   walking,
   cfg,
-}: RobotProps & { cfg: GltfConfig }) {
+  facingLeft = false,
+}: RobotProps & { cfg: GltfConfig; facingLeft?: boolean }) {
   const { scene, animations } = useGLTF(cfg.modelPath);
   const clonedScene = useMemo(
     () => SkeletonUtils.clone(scene) as THREE.Group,
@@ -294,14 +296,27 @@ function GltfModelInner({
     }
   }, [mood, walking, actions, cfg]);
 
-  // Only add float for models without their own idle motion
+  // Smooth rotation when facing direction changes (avoids scaleX snap/shake)
+  // + optional float for models without built-in idle animation
   useFrame(({ clock }) => {
-    if (cfg.noFloat || !clonedRef.current) return;
-    const baseY = cfg.positionY ?? 0;
-    clonedRef.current.position.y =
-      !walking && (mood === "idle" || mood === "talking")
-        ? baseY + Math.sin(clock.elapsedTime * 1.2) * 0.04
-        : baseY;
+    if (!clonedRef.current) return;
+
+    // Smooth direction turn: idle/talking face camera, walking turns 90° sideways
+    const baseRotY = cfg.rotationY ?? 0;
+    const targetRotY = walking
+      ? baseRotY + (facingLeft ? Math.PI / 2 : -Math.PI / 2)
+      : baseRotY;
+    clonedRef.current.rotation.y +=
+      (targetRotY - clonedRef.current.rotation.y) * 0.12;
+
+    // Float (only for models without their own idle animation)
+    if (!cfg.noFloat) {
+      const baseY = cfg.positionY ?? 0;
+      clonedRef.current.position.y =
+        !walking && (mood === "idle" || mood === "talking")
+          ? baseY + Math.sin(clock.elapsedTime * 1.2) * 0.04
+          : baseY;
+    }
   });
 
   return (
@@ -310,7 +325,6 @@ function GltfModelInner({
       object={clonedScene}
       scale={cfg.scale ?? 1}
       position={[0, cfg.positionY ?? 0, 0]}
-      rotation={[0, cfg.rotationY ?? 0, 0]}
       dispose={null}
     />
   );
@@ -319,6 +333,7 @@ function GltfModelInner({
 function GltfCanvas({
   mood,
   walking = false,
+  facingLeft = false,
   cfg,
   width = 200,
   height = 280,
@@ -327,6 +342,7 @@ function GltfCanvas({
   fov,
   orbitControls = false,
 }: RobotProps & {
+  facingLeft?: boolean;
   cfg: GltfConfig;
   width?: number;
   height?: number;
@@ -342,7 +358,7 @@ function GltfCanvas({
       style={{ width, height, display: "block", background: "transparent" }}
     >
       <RobotLighting />
-      <GltfModelInner mood={mood} walking={walking} cfg={cfg} />
+      <GltfModelInner mood={mood} walking={walking} facingLeft={facingLeft} cfg={cfg} />
       {/* Always render OrbitControls to set camera lookAt (target) correctly.
           enableZoom/enableRotate controlled by orbitControls prop. */}
       <OrbitControls
@@ -369,7 +385,7 @@ const XBOT_CFG: GltfConfig = {
     talking: "agree",    // nodding while speaking
     walking: "walk",
   },
-  scale: 2.0,
+  scale: 2.2,
   positionY: -1.75,
   rotationY: Math.PI,
   tint: "#7C3AED", // Zkawi purple
@@ -380,6 +396,7 @@ const XBOT_CFG: GltfConfig = {
 export function XbotExpressive({
   mood,
   walking = false,
+  facingLeft = false,
   width = 200,
   height = 280,
   orbitControls = false,
@@ -388,6 +405,7 @@ export function XbotExpressive({
     <GltfCanvas
       mood={mood}
       walking={walking}
+      facingLeft={facingLeft}
       cfg={XBOT_CFG}
       width={width}
       height={height}

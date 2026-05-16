@@ -469,7 +469,6 @@ export function Mascot() {
         {/* Robot */}
         <motion.div
           className="pointer-events-auto cursor-pointer w-full h-full relative"
-          style={{ scaleX: facingLeft ? -1 : 1 }}
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
           role="button"
@@ -491,7 +490,7 @@ export function Mascot() {
             className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
             style={{ width: 60, height: 10, background: "rgba(109,40,217,0.25)", filter: "blur(8px)" }}
           />
-          <XbotExpressive mood={mood} walking={isWalking} width={140} height={180} />
+          <XbotExpressive mood={mood} walking={isWalking} facingLeft={facingLeft} width={140} height={180} />
 
           {/* Chat badge — shows when chat is closed */}
           <AnimatePresence>

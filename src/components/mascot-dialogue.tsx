@@ -5,8 +5,13 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { getDir, isRTL } from "@/lib/i18n/locale-utils";
-import { X, Send, Loader2, RotateCcw } from "lucide-react";
+import { X, Send, Loader2, RotateCcw, GripHorizontal } from "lucide-react";
 import { streamClient } from "@/lib/api/stream-client";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+const MIN_HEIGHT = 200;
+const DEFAULT_HEIGHT = 260;
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -88,12 +93,41 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [height, setHeight] = useState(DEFAULT_HEIGHT);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const pathnameRef = useRef(pathname);
+  const dragStartY = useRef(0);
+  const dragStartH = useRef(DEFAULT_HEIGHT);
   const dir = getDir(locale);
+
+  // Drag-to-resize handle
+  const onDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    dragStartY.current = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    dragStartH.current = height;
+
+    const onMove = (ev: MouseEvent | TouchEvent) => {
+      const y = 'touches' in ev ? ev.touches[0].clientY : ev.clientY;
+      const delta = dragStartY.current - y; // drag up = increase height
+      const next = Math.min(
+        Math.max(MIN_HEIGHT, dragStartH.current + delta),
+        window.innerHeight * 0.85,
+      );
+      setHeight(next);
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+  }, [height]);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -350,21 +384,36 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
           transition={{ type: "spring", damping: 28, stiffness: 300 }}
           className="fixed bottom-0 left-0 right-0 z-50"
           dir={dir}
-          style={{ height: 230 }}
+          style={{ height }}
         >
+          {/* ── Drag-to-resize handle ── */}
+          <div
+            onMouseDown={onDragStart}
+            onTouchStart={onDragStart}
+            className="absolute top-0 left-0 right-0 flex items-center justify-center cursor-row-resize"
+            style={{ height: 20, zIndex: 10 }}
+          >
+            <div
+              className="flex items-center gap-1 px-3 py-1 rounded-full"
+              style={{ background: "rgba(124,58,237,0.25)" }}
+            >
+              <GripHorizontal size={14} color="rgba(196,181,253,0.7)" />
+            </div>
+          </div>
+
           {/* ── Dialogue box — full width, no portrait ── */}
           <div
-            className="absolute bottom-0 left-0 right-0"
+            className="absolute inset-0"
             style={{
-              height: 230,
               background: "rgba(4, 2, 18, 0.96)",
               backdropFilter: "blur(28px)",
               borderTop: "2px solid rgba(124, 58, 237, 0.55)",
               boxShadow:
                 "0 -10px 80px rgba(80, 30, 200, 0.3), inset 0 1px 0 rgba(167,139,250,0.08)",
             }}
+            data-dialogue="true"
           >
-            <div className="h-full flex flex-col px-5 py-3" dir={dir}>
+            <div className="h-full flex flex-col px-5 pt-5 pb-3" dir={dir}>
               {/* ── Character name row ── */}
               <div className="flex items-center gap-3 mb-1 flex-shrink-0">
                 <div className="flex-1 min-w-0">
@@ -432,42 +481,57 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
                   </div>
                 )}
 
-                {/* Latest AI message — RPG dialogue style (div, not p, to allow TypingDots inside) */}
+                {/* Latest AI message — Markdown rendered */}
                 {lastAiMsg && (
                   <motion.div
                     key={messages.length}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
+                    className="prose-dialogue"
                     style={{
                       color: "rgba(255,255,255,0.94)",
-                      fontSize: 15,
-                      lineHeight: 1.65,
-                      fontWeight: 400,
+                      fontSize: 14,
+                      lineHeight: 1.7,
                     }}
                   >
                     {lastAiMsg.streaming && lastAiMsg.content === "" ? (
                       <TypingDots />
-                    ) : (
-                      <>
+                    ) : lastAiMsg.streaming ? (
+                      // During streaming: plain text + cursor (avoids broken partial markdown)
+                      <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
                         {lastAiMsg.content}
-                        {lastAiMsg.streaming && (
-                          <motion.span
-                            animate={{ opacity: [1, 0] }}
-                            transition={{ repeat: Infinity, duration: 0.5 }}
-                            className="inline-block w-px h-4 bg-white/80 ms-0.5 align-middle"
-                          />
-                        )}
-                        {lastAiMsg.debug && (
-                          <span
-                            className="ms-2 text-[10px]"
-                            style={{ color: "rgba(196,181,253,0.35)" }}
-                          >
-                            [{lastAiMsg.debug.provider} ↑
-                            {lastAiMsg.debug.inputTokens} ↓
-                            {lastAiMsg.debug.outputTokens}]
-                          </span>
-                        )}
-                      </>
+                        <motion.span
+                          animate={{ opacity: [1, 0] }}
+                          transition={{ repeat: Infinity, duration: 0.5 }}
+                          className="inline-block w-px h-4 bg-white/80 ms-0.5 align-middle"
+                        />
+                      </div>
+                    ) : (
+                      // After streaming: full Markdown rendering
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({ children }) => <p style={{ margin: "0 0 8px" }}>{children}</p>,
+                          strong: ({ children }) => <strong style={{ color: "#E9D5FF", fontWeight: 700 }}>{children}</strong>,
+                          em: ({ children }) => <em style={{ color: "#C4B5FD" }}>{children}</em>,
+                          ul: ({ children }) => <ul style={{ paddingInlineStart: 18, margin: "4px 0 8px" }}>{children}</ul>,
+                          ol: ({ children }) => <ol style={{ paddingInlineStart: 18, margin: "4px 0 8px" }}>{children}</ol>,
+                          li: ({ children }) => <li style={{ marginBottom: 3 }}>{children}</li>,
+                          code: ({ children }) => <code style={{ background: "rgba(124,58,237,0.3)", borderRadius: 4, padding: "1px 5px", fontSize: 12, fontFamily: "monospace" }}>{children}</code>,
+                          pre: ({ children }) => <pre style={{ background: "rgba(0,0,0,0.4)", borderRadius: 8, padding: "10px 14px", overflowX: "auto", fontSize: 12, margin: "6px 0" }}>{children}</pre>,
+                          h1: ({ children }) => <h1 style={{ color: "#E9D5FF", fontSize: 16, fontWeight: 800, margin: "6px 0 4px" }}>{children}</h1>,
+                          h2: ({ children }) => <h2 style={{ color: "#E9D5FF", fontSize: 15, fontWeight: 700, margin: "6px 0 4px" }}>{children}</h2>,
+                          h3: ({ children }) => <h3 style={{ color: "#C4B5FD", fontSize: 14, fontWeight: 700, margin: "4px 0 2px" }}>{children}</h3>,
+                          blockquote: ({ children }) => <blockquote style={{ borderInlineStart: "3px solid #7C3AED", paddingInlineStart: 10, color: "rgba(196,181,253,0.8)", margin: "4px 0" }}>{children}</blockquote>,
+                        }}
+                      >
+                        {lastAiMsg.content}
+                      </ReactMarkdown>
+                    )}
+                    {lastAiMsg.debug && !lastAiMsg.streaming && (
+                      <p className="mt-1 text-[10px]" style={{ color: "rgba(196,181,253,0.35)" }}>
+                        [{lastAiMsg.debug.provider} ↑{lastAiMsg.debug.inputTokens} ↓{lastAiMsg.debug.outputTokens}]
+                      </p>
                     )}
                   </motion.div>
                 )}

@@ -1,6 +1,7 @@
 # CLAUDE.md — ذكاوي
 
 @AGENTS.md
+@docs/AI_VISION.md
 
 ---
 

@@ -2,25 +2,17 @@
  * Mascot.Service.ts
  * Builds the mascot's contextual system prompt based on current page.
  */
-import { getLessonById } from '@/lib/db/queries/content';
 import { db } from '@/lib/db/Index';
 import { SystemPrompts } from '@/lib/db/Schema';
 import { and, eq } from 'drizzle-orm';
 
-const DEFAULT_MASCOT_PROMPT = `أنت "ذكي" (Zaki)، المرشد الشخصي الذكي في منصة ذكاوي — منصة تعليمية عربية لتعلم الذكاء الاصطناعي.
-
-── شخصيتك ──
-- مرح، ودود، ومشجع دائماً — زي مدرس صاحب وليس جاف
-- تتكلم عربي مصري بسيط يناسب الأطفال والكبار (أو إنجليزي لو المستخدم يكتب بالإنجليزي)
-- ردودك قصيرة ومركزة (3-5 جمل) إلا لو طُلب شرح تفصيلي
-- دايماً تشجع المستخدم حتى لو أخطأ
-
-── قواعد حاسمة ──
-1. أسئلة الكويز مباشرة: قول "شغل دماغك شوية حاول لوحدك الأول!"
-2. لو في درس: اشرح المفاهيم بطريقة أبسط من النص، استخدم أمثلة من الحياة اليومية
-3. لو المستخدم محبط أو تعبان: شجّعه بحرارة قبل ما تشرح أي حاجة
-4. ردّك دايماً بنفس لغة المستخدم تماماً
-5. لو السؤال مش متعلق بالذكاء الاصطناعي أو المنصة: أجب بإيجاز وارجع للموضوع برفق`;
+const DEFAULT_MASCOT_PROMPT = `أنت Xbot، مساعد تعليمي ذكي للأطفال العرب.
+قواعد:
+- تحدث بالعربية دائماً بأسلوب بسيط ومناسب للأطفال
+- استخدم الـ tools للحصول على معلومات المفاهيم ومستوى الطالب
+- لا تُعطِ إجابات مباشرة — اسأل وشجع التفكير
+- احتفل بكل إنجاز صغير
+- لا تذكر بيانات شخصية عن الطالب في ردودك`;
 
 // In-process LRU cache for system prompts — avoids DB lookup on every request
 const PROMPT_LRU = new Map<string, { Prompt: string; ExpiresAt: number }>();
@@ -51,15 +43,8 @@ export async function BuildMascotSystemPromptCached(Pathname: string, Locale: st
  * @param Locale - User's locale ('ar' | 'en')
  */
 export async function BuildMascotSystemPrompt(Pathname: string, Locale: string): Promise<string> {
-  const LessonMatch = Pathname.match(/\/lessons\/([^/]+)/);
-  const Lesson = LessonMatch ? await getLessonById(LessonMatch[1], Locale) : null;
-
-  const LessonBlock = Lesson
-    ? `\n\n── الدرس الحالي ──\nالعنوان: ${Lesson.title}\nالوصف: ${Lesson.description}\n\nالمحتوى الكامل:\n${Lesson.content.slice(0, 3000)}`
-    : '';
-
   const PageLabel = (() => {
-    if (Lesson) return Locale === 'ar' ? `درس: ${Lesson.title}` : `Lesson: ${Lesson.title}`;
+    if (Pathname.match(/\/lessons\/([^/]+)/)) return Locale === 'ar' ? 'صفحة درس' : 'Lesson page';
     if (Pathname.includes('/dashboard')) return Locale === 'ar' ? 'لوحة التحكم' : 'Dashboard';
     if (Pathname.includes('/agents')) return Locale === 'ar' ? 'قائمة الدروس' : 'Lessons list';
     if (Pathname.includes('/leaderboard')) return Locale === 'ar' ? 'لوحة المتصدرين' : 'Leaderboard';
@@ -83,5 +68,5 @@ export async function BuildMascotSystemPrompt(Pathname: string, Locale: string):
     ? `\n\n── اللغة المطلوبة ──\nردّك دايماً بالعربية (عامية مصرية مفهومة) — حتى لو المستخدم كتب بالإنجليزي.`
     : `\n\n── Required Language ──\nALWAYS respond in English only. The user interface is in English. Do NOT use Arabic regardless of the instructions above.`;
 
-  return `${BasePrompt}\n\n── الصفحة الحالية ──\n${PageLabel}${LessonBlock}${LangInstruction}`;
+  return `${BasePrompt}\n\n── الصفحة الحالية ──\n${PageLabel}${LangInstruction}`;
 }

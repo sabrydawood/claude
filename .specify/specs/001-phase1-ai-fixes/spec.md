@@ -118,5 +118,17 @@
 - pgvector وDrizzle موجودان ومُهيَّآن (Phase 1 ✅)
 - ConceptChunks table موجود في Schema (Phase 1 ✅) لكن فارغ — يُملأ لاحقاً
 - Admin Dashboard موجود في المشروع (يُضاف section جديد فقط)
-- better-auth يُؤمّن Admin routes بـ role-based access
+- better-auth يُؤمّن Admin routes بـ role-based access (role: "admin")
 - ApiKey encryption: AES-256-GCM عبر Web Crypto API (متاح في Bun)
+
+## Gaps مُعالَجة (Clarify + Analyze)
+
+- **FR-011**: `ENCRYPTION_KEY` env variable (32 bytes hex) مطلوب في `.env` لتشفير ApiKey
+- **FR-012**: TaskType classifier — rule-based بسيط:
+  - `simple_chat`: أسئلة < 10 كلمات بدون مصطلحات تقنية
+  - `explanation`: يحتوي "ما هو" أو "اشرح" أو "كيف"
+  - `socratic`: يحتوي "لماذا" أو سياق تقييم
+  - `assessment`: استجابة لإجابة طالب
+  - `content_gen`: استدعاء داخلي من نظام المحتوى
+- **FR-013**: Admin Dashboard يستخدم `dir="rtl"` — عربي أولاً (Constitution: Arabic-First)
+- **FR-014**: `get_concept()` fallback: إذا ConceptChunks فارغ → يُعيد summary من Concept.description

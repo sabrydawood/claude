@@ -1,0 +1,3767 @@
+{
+  "id": "b7952183-fae9-415c-9279-21c5b53a7db9",
+  "prevId": "1d621231-e9e0-4cc3-a260-7fdb593bff7c",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.AchievementTranslations": {
+      "name": "AchievementTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "AchievementId": {
+          "name": "AchievementId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "Idx_AchTrans_AchievementId": {
+          "name": "Idx_AchTrans_AchievementId",
+          "columns": [
+            {
+              "expression": "AchievementId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "AchievementTranslations_AchievementId_Achievements_Id_fk": {
+          "name": "AchievementTranslations_AchievementId_Achievements_Id_fk",
+          "tableFrom": "AchievementTranslations",
+          "tableTo": "Achievements",
+          "columnsFrom": [
+            "AchievementId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_AchTrans_AchLocale": {
+          "name": "Uq_AchTrans_AchLocale",
+          "nullsNotDistinct": false,
+          "columns": [
+            "AchievementId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Achievements": {
+      "name": "Achievements",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Icon": {
+          "name": "Icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ConditionType": {
+          "name": "ConditionType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ConditionValue": {
+          "name": "ConditionValue",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.AgentTranslations": {
+      "name": "AgentTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "AgentId": {
+          "name": "AgentId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "FullDescription": {
+          "name": "FullDescription",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "Idx_AgentTranslations_Locale": {
+          "name": "Idx_AgentTranslations_Locale",
+          "columns": [
+            {
+              "expression": "Locale",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_AgentTranslations_AgentId": {
+          "name": "Idx_AgentTranslations_AgentId",
+          "columns": [
+            {
+              "expression": "AgentId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "AgentTranslations_AgentId_Agents_Id_fk": {
+          "name": "AgentTranslations_AgentId_Agents_Id_fk",
+          "tableFrom": "AgentTranslations",
+          "tableTo": "Agents",
+          "columnsFrom": [
+            "AgentId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_AgentTranslations_AgentLocale": {
+          "name": "Uq_AgentTranslations_AgentLocale",
+          "nullsNotDistinct": false,
+          "columns": [
+            "AgentId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Agents": {
+      "name": "Agents",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Slug": {
+          "name": "Slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Color": {
+          "name": "Color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Icon": {
+          "name": "Icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Agents_Slug_unique": {
+          "name": "Agents_Slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "Slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ConceptChunks": {
+      "name": "ConceptChunks",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ConceptId": {
+          "name": "ConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Content": {
+          "name": "Content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ar'"
+        },
+        "EmbeddingText": {
+          "name": "EmbeddingText",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_ConceptChunks_ConceptId": {
+          "name": "Idx_ConceptChunks_ConceptId",
+          "columns": [
+            {
+              "expression": "ConceptId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ConceptChunks_ConceptId_Concepts_Id_fk": {
+          "name": "ConceptChunks_ConceptId_Concepts_Id_fk",
+          "tableFrom": "ConceptChunks",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "ConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ConceptRelations": {
+      "name": "ConceptRelations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "FromConceptId": {
+          "name": "FromConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ToConceptId": {
+          "name": "ToConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "RelationType": {
+          "name": "RelationType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_ConceptRelations_From": {
+          "name": "Idx_ConceptRelations_From",
+          "columns": [
+            {
+              "expression": "FromConceptId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_ConceptRelations_To": {
+          "name": "Idx_ConceptRelations_To",
+          "columns": [
+            {
+              "expression": "ToConceptId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ConceptRelations_FromConceptId_Concepts_Id_fk": {
+          "name": "ConceptRelations_FromConceptId_Concepts_Id_fk",
+          "tableFrom": "ConceptRelations",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "FromConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ConceptRelations_ToConceptId_Concepts_Id_fk": {
+          "name": "ConceptRelations_ToConceptId_Concepts_Id_fk",
+          "tableFrom": "ConceptRelations",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "ToConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Concepts": {
+      "name": "Concepts",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "NameAr": {
+          "name": "NameAr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "NameEn": {
+          "name": "NameEn",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Difficulty": {
+          "name": "Difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "Type": {
+          "name": "Type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ConversationMessages": {
+      "name": "ConversationMessages",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ConversationId": {
+          "name": "ConversationId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Role": {
+          "name": "Role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Content": {
+          "name": "Content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Provider": {
+          "name": "Provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_ConvMsg_ConvId": {
+          "name": "Idx_ConvMsg_ConvId",
+          "columns": [
+            {
+              "expression": "ConversationId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ConversationMessages_ConversationId_Conversations_Id_fk": {
+          "name": "ConversationMessages_ConversationId_Conversations_Id_fk",
+          "tableFrom": "ConversationMessages",
+          "tableTo": "Conversations",
+          "columnsFrom": [
+            "ConversationId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Conversations": {
+      "name": "Conversations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Source": {
+          "name": "Source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Route": {
+          "name": "Route",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Title": {
+          "name": "Title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_Conversations_UserId_Source": {
+          "name": "Idx_Conversations_UserId_Source",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "Source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_Conversations_UserId_Route": {
+          "name": "Idx_Conversations_UserId_Route",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "Route",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Conversations_UserId_users_id_fk": {
+          "name": "Conversations_UserId_users_id_fk",
+          "tableFrom": "Conversations",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.CourseTranslations": {
+      "name": "CourseTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "CourseId": {
+          "name": "CourseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "Idx_CourseTrans_CourseId": {
+          "name": "Idx_CourseTrans_CourseId",
+          "columns": [
+            {
+              "expression": "CourseId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "CourseTranslations_CourseId_Courses_Id_fk": {
+          "name": "CourseTranslations_CourseId_Courses_Id_fk",
+          "tableFrom": "CourseTranslations",
+          "tableTo": "Courses",
+          "columnsFrom": [
+            "CourseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_CourseTrans": {
+          "name": "Uq_CourseTrans",
+          "nullsNotDistinct": false,
+          "columns": [
+            "CourseId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Courses": {
+      "name": "Courses",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "SubjectId": {
+          "name": "SubjectId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "Difficulty": {
+          "name": "Difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "EstimatedHours": {
+          "name": "EstimatedHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Courses_SubjectId_Subjects_Id_fk": {
+          "name": "Courses_SubjectId_Subjects_Id_fk",
+          "tableFrom": "Courses",
+          "tableTo": "Subjects",
+          "columnsFrom": [
+            "SubjectId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.EncryptedKeys": {
+      "name": "EncryptedKeys",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "EncryptedKey": {
+          "name": "EncryptedKey",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "KeyHint": {
+          "name": "KeyHint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Provider": {
+          "name": "Provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'anthropic'"
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "EncryptedKeys_UserId_users_id_fk": {
+          "name": "EncryptedKeys_UserId_users_id_fk",
+          "tableFrom": "EncryptedKeys",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "EncryptedKeys_UserId_unique": {
+          "name": "EncryptedKeys_UserId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ExerciseSubmissions": {
+      "name": "ExerciseSubmissions",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ExerciseId": {
+          "name": "ExerciseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Code": {
+          "name": "Code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "Passed": {
+          "name": "Passed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "Score": {
+          "name": "Score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "Attempts": {
+          "name": "Attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "SubmittedAt": {
+          "name": "SubmittedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_ExSub_UserId": {
+          "name": "Idx_ExSub_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_ExSub_ExerciseId": {
+          "name": "Idx_ExSub_ExerciseId",
+          "columns": [
+            {
+              "expression": "ExerciseId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ExerciseSubmissions_UserId_users_id_fk": {
+          "name": "ExerciseSubmissions_UserId_users_id_fk",
+          "tableFrom": "ExerciseSubmissions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ExerciseSubmissions_ExerciseId_Exercises_Id_fk": {
+          "name": "ExerciseSubmissions_ExerciseId_Exercises_Id_fk",
+          "tableFrom": "ExerciseSubmissions",
+          "tableTo": "Exercises",
+          "columnsFrom": [
+            "ExerciseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ExerciseTranslations": {
+      "name": "ExerciseTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ExerciseId": {
+          "name": "ExerciseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Title": {
+          "name": "Title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Instructions": {
+          "name": "Instructions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "HintText": {
+          "name": "HintText",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "StarterCode": {
+          "name": "StarterCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "SolutionCode": {
+          "name": "SolutionCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "TestCases": {
+          "name": "TestCases",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        }
+      },
+      "indexes": {
+        "Idx_ExTrans_ExerciseId": {
+          "name": "Idx_ExTrans_ExerciseId",
+          "columns": [
+            {
+              "expression": "ExerciseId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ExerciseTranslations_ExerciseId_Exercises_Id_fk": {
+          "name": "ExerciseTranslations_ExerciseId_Exercises_Id_fk",
+          "tableFrom": "ExerciseTranslations",
+          "tableTo": "Exercises",
+          "columnsFrom": [
+            "ExerciseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_ExTrans_ExLocale": {
+          "name": "Uq_ExTrans_ExLocale",
+          "nullsNotDistinct": false,
+          "columns": [
+            "ExerciseId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Exercises": {
+      "name": "Exercises",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "LessonId": {
+          "name": "LessonId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CourseId": {
+          "name": "CourseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Type": {
+          "name": "Type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Difficulty": {
+          "name": "Difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "XpReward": {
+          "name": "XpReward",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 20
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Exercises_LessonId_Lessons_Id_fk": {
+          "name": "Exercises_LessonId_Lessons_Id_fk",
+          "tableFrom": "Exercises",
+          "tableTo": "Lessons",
+          "columnsFrom": [
+            "LessonId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Exercises_CourseId_Courses_Id_fk": {
+          "name": "Exercises_CourseId_Courses_Id_fk",
+          "tableFrom": "Exercises",
+          "tableTo": "Courses",
+          "columnsFrom": [
+            "CourseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.LearningPaths": {
+      "name": "LearningPaths",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "TrackId": {
+          "name": "TrackId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "LessonOrder": {
+          "name": "LessonOrder",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "CurrentLessonId": {
+          "name": "CurrentLessonId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "GeneratedAt": {
+          "name": "GeneratedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_LearningPaths_UserActive": {
+          "name": "Idx_LearningPaths_UserActive",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "IsActive",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "LearningPaths_UserId_users_id_fk": {
+          "name": "LearningPaths_UserId_users_id_fk",
+          "tableFrom": "LearningPaths",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "LearningPaths_TrackId_Tracks_Id_fk": {
+          "name": "LearningPaths_TrackId_Tracks_Id_fk",
+          "tableFrom": "LearningPaths",
+          "tableTo": "Tracks",
+          "columnsFrom": [
+            "TrackId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "LearningPaths_CurrentLessonId_Lessons_Id_fk": {
+          "name": "LearningPaths_CurrentLessonId_Lessons_Id_fk",
+          "tableFrom": "LearningPaths",
+          "tableTo": "Lessons",
+          "columnsFrom": [
+            "CurrentLessonId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.LearningSignals": {
+      "name": "LearningSignals",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ConceptId": {
+          "name": "ConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "SignalType": {
+          "name": "SignalType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Value": {
+          "name": "Value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_LearningSignals_UserId": {
+          "name": "Idx_LearningSignals_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_LearningSignals_ConceptId": {
+          "name": "Idx_LearningSignals_ConceptId",
+          "columns": [
+            {
+              "expression": "ConceptId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "LearningSignals_UserId_users_id_fk": {
+          "name": "LearningSignals_UserId_users_id_fk",
+          "tableFrom": "LearningSignals",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "LearningSignals_ConceptId_Concepts_Id_fk": {
+          "name": "LearningSignals_ConceptId_Concepts_Id_fk",
+          "tableFrom": "LearningSignals",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "ConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.LessonTranslations": {
+      "name": "LessonTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "LessonId": {
+          "name": "LessonId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Title": {
+          "name": "Title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "Content": {
+          "name": "Content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "Idx_LessonTranslations_Locale": {
+          "name": "Idx_LessonTranslations_Locale",
+          "columns": [
+            {
+              "expression": "Locale",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_LessonTranslations_LessonId": {
+          "name": "Idx_LessonTranslations_LessonId",
+          "columns": [
+            {
+              "expression": "LessonId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "LessonTranslations_LessonId_Lessons_Id_fk": {
+          "name": "LessonTranslations_LessonId_Lessons_Id_fk",
+          "tableFrom": "LessonTranslations",
+          "tableTo": "Lessons",
+          "columnsFrom": [
+            "LessonId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_LessonTranslations_LessonLocale": {
+          "name": "Uq_LessonTranslations_LessonLocale",
+          "nullsNotDistinct": false,
+          "columns": [
+            "LessonId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Lessons": {
+      "name": "Lessons",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "AgentId": {
+          "name": "AgentId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CourseId": {
+          "name": "CourseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "XpReward": {
+          "name": "XpReward",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 50
+        },
+        "EstimatedMinutes": {
+          "name": "EstimatedMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5
+        },
+        "Difficulty": {
+          "name": "Difficulty",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Lessons_AgentId_Agents_Id_fk": {
+          "name": "Lessons_AgentId_Agents_Id_fk",
+          "tableFrom": "Lessons",
+          "tableTo": "Agents",
+          "columnsFrom": [
+            "AgentId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "Lessons_CourseId_Courses_Id_fk": {
+          "name": "Lessons_CourseId_Courses_Id_fk",
+          "tableFrom": "Lessons",
+          "tableTo": "Courses",
+          "columnsFrom": [
+            "CourseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ProviderModels": {
+      "name": "ProviderModels",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ProviderId": {
+          "name": "ProviderId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ModelName": {
+          "name": "ModelName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "InputCostPerM": {
+          "name": "InputCostPerM",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "OutputCostPerM": {
+          "name": "OutputCostPerM",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "MaxTokens": {
+          "name": "MaxTokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 8192
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ProviderModels_ProviderId_Providers_Id_fk": {
+          "name": "ProviderModels_ProviderId_Providers_Id_fk",
+          "tableFrom": "ProviderModels",
+          "tableTo": "Providers",
+          "columnsFrom": [
+            "ProviderId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Providers": {
+      "name": "Providers",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "BaseUrl": {
+          "name": "BaseUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ApiKeyEnc": {
+          "name": "ApiKeyEnc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.QuizOptionTranslations": {
+      "name": "QuizOptionTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "OptionId": {
+          "name": "OptionId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Text": {
+          "name": "Text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "Idx_QOTrans_OptionId": {
+          "name": "Idx_QOTrans_OptionId",
+          "columns": [
+            {
+              "expression": "OptionId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "QuizOptionTranslations_OptionId_QuizOptions_Id_fk": {
+          "name": "QuizOptionTranslations_OptionId_QuizOptions_Id_fk",
+          "tableFrom": "QuizOptionTranslations",
+          "tableTo": "QuizOptions",
+          "columnsFrom": [
+            "OptionId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_QOTrans_OptionLocale": {
+          "name": "Uq_QOTrans_OptionLocale",
+          "nullsNotDistinct": false,
+          "columns": [
+            "OptionId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.QuizOptions": {
+      "name": "QuizOptions",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "QuestionId": {
+          "name": "QuestionId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "IsCorrect": {
+          "name": "IsCorrect",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "QuizOptions_QuestionId_QuizQuestions_Id_fk": {
+          "name": "QuizOptions_QuestionId_QuizQuestions_Id_fk",
+          "tableFrom": "QuizOptions",
+          "tableTo": "QuizQuestions",
+          "columnsFrom": [
+            "QuestionId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.QuizQuestionTranslations": {
+      "name": "QuizQuestionTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "QuestionId": {
+          "name": "QuestionId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Question": {
+          "name": "Question",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "Idx_QQTrans_QuestionId": {
+          "name": "Idx_QQTrans_QuestionId",
+          "columns": [
+            {
+              "expression": "QuestionId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "QuizQuestionTranslations_QuestionId_QuizQuestions_Id_fk": {
+          "name": "QuizQuestionTranslations_QuestionId_QuizQuestions_Id_fk",
+          "tableFrom": "QuizQuestionTranslations",
+          "tableTo": "QuizQuestions",
+          "columnsFrom": [
+            "QuestionId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_QQTrans_QuestionLocale": {
+          "name": "Uq_QQTrans_QuestionLocale",
+          "nullsNotDistinct": false,
+          "columns": [
+            "QuestionId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.QuizQuestions": {
+      "name": "QuizQuestions",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "LessonId": {
+          "name": "LessonId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Type": {
+          "name": "Type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "QuizQuestions_LessonId_Lessons_Id_fk": {
+          "name": "QuizQuestions_LessonId_Lessons_Id_fk",
+          "tableFrom": "QuizQuestions",
+          "tableTo": "Lessons",
+          "columnsFrom": [
+            "LessonId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.RoutingRules": {
+      "name": "RoutingRules",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "TaskType": {
+          "name": "TaskType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ModelId": {
+          "name": "ModelId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Priority": {
+          "name": "Priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "RoutingRules_ModelId_ProviderModels_Id_fk": {
+          "name": "RoutingRules_ModelId_ProviderModels_Id_fk",
+          "tableFrom": "RoutingRules",
+          "tableTo": "ProviderModels",
+          "columnsFrom": [
+            "ModelId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.SandboxSessions": {
+      "name": "SandboxSessions",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Model": {
+          "name": "Model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'claude-haiku-4-5-20251001'"
+        },
+        "MessagesCount": {
+          "name": "MessagesCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "TokensUsed": {
+          "name": "TokensUsed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_SandboxSessions_UserId": {
+          "name": "Idx_SandboxSessions_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "SandboxSessions_UserId_users_id_fk": {
+          "name": "SandboxSessions_UserId_users_id_fk",
+          "tableFrom": "SandboxSessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.SemanticCache": {
+      "name": "SemanticCache",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "QuestionHash": {
+          "name": "QuestionHash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Question": {
+          "name": "Question",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Answer": {
+          "name": "Answer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "PageKey": {
+          "name": "PageKey",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ar'"
+        },
+        "HitCount": {
+          "name": "HitCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_SemanticCache_Hash": {
+          "name": "Idx_SemanticCache_Hash",
+          "columns": [
+            {
+              "expression": "QuestionHash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Idx_SemanticCache_PageKey": {
+          "name": "Idx_SemanticCache_PageKey",
+          "columns": [
+            {
+              "expression": "PageKey",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.StudentInsights": {
+      "name": "StudentInsights",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Insights": {
+          "name": "Insights",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "StudentInsights_UserId_users_id_fk": {
+          "name": "StudentInsights_UserId_users_id_fk",
+          "tableFrom": "StudentInsights",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "StudentInsights_UserId_unique": {
+          "name": "StudentInsights_UserId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.StudentMastery": {
+      "name": "StudentMastery",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ConceptId": {
+          "name": "ConceptId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Score": {
+          "name": "Score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "Attempts": {
+          "name": "Attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "LastTested": {
+          "name": "LastTested",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_StudentMastery_UserId": {
+          "name": "Idx_StudentMastery_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "StudentMastery_UserId_users_id_fk": {
+          "name": "StudentMastery_UserId_users_id_fk",
+          "tableFrom": "StudentMastery",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "StudentMastery_ConceptId_Concepts_Id_fk": {
+          "name": "StudentMastery_ConceptId_Concepts_Id_fk",
+          "tableFrom": "StudentMastery",
+          "tableTo": "Concepts",
+          "columnsFrom": [
+            "ConceptId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uniq_StudentMastery_UserConcept": {
+          "name": "Uniq_StudentMastery_UserConcept",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId",
+            "ConceptId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.SubjectTranslations": {
+      "name": "SubjectTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "SubjectId": {
+          "name": "SubjectId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "Idx_SubjectTrans_SubjectId": {
+          "name": "Idx_SubjectTrans_SubjectId",
+          "columns": [
+            {
+              "expression": "SubjectId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "SubjectTranslations_SubjectId_Subjects_Id_fk": {
+          "name": "SubjectTranslations_SubjectId_Subjects_Id_fk",
+          "tableFrom": "SubjectTranslations",
+          "tableTo": "Subjects",
+          "columnsFrom": [
+            "SubjectId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_SubjectTrans": {
+          "name": "Uq_SubjectTrans",
+          "nullsNotDistinct": false,
+          "columns": [
+            "SubjectId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Subjects": {
+      "name": "Subjects",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Slug": {
+          "name": "Slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Icon": {
+          "name": "Icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'BookOpen'"
+        },
+        "Color": {
+          "name": "Color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'#7C3AED'"
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Subjects_Slug_unique": {
+          "name": "Subjects_Slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "Slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.SystemPrompts": {
+      "name": "SystemPrompts",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Key": {
+          "name": "Key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Content": {
+          "name": "Content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ar'"
+        },
+        "IsActive": {
+          "name": "IsActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedBy": {
+          "name": "UpdatedBy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "SystemPrompts_Key_unique": {
+          "name": "SystemPrompts_Key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "Key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.TrackTranslations": {
+      "name": "TrackTranslations",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "TrackId": {
+          "name": "TrackId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Locale": {
+          "name": "Locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Description": {
+          "name": "Description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "Idx_TrackTranslations_TrackId": {
+          "name": "Idx_TrackTranslations_TrackId",
+          "columns": [
+            {
+              "expression": "TrackId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "TrackTranslations_TrackId_Tracks_Id_fk": {
+          "name": "TrackTranslations_TrackId_Tracks_Id_fk",
+          "tableFrom": "TrackTranslations",
+          "tableTo": "Tracks",
+          "columnsFrom": [
+            "TrackId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_TrackTranslations_TrackLocale": {
+          "name": "Uq_TrackTranslations_TrackLocale",
+          "nullsNotDistinct": false,
+          "columns": [
+            "TrackId",
+            "Locale"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Tracks": {
+      "name": "Tracks",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Slug": {
+          "name": "Slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Icon": {
+          "name": "Icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Order": {
+          "name": "Order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "IsDefault": {
+          "name": "IsDefault",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "IsDeleted": {
+          "name": "IsDeleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Tracks_Slug_unique": {
+          "name": "Tracks_Slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "Slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UserAchievements": {
+      "name": "UserAchievements",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "AchievementId": {
+          "name": "AchievementId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "EarnedAt": {
+          "name": "EarnedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_UserAchievements_UserId": {
+          "name": "Idx_UserAchievements_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "UserAchievements_UserId_users_id_fk": {
+          "name": "UserAchievements_UserId_users_id_fk",
+          "tableFrom": "UserAchievements",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UserAchievements_AchievementId_Achievements_Id_fk": {
+          "name": "UserAchievements_AchievementId_Achievements_Id_fk",
+          "tableFrom": "UserAchievements",
+          "tableTo": "Achievements",
+          "columnsFrom": [
+            "AchievementId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_UserAchievements_UserAch": {
+          "name": "Uq_UserAchievements_UserAch",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId",
+            "AchievementId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UserCourseProgress": {
+      "name": "UserCourseProgress",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "CourseId": {
+          "name": "CourseId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "CompletedLessons": {
+          "name": "CompletedLessons",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "TotalXp": {
+          "name": "TotalXp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "StartedAt": {
+          "name": "StartedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "CompletedAt": {
+          "name": "CompletedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "Idx_UCProgress_UserId": {
+          "name": "Idx_UCProgress_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "UserCourseProgress_UserId_users_id_fk": {
+          "name": "UserCourseProgress_UserId_users_id_fk",
+          "tableFrom": "UserCourseProgress",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UserCourseProgress_CourseId_Courses_Id_fk": {
+          "name": "UserCourseProgress_CourseId_Courses_Id_fk",
+          "tableFrom": "UserCourseProgress",
+          "tableTo": "Courses",
+          "columnsFrom": [
+            "CourseId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_UCProgress_UserCourse": {
+          "name": "Uq_UCProgress_UserCourse",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId",
+            "CourseId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UserPreferences": {
+      "name": "UserPreferences",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "AgeGroup": {
+          "name": "AgeGroup",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'adult'"
+        },
+        "Goal": {
+          "name": "Goal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'chat'"
+        },
+        "Experience": {
+          "name": "Experience",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'none'"
+        },
+        "LearningStyle": {
+          "name": "LearningStyle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'practice'"
+        },
+        "DailyMinutes": {
+          "name": "DailyMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 15
+        },
+        "PreferredLocale": {
+          "name": "PreferredLocale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ar'"
+        },
+        "OnboardingCompleted": {
+          "name": "OnboardingCompleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "UserPreferences_UserId_users_id_fk": {
+          "name": "UserPreferences_UserId_users_id_fk",
+          "tableFrom": "UserPreferences",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "UserPreferences_UserId_unique": {
+          "name": "UserPreferences_UserId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UserProgress": {
+      "name": "UserProgress",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "LessonId": {
+          "name": "LessonId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Completed": {
+          "name": "Completed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "Score": {
+          "name": "Score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "CompletedAt": {
+          "name": "CompletedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "Idx_UserProgress_UserId": {
+          "name": "Idx_UserProgress_UserId",
+          "columns": [
+            {
+              "expression": "UserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "UserProgress_UserId_users_id_fk": {
+          "name": "UserProgress_UserId_users_id_fk",
+          "tableFrom": "UserProgress",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UserProgress_LessonId_Lessons_Id_fk": {
+          "name": "UserProgress_LessonId_Lessons_Id_fk",
+          "tableFrom": "UserProgress",
+          "tableTo": "Lessons",
+          "columnsFrom": [
+            "LessonId"
+          ],
+          "columnsTo": [
+            "Id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Uq_UserProgress_UserLesson": {
+          "name": "Uq_UserProgress_UserLesson",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId",
+            "LessonId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UserStats": {
+      "name": "UserStats",
+      "schema": "",
+      "columns": {
+        "Id": {
+          "name": "Id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserId": {
+          "name": "UserId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "TotalXp": {
+          "name": "TotalXp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "StreakDays": {
+          "name": "StreakDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "LastActivityDate": {
+          "name": "LastActivityDate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "LessonsCompleted": {
+          "name": "LessonsCompleted",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "QuizzesCompleted": {
+          "name": "QuizzesCompleted",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "UserStats_UserId_users_id_fk": {
+          "name": "UserStats_UserId_users_id_fk",
+          "tableFrom": "UserStats",
+          "tableTo": "users",
+          "columnsFrom": [
+            "UserId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "UserStats_UserId_unique": {
+          "name": "UserStats_UserId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "UserId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.accounts": {
+      "name": "accounts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "accounts_user_id_users_id_fk": {
+          "name": "accounts_user_id_users_id_fk",
+          "tableFrom": "accounts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sessions": {
+      "name": "sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sessions_token_unique": {
+          "name": "sessions_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.verification_tokens": {
+      "name": "verification_tokens",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

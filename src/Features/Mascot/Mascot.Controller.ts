@@ -7,6 +7,7 @@
  * SEV-005: Internal errors are logged only, not sent to client.
  */
 import { NextRequest, NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
 import { auth } from '@/Features/Auth/Auth.Config';
 import { ParseBodyOrBadRequest } from '@/Shared/Middleware/Validation.Middleware';
 import { CheckRateLimit, AI_RATE_LIMIT } from '@/Shared/Middleware/RateLimit.Middleware';
@@ -14,6 +15,8 @@ import { streamChat, type ChatMessage } from '@/lib/ai/Providers';
 import { MascotChatSchema } from './Mascot.Schemas';
 import { BuildMascotSystemPromptCached } from './Mascot.Service';
 import { BuildCacheKey, CheckCache, BumpCacheHit, SaveToCache, GetPageKey } from '@/lib/ai/Cache.Service';
+import { MascotTools, ClassifyTaskType } from '@/lib/ai/Tools';
+import { HandleTool } from '@/lib/ai/ToolHandlers';
 
 const GUEST_RATE_LIMIT = { MaxRequests: 10, WindowMs: 60_000 };
 
@@ -65,8 +68,94 @@ export async function PostMascotChat(Req: NextRequest): Promise<NextResponse | R
       );
     }
 
+    // Classify task type for future Provider Router use (logged for now)
+    const TaskType = ClassifyTaskType(LastUserMsg.content);
+    console.log(`[Mascot] TaskType: ${TaskType}`);
+
     // Cache miss — run AI and save result
     let FullResponse = '';
+
+    // If Anthropic is available, run the tool-use loop first (non-streaming),
+    // then emit the final text as a single SSE chunk.
+    // Otherwise fall back to the provider-agnostic streamChat.
+    if (process.env.ANTHROPIC_API_KEY) {
+      const AnthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const UserId = Session?.user?.id;
+
+      // Build Anthropic-typed messages — separate from ChatMessage[] to allow tool_result blocks
+      const AnthropicMessages: Anthropic.MessageParam[] = TrimmedMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      try {
+        let AnthropicResponse = await AnthropicClient.messages.create({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 512,
+          system: SystemPrompt,
+          messages: AnthropicMessages,
+          tools: MascotTools as unknown as Anthropic.Tool[],
+        });
+
+        // Tool-use loop: keep resolving tool calls until AI is done
+        while (AnthropicResponse.stop_reason === 'tool_use') {
+          const ToolUseBlocks = AnthropicResponse.content.filter(
+            (b): b is Anthropic.ToolUseBlock => b.type === 'tool_use',
+          );
+
+          const ToolResults = await Promise.all(
+            ToolUseBlocks.map(async (Block) => {
+              const Result = await HandleTool(
+                Block.name,
+                Block.input as Record<string, unknown>,
+                UserId,
+              );
+              return {
+                type: 'tool_result' as const,
+                tool_use_id: Block.id,
+                content: Result.content,
+              };
+            }),
+          );
+
+          AnthropicMessages.push({ role: 'assistant', content: AnthropicResponse.content });
+          AnthropicMessages.push({ role: 'user', content: ToolResults });
+
+          AnthropicResponse = await AnthropicClient.messages.create({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 512,
+            system: SystemPrompt,
+            messages: AnthropicMessages,
+            tools: MascotTools as unknown as Anthropic.Tool[],
+          });
+        }
+
+        // Extract final text from last response
+        for (const Block of AnthropicResponse.content) {
+          if (Block.type === 'text') FullResponse += Block.text;
+        }
+
+        // Save to cache (fire-and-forget)
+        SaveToCache(CacheKey, LastUserMsg.content, FullResponse, PageKey, Body.Locale);
+
+        const Enc = new TextEncoder();
+        return new Response(
+          new ReadableStream({
+            start(Ctrl) {
+              Ctrl.enqueue(Enc.encode(`data: ${JSON.stringify({ text: FullResponse })}\n\n`));
+              Ctrl.enqueue(Enc.encode('data: [DONE]\n\n'));
+              Ctrl.close();
+            },
+          }),
+          { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' } },
+        );
+      } catch (Err: unknown) {
+        console.error('[Mascot] Anthropic tool-use error:', Err);
+        // Fall through to streamChat below
+      }
+    }
+
+    // Fallback: provider-agnostic streaming (no tool use)
     const OriginalStream = new ReadableStream({
       async start(Controller) {
         try {

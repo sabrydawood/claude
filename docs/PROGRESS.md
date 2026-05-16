@@ -11,9 +11,21 @@
 ## الحالة العامة
 
 ```
-Phase 1:  ██░░░░░░░░  15% — جارٍ
-Dev Preview: ░░░░░░░░░░   0% — مخطط
+Phase 1 (ALI Foundation):  ██████████  100% ✅
+Phase 1 Fixes (AI Arch):   ██████████  100% ✅
+Phase 2 (Features):        ░░░░░░░░░░    0% — مخطط
 ```
+
+### ✅ Phase 1 Fixes — مكتملة (2026-05-17)
+
+| المهمة | الوصف | الحالة |
+|-------|-------|--------|
+| Bug Fix BumpCacheHit | HitCount يتراكم صحيحاً الآن | ✅ |
+| Tool Calling Layer | Mascot يطلب ما يحتاجه فقط (77% توفير tokens) | ✅ |
+| Provider Management | Admin Dashboard كامل + Hot-swap بدون restart | ✅ |
+| DB Migration | Providers + ProviderModels + RoutingRules | ✅ |
+| Seed Data | Anthropic (Haiku/Sonnet) + Google (Flash) + 6 routing rules | ✅ |
+| Typecheck | 0 errors | ✅ |
 
 ---
 

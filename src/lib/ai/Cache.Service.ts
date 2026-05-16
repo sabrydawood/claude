@@ -7,7 +7,7 @@
 
 import { db } from '@/lib/db/Index';
 import { SemanticCache } from '@/lib/db/Schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 // SHA-256 hash using Web Crypto API (Bun native)
 async function Sha256(Text: string): Promise<string> {
@@ -53,7 +53,7 @@ export async function CheckCache(QuestionHash: string): Promise<ICacheEntry | nu
 // Increment hit counter (fire-and-forget)
 export function BumpCacheHit(CacheId: string): void {
   db.update(SemanticCache)
-    .set({ HitCount: 1 }) // note: would need SQL increment in production
+    .set({ HitCount: sql`${SemanticCache.HitCount} + 1` })
     .where(eq(SemanticCache.Id, CacheId))
     .catch(() => {});
 }

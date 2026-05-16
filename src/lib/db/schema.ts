@@ -19,6 +19,7 @@ import {
   unique,
   index,
   jsonb,
+  numeric,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
@@ -703,6 +704,52 @@ export const LearningSignalsRelations = relations(LearningSignals, ({ one }) => 
   Concept: one(Concepts, { fields: [LearningSignals.ConceptId], references: [Concepts.Id] }),
 }));
 
+// ─── AI Provider Management ────────────────────────────────────────────────────
+
+export const Providers = pgTable('Providers', {
+  Id:          uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  Name:        text('Name').notNull(),
+  Description: text('Description'),
+  BaseUrl:     text('BaseUrl').notNull(),
+  ApiKeyEnc:   text('ApiKeyEnc').notNull(),
+  IsActive:    boolean('IsActive').default(true).notNull(),
+  CreatedAt:   timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  UpdatedAt:   timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const ProviderModels = pgTable('ProviderModels', {
+  Id:             uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  ProviderId:     uuid('ProviderId').notNull().references(() => Providers.Id, { onDelete: 'cascade' }),
+  ModelName:      text('ModelName').notNull(),
+  InputCostPerM:  text('InputCostPerM').notNull().default('0'),
+  OutputCostPerM: text('OutputCostPerM').notNull().default('0'),
+  MaxTokens:      integer('MaxTokens').default(8192).notNull(),
+  IsActive:       boolean('IsActive').default(true).notNull(),
+  CreatedAt:      timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const RoutingRules = pgTable('RoutingRules', {
+  Id:       uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  TaskType: text('TaskType').notNull(),
+  ModelId:  uuid('ModelId').notNull().references(() => ProviderModels.Id, { onDelete: 'cascade' }),
+  Priority: integer('Priority').default(1).notNull(),
+  IsActive: boolean('IsActive').default(true).notNull(),
+  UpdatedAt: timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const ProvidersRelations = relations(Providers, ({ many }) => ({
+  Models: many(ProviderModels),
+}));
+
+export const ProviderModelsRelations = relations(ProviderModels, ({ one, many }) => ({
+  Provider: one(Providers, { fields: [ProviderModels.ProviderId], references: [Providers.Id] }),
+  RoutingRules: many(RoutingRules),
+}));
+
+export const RoutingRulesRelations = relations(RoutingRules, ({ one }) => ({
+  Model: one(ProviderModels, { fields: [RoutingRules.ModelId], references: [ProviderModels.Id] }),
+}));
+
 // ─── TypeScript Types ─────────────────────────────────────────────────────────
 
 export type TUser              = typeof users.$inferSelect;
@@ -736,3 +783,6 @@ export type TStudentMastery     = typeof StudentMastery.$inferSelect;
 export type TLearningSignal     = typeof LearningSignals.$inferSelect;
 export type TStudentInsight     = typeof StudentInsights.$inferSelect;
 export type TSemanticCache      = typeof SemanticCache.$inferSelect;
+export type TProvider       = typeof Providers.$inferSelect;
+export type TProviderModel  = typeof ProviderModels.$inferSelect;
+export type TRoutingRule    = typeof RoutingRules.$inferSelect;

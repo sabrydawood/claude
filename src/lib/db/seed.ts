@@ -18,7 +18,9 @@ import {
   Achievements, AchievementTranslations,
   SystemPrompts,
   Subjects, SubjectTranslations,
+  Providers, ProviderModels, RoutingRules,
 } from './Schema';
+import { EncryptApiKey } from '../Ai/Crypto';
 import { seedProgramming } from './seeds/programming.seed';
 import { seedDatabases } from './seeds/databases.seed';
 import { seedWebDesign } from './seeds/web-design.seed';
@@ -176,6 +178,69 @@ async function Seed() {
   await seedPromptEngineering(db); console.log('  ✓ prompt-engineering');
   await seedProjectBuilding(db);   console.log('  ✓ project-building');
   await seedDesignPatterns(db);    console.log('  ✓ design-patterns');
+
+  // ─── AI Providers, Models & Routing Rules ────────────────────────────────────
+  const existingProviders = await db.select({ Id: Providers.Id }).from(Providers).limit(1);
+  if (existingProviders.length === 0) {
+    // Use a placeholder encrypted key - real keys set via Admin Dashboard
+    const placeholderKey = process.env.ENCRYPTION_KEY
+      ? await EncryptApiKey('placeholder-set-via-admin')
+      : 'placeholder:placeholder';
+
+    const [anthropic] = await db.insert(Providers).values({
+      Id: uuidv7(),
+      Name: 'Anthropic',
+      Description: 'Claude models for educational AI',
+      BaseUrl: 'https://api.anthropic.com',
+      ApiKeyEnc: placeholderKey,
+      IsActive: true,
+    }).returning();
+
+    const [google] = await db.insert(Providers).values({
+      Id: uuidv7(),
+      Name: 'Google',
+      Description: 'Gemini models - cost-effective for simple tasks',
+      BaseUrl: 'https://generativelanguage.googleapis.com',
+      ApiKeyEnc: placeholderKey,
+      IsActive: true,
+    }).returning();
+
+    // Anthropic models
+    const [haiku] = await db.insert(ProviderModels).values({
+      Id: uuidv7(), ProviderId: anthropic.Id,
+      ModelName: 'claude-haiku-4-5-20251001',
+      InputCostPerM: '1.00', OutputCostPerM: '5.00',
+      MaxTokens: 8192, IsActive: true,
+    }).returning();
+
+    const [sonnet] = await db.insert(ProviderModels).values({
+      Id: uuidv7(), ProviderId: anthropic.Id,
+      ModelName: 'claude-sonnet-4-5',
+      InputCostPerM: '3.00', OutputCostPerM: '15.00',
+      MaxTokens: 8192, IsActive: true,
+    }).returning();
+
+    // Google models
+    const [flash] = await db.insert(ProviderModels).values({
+      Id: uuidv7(), ProviderId: google.Id,
+      ModelName: 'gemini-2.0-flash',
+      InputCostPerM: '0.10', OutputCostPerM: '0.40',
+      MaxTokens: 8192, IsActive: true,
+    }).returning();
+
+    // Routing rules
+    await db.insert(RoutingRules).values([
+      { Id: uuidv7(), TaskType: 'simple_chat', ModelId: flash.Id, Priority: 1, IsActive: true, UpdatedAt: new Date() },
+      { Id: uuidv7(), TaskType: 'translation', ModelId: flash.Id, Priority: 1, IsActive: true, UpdatedAt: new Date() },
+      { Id: uuidv7(), TaskType: 'explanation', ModelId: haiku.Id, Priority: 1, IsActive: true, UpdatedAt: new Date() },
+      { Id: uuidv7(), TaskType: 'socratic', ModelId: sonnet.Id, Priority: 1, IsActive: true, UpdatedAt: new Date() },
+      { Id: uuidv7(), TaskType: 'assessment', ModelId: sonnet.Id, Priority: 1, IsActive: true, UpdatedAt: new Date() },
+      { Id: uuidv7(), TaskType: 'content_gen', ModelId: sonnet.Id, Priority: 1, IsActive: true, UpdatedAt: new Date() },
+    ]);
+    console.log('  ✓ 2 providers, 3 models, 6 routing rules');
+  } else {
+    console.log('  ⏭  Providers already seeded — skipping');
+  }
 
   console.log('\n✅ Seed complete!\n');
   process.exit(0);

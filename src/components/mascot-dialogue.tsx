@@ -457,8 +457,8 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
           <div
             onMouseDown={onDragStart}
             onTouchStart={onDragStart}
-            className="absolute top-0 left-0 right-0 flex items-center justify-center cursor-row-resize"
-            style={{ height: 20, zIndex: 10 }}
+            className="absolute top-0 left-0 right-0 flex items-center justify-center cursor-row-resize z-10"
+            style={{ height: 20 }}
           >
             <div
               className="flex items-center gap-1 px-3 py-1 rounded-full"
@@ -496,7 +496,7 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
                     ذكي · Zaki
                   </span>
                 </div>
-                <div className="flex items-center gap-1 bg-red-500">
+                <div className="flex items-center gap-1 relative z-20">
                   {hasHistory && (
                     <button
                       onClick={handleReset}

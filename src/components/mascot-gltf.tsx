@@ -383,7 +383,7 @@ function GltfCanvas({
     <Canvas
       gl={{ antialias: true, alpha: true }}
       camera={{ position: camPos, fov }}
-      style={{ width, height, display: "block", background: "transparent" }}
+      style={{ width, height, display: "block", background: "transparent", pointerEvents: orbitControls ? "auto" : "none" }}
     >
       <RobotLighting />
       <GltfModelInner mood={mood} walking={walking} facingLeft={facingLeft} cfg={cfg} />

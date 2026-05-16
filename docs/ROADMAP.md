@@ -1,140 +1,190 @@
 # Roadmap — ذكاوي (Zkawi)
 
-> **الرؤية:** منصة عربية تعليمية تصبح المرجع الأول لتعلم الذكاء الاصطناعي للأطفال والكبار في العالم العربي.
+> **الرؤية:** طفرة نوعية في التعليم العربي — نظام يتعلم من كل طفل ويصبح أذكى وأرخص مع الوقت.
+> كل مرحلة تبني على السابقة وتضيف طبقة من الـ ALI (Adaptive Learning Intelligence).
 
 ---
 
-## الوضع الحالي — v0.2 (جارٍ التطوير)
+## Phase 0 — الأساس (مكتمل)
 
-### ✅ مكتمل (v0.1 — MVP)
+### البنية التقنية
+- [x] Next.js 16 + TypeScript + Bun + Tailwind v4
+- [x] PostgreSQL + Drizzle ORM + Translation Tables pattern
+- [x] better-auth (email/password + email verification)
+- [x] Multi-provider AI: OpenRouter → Gemini → OpenAI → Anthropic
+- [x] Rate limiting + Zod validation + Security headers (SEV-001 → SEV-016)
+- [x] Sentry error tracking
+- [x] PWA (Service Worker + Install Banner)
+- [x] i18n: Arabic (default) + English، RTL/LTR
 
-**البنية التقنية**
-- Next.js 15 App Router + Bun + TypeScript + Tailwind CSS v4
-- PostgreSQL + Drizzle ORM + Translation Table pattern (i18n قابل للتوسع بدون schema changes)
-- better-auth (email/password)
-- next-intl للـ UI translations
-- Framer Motion للأنيميشن
-
-**المحتوى**
-- قسم Claude: 5 دروس تفاعلية + كويز متعدد الخيارات + نظام XP
-- Prompt Engineering، Use Cases، Advanced Features
-
-**UI/UX**
-- Dark mode كـ Default + Light mode (CSS custom properties)
-- Arabic-first مع دعم English + RTL/LTR تلقائي
-- Header مع ThemeToggle + Language Switcher + User menu
-- Footer، Logo SVG (Robot mascot)، Brand tokens
-
-**الحسابات والتقدم**
-- تسجيل دخول / إنشاء حساب
-- Dashboard: XP bar، streak، إنجازات، lessons list
-- حفظ التقدم (localStorage — جاهز للـ DB)
-
-**SEO & Branding**
-- Dynamic metadata (generateMetadata per route)
-- OG images ديناميكية (Edge Runtime PNG) عبر `/api/og`
-- JSON-LD Structured Data (WebSite, Organization, Course, LearningResource, Breadcrumb)
-- robots.txt، sitemap.xml، hreflang، PWA manifest
-
-**DB**
-- Schema كامل: users, sessions, accounts, agents, lessons, quiz_questions, quiz_options, achievements, translations, user_progress, user_stats, user_achievements
-- db:reset → db:generate → db:migrate → db:seed (`bun run db:all`)
+### المحتوى والـ UI
+- [x] Mascot 3D (Xbot/Mixamo) — animations + patrol + chat
+- [x] RPG Dialogue Box (drag-to-resize + markdown rendering)
+- [x] Sandbox (multi-provider + user API key + conversation history sidebar)
+- [x] Conversation persistence في DB (Mascot + Sandbox)
+- [x] Selection Tooltip ("اشرح مع ذكي ✨")
+- [x] XP + Streak + Achievements system
+- [x] Leaderboard + Profile
 
 ---
 
-### ✅ مكتمل (v0.2 — جديد)
+## Phase 1 — الذاكرة الذكية (الأسبوع 1-4)
 
-**Dark/Light Mode (كامل)**
-- CSS custom properties (`--bg`, `--surface`, `--text`, `--border`, `--zkawi-pink`, إلخ)
-- تحديث جميع المكونات: Button، Card، Input، Badge، Progress
-- تحديث جميع الصفحات: Home، Auth، Dashboard، Agent، Lesson، Quiz
-- Wave SVG في Hero يتكيف مع dark/light
-- `.lesson-content` CSS class للمحتوى المحوَّل من Markdown
+**الهدف:** بناء الطبقات الأساسية للـ ALI — معرفة كـ Graph، طالب كـ Profile، إجابات كـ Cache دائم.
 
-**Onboarding Wizard**
-- `/onboarding` — 5 خطوات متحركة مع AnimatePresence:
-  1. العمر (child / teen / adult)
-  2. الهدف (chat / work / creative / developer / educator)
-  3. مستوى الخبرة (none / some / advanced)
-  4. طريقة التعلم (visual / reading / practice / game)
-  5. الوقت اليومي (5 / 15 / 30 / 60 دقيقة)
-- بعد إتمامه: مسار تعلم مخصص يُولَّد ويُحفظ في DB
-- Dashboard يتحقق تلقائياً ويُعيد التوجيه إن لم يُكتمل
+### 1.1 Knowledge Graph
+- [ ] `Concepts` table: id, name_ar, name_en, difficulty (1-5), type (factual/procedural/conceptual)
+- [ ] `ConceptRelations` table: from_id, to_id, relation_type (PREREQUISITE_OF / EXAMPLE_OF / RELATED_TO / BUILDS_ON)
+- [ ] `ConceptChunks` table: concept_id, content (~400 chars), embedding (vector)
+- [ ] pgvector extension على PostgreSQL
+- [ ] Script AI لاستخراج المفاهيم من الدروس الموجودة
+- [ ] Admin UI لمراجعة الـ Graph وتعديله
 
-**Learning Tracks (5 مسارات)**
-- explorer 🚀 (المبتدئ الفضولي — default)
-- creator 🎨 (المبدع والكاتب)
-- engineer ⚙️ (محترف Prompt Engineering)
-- developer 💻 (مطور API)
-- educator 📚 (معلم/مدرب)
+### 1.2 Student Mastery Profile
+- [ ] `StudentMastery` table: user_id, concept_id, score (0-100), attempts, last_tested
+- [ ] `LearningSignals` table: user_id, concept_id, signal_type, value, created_at
+- [ ] `StudentInsights` table: user_id, insight_type, value ← حقائق مستخلصة (مش تاريخ كامل)
+- [ ] Engine لاستخلاص الـ insights من المحادثات بعد كل exchange
+- [ ] Profile page: خريطة المفاهيم + نقاط القوة والضعف
 
-**Schema جديد (5 جداول)**
-- `tracks` — مسارات التعلم
-- `user_preferences` — إجابات Onboarding
-- `learning_paths` — المسارات المخصصة (JSON lesson order)
-- `encrypted_keys` — مفاتيح Anthropic API للـ Sandbox
-- `sandbox_sessions` — تاريخ جلسات الـ Sandbox
+### 1.3 Semantic Cache (الذاكرة الدائمة)
+- [ ] `SemanticCache` table: question_embedding, answer, page_key, locale, hit_count, created_at
+- [ ] دالة بحث بالـ cosine similarity (pgvector) — threshold: 0.92
+- [ ] Mascot Controller يمر بالـ Cache أولاً قبل أي AI call
+- [ ] **قاعدة:** الـ Cache لا يُحذف تلقائياً — هو قاعدة معرفة دائمة تنمو
+- [ ] Dashboard: hit rate + estimated cost savings
 
-**APIs**
-- `POST /api/onboarding` — حفظ إجابات + توليد learning path
-- `GET /api/user/preferences` — قراءة حالة onboarding
-- Learning Path Generator (`src/lib/learning-path.ts`) — يُرتِّب الدروس بناءً على profile
+### 1.4 تحسين Mascot
+- [ ] استبدال static system prompt بـ RAG (top-3 chunks مرتبطة بالسؤال)
+- [ ] Student Profile يُضاف للـ context (100 حرف بدل 500)
+- [ ] In-process LRU Cache لـ `BuildMascotSystemPrompt` (TTL: 10 دقائق)
+- [ ] Anthropic `cache_control: ephemeral` على الـ system prompt → -90% input tokens
 
 ---
 
-## v0.3 — ربط DB والـ Sandbox (التالي)
+## Phase 2 — التخصيص الكامل (الشهر 2-3)
 
-### أولوية عالية
-- [ ] **Sandbox** — محرر داخل المنصة يستخدم مفتاح Anthropic API الخاص بالمستخدم
-  - واجهة chat بسيطة داخل الدرس
-  - تشفير المفتاح (AES-256) قبل حفظه في `encrypted_keys`
-  - استدعاء API من server-side فقط (المفتاح لا يُكشف للـ client أبداً)
-- [ ] **ربط التقدم بـ DB** — استبدال localStorage بـ API calls إلى `user_progress` و`user_stats`
-- [ ] **الـ Streak الحقيقي** — حساب يومي مرتبط بـ `lastActivityDate` في `user_stats`
-- [ ] **Dashboard الشخصي** — عرض المسار المخصص من `learning_paths`
+**الهدف:** كل طفل يحصل على تجربة مختلفة تماماً — مبنية على مستواه وأسلوب تعلمه.
 
-### أولوية متوسطة
-- [ ] **Admin Panel** — `/admin` بسيط لإضافة دروس من الـ UI
-- [ ] **Content API** — `POST /api/admin/lessons` لـ AI agents تُضيف محتوى برمجياً
+### 2.1 Adaptive Content Delivery
+- [ ] 3 مستويات شرح لكل مفهوم: مبتدئ / متوسط / متقدم
+- [ ] محرك اختيار المستوى المناسب من Student Profile
+- [ ] `ConceptExplanations` table: concept_id, level, locale, content (pre-generated)
 
----
+### 2.2 Multi-Signal Assessment Engine
+- [ ] Socratic Dialogue Engine — سلسلة أسئلة تُقيّم عمق الفهم
+- [ ] تحديث `StudentMastery.score` بعد كل تفاعل (weighted formula)
+- [ ] Mastery Score = quiz(20%) + socratic(35%) + practical(30%) + peer(15%)
+- [ ] Mastery Badge per concept (المفهوم المُتقن يحصل على شارة)
+- [ ] تقرير للطفل: "أتقنت X مفهوم، تحتاج مراجعة Y"
 
-## v0.4 — المحتوى المتقدم
+### 2.3 Credits + XP Economy
+- [ ] `Credits` table: user_id, balance, total_earned
+- [ ] `CreditTransactions` table: user_id, amount, reason, timestamp
+- [ ] Time-limited questions: server-side timer، لا يمكن تمديده
+- [ ] لا تكرار للـ Credits على نفس السؤال (إجابة تُقبل لكن Credits = 0)
+- [ ] Credits Marketplace: شروح مخصصة، Classroom خاص، تحديات متقدمة
 
-- [ ] Prompt Engineering track: 8 دروس (Zero-shot, Few-shot, Chain of thought, etc.)
-- [ ] Claude API track: 6 دروس (Auth, Messages, Streaming, Tool Use, Files, Caching)
-- [ ] Developer track: 5 دروس (Build a chatbot, RAG, Agents with tools)
-- [ ] أنواع أنشطة جديدة: Fill-in-the-blank, Drag-and-drop
-- [ ] Kid Mode: خط أكبر، ألوان أكثر، مكافآت مبالغ فيها
-
----
-
-## v0.5 — Social & Polish
-
-- [ ] Leaderboard (top learners)
-- [ ] مشاركة الإنجازات (OG card مخصص لكل إنجاز)
-- [ ] ملفات شخصية عامة
-- [ ] تعليقات على الدروس
-- [ ] PWA كاملة (Offline mode)
+### 2.4 Data Flywheel الأول
+- [ ] Signal collection: هل الطفل راضٍ عن الرد؟ (implicit signals)
+- [ ] Auto-update: مفاهيم تحصل على signals سلبية → يُعاد توليد شرحها
+- [ ] Weekly report: أي شرح يحتاج تحسين بناءً على بيانات الأسبوع
 
 ---
 
-## v1.0 — الكمال
+## Phase 3 — الفصول الذكية (الشهر 4-6)
 
-- [ ] ChatGPT + Gemini tracks
-- [ ] تعدد اللغات: فرنسي، أردي، تركي
-- [ ] خطة Pro (شهادات، محتوى متقدم)
-- [ ] خطة مدارس (لوحة تحكم معلمين)
-- [ ] React Native app
+**الهدف:** AI معلم يدير فصلاً بأطفال متعددين في نفس الوقت.
+
+### 3.1 البنية التحتية Real-time
+- [ ] WebSocket server (Bun native WebSocket)
+- [ ] `Classrooms` table: id, host_id, topic_concept_id, max_students, state, scheduled_at
+- [ ] `ClassroomParticipants` table: classroom_id, user_id, joined_at, role (student/supervisor)
+- [ ] Redis / Bun in-memory للـ classroom state الحية
+
+### 3.2 Classroom Orchestrator AI
+- [ ] State Machine: TEACHING → QUESTIONING → DISCUSSION → INDIVIDUAL → ASSESSMENT
+- [ ] Confusion Detector: رصد "مش فاهم"، صمت طويل، إجابات خاطئة متكررة
+- [ ] Turn Manager: دور عادل للكلام، يشجع الساكتين تلقائياً
+- [ ] Peer Teaching Matcher: الطفل الأقوى يشرح للأضعف + كلاهما يكسب Credits
+- [ ] Human Supervisor Dashboard: الكل يراه، يتدخل فقط عند الحاجة
+
+### 3.3 Classroom Economy
+- [ ] Credits bonus للـ peer teaching (+30 للمعلم + +15 للمتعلم)
+- [ ] Class leaderboard في نهاية كل جلسة
+- [ ] Classroom Credits خاصة (لا تُحتسب في الـ XP العام)
 
 ---
 
-## مبادئ التطوير (اتُّفق عليها)
+## Phase 4 — الشرح المرئي الحي (الشهر 6-9)
 
-1. **الطفل أولاً:** كل feature تُختبر على مستخدمين 8-12 سنة
-2. **العربية أولاً — عامية مصرية:** لا فصحى في الـ UI أبداً
-3. **اسئل دائماً قبل الكود:** لا يُكتب سطر كود قبل نقاش الخطة
-4. **Translation Table:** إضافة لغة = INSERT rows فقط، لا schema changes
-5. **Dark default:** الـ dark mode هو الافتراضي دائماً
-6. **Privacy by design:** مفاتيح API مشفرة، بيانات الأطفال محمية
-7. **المحتوى مجاني للأطفال:** دائماً وأبداً
+**الهدف:** شرح مخصص بصوت + رسوم + كود — يُولَّد للحظة لكل طفل.
+
+### 4.1 TTS (Text-to-Speech)
+- [ ] Integration مع ElevenLabs أو Murf (Arabic + Dialects)
+- [ ] اختيار صوت حسب عمر الطفل من Student Profile
+- [ ] Streaming TTS — لا انتظار لاكتمال النص
+
+### 4.2 Living Canvas
+- [ ] JSON-driven animation format: AI يولّد JSON → Canvas يرسم في الوقت الفعلي
+- [ ] مكتبة animations للمفاهيم الشائعة (loops، variables، functions، data structures)
+- [ ] Mascot يتحرك ويشير للعناصر المرسومة أثناء الشرح
+
+### 4.3 Live Code Execution
+- [ ] Sandboxed code runner: Python + JavaScript
+- [ ] Step-by-step execution مع شرح كل خطوة
+- [ ] Visual output: رسوم بيانية، قوائم، جداول
+
+### 4.4 AI-Generated Explanation Pipeline
+- [ ] Pre-generate Living Explanations لكل concept × 3 levels
+- [ ] `ConceptLivingExplanations` table: concept_id, level, tts_url, canvas_json, code_snippet
+- [ ] Fallback: text-only عند ضعف الاتصال
+
+---
+
+## Phase 5 — النموذج الخاص (الشهر 12+)
+
+**الهدف:** نموذج AI مدرّب على بيانات ذكاوي — أذكى وأرخص من النماذج العامة.
+
+### 5.1 Data Collection Pipeline
+- [ ] Socratic dialogues مُعلَّمة (سؤال + إجابة + score)
+- [ ] أساليب الشرح الناجحة حسب Student Profile
+- [ ] Classroom interactions + Peer teaching quality
+- [ ] RLHF signals من تفاعل الطفل (implicit feedback)
+
+### 5.2 Fine-tuning Pipeline
+- [ ] Data cleaning + formatting للـ instruction tuning
+- [ ] Fine-tune على نموذج مفتوح: Llama 3 أو Qwen 2.5
+- [ ] Evaluation على مهام التعليم العربي للأطفال
+- [ ] A/B testing: النموذج الخاص vs النموذج العام
+
+### 5.3 Arabic Dialect Support
+- [ ] دعم: مصري، سعودي، إماراتي، مغربي، شامي
+- [ ] اكتشاف اللهجة تلقائياً من نمط الكلام
+- [ ] رد بنفس اللهجة تلقائياً
+
+---
+
+## مؤشرات النجاح
+
+| المرحلة | المؤشر الرئيسي | الهدف |
+|---------|---------------|-------|
+| Phase 1 | Semantic Cache hit rate | ≥ 40% في أول شهر |
+| Phase 2 | Mastery Score correlation | ≥ 90% مع اختبارات خارجية |
+| Phase 3 | Classroom engagement rate | ≥ 80% من وقت الجلسة |
+| Phase 4 | Time-to-understand concept | < 5 دقائق لمفهوم جديد |
+| Phase 5 | AI cost per 1000 messages | -70% مقارنة بالنماذج العامة |
+
+---
+
+## ما لا نبنيه الآن
+
+- ❌ Mobile app (PWA يكفي في هذه المرحلة)
+- ❌ فيديو مسجل بمعلم بشري
+- ❌ نظام مدفوعات للآباء (مرحلة لاحقة)
+- ❌ دعم لغات إضافية (فوق العربية والإنجليزية)
+- ❌ Admin لوحة متقدمة (البسيط يكفي)
+
+---
+
+> **القاعدة الذهبية:** إذا كانت الميزة لا تجعل النظام أذكى أو أرخص — فليست أولوية الآن.

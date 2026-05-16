@@ -2,26 +2,34 @@
  * Mascot.Controller.ts
  * SSE streaming handler for the AI mascot chat.
  *
- * SEV-002: Rate limited to 20 requests/minute per user.
+ * Works for both authenticated users and guests.
+ * SEV-002: Rate limited — 20 req/min for users, 10 req/min per IP for guests.
  * SEV-005: Internal errors are logged only, not sent to client.
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { GetSessionOrUnauthorized } from '@/Shared/Middleware/Auth.Middleware';
+import { auth } from '@/Features/Auth/Auth.Config';
 import { ParseBodyOrBadRequest } from '@/Shared/Middleware/Validation.Middleware';
 import { CheckRateLimit, AI_RATE_LIMIT } from '@/Shared/Middleware/RateLimit.Middleware';
 import { streamChat, type ChatMessage } from '@/lib/ai/Providers';
 import { MascotChatSchema } from './Mascot.Schemas';
 import { BuildMascotSystemPrompt } from './Mascot.Service';
 
+const GUEST_RATE_LIMIT = { MaxRequests: 10, WindowMs: 60_000 };
+
 /**
  * POST /api/v1/mascot — streams mascot response using platform AI providers.
+ * Accessible to all visitors (guests and authenticated users).
  */
 export async function PostMascotChat(Req: NextRequest): Promise<NextResponse | Response> {
-  const Session = await GetSessionOrUnauthorized(Req);
-  if (Session instanceof NextResponse) return Session;
+  // Optional auth — guests can use the mascot too
+  const Session = await auth.api.getSession({ headers: Req.headers }).catch(() => null);
 
-  // SEV-002: Apply rate limit per user
-  const RateLimitResponse = await CheckRateLimit(Req, Session.user.id, AI_RATE_LIMIT);
+  // Rate limit: by user ID if logged in, by IP for guests
+  const RateLimitKey = Session?.user?.id
+    ?? (Req.headers.get('x-forwarded-for') ?? Req.headers.get('x-real-ip') ?? 'unknown-ip');
+  const Config = Session?.user?.id ? AI_RATE_LIMIT : GUEST_RATE_LIMIT;
+
+  const RateLimitResponse = await CheckRateLimit(Req, RateLimitKey, Config);
   if (RateLimitResponse) return RateLimitResponse;
 
   const Body = await ParseBodyOrBadRequest(Req, MascotChatSchema);
@@ -38,7 +46,6 @@ export async function PostMascotChat(Req: NextRequest): Promise<NextResponse | R
           Controller.enqueue(Encoder.encode(`data: ${JSON.stringify({ text: Text })}\n\n`));
         }
       } catch (Err: unknown) {
-        // SEV-005: Log full error server-side, send generic message to client
         console.error('[Mascot] Stream error:', Err);
         Controller.enqueue(Encoder.encode(`data: ${JSON.stringify({ error: 'AI unavailable' })}\n\n`));
       } finally {

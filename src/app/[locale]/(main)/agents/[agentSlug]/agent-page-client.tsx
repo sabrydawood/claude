@@ -94,7 +94,7 @@ export default function AgentPageClient({
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/dashboard">
-            <div className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6 text-sm font-medium transition-colors">
+            <div className="inline-flex items-center gap-2 hover:text-white mb-6 text-sm font-medium transition-colors">
               <ChevronLeft size={16} className="flip-rtl" />
               {t("backToAgents")}
             </div>
@@ -121,7 +121,7 @@ export default function AgentPageClient({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-white/80 max-w-xl leading-relaxed"
+                className="max-w-xl leading-relaxed"
               >
                 {agent.fullDescription}
               </motion.p>

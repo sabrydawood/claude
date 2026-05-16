@@ -139,7 +139,7 @@ export default function HomeAgents({
                   <div
                     className={`bg-gradient-to-br ${gradient} p-6 text-white text-center`}
                   >
-                    <div className="flex justify-center mb-2 text-white/90">
+                    <div className="flex justify-center mb-2">
                       <DynamicIcon name={agent.icon} size={52} />
                     </div>
                     <h3 className="text-2xl font-black">{agent.name}</h3>

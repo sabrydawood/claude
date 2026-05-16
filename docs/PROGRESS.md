@@ -23,10 +23,10 @@ Dev Preview: ░░░░░░░░░░   0% — مخطط
 |----|--------|--------|--------|--------|---------|
 | P1-PREV | Dev Preview Page | Claude (main) | 🔄 In Progress | - | World Map 3D + Phase 1 preview |
 | P1-S | DB Schema — كل جداول Phase 1 | Schema-Agent | ✅ Done | 020265c | 7 tables + migration |
-| P1-G | Knowledge Graph Service | Graph-Agent | ✅ Done | pending review | ⚠️ path: src/lib/Graph/ (lowercase — fix needed) |
-| P1-C | Semantic Cache Service + Mascot update | Cache-Agent | ✅ Done | pending review | Cache.Service + LRU + Controller updated |
-| P1-M | Student Mastery Service + API | Mastery-Agent | 🔄 In Progress | - | يعمل الآن |
-| P1-R | Review + Typecheck + Merge | Claude (main) | ⏳ Waiting | - | بعد اكتمال كل Agents |
+| P1-G | Knowledge Graph Service | Graph-Agent | ✅ Done | f4d9b10 | import fix: @/Lib/ → @/lib/ |
+| P1-C | Semantic Cache Service + Mascot update | Cache-Agent | ✅ Done | f4d9b10 | Cache.Service + LRU + Controller |
+| P1-M | Student Mastery Service + API | Mastery-Agent | ✅ Done | 0a90f98 | Mastery feature + 2 API routes |
+| P1-R | Review + Typecheck + Merge | Claude (main) | ✅ Done | f4d9b10 | 0 TypeScript errors |
 
 ---
 

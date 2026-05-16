@@ -196,3 +196,125 @@ export function RobotExpressivePortrait({
 
 // Preload so the first render doesn't stall
 useGLTF.preload('/models/RobotExpressive.glb');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Generic GLTF character — parameterised model path + animation map
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface GltfConfig {
+  modelPath: string;
+  animMap: Record<RobotMood, string>;
+  scale?: number;
+  positionY?: number;
+  rotationY?: number;
+}
+
+function GltfModelInner({ mood, walking, cfg }: RobotProps & { cfg: GltfConfig }) {
+  const { scene, animations } = useGLTF(cfg.modelPath);
+  const clonedScene = useMemo(
+    () => SkeletonUtils.clone(scene) as THREE.Group,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+  const clonedRef = useRef<THREE.Group>(clonedScene);
+  const { actions, mixer } = useAnimations(animations, clonedRef);
+  const activeAnim = useRef('');
+
+  useEffect(() => {
+    const first = cfg.animMap['idle'];
+    const a = actions[first];
+    if (a) { a.play(); activeAnim.current = first; }
+    return () => { mixer.stopAllAction(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const target = walking ? cfg.animMap['walking'] : cfg.animMap[mood];
+    if (!target || target === activeAnim.current) return;
+    const prev = activeAnim.current;
+    activeAnim.current = target;
+    if (prev && actions[prev]) actions[prev]!.fadeOut(0.35);
+    const next = actions[target];
+    if (next) { next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(0.35).play(); }
+  }, [mood, walking, actions, cfg]);
+
+  useFrame(({ clock }) => {
+    if (!clonedRef.current) return;
+    const baseY = cfg.positionY ?? 0;
+    clonedRef.current.position.y = !walking && (mood === 'idle' || mood === 'talking')
+      ? baseY + Math.sin(clock.elapsedTime * 1.2) * 0.04
+      : baseY;
+  });
+
+  return (
+    <primitive
+      ref={clonedRef}
+      object={clonedScene}
+      scale={cfg.scale ?? 1}
+      position={[0, cfg.positionY ?? 0, 0]}
+      rotation={[0, cfg.rotationY ?? 0, 0]}
+      dispose={null}
+    />
+  );
+}
+
+function GltfCanvas({
+  mood, walking = false, cfg, width = 200, height = 280,
+  camPos, camTarget, fov, orbitControls = false,
+}: RobotProps & {
+  cfg: GltfConfig;
+  width?: number; height?: number;
+  camPos: [number, number, number];
+  camTarget: [number, number, number];
+  fov: number;
+  orbitControls?: boolean;
+}) {
+  return (
+    <Canvas
+      gl={{ antialias: true, alpha: true }}
+      camera={{ position: camPos, fov }}
+      style={{ width, height, display: 'block', background: 'transparent' }}
+    >
+      <RobotLighting />
+      <GltfModelInner mood={mood} walking={walking} cfg={cfg} />
+      {orbitControls && (
+        <OrbitControls target={camTarget} enableZoom enableRotate enablePan={false} minDistance={2} maxDistance={20} />
+      )}
+    </Canvas>
+  );
+}
+
+// ─── Xbot (Mixamo humanoid) ────────────────────────────────────────────────────
+
+const XBOT_CFG: GltfConfig = {
+  modelPath: '/models/Xbot.glb',
+  animMap: { idle: 'idle', happy: 'agree', thinking: 'sad_pose', talking: 'agree', walking: 'walk' },
+  scale: 1.0,
+  positionY: -1.75,
+  rotationY: Math.PI,
+};
+
+export function XbotExpressive({ mood, walking = false, width = 200, height = 280, orbitControls = false }: CanvasProps) {
+  return <GltfCanvas mood={mood} walking={walking} cfg={XBOT_CFG} width={width} height={height} camPos={[0, 0.2, 7.5]} camTarget={[0, 0, 0]} fov={40} orbitControls={orbitControls} />;
+}
+
+export function XbotPortrait({ mood, width = 150, height = 270, orbitControls = false }: { mood: RobotMood; width?: number; height?: number; orbitControls?: boolean }) {
+  return <GltfCanvas mood={mood} cfg={XBOT_CFG} width={width} height={height} camPos={[0, 0.8, 2.8]} camTarget={[0, 0.8, 0]} fov={32} orbitControls={orbitControls} />;
+}
+
+// ─── Soldier ──────────────────────────────────────────────────────────────────
+
+const SOLDIER_CFG: GltfConfig = {
+  modelPath: '/models/Soldier.glb',
+  animMap: { idle: 'Idle', happy: 'Idle', thinking: 'Idle', talking: 'Idle', walking: 'Walk' },
+  scale: 1.0,
+  positionY: -1.75,
+  rotationY: Math.PI,
+};
+
+export function SoldierExpressive({ mood, walking = false, width = 200, height = 280, orbitControls = false }: CanvasProps) {
+  return <GltfCanvas mood={mood} walking={walking} cfg={SOLDIER_CFG} width={width} height={height} camPos={[0, 0.2, 7.5]} camTarget={[0, 0, 0]} fov={40} orbitControls={orbitControls} />;
+}
+
+useGLTF.preload('/models/Xbot.glb');
+useGLTF.preload('/models/Soldier.glb');

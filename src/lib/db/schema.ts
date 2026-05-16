@@ -491,6 +491,112 @@ export const ExerciseSubmissions = pgTable('ExerciseSubmissions', {
   index('Idx_ExSub_ExerciseId').on(T.ExerciseId),
 ]);
 
+// ─── ALI Phase 1 — Knowledge Graph ───────────────────────────────────────────
+
+export const Concepts = pgTable('Concepts', {
+  Id:         uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  NameAr:     text('NameAr').notNull(),
+  NameEn:     text('NameEn').notNull(),
+  Difficulty: integer('Difficulty').default(1).notNull(), // 1-5
+  Type:       text('Type').notNull(), // 'factual' | 'procedural' | 'conceptual'
+  IsDeleted:  boolean('IsDeleted').default(false).notNull(),
+  CreatedAt:  timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  UpdatedAt:  timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const ConceptEdges = pgTable(
+  'ConceptRelations',
+  {
+    Id:            uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    FromConceptId: uuid('FromConceptId').notNull().references(() => Concepts.Id, { onDelete: 'cascade' }),
+    ToConceptId:   uuid('ToConceptId').notNull().references(() => Concepts.Id, { onDelete: 'cascade' }),
+    RelationType:  text('RelationType').notNull(), // 'PREREQUISITE_OF' | 'EXAMPLE_OF' | 'RELATED_TO' | 'BUILDS_ON'
+    CreatedAt:     timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    index('Idx_ConceptRelations_From').on(T.FromConceptId),
+    index('Idx_ConceptRelations_To').on(T.ToConceptId),
+  ],
+);
+
+export const ConceptChunks = pgTable(
+  'ConceptChunks',
+  {
+    Id:            uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    ConceptId:     uuid('ConceptId').notNull().references(() => Concepts.Id, { onDelete: 'cascade' }),
+    Content:       text('Content').notNull(),
+    Locale:        text('Locale').notNull().default('ar'),
+    EmbeddingText: text('EmbeddingText'), // raw text used for embedding (for future pgvector)
+    CreatedAt:     timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    index('Idx_ConceptChunks_ConceptId').on(T.ConceptId),
+  ],
+);
+
+// ─── ALI Phase 1 — Student Intelligence ──────────────────────────────────────
+
+export const StudentMastery = pgTable(
+  'StudentMastery',
+  {
+    Id:         uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    UserId:     uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    ConceptId:  uuid('ConceptId').notNull().references(() => Concepts.Id, { onDelete: 'cascade' }),
+    Score:      integer('Score').default(0).notNull(), // 0-100
+    Attempts:   integer('Attempts').default(0).notNull(),
+    LastTested: timestamp('LastTested', { withTimezone: true }),
+    CreatedAt:  timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+    UpdatedAt:  timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    unique('Uniq_StudentMastery_UserConcept').on(T.UserId, T.ConceptId),
+    index('Idx_StudentMastery_UserId').on(T.UserId),
+  ],
+);
+
+export const LearningSignals = pgTable(
+  'LearningSignals',
+  {
+    Id:         uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    UserId:     uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    ConceptId:  uuid('ConceptId').notNull().references(() => Concepts.Id, { onDelete: 'cascade' }),
+    SignalType: text('SignalType').notNull(), // 'quiz_correct'|'quiz_wrong'|'socratic_pass'|'practical_done'|'peer_taught'
+    Value:      integer('Value').default(1).notNull(),
+    CreatedAt:  timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    index('Idx_LearningSignals_UserId').on(T.UserId),
+    index('Idx_LearningSignals_ConceptId').on(T.ConceptId),
+  ],
+);
+
+export const StudentInsights = pgTable('StudentInsights', {
+  Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+  UserId:    uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  Insights:  text('Insights').notNull().default('{}'), // JSON string
+  UpdatedAt: timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
+});
+
+// ─── ALI Phase 1 — Semantic Cache ────────────────────────────────────────────
+
+export const SemanticCache = pgTable(
+  'SemanticCache',
+  {
+    Id:           uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    QuestionHash: text('QuestionHash').notNull(), // SHA256 of question+pageKey+locale
+    Question:     text('Question').notNull(),
+    Answer:       text('Answer').notNull(),
+    PageKey:      text('PageKey'),    // 'lesson:uuid' | 'page:dashboard' | etc.
+    Locale:       text('Locale').notNull().default('ar'),
+    HitCount:     integer('HitCount').default(0).notNull(),
+    CreatedAt:    timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    index('Idx_SemanticCache_Hash').on(T.QuestionHash),
+    index('Idx_SemanticCache_PageKey').on(T.PageKey),
+  ],
+);
+
 // ─── Relations ────────────────────────────────────────────────────────────────
 
 export const AgentsRelations = relations(Agents, ({ many }) => ({
@@ -554,6 +660,9 @@ export const UsersRelations = relations(users, ({ many, one }) => ({
   EncryptedKey:    one(EncryptedKeys),
   SandboxSessions: many(SandboxSessions),
   Conversations:   many(Conversations),
+  Mastery:         many(StudentMastery),
+  Signals:         many(LearningSignals),
+  Insights:        one(StudentInsights),
 }));
 
 export const UserProgressRelations = relations(UserProgress, ({ one }) => ({
@@ -565,6 +674,33 @@ export const LearningPathsRelations = relations(LearningPaths, ({ one }) => ({
   User:          one(users, { fields: [LearningPaths.UserId], references: [users.id] }),
   Track:         one(Tracks, { fields: [LearningPaths.TrackId], references: [Tracks.Id] }),
   CurrentLesson: one(Lessons, { fields: [LearningPaths.CurrentLessonId], references: [Lessons.Id] }),
+}));
+
+export const ConceptsRelations = relations(Concepts, ({ many }) => ({
+  Chunks:    many(ConceptChunks),
+  Mastery:   many(StudentMastery),
+  Signals:   many(LearningSignals),
+  FromEdges: many(ConceptEdges, { relationName: 'FromEdges' }),
+  ToEdges:   many(ConceptEdges, { relationName: 'ToEdges' }),
+}));
+
+export const ConceptEdgesRelations = relations(ConceptEdges, ({ one }) => ({
+  From: one(Concepts, { fields: [ConceptEdges.FromConceptId], references: [Concepts.Id], relationName: 'FromEdges' }),
+  To:   one(Concepts, { fields: [ConceptEdges.ToConceptId],   references: [Concepts.Id], relationName: 'ToEdges' }),
+}));
+
+export const ConceptChunksRelations = relations(ConceptChunks, ({ one }) => ({
+  Concept: one(Concepts, { fields: [ConceptChunks.ConceptId], references: [Concepts.Id] }),
+}));
+
+export const StudentMasteryRelations = relations(StudentMastery, ({ one }) => ({
+  User:    one(users, { fields: [StudentMastery.UserId], references: [users.id] }),
+  Concept: one(Concepts, { fields: [StudentMastery.ConceptId], references: [Concepts.Id] }),
+}));
+
+export const LearningSignalsRelations = relations(LearningSignals, ({ one }) => ({
+  User:    one(users, { fields: [LearningSignals.UserId], references: [users.id] }),
+  Concept: one(Concepts, { fields: [LearningSignals.ConceptId], references: [Concepts.Id] }),
 }));
 
 // ─── TypeScript Types ─────────────────────────────────────────────────────────
@@ -593,3 +729,10 @@ export type TCourse             = typeof Courses.$inferSelect;
 export type TSystemPrompt       = typeof SystemPrompts.$inferSelect;
 export type TExercise           = typeof Exercises.$inferSelect;
 export type TExerciseSubmission = typeof ExerciseSubmissions.$inferSelect;
+export type TConcept            = typeof Concepts.$inferSelect;
+export type TConceptEdge        = typeof ConceptEdges.$inferSelect;
+export type TConceptChunk       = typeof ConceptChunks.$inferSelect;
+export type TStudentMastery     = typeof StudentMastery.$inferSelect;
+export type TLearningSignal     = typeof LearningSignals.$inferSelect;
+export type TStudentInsight     = typeof StudentInsights.$inferSelect;
+export type TSemanticCache      = typeof SemanticCache.$inferSelect;

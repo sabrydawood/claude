@@ -120,7 +120,12 @@
     "connectionError": "Connection failed",
     "userKeyFailed": "Your API key stopped working — it may have run out of credits or expired",
     "deleteKeyToRecover": "Delete key to use system providers",
-    "systemMode": "System Provider"
+    "systemMode": "System Provider",
+    "newChat": "New Chat",
+    "conversations": "Conversations",
+    "noConversations": "No previous conversations",
+    "deleteConversation": "Delete conversation",
+    "loadingHistory": "Loading..."
   },
   "home": {
     "hero": {

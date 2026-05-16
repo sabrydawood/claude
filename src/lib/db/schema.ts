@@ -338,6 +338,39 @@ export const SandboxSessions = pgTable(
   ],
 );
 
+export const Conversations = pgTable(
+  'Conversations',
+  {
+    Id:        uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    UserId:    uuid('UserId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    Source:    text('Source').notNull(),  // 'sandbox' | 'mascot'
+    Route:     text('Route'),             // mascot: page pathname
+    Title:     text('Title'),             // AI-generated title
+    IsDeleted: boolean('IsDeleted').default(false).notNull(),
+    CreatedAt: timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+    UpdatedAt: timestamp('UpdatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    index('Idx_Conversations_UserId_Source').on(T.UserId, T.Source),
+    index('Idx_Conversations_UserId_Route').on(T.UserId, T.Route),
+  ],
+);
+
+export const ConversationMessages = pgTable(
+  'ConversationMessages',
+  {
+    Id:             uuid('Id').primaryKey().$defaultFn(() => uuidv7()),
+    ConversationId: uuid('ConversationId').notNull().references(() => Conversations.Id, { onDelete: 'cascade' }),
+    Role:           text('Role').notNull(),    // 'user' | 'assistant'
+    Content:        text('Content').notNull(),
+    Provider:       text('Provider'),          // AI provider for assistant messages
+    CreatedAt:      timestamp('CreatedAt', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (T) => [
+    index('Idx_ConvMsg_ConvId').on(T.ConversationId),
+  ],
+);
+
 export const UserProgress = pgTable(
   'UserProgress',
   {
@@ -501,6 +534,15 @@ export const AchievementsRelations = relations(Achievements, ({ many }) => ({
   UserAchievements: many(UserAchievements),
 }));
 
+export const ConversationsRelations = relations(Conversations, ({ one, many }) => ({
+  User:     one(users, { fields: [Conversations.UserId], references: [users.id] }),
+  Messages: many(ConversationMessages),
+}));
+
+export const ConversationMessagesRelations = relations(ConversationMessages, ({ one }) => ({
+  Conversation: one(Conversations, { fields: [ConversationMessages.ConversationId], references: [Conversations.Id] }),
+}));
+
 export const UsersRelations = relations(users, ({ many, one }) => ({
   Sessions:        many(sessions),
   Accounts:        many(accounts),
@@ -511,6 +553,7 @@ export const UsersRelations = relations(users, ({ many, one }) => ({
   LearningPaths:   many(LearningPaths),
   EncryptedKey:    one(EncryptedKeys),
   SandboxSessions: many(SandboxSessions),
+  Conversations:   many(Conversations),
 }));
 
 export const UserProgressRelations = relations(UserProgress, ({ one }) => ({
@@ -541,8 +584,10 @@ export type TUserStats         = typeof UserStats.$inferSelect;
 export type TUserAchievement   = typeof UserAchievements.$inferSelect;
 export type TUserPreferences   = typeof UserPreferences.$inferSelect;
 export type TLearningPath      = typeof LearningPaths.$inferSelect;
-export type TEncryptedKey      = typeof EncryptedKeys.$inferSelect;
-export type TSandboxSession    = typeof SandboxSessions.$inferSelect;
+export type TEncryptedKey           = typeof EncryptedKeys.$inferSelect;
+export type TSandboxSession         = typeof SandboxSessions.$inferSelect;
+export type TConversation           = typeof Conversations.$inferSelect;
+export type TConversationMessage    = typeof ConversationMessages.$inferSelect;
 export type TSubject            = typeof Subjects.$inferSelect;
 export type TCourse             = typeof Courses.$inferSelect;
 export type TSystemPrompt       = typeof SystemPrompts.$inferSelect;

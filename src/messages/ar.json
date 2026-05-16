@@ -120,7 +120,12 @@
     "connectionError": "فشل الاتصال بالخادم",
     "userKeyFailed": "مفتاحك توقف عن العمل — ربما نفد رصيدك أو انتهت صلاحيته",
     "deleteKeyToRecover": "احذف المفتاح للرجوع لمزودي النظام",
-    "systemMode": "مزود النظام"
+    "systemMode": "مزود النظام",
+    "newChat": "محادثة جديدة",
+    "conversations": "المحادثات",
+    "noConversations": "لا توجد محادثات سابقة",
+    "deleteConversation": "حذف المحادثة",
+    "loadingHistory": "جارٍ التحميل..."
   },
   "home": {
     "hero": {

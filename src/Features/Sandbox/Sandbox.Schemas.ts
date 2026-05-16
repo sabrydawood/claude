@@ -14,6 +14,7 @@ export const SandboxChatSchema = z.object({
       content: z.string().min(1).max(MAX_MESSAGE_LENGTH),
     }),
   ).min(1).max(MAX_MESSAGES),
+  ConversationId: z.string().uuid().optional(),
 });
 
 export type TSandboxChatInput = z.infer<typeof SandboxChatSchema>;

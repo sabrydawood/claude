@@ -15,6 +15,13 @@
       "when": 1778942783119,
       "tag": "0001_sweet_naoko",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778944900527,
+      "tag": "0002_slim_tomorrow_man",
+      "breakpoints": true
     }
   ]
 }

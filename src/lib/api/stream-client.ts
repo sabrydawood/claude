@@ -20,6 +20,7 @@ export class StreamError extends Error {
 
 type TextStreamOptions = {
   onChunk: (accumulated: string) => void;
+  onHeaders?: (headers: Headers) => void;
   signal?: AbortSignal;
 };
 
@@ -53,6 +54,7 @@ export const streamClient = {
    */
   async text(url: string, body: unknown, opts: TextStreamOptions): Promise<void> {
     const res = await postStream(url, body, opts.signal);
+    opts.onHeaders?.(res.headers);
     const reader = res.body!.getReader();
     const decoder = new TextDecoder();
     let accumulated = '';

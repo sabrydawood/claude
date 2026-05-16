@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getDir, isRTL } from "@/lib/i18n/locale-utils";
 import { X, Send, Loader2, RotateCcw, GripHorizontal } from "lucide-react";
 import { streamClient } from "@/lib/api/stream-client";
+import { useSession } from "@/lib/auth-client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -88,6 +89,7 @@ function TypingDots() {
 export function MascotDialogue({ isOpen, onClose, locale }: Props) {
   const pathname = usePathname();
   const t = useTranslations("mascot");
+  const { data: session } = useSession();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -99,8 +101,13 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const pathnameRef = useRef(pathname);
+  const conversationIdRef = useRef<string | null>(null);
+  const sessionRef = useRef(session);
   const dragStartY = useRef(0);
   const dragStartH = useRef(DEFAULT_HEIGHT);
+
+  // Keep sessionRef in sync
+  useEffect(() => { sessionRef.current = session; }, [session]);
   const dir = getDir(locale);
 
   // Drag-to-resize handle
@@ -141,6 +148,31 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
     }
   }, [isOpen]);
 
+  // ── Save mascot exchange to DB (fire-and-forget) ────────────────────────
+
+  const saveMascotPair = useCallback(
+    async (userMessage: string, assistantMessage: string, provider?: string) => {
+      try {
+        const res = await fetch("/api/v1/conversations/mascot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ConversationId: conversationIdRef.current ?? undefined,
+            Route: pathnameRef.current,
+            UserMessage: userMessage,
+            AssistMessage: assistantMessage,
+            Provider: provider,
+          }),
+        });
+        const data = await res.json() as { Success: boolean; Data?: { ConversationId: string } };
+        if (data?.Success && data?.Data?.ConversationId) {
+          conversationIdRef.current = data.Data.ConversationId;
+        }
+      } catch { /* ignore — persistence is best-effort */ }
+    },
+    [],
+  );
+
   // ── Core streaming function ────────────────────────────────────────────────
 
   const streamResponse = useCallback(
@@ -158,6 +190,9 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
         { role: "assistant", content: "", streaming: true },
       ]);
 
+      let assistantBuffer = "";
+      let debugProvider = "";
+
       try {
         await streamClient.sse<{
           text?: string;
@@ -170,6 +205,7 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
             signal: controller.signal,
             onEvent: (event) => {
               if (event.text) {
+                assistantBuffer += event.text;
                 setMessages((prev) => {
                   const updated = [...prev];
                   const last = updated[updated.length - 1];
@@ -184,6 +220,7 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
                 });
               }
               if (event.debug) {
+                debugProvider = event.debug.provider;
                 setMessages((prev) => {
                   const updated = [...prev];
                   const last = updated[updated.length - 1];
@@ -223,9 +260,15 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
           return updated;
         });
         setIsStreaming(false);
+
+        // Persist user-initiated exchanges to DB (skip auto-greetings)
+        if (!isGreeting && assistantBuffer && sessionRef.current?.user?.id) {
+          const userMsg = history[history.length - 1].content;
+          saveMascotPair(userMsg, assistantBuffer, debugProvider || undefined);
+        }
       }
     },
-    [pathname, locale, t],
+    [pathname, locale, t, saveMascotPair],
   );
 
   // ── Proactive greeting on first open ──────────────────────────────────────
@@ -319,17 +362,42 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
     }
   }, [messages]);
 
-  // ── Route change: restore per-page history ────────────────────────────────
+  // ── Route change: restore per-page history (DB for auth users, localStorage for guests) ──
 
   useEffect(() => {
     pathnameRef.current = pathname;
+    conversationIdRef.current = null;
     abortRef.current?.abort();
-    const history = loadChatHistory(pathname);
-    setMessages(history);
-    setInitialized(history.length > 0);
     setInput("");
     setIsStreaming(false);
-  }, [pathname]);
+
+    const userId = session?.user?.id;
+    if (userId) {
+      fetch(`/api/v1/conversations/mascot?route=${encodeURIComponent(pathname)}`)
+        .then((r) => r.json())
+        .then((data: { Success: boolean; Data?: { ConversationId: string; Messages: { Role: string; Content: string }[] } }) => {
+          if (data?.Success && data?.Data) {
+            conversationIdRef.current = data.Data.ConversationId;
+            const msgs: Message[] = data.Data.Messages.map((m) => ({
+              role: m.Role as "user" | "assistant",
+              content: m.Content,
+            }));
+            setMessages(msgs);
+            setInitialized(msgs.length > 0);
+          }
+        })
+        .catch(() => {
+          const history = loadChatHistory(pathname);
+          setMessages(history);
+          setInitialized(history.length > 0);
+        });
+    } else {
+      const history = loadChatHistory(pathname);
+      setMessages(history);
+      setInitialized(history.length > 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, session?.user?.id]);
 
   // ── User actions ──────────────────────────────────────────────────────────
 
@@ -358,11 +426,10 @@ export function MascotDialogue({ isOpen, onClose, locale }: Props) {
     setMessages([]);
     setInitialized(false);
     setIsStreaming(false);
+    conversationIdRef.current = null;
     try {
       localStorage.removeItem(chatKey(pathname));
-    } catch {
-      /* ignore */
-    }
+    } catch { /* ignore */ }
   };
 
   // ── Mood derived from state ────────────────────────────────────────────────

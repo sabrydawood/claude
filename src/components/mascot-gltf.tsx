@@ -239,22 +239,17 @@ function GltfModelInner({
   facingLeft = false,
 }: RobotProps & { cfg: GltfConfig; facingLeft?: boolean }) {
   const { scene, animations } = useGLTF(cfg.modelPath);
-  const clonedScene = useMemo(
-    () => SkeletonUtils.clone(scene) as THREE.Group,
+  const clonedScene = useMemo(() => {
+    const clone = SkeletonUtils.clone(scene) as THREE.Group;
+    // Set rotation synchronously BEFORE any useFrame runs to avoid the
+    // "rotation snap" bug where useEffect runs one frame after useFrame starts.
+    clone.rotation.y = cfg.rotationY ?? 0;
+    return clone;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  }, []);
   const clonedRef = useRef<THREE.Group>(clonedScene);
   const { actions, mixer } = useAnimations(animations, clonedRef);
   const activeAnim = useRef("");
-
-  // Set initial rotation immediately so model faces camera from frame 0
-  useEffect(() => {
-    if (clonedRef.current) {
-      clonedRef.current.rotation.y = cfg.rotationY ?? 0;
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Apply tint color to all mesh materials on mount
   useEffect(() => {
@@ -304,7 +299,7 @@ function GltfModelInner({
     }
   }, [mood, walking, actions, cfg]);
 
-  // Smooth rotation + logging to diagnose shaking
+  // Smooth rotation with shortest-path lerp (no scaleX, no snap)
   useFrame(({ clock }) => {
     if (!clonedRef.current) return;
 
@@ -312,20 +307,13 @@ function GltfModelInner({
     const targetRotY = walking
       ? baseRotY + (facingLeft ? Math.PI / 2 : -Math.PI / 2)
       : baseRotY;
-    const currentRotY = clonedRef.current.rotation.y;
-    const delta = targetRotY - currentRotY;
-    clonedRef.current.rotation.y += delta * 0.12;
 
-    // LOG: flag large or oscillating deltas that could cause shaking
-    if (Math.abs(delta) > 0.5) {
-      console.log('[Mascot rotation]', {
-        target: targetRotY.toFixed(3),
-        current: currentRotY.toFixed(3),
-        delta: delta.toFixed(3),
-        walking,
-        facingLeft,
-      });
-    }
+    // Shortest-path delta: always rotate ≤ 180° (avoids the 270° long-way spin)
+    let delta = targetRotY - clonedRef.current.rotation.y;
+    if (delta > Math.PI) delta -= 2 * Math.PI;
+    else if (delta < -Math.PI) delta += 2 * Math.PI;
+
+    clonedRef.current.rotation.y += delta * 0.15;
 
     // Float (only for models without their own idle animation)
     if (!cfg.noFloat) {

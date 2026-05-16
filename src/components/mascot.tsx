@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { getDir, isRTL } from '@/lib/i18n/locale-utils';
 import { X, MessageCircle } from 'lucide-react';
 import { MascotChat } from '@/components/mascot-chat';
+import { streamClient } from '@/lib/api/stream-client';
 
 type Mood = 'idle' | 'happy' | 'thinking';
 
@@ -243,12 +244,39 @@ export function Mascot() {
   const [bubbleOpen, setBubbleOpen] = useState(false);
   const [isSmall, setIsSmall] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [aiBubble, setAiBubble] = useState('');
+  const aiBubbleAbortRef = useRef<AbortController | null>(null);
 
   const currentPosRef = useRef({ x: 74, y: 72 });
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const activeRef = useRef(false);
 
   const hide = pathname.includes('/onboarding');
+
+  // Fetch a short AI greeting for the current page (fires once per route change)
+  const fetchAiBubble = useCallback(async (routeKey: string) => {
+    aiBubbleAbortRef.current?.abort();
+    const controller = new AbortController();
+    aiBubbleAbortRef.current = controller;
+    setAiBubble('');
+
+    const prompt = locale === 'ar'
+      ? `قول جملة واحدة قصيرة بالعامية المصرية (8 كلمات بالأقصى) مناسبة لصفحة "${routeKey}" في منصة تعليمية للأطفال.`
+      : `Say one short encouraging sentence (max 8 words) for the "${routeKey}" page of a kids learning platform.`;
+
+    try {
+      await streamClient.sse<{ text?: string }>(
+        '/api/v1/mascot',
+        { Messages: [{ role: 'user', content: prompt }], Pathname: pathname, Locale: locale },
+        {
+          signal: controller.signal,
+          onEvent: (event) => {
+            if (event.text) setAiBubble(prev => prev + event.text);
+          },
+        },
+      );
+    } catch { /* silently ignore — bubble stays empty, static fallback shows */ }
+  }, [locale, pathname]);
 
   useEffect(() => {
     setMounted(true);
@@ -337,14 +365,17 @@ export function Mascot() {
       if (!activeRef.current) return;
       setIsWalking(false);
       setMood('happy');
+      // Fetch AI greeting once the mascot has settled on this page
+      fetchAiBubble(routeKey);
       timerRef.current = setTimeout(runLoop, 600);
     }, dur0 * 1000 + 50);
 
     return () => {
       activeRef.current = false;
       clearTimeout(timerRef.current);
+      aiBubbleAbortRef.current?.abort();
     };
-  }, [pathname, mounted, hide, isSmall]);
+  }, [pathname, mounted, hide, isSmall, fetchAiBubble]);
 
   if (!mounted || hide) return null;
 
@@ -363,7 +394,7 @@ export function Mascot() {
       >
         {/* Speech bubble — anchored to robot */}
         <AnimatePresence>
-          {bubbleOpen && bubbleMsg && (
+          {((bubbleOpen && !!bubbleMsg) || !!aiBubble) && (
             <motion.div
               key="bubble"
               initial={{ opacity: 0, scale: 0.7, y: 10 }}
@@ -388,14 +419,14 @@ export function Mascot() {
                 }}
               >
                 <button
-                  onClick={() => setBubbleOpen(false)}
+                  onClick={() => { setBubbleOpen(false); setAiBubble(''); }}
                   aria-label={locale === 'ar' ? 'إغلاق الرسالة' : 'Close message'}
                   className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center"
                   style={{ background: 'var(--border)', color: 'var(--text-muted)' }}
                 >
                   <X size={10} />
                 </button>
-                {t(bubbleMsg)}
+                {aiBubble || (bubbleMsg ? t(bubbleMsg) : '')}
                 <div
                   className="absolute -bottom-[9px] right-3 w-4 h-4 rotate-45"
                   style={{

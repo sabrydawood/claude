@@ -6,6 +6,7 @@ import HomeAgents from '@/components/home/agents';
 import HomeHowItWorks from '@/components/home/how-it-works';
 import HomeStats from '@/components/home/stats';
 import HomeCta from '@/components/home/cta';
+import OnboardingWizard from '@/components/home/onboarding-wizard';
 import { WebSiteSchema, OrganizationSchema } from '@/components/seo/json-ld';
 import { getAgents, getSubjects } from '@/lib/db/queries/content';
 
@@ -21,6 +22,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <WebSiteSchema locale={locale} />
       <OrganizationSchema locale={locale} />
       <Header />
+      <OnboardingWizard locale={locale} />
       <main className="flex-1">
         <HomeHero locale={locale} />
         <HomeStats locale={locale} />

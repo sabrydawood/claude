@@ -432,6 +432,8 @@
     "next": "التالي",
     "prev": "السابق",
     "finish": "ابدأ رحلتك!",
+    "skip": "تخطي",
+    "guestWelcome": "أهلاً! أنا ذكي 👋 خليني أخصص تجربتك!",
     "steps": {
       "age": {
         "title": "عندك كام سنة؟",
@@ -605,6 +607,7 @@
     "subtitle": "كل مجال فيه كورسات ودروس مخصصة ليك",
     "courses": "كورس",
     "lessons": "درس",
+    "recommended": "مقترح لك",
     "startLearning": "ابدأ التعلم",
     "continueLearning": "كمل التعلم",
     "allCourses": "كل الكورسات",

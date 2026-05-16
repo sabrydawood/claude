@@ -70,6 +70,26 @@ function TypingDots() {
   );
 }
 
+function chatKey(pathname: string) {
+  return `zkawi_chat_${encodeURIComponent(pathname)}`;
+}
+
+function loadChatHistory(pathname: string): Message[] {
+  try {
+    const raw = localStorage.getItem(chatKey(pathname));
+    return raw ? (JSON.parse(raw) as Message[]) : [];
+  } catch { return []; }
+}
+
+function saveChatHistory(pathname: string, messages: Message[]) {
+  try {
+    const toSave = messages.filter(m => !m.streaming).slice(-20);
+    if (toSave.length > 0) {
+      localStorage.setItem(chatKey(pathname), JSON.stringify(toSave));
+    }
+  } catch { /* ignore quota errors */ }
+}
+
 export function MascotChat({ isOpen, onClose }: Props) {
   const pathname = usePathname();
   const locale = useLocale();
@@ -83,6 +103,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const pathnameRef = useRef(pathname);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -209,11 +230,22 @@ export function MascotChat({ isOpen, onClose }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStreaming, messages, locale]);
 
-  // Reset on route change
+  // Persist messages to localStorage after each update (skip streaming messages)
   useEffect(() => {
-    setMessages([]);
-    setInitialized(false);
+    if (messages.length > 0) {
+      saveChatHistory(pathnameRef.current, messages);
+    }
+  }, [messages]);
+
+  // On route change: restore history for the new page (or start fresh)
+  useEffect(() => {
+    pathnameRef.current = pathname;
+    abortRef.current?.abort();
+    const history = loadChatHistory(pathname);
+    setMessages(history);
+    setInitialized(history.length > 0); // skip greeting if history exists
     setInput('');
+    setIsStreaming(false);
   }, [pathname]);
 
   const handleSend = () => {
@@ -239,6 +271,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
     setMessages([]);
     setInitialized(false);
     setIsStreaming(false);
+    try { localStorage.removeItem(chatKey(pathname)); } catch { /* ignore */ }
   };
 
   return (

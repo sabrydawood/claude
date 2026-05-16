@@ -432,6 +432,8 @@
     "next": "Next",
     "prev": "Back",
     "finish": "Start your journey!",
+    "skip": "Skip",
+    "guestWelcome": "Hi! I'm Zaki 👋 Let me personalize your experience!",
     "steps": {
       "age": {
         "title": "How old are you?",
@@ -605,6 +607,7 @@
     "subtitle": "Each subject has courses and lessons designed for you",
     "courses": "course",
     "lessons": "lesson",
+    "recommended": "For You",
     "startLearning": "Start Learning",
     "continueLearning": "Continue Learning",
     "allCourses": "All Courses",

@@ -1,12 +1,29 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronRight, Sparkles } from 'lucide-react';
 import type { SubjectRow } from '@/lib/db/queries/content';
+import type { GuestPrefs } from '@/components/home/onboarding-wizard';
+
+// Keywords per goal that map to subject slugs/names
+const GOAL_KEYWORDS: Record<string, string[]> = {
+  developer: ['programming', 'python', 'web', 'code', 'برمج', 'بايثون', 'ويب'],
+  chat: ['ai', 'prompt', 'ذكاء', 'برومبت', 'llm'],
+  creative: ['design', 'art', 'تصميم', 'إبداع', 'creative'],
+  work: ['ai', 'automation', 'productivity', 'ذكاء', 'إنتاجية'],
+  educator: ['ai', 'education', 'تعليم', 'ذكاء'],
+};
+
+function isRecommended(subject: SubjectRow, goal: string): boolean {
+  const kws = GOAL_KEYWORDS[goal] ?? [];
+  const haystack = `${subject.slug} ${subject.name} ${subject.description}`.toLowerCase();
+  return kws.some(k => haystack.includes(k.toLowerCase()));
+}
 
 interface Props {
   subjects: SubjectRow[];
@@ -15,6 +32,23 @@ interface Props {
 
 export default function SubjectsClient({ subjects, locale: _locale }: Props) {
   const t = useTranslations('subjects');
+  const [prefs, setPrefs] = useState<GuestPrefs | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('zkawi_guest_prefs');
+      if (raw) setPrefs(JSON.parse(raw) as GuestPrefs);
+    } catch { /* ignore */ }
+  }, []);
+
+  // Sort: recommended subjects first when we have prefs
+  const sorted = prefs
+    ? [...subjects].sort((a, b) => {
+        const ra = isRecommended(a, prefs.goal) ? 0 : 1;
+        const rb = isRecommended(b, prefs.goal) ? 0 : 1;
+        return ra - rb;
+      })
+    : subjects;
 
   if (subjects.length === 0) {
     return (
@@ -27,7 +61,9 @@ export default function SubjectsClient({ subjects, locale: _locale }: Props) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-      {subjects.map((subject, i) => (
+      {sorted.map((subject, i) => {
+        const recommended = !!prefs && isRecommended(subject, prefs.goal);
+        return (
         <motion.div
           key={subject.id}
           initial={{ opacity: 0, y: 30 }}
@@ -39,10 +75,21 @@ export default function SubjectsClient({ subjects, locale: _locale }: Props) {
             <div
               className="relative rounded-3xl border-2 p-6 cursor-pointer transition-all h-full flex flex-col"
               style={{
-                borderColor: subject.color + '40',
-                background: subject.color + '08',
+                borderColor: recommended ? 'var(--zkawi-purple)' : subject.color + '40',
+                background: recommended ? 'var(--zkawi-purple)/5' : subject.color + '08',
               }}
             >
+              {/* Recommended badge */}
+              {recommended && (
+                <div
+                  className="absolute top-3 end-3 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                  style={{ background: 'var(--zkawi-purple)', color: '#fff' }}
+                >
+                  <Sparkles size={10} />
+                  {t('recommended')}
+                </div>
+              )}
+
               {/* Icon */}
               <div
                 className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 shadow-sm"
@@ -82,7 +129,8 @@ export default function SubjectsClient({ subjects, locale: _locale }: Props) {
             </div>
           </Link>
         </motion.div>
-      ))}
+      );
+      })}
     </div>
   );
 }

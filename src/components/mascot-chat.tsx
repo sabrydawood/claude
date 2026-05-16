@@ -106,7 +106,7 @@ export function MascotChat({ isOpen, onClose }: Props) {
     try {
       await streamClient.sse<{ text?: string; error?: string }>(
         '/api/v1/mascot',
-        { messages: history, pathname, locale },
+        { Messages: history, Pathname: pathname, Locale: locale },
         {
           signal: controller.signal,
           onEvent: (event) => {

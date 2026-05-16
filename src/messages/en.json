@@ -435,6 +435,16 @@
     "skip": "Skip",
     "guestWelcome": "Hi! I'm Zaki 👋 Let me personalize your experience!",
     "steps": {
+      "interests": {
+        "title": "What would you like to learn?",
+        "subtitle": "Pick the area that excites you most",
+        "programming": "Programming",
+        "web": "Web Development",
+        "databases": "Databases",
+        "ai": "Artificial Intelligence",
+        "logic": "Problem Solving",
+        "projects": "Build Projects"
+      },
       "age": {
         "title": "How old are you?",
         "subtitle": "We won't judge!",

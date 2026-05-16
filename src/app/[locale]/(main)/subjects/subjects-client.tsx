@@ -10,17 +10,18 @@ import { BookOpen, ChevronRight, Sparkles } from 'lucide-react';
 import type { SubjectRow } from '@/lib/db/queries/content';
 import type { GuestPrefs } from '@/components/home/onboarding-wizard';
 
-// Keywords per goal that map to subject slugs/names
-const GOAL_KEYWORDS: Record<string, string[]> = {
-  developer: ['programming', 'python', 'web', 'code', 'برمج', 'بايثون', 'ويب'],
-  chat: ['ai', 'prompt', 'ذكاء', 'برومبت', 'llm'],
-  creative: ['design', 'art', 'تصميم', 'إبداع', 'creative'],
-  work: ['ai', 'automation', 'productivity', 'ذكاء', 'إنتاجية'],
-  educator: ['ai', 'education', 'تعليم', 'ذكاء'],
+// Keywords per interest that map to subject slugs/names/descriptions
+const INTEREST_KEYWORDS: Record<string, string[]> = {
+  programming: ['programming', 'python', 'javascript', 'code', 'برمجة', 'بايثون', 'كود', 'لغة'],
+  web: ['web', 'html', 'css', 'ويب', 'تصميم', 'موقع', 'design'],
+  databases: ['database', 'sql', 'data', 'قواعد', 'بيانات'],
+  ai: ['ai', 'artificial', 'intelligence', 'prompt', 'ذكاء', 'اصطناعي', 'برومبت', 'نماذج'],
+  logic: ['problem', 'solving', 'algorithm', 'logic', 'منطق', 'مشكلة', 'خوارزم', 'تفكير'],
+  projects: ['project', 'build', 'software', 'design', 'pattern', 'مشروع', 'بناء', 'برامج'],
 };
 
-function isRecommended(subject: SubjectRow, goal: string): boolean {
-  const kws = GOAL_KEYWORDS[goal] ?? [];
+function isRecommended(subject: SubjectRow, interest: string): boolean {
+  const kws = INTEREST_KEYWORDS[interest] ?? [];
   const haystack = `${subject.slug} ${subject.name} ${subject.description}`.toLowerCase();
   return kws.some(k => haystack.includes(k.toLowerCase()));
 }
@@ -44,8 +45,8 @@ export default function SubjectsClient({ subjects, locale: _locale }: Props) {
   // Sort: recommended subjects first when we have prefs
   const sorted = prefs
     ? [...subjects].sort((a, b) => {
-        const ra = isRecommended(a, prefs.goal) ? 0 : 1;
-        const rb = isRecommended(b, prefs.goal) ? 0 : 1;
+        const ra = isRecommended(a, prefs.interest) ? 0 : 1;
+        const rb = isRecommended(b, prefs.interest) ? 0 : 1;
         return ra - rb;
       })
     : subjects;
@@ -62,7 +63,7 @@ export default function SubjectsClient({ subjects, locale: _locale }: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
       {sorted.map((subject, i) => {
-        const recommended = !!prefs && isRecommended(subject, prefs.goal);
+        const recommended = !!prefs && isRecommended(subject, prefs.interest);
         return (
         <motion.div
           key={subject.id}

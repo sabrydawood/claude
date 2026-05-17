@@ -90,8 +90,12 @@ function XbotOnIsland() {
   }, [scene]);
   const groupRef = useRef<THREE.Group>(cloned);
   const { actions } = useAnimations(animations, groupRef);
-  useEffect(() => { actions['idle']?.reset().play(); }, [actions]);
-  return <primitive ref={groupRef} object={cloned} scale={1.5} position={[0,-1.75,-3.5]} rotation={[0,0,0]} dispose={null} />;
+  useEffect(() => {
+    const idle = actions['idle'];
+    if (idle) idle.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(0.1).play();
+  }, [actions]);
+  // scale=1.5 → feet at ~Y=-1.2, positioned in front of portal facing it (rotation π = faces camera)
+  return <primitive ref={groupRef} object={cloned} scale={1.5} position={[0, -1.2, -2.5]} rotation={[0, Math.PI, 0]} dispose={null} />;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -116,15 +120,16 @@ function IslandScene({ onEnterDungeon: _onEnterDungeon }: { onEnterDungeon: () =
         </group>
       ))}
       <group position={[0,0,-5.5]}>
-        <mesh position={[-0.8,0.5,0]}><boxGeometry args={[0.4,3,0.4]} /><meshStandardMaterial color="#4A4A4A" roughness={0.9} /></mesh>
-        <mesh position={[0.8,0.5,0]}><boxGeometry args={[0.4,3,0.4]} /><meshStandardMaterial color="#4A4A4A" roughness={0.9} /></mesh>
-        <mesh position={[0,2.1,0]}><boxGeometry args={[2.2,0.5,0.4]} /><meshStandardMaterial color="#3A3A3A" roughness={0.9} /></mesh>
-        <mesh position={[0,0.5,0]}><planeGeometry args={[1.4,2.6]} /><meshStandardMaterial color="#7C3AED" emissive="#7C3AED" emissiveIntensity={0.8} transparent opacity={0.85} /></mesh>
-        <pointLight position={[0,1,0.3]} intensity={2} color="#7C3AED" distance={4} />
-        <mesh position={[0,3,0]}><boxGeometry args={[1.8,0.5,0.1]} /><meshStandardMaterial color="#5D3A1A" roughness={1} /></mesh>
+        <mesh position={[-0.9,0.5,0]}><boxGeometry args={[0.5,4,0.5]} /><meshStandardMaterial color="#4A4A4A" roughness={0.9} /></mesh>
+        <mesh position={[0.9,0.5,0]}><boxGeometry args={[0.5,4,0.5]} /><meshStandardMaterial color="#4A4A4A" roughness={0.9} /></mesh>
+        <mesh position={[0,2.5,0]}><boxGeometry args={[2.6,0.6,0.5]} /><meshStandardMaterial color="#3A3A3A" roughness={0.9} /></mesh>
+        <mesh position={[0,0.7,0]}><planeGeometry args={[1.8,3.4]} /><meshStandardMaterial color="#7C3AED" emissive="#7C3AED" emissiveIntensity={1.5} transparent opacity={0.85} /></mesh>
+        <pointLight position={[0,1,0.3]} intensity={4} color="#7C3AED" distance={6} />
+        <mesh position={[0,3.4,0]}><boxGeometry args={[2.2,0.6,0.15]} /><meshStandardMaterial color="#5D3A1A" roughness={1} /></mesh>
       </group>
+      <pointLight position={[0,2,-4.5]} intensity={3} color="#7C3AED" distance={6} />
       <Suspense fallback={null}><XbotOnIsland /></Suspense>
-      <OrbitControls target={[0,0,-2]} maxPolarAngle={Math.PI/2.3} minDistance={8} maxDistance={22} autoRotate autoRotateSpeed={0.4} enablePan={false} />
+      <OrbitControls target={[0,1,-4]} maxPolarAngle={Math.PI/2.1} minDistance={5} maxDistance={18} autoRotate autoRotateSpeed={0.3} enablePan={false} />
     </>
   );
 }
@@ -190,21 +195,24 @@ function DungeonScene({ monsters, defeated, onMonsterEncounter, onExit, encounte
   }, []);
   return (
     <>
-      <color attach="background" args={['#0D0B1E']} />
-      <fog attach="fog" args={['#0D0B1E', 18, 38]} />
-      <ambientLight intensity={0.45} color="#9DA8FF" />
-      <pointLight position={[0,2.5,2]}   intensity={0.5} color="#A78BFA" distance={10} />
-      <pointLight position={[0,2.5,-8]}  intensity={0.4} color="#818CF8" distance={10} />
-      <pointLight position={[0,2.5,-14]} intensity={0.4} color="#C084FC" distance={10} />
-      <pointLight position={[0,2.5,-20]} intensity={1.0} color="#EF4444" distance={14} />
-      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1,-10]}><planeGeometry args={[5,28]} /><meshStandardMaterial color="#13102A" roughness={1} /></mesh>
-      <mesh rotation={[Math.PI/2,0,0]}  position={[0,3,-10]}><planeGeometry args={[5,28]}  /><meshStandardMaterial color="#0F0D20" roughness={1} /></mesh>
-      <mesh rotation={[0,Math.PI/2,0]}  position={[-2.5,1,-10]}><planeGeometry args={[28,4]} /><meshStandardMaterial color="#14122A" roughness={1} /></mesh>
-      <mesh rotation={[0,-Math.PI/2,0]} position={[2.5,1,-10]}><planeGeometry args={[28,4]}  /><meshStandardMaterial color="#14122A" roughness={1} /></mesh>
+      <color attach="background" args={['#0F0C22']} />
+      <fog attach="fog" args={['#0F0C22', 20, 40]} />
+      <ambientLight intensity={0.7} color="#B8C4FF" />
+      <directionalLight position={[0, 5, 0]} intensity={0.4} color="#C4B5FD" />
+      <pointLight position={[0, 2.5, 2]}   intensity={1.0} color="#A78BFA" distance={12} />
+      <pointLight position={[0, 2.5, -4]}  intensity={0.8} color="#818CF8" distance={10} />
+      <pointLight position={[0, 2.5, -8]}  intensity={0.8} color="#818CF8" distance={10} />
+      <pointLight position={[0, 2.5, -12]} intensity={0.8} color="#C084FC" distance={10} />
+      <pointLight position={[0, 2.5, -16]} intensity={0.8} color="#C084FC" distance={10} />
+      <pointLight position={[0, 2.5, -20]} intensity={2.0} color="#EF4444" distance={16} />
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1,-10]}><planeGeometry args={[5,28]} /><meshStandardMaterial color="#1E1A38" roughness={1} /></mesh>
+      <mesh rotation={[Math.PI/2,0,0]}  position={[0,3,-10]}><planeGeometry args={[5,28]}  /><meshStandardMaterial color="#18152E" roughness={1} /></mesh>
+      <mesh rotation={[0,Math.PI/2,0]}  position={[-2.5,1,-10]}><planeGeometry args={[28,4]} /><meshStandardMaterial color="#1C1940" roughness={1} /></mesh>
+      <mesh rotation={[0,-Math.PI/2,0]} position={[2.5,1,-10]}><planeGeometry args={[28,4]}  /><meshStandardMaterial color="#1C1940" roughness={1} /></mesh>
       {[-8,-14,-20].map((z,i) => (
         <group key={i}>
-          <pointLight position={[-2.2,1.8,z]} intensity={0.6} color="#F59E0B" distance={5} />
-          <pointLight position={[2.2,1.8,z]}  intensity={0.6} color="#F59E0B" distance={5} />
+          <pointLight position={[-2.2,1.8,z]} intensity={1.2} color="#F59E0B" distance={6} />
+          <pointLight position={[2.2,1.8,z]}  intensity={1.2} color="#F59E0B" distance={6} />
           <mesh position={[-2.2,1.5,z]}><boxGeometry args={[0.1,0.4,0.1]} /><meshStandardMaterial color="#5D3A1A" /></mesh>
           <mesh position={[2.2,1.5,z]}><boxGeometry args={[0.1,0.4,0.1]} /><meshStandardMaterial color="#5D3A1A" /></mesh>
         </group>
@@ -228,7 +236,7 @@ function DungeonScene({ monsters, defeated, onMonsterEncounter, onExit, encounte
 function CameraController({ stage }: { stage: GameStage }) {
   const target = stage === 'battle'
     ? new THREE.Vector3(0, 3.5, 8)
-    : new THREE.Vector3(0, 8, 14);
+    : new THREE.Vector3(0, 5, 10);
   useFrame(({ camera }) => {
     camera.position.lerp(target, 0.05);
     if (stage === 'battle') camera.lookAt(0, 0.5, 0);
@@ -238,110 +246,117 @@ function CameraController({ stage }: { stage: GameStage }) {
 
 // ─── Battle Arena ─────────────────────────────────────────────────────────────────
 
+const HIT_DIRS = Array.from({ length: 12 }, (_, i) => {
+  const angle = (i / 12) * Math.PI * 2;
+  const elevation = (i % 3) * 0.4 + 0.3;
+  return new THREE.Vector3(Math.cos(angle) * 2.5, elevation * 2, Math.sin(angle) * 2.5);
+});
+
+function HitParticles({ active, color, position }: { active: boolean; color: string; position: [number,number,number] }) {
+  const groupRef  = useRef<THREE.Group>(null!);
+  const lightRef  = useRef<THREE.PointLight>(null!);
+  const ringRef   = useRef<THREE.Mesh>(null!);
+  const meshRefs  = useRef<THREE.Mesh[]>([]);
+  const elapsed   = useRef(0);
+  const wasActive = useRef(false);
+  useFrame((_, delta) => {
+    if (!active && !wasActive.current) return;
+    if (active && !wasActive.current) { wasActive.current = true; elapsed.current = 0; meshRefs.current.forEach(m => { if (m) { m.visible = true; m.scale.setScalar(1); } }); }
+    elapsed.current += delta;
+    const progress = Math.min(elapsed.current / 0.55, 1);
+    meshRefs.current.forEach((mesh, i) => { if (!mesh) return; const dir = HIT_DIRS[i]; mesh.position.set(dir.x*progress, dir.y*progress - 4*progress*progress, dir.z*progress); const s = Math.max(0, 1 - progress*1.5); mesh.scale.setScalar(s); mesh.visible = s > 0; });
+    if (ringRef.current) { const mat = ringRef.current.material as THREE.MeshBasicMaterial; ringRef.current.scale.setScalar(1 + progress * 4); mat.opacity = Math.max(0, 0.9 - progress * 2); ringRef.current.visible = mat.opacity > 0; }
+    if (lightRef.current) lightRef.current.intensity = Math.max(0, (1 - progress * 3) * 10);
+    if (!active) wasActive.current = false;
+  });
+  return (
+    <group ref={groupRef} position={position}>
+      <pointLight ref={lightRef} color={color} intensity={0} distance={6} />
+      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
+        <ringGeometry args={[0.2, 0.5, 32]} />
+        <meshBasicMaterial color={color} transparent opacity={0} />
+      </mesh>
+      {HIT_DIRS.map((_, i) => (
+        <mesh key={i} ref={el => { if (el) meshRefs.current[i] = el; }} visible={false}>
+          <sphereGeometry args={[0.09, 6, 6]} />
+          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={3} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 function BattleArenaXbot({ attacking }: { attacking: boolean }) {
   const { scene, animations } = useGLTF('/models/Xbot.glb');
   const cloned = useMemo(() => {
     const c = SkeletonUtils.clone(scene) as THREE.Group;
-    c.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mats = Array.isArray((child as THREE.Mesh).material)
-          ? (child as THREE.Mesh).material as THREE.Material[]
-          : [(child as THREE.Mesh).material as THREE.Material];
-        mats.forEach(m => {
-          const sm = m as THREE.MeshStandardMaterial;
-          if (sm.color) sm.color.set('#7C3AED');
-          sm.metalness = 0.4; sm.roughness = 0.4; sm.needsUpdate = true;
-        });
-      }
-    });
+    c.traverse(child => { if ((child as THREE.Mesh).isMesh) { const mats = Array.isArray((child as THREE.Mesh).material) ? (child as THREE.Mesh).material as THREE.Material[] : [(child as THREE.Mesh).material as THREE.Material]; mats.forEach(m => { const sm = m as THREE.MeshStandardMaterial; if (sm.color) sm.color.set('#7C3AED'); sm.metalness=0.4; sm.roughness=0.4; sm.needsUpdate=true; }); } });
     return c;
   }, [scene]);
   const groupRef = useRef<THREE.Group>(cloned);
   const { actions } = useAnimations(animations, groupRef);
-  const baseX = useRef(-2.2);
+  const prevAttacking = useRef(false);
   useEffect(() => { actions['idle']?.reset().play(); }, [actions]);
+  useEffect(() => {
+    if (attacking && !prevAttacking.current) {
+      Object.values(actions).forEach(a => a?.fadeOut(0.08));
+      const atk = actions['agree'] ?? actions['walk'];
+      if (atk) atk.reset().setEffectiveTimeScale(2.5).setEffectiveWeight(1).fadeIn(0.08).play();
+    } else if (!attacking && prevAttacking.current) {
+      Object.values(actions).forEach(a => a?.fadeOut(0.2));
+      actions['idle']?.reset().setEffectiveTimeScale(1).fadeIn(0.2).play();
+    }
+    prevAttacking.current = attacking;
+  }, [attacking, actions]);
   useFrame(() => {
     if (!groupRef.current) return;
-    const targetX = attacking ? 0.2 : baseX.current;
-    groupRef.current.position.x += (targetX - groupRef.current.position.x) * 0.15;
+    const targetX = attacking ? -0.5 : -2.2;
+    groupRef.current.position.x += (targetX - groupRef.current.position.x) * 0.2;
   });
-  return (
-    <primitive
-      ref={groupRef}
-      object={cloned}
-      scale={1.3}
-      position={[-2.2, -1.3, 0]}
-      rotation={[0, Math.PI / 2, 0]}
-      dispose={null}
-    />
-  );
+  return <primitive ref={groupRef} object={cloned} scale={1.3} position={[-2.2,-1.3,0]} rotation={[0,Math.PI/2,0]} dispose={null} />;
 }
 
 function BattleArenaScene({ monster, monsterHp, xbotAttacking, monsterAttacking }: {
   monster: Monster; monsterHp: number; xbotAttacking: boolean; monsterAttacking: boolean;
 }) {
   const monsterGroupRef = useRef<THREE.Group>(null!);
-  const baseMonsterX = useRef(2.5);
-
-  useFrame(() => {
+  const shakeRef = useRef(0);
+  useFrame((_, delta) => {
     if (!monsterGroupRef.current) return;
-    const targetX = monsterAttacking ? -0.2 : baseMonsterX.current;
-    monsterGroupRef.current.position.x += (targetX - monsterGroupRef.current.position.x) * 0.15;
+    monsterGroupRef.current.position.x += ((monsterAttacking ? 0 : 2.5) - monsterGroupRef.current.position.x) * 0.18;
+    if (xbotAttacking) shakeRef.current += delta; else shakeRef.current = 0;
+    if (shakeRef.current > 0 && shakeRef.current < 0.45) {
+      const t = shakeRef.current / 0.45;
+      monsterGroupRef.current.rotation.z = Math.sin(t * Math.PI * 8) * 0.25 * (1 - t);
+    } else { monsterGroupRef.current.rotation.z = 0; }
   });
-
   const isBoss = monster.type === 'boss';
-
   return (
     <>
       <color attach="background" args={[isBoss ? '#1A0505' : '#0A0520']} />
       <fog attach="fog" args={[isBoss ? '#1A0505' : '#0A0520', 12, 30]} />
-      <ambientLight intensity={0.3} />
-      <directionalLight position={[0, 8, 4]} intensity={0.6} color="#C4B5FD" />
-      {/* Arena platform */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
-        <circleGeometry args={[5, 64]} />
-        <meshStandardMaterial color={isBoss ? '#1C0A0A' : '#0F0A30'} roughness={0.8} />
-      </mesh>
-      {/* Glowing ring edge */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.33, 0]}>
-        <ringGeometry args={[4.7, 5.0, 64]} />
-        <meshStandardMaterial
-          color={isBoss ? '#EF4444' : '#7C3AED'}
-          emissive={isBoss ? '#EF4444' : '#7C3AED'}
-          emissiveIntensity={0.8}
-        />
-      </mesh>
-      {/* Arena lights */}
-      <pointLight position={[-3, 3, 0]} intensity={1.5} color="#7C3AED" distance={8} />
-      <pointLight position={[3, 3, 0]} intensity={1.5} color={monster.color} distance={8} />
-      <pointLight position={[0, 5, 0]} intensity={0.8} color={isBoss ? '#EF4444' : '#C4B5FD'} distance={12} />
-      {/* Stars */}
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[0,8,4]} intensity={0.8} color="#C4B5FD" />
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1.35,0]}><circleGeometry args={[5,64]} /><meshStandardMaterial color={isBoss?'#1C0A0A':'#0F0A30'} roughness={0.8} /></mesh>
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1.33,0]}><ringGeometry args={[4.7,5.0,64]} /><meshStandardMaterial color={isBoss?'#EF4444':'#7C3AED'} emissive={isBoss?'#EF4444':'#7C3AED'} emissiveIntensity={0.8} /></mesh>
+      <pointLight position={[-3,3,0]} intensity={2} color="#7C3AED" distance={8} />
+      <pointLight position={[3,3,0]} intensity={2} color={monster.color} distance={8} />
+      <pointLight position={[0,5,0]} intensity={1} color={isBoss?'#EF4444':'#C4B5FD'} distance={14} />
       <Stars radius={40} depth={20} count={400} factor={2} fade speed={0.3} />
-      {/* Player side pillar light */}
-      <mesh position={[-4, 0, 0]}>
-        <cylinderGeometry args={[0.1, 0.1, 3, 8]} />
-        <meshStandardMaterial color="#2D1B69" />
-      </mesh>
-      <pointLight position={[-4, 2, 0]} intensity={0.6} color="#7C3AED" distance={3} />
-      {/* Monster side pillar */}
-      <mesh position={[4, 0, 0]}>
-        <cylinderGeometry args={[0.1, 0.1, 3, 8]} />
-        <meshStandardMaterial color={isBoss ? '#7F1D1D' : '#374151'} />
-      </mesh>
-      <pointLight position={[4, 2, 0]} intensity={0.6} color={monster.color} distance={3} />
-      {/* Xbot (player) */}
-      <Suspense fallback={null}>
-        <BattleArenaXbot attacking={xbotAttacking} />
-      </Suspense>
-      {/* Monster */}
-      <group ref={monsterGroupRef} position={[2.5, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        {monster.type === 'slime' && <SlimeMonster color={monster.color} defeated={false} />}
-        {monster.type === 'ghost' && <GhostMonster color={monster.color} defeated={false} />}
-        {monster.type === 'rock'  && <RockMonster  color={monster.color} defeated={false} />}
-        {monster.type === 'boss'  && <BossMonster  hp={monsterHp} maxHp={monster.maxHp} defeated={false} />}
+      <mesh position={[-4,0,0]}><cylinderGeometry args={[0.1,0.1,3,8]} /><meshStandardMaterial color="#2D1B69" /></mesh>
+      <pointLight position={[-4,2,0]} intensity={1} color="#7C3AED" distance={4} />
+      <mesh position={[4,0,0]}><cylinderGeometry args={[0.1,0.1,3,8]} /><meshStandardMaterial color={isBoss?'#7F1D1D':'#374151'} /></mesh>
+      <pointLight position={[4,2,0]} intensity={1} color={monster.color} distance={4} />
+      <Suspense fallback={null}><BattleArenaXbot attacking={xbotAttacking} /></Suspense>
+      <group ref={monsterGroupRef} position={[2.5,0,0]} rotation={[0,-Math.PI/2,0]}>
+        {monster.type==='slime' && <SlimeMonster color={monster.color} defeated={false} />}
+        {monster.type==='ghost' && <GhostMonster color={monster.color} defeated={false} />}
+        {monster.type==='rock'  && <RockMonster  color={monster.color} defeated={false} />}
+        {monster.type==='boss'  && <BossMonster  hp={monsterHp} maxHp={monster.maxHp} defeated={false} />}
       </group>
-      {/* VS text */}
-      <Text position={[0, 0.5, 0]} fontSize={0.5} color="rgba(255,255,255,0.15)" anchorX="center">VS</Text>
+      <HitParticles active={xbotAttacking} color={monster.color} position={[2.2,0.5,0]} />
+      <HitParticles active={monsterAttacking} color="#EF4444" position={[-2.2,0.5,0]} />
+      <Text position={[0,0.5,0]} fontSize={0.5} color="rgba(255,255,255,0.15)" anchorX="center">VS</Text>
     </>
   );
 }
@@ -510,7 +525,7 @@ export default function AdventureClient({ locale }: { locale: string }) {
 
   return (
     <div style={{ position:'fixed', inset:0 }} dir={isRtl?'rtl':'ltr'}>
-      <Canvas camera={{ position:[0,8,14], fov:50 }} style={{ width:'100%', height:'100%' }} gl={{ antialias:true }}>
+      <Canvas camera={{ position:[0,5,10], fov:55 }} style={{ width:'100%', height:'100%' }} gl={{ antialias:true }}>
         <Suspense fallback={null}>
           {stage==='island' && <IslandScene onEnterDungeon={() => setStage('dungeon')} />}
           {stage==='battle' && currentMonster && (

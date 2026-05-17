@@ -110,7 +110,6 @@ function IslandScene({ onEnterDungeon: _onEnterDungeon }: { onEnterDungeon: () =
       <pointLight position={[0,5,0]} intensity={0.6} color="#7C3AED" />
       <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1.5,0]}><planeGeometry args={[60,60]} /><meshStandardMaterial color="#1E3A5F" roughness={0.1} metalness={0.3} /></mesh>
       <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.5,0]}><circleGeometry args={[8,64]} /><meshStandardMaterial color="#2D5A27" roughness={0.9} /></mesh>
-      <mesh position={[0,-0.2,0]}><sphereGeometry args={[5,32,16,0,Math.PI*2,0,Math.PI/2.5]} /><meshStandardMaterial color="#3A7A33" roughness={0.9} /></mesh>
       <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.49,0]}><ringGeometry args={[6.5,8.5,64]} /><meshStandardMaterial color="#C8A96E" roughness={1} /></mesh>
       <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.45,-2]}><planeGeometry args={[1.5,8]} /><meshStandardMaterial color="#8B7355" roughness={1} /></mesh>
       {[[-3,0,2],[3,0,1],[-2,0,-1],[3,0,-3],[-4,0,-2]].map(([x,y,z],i) => (

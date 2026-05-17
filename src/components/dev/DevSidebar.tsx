@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Wrench, X, Bot, Home, BarChart3, Globe, Rocket,
-  Sparkles, BookOpen, FlaskConical, Trophy, Users, Settings,
+  Sparkles, BookOpen, FlaskConical, Trophy, Users, Settings, Swords,
 } from 'lucide-react';
 
 const PURPLE = '#7C3AED';
@@ -24,7 +24,8 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   leaderboard:<Trophy size={16} />,
   parent:    <Users size={16} />,
   admin:     <Settings size={16} />,
-  classroom: <Users size={16} />,
+  classroom:  <Users size={16} />,
+  adventure:  <Swords size={16} />,
 };
 
 interface NavItem {
@@ -40,6 +41,7 @@ const PAGES: NavItem[] = [
   { href: '/ar/dev', label: 'Dev Preview (3D Map)', icon: 'dev', tag: 'dev' },
   { href: '/ar/dev/child-journey', label: 'Child Journey Demo', icon: 'journey', tag: 'dev' },
   { href: '/ar/dev/classroom', label: 'Classroom Demo', icon: 'classroom', tag: 'dev' },
+  { href: '/ar/dev/adventure', label: 'Adventure Demo', icon: 'adventure', tag: 'dev' },
   { href: '/ar/onboarding', label: 'Onboarding', icon: 'onboarding' },
   { href: '/ar/agents', label: 'AI Agents', icon: 'agents' },
   { href: '/ar/tracks', label: 'Tracks', icon: 'tracks' },

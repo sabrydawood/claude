@@ -327,7 +327,7 @@ export function IslandPlayerController({
         newNearId = d.id;
         const idx = dungeons.indexOf(d);
         const prevCompleted = idx === 0 || completedIds.has(dungeons[idx - 1].id);
-        if (prevCompleted && !completedIds.has(d.id) && !enterCooldown.current && !returnCooldownRef.current) {
+        if (prevCompleted && !completedIds.has(d.id) && !enterCooldown.current && !returnCooldownRef?.current) {
           enterCooldown.current = true;
           onEnterDungeon(d);
           setTimeout(() => { enterCooldown.current = false; }, 2000);

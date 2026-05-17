@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Stars, Text, useGLTF, useAnimations } from '@react-three/drei';
 import { SkeletonUtils } from 'three-stdlib';
 import * as THREE from 'three';
@@ -25,12 +25,12 @@ interface Student {
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const STUDENTS: Student[] = [
-  { id: '1', name: 'أحمد',  mastery: 92, xp: 1240, level: 8, status: 'active',     streak: 5, pos: [-3.5, 0, -1] },
-  { id: '2', name: 'سارة',  mastery: 78, xp: 890,  level: 6, status: 'thinking',   streak: 3, pos: [0,    0, -1] },
-  { id: '3', name: 'محمد',  mastery: 61, xp: 650,  level: 5, status: 'struggling', streak: 1, pos: [3.5,  0, -1] },
-  { id: '4', name: 'ليلى',  mastery: 85, xp: 1050, level: 7, status: 'active',     streak: 7, pos: [-3.5, 0,  2] },
-  { id: '5', name: 'يوسف',  mastery: 45, xp: 420,  level: 4, status: 'offline',    streak: 0, pos: [0,    0,  2] },
-  { id: '6', name: 'نور',   mastery: 73, xp: 780,  level: 6, status: 'thinking',   streak: 4, pos: [3.5,  0,  2] },
+  { id: '1', name: 'أحمد',  mastery: 92, xp: 1240, level: 8, status: 'active',     streak: 5, pos: [-5, 0, -1] },
+  { id: '2', name: 'سارة',  mastery: 78, xp: 890,  level: 6, status: 'thinking',   streak: 3, pos: [0,  0, -1] },
+  { id: '3', name: 'محمد',  mastery: 61, xp: 650,  level: 5, status: 'struggling', streak: 1, pos: [5,  0, -1] },
+  { id: '4', name: 'ليلى',  mastery: 85, xp: 1050, level: 7, status: 'active',     streak: 7, pos: [-5, 0,  3] },
+  { id: '5', name: 'يوسف',  mastery: 45, xp: 420,  level: 4, status: 'offline',    streak: 0, pos: [0,  0,  3] },
+  { id: '6', name: 'نور',   mastery: 73, xp: 780,  level: 6, status: 'thinking',   streak: 4, pos: [5,  0,  3] },
 ];
 
 const PHASES = [
@@ -44,147 +44,177 @@ const PHASES = [
 
 type Phase = typeof PHASES[number];
 
+// ─── CameraSetup ──────────────────────────────────────────────────────────────
+
+function CameraSetup() {
+  const { camera } = useThree();
+  useEffect(() => {
+    camera.lookAt(0, 1, -1);
+    camera.updateProjectionMatrix();
+  }, [camera]);
+  return null;
+}
+
 // ─── StudentAvatar ────────────────────────────────────────────────────────────
 
 function StudentAvatar({ student, isDirected }: { student: Student; isDirected: boolean }) {
   const headRef = useRef<THREE.Mesh>(null!);
   const glowRef = useRef<THREE.PointLight>(null!);
+  const tabletRef = useRef<THREE.Mesh>(null!);
 
   const bodyColor =
-    student.status === 'active'     ? '#818CF8' :
-    student.status === 'thinking'   ? '#F59E0B' :
-    student.status === 'struggling' ? '#EF4444' :
-    '#374151';
+    student.status === 'active'     ? '#6366F1' :
+    student.status === 'thinking'   ? '#D97706' :
+    student.status === 'struggling' ? '#DC2626' :
+    '#4B5563';
 
   useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
     if (headRef.current && student.status !== 'offline') {
-      headRef.current.position.y = 1.15 + Math.sin(clock.elapsedTime * 1.2 + parseFloat(student.id)) * 0.02;
+      headRef.current.position.y = 1.35 + Math.sin(t * 1.2 + parseFloat(student.id)) * 0.025;
     }
     if (glowRef.current) {
-      glowRef.current.intensity = isDirected
-        ? 2 + Math.sin(clock.elapsedTime * 4) * 0.8
-        : 0;
+      glowRef.current.intensity = isDirected ? 3 + Math.sin(t * 5) * 1 : 0;
+    }
+    if (tabletRef.current) {
+      const mat = tabletRef.current.material as THREE.MeshStandardMaterial;
+      mat.emissiveIntensity = 0.4 + Math.sin(t * 0.8 + parseFloat(student.id)) * 0.1;
     }
   });
 
   return (
     <group position={student.pos}>
       {/* Desk surface */}
-      <mesh position={[0, -0.2, 0.3]}>
-        <boxGeometry args={[1.2, 0.05, 0.7]} />
-        <meshStandardMaterial color="#8B7355" roughness={0.9} />
+      <mesh position={[0, -0.15, 0.2]}>
+        <boxGeometry args={[1.8, 0.06, 1.0]} />
+        <meshStandardMaterial color="#1E1A3A" roughness={0.7} metalness={0.2} />
       </mesh>
       {/* Desk legs */}
-      {([ [-0.55, -0.1], [-0.55, 0.65], [0.55, -0.1], [0.55, 0.65] ] as [number, number][]).map(([dx, dz], i) => (
-        <mesh key={i} position={[dx, -0.55, dz]}>
-          <cylinderGeometry args={[0.03, 0.03, 0.7, 6]} />
-          <meshStandardMaterial color="#5D3A1A" roughness={1} />
+      {([ [-0.8, -0.1], [-0.8, 1.1], [0.8, -0.1], [0.8, 1.1] ] as [number, number][]).map(([dx, dz], i) => (
+        <mesh key={i} position={[dx, -0.65, dz]}>
+          <cylinderGeometry args={[0.04, 0.04, 1, 6]} />
+          <meshStandardMaterial color="#2A2040" roughness={0.8} />
         </mesh>
       ))}
+      {/* Glowing tablet on desk */}
+      <mesh ref={tabletRef} position={[0.3, -0.1, 0.5]} rotation={[-0.3, 0, 0]}>
+        <boxGeometry args={[0.7, 0.45, 0.02]} />
+        <meshStandardMaterial
+          color={bodyColor}
+          emissive={bodyColor}
+          emissiveIntensity={0.4}
+          roughness={0.2}
+          metalness={0.6}
+        />
+      </mesh>
       {/* Chair seat */}
-      <mesh position={[0, -0.55, 0.9]}>
-        <boxGeometry args={[0.8, 0.05, 0.7]} />
-        <meshStandardMaterial color="#374151" roughness={0.8} />
+      <mesh position={[0, -0.6, 1.1]}>
+        <boxGeometry args={[1.1, 0.06, 0.9]} />
+        <meshStandardMaterial color="#1A1630" roughness={0.8} />
       </mesh>
       {/* Chair back */}
-      <mesh position={[0, -0.15, 1.25]}>
-        <boxGeometry args={[0.8, 0.8, 0.05]} />
-        <meshStandardMaterial color="#374151" roughness={0.8} />
+      <mesh position={[0, -0.15, 1.55]}>
+        <boxGeometry args={[1.1, 0.9, 0.06]} />
+        <meshStandardMaterial color="#1A1630" roughness={0.8} />
       </mesh>
 
       {/* Student body */}
-      <mesh position={[0, 0.4, 0.7]}>
-        <boxGeometry args={[0.5, 0.7, 0.3]} />
-        <meshStandardMaterial color={bodyColor} roughness={0.5} />
+      <mesh position={[0, 0.55, 1.0]}>
+        <boxGeometry args={[0.65, 0.9, 0.35]} />
+        <meshStandardMaterial color={bodyColor} roughness={0.5} metalness={0.1} />
+      </mesh>
+      {/* Neck */}
+      <mesh position={[0, 1.1, 0.98]}>
+        <cylinderGeometry args={[0.1, 0.12, 0.2, 8]} />
+        <meshStandardMaterial color="#E8C09A" roughness={0.7} />
       </mesh>
       {/* Head */}
-      <mesh ref={headRef} position={[0, 1.15, 0.7]}>
-        <sphereGeometry args={[0.22, 12, 12]} />
-        <meshStandardMaterial color="#F5C5A3" roughness={0.6} />
+      <mesh ref={headRef} position={[0, 1.35, 0.97]}>
+        <sphereGeometry args={[0.26, 16, 16]} />
+        <meshStandardMaterial color="#F0C090" roughness={0.6} />
       </mesh>
       {/* Eyes */}
-      {([-0.08, 0.08] as number[]).map((ex, i) => (
-        <mesh key={i} position={[ex, 1.17, 0.91]}>
-          <sphereGeometry args={[0.04, 6, 6]} />
-          <meshStandardMaterial color="#1E1B4B" />
+      {([-0.09, 0.09] as number[]).map((ex, i) => (
+        <mesh key={i} position={[ex, 1.37, 1.22]}>
+          <sphereGeometry args={[0.05, 8, 8]} />
+          <meshStandardMaterial color="#1A1040" />
         </mesh>
       ))}
 
-      {/* Glow when directed */}
-      <pointLight ref={glowRef} color="#F59E0B" intensity={0} distance={3} position={[0, 1.5, 0.7]} />
-
-      {/* Highlight ring on desk */}
+      {/* Directed highlight ring */}
       {isDirected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.17, 0.3]}>
-          <ringGeometry args={[0.55, 0.65, 32]} />
-          <meshBasicMaterial color="#F59E0B" transparent opacity={0.8} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.13, 0.2]}>
+          <ringGeometry args={[0.85, 0.95, 40]} />
+          <meshStandardMaterial color="#F59E0B" emissive="#F59E0B" emissiveIntensity={1.5} transparent opacity={0.9} />
         </mesh>
       )}
+      <pointLight ref={glowRef} color="#F59E0B" intensity={0} distance={4} position={[0, 2, 1]} />
 
       {/* Name label */}
-      <Text
-        position={[0, 1.65, 0.7]}
-        fontSize={0.2}
-        color="white"
-        anchorX="center"
-        outlineWidth={0.02}
-        outlineColor="#000000"
-      >
-        {student.name}
-      </Text>
-
-      {/* Status dot */}
-      <mesh position={[0.3, 1.15, 0.92]}>
-        <sphereGeometry args={[0.05, 6, 6]} />
-        <meshStandardMaterial
+      <Suspense fallback={null}>
+        <Text
+          position={[0, 2.0, 0.97]}
+          fontSize={0.22}
+          color="white"
+          anchorX="center"
+          outlineWidth={0.025}
+          outlineColor="#000000"
+        >
+          {student.name}
+        </Text>
+        <Text
+          position={[0, 1.73, 0.97]}
+          fontSize={0.14}
           color={bodyColor}
-          emissive={student.status !== 'offline' ? bodyColor : '#374151'}
-          emissiveIntensity={student.status !== 'offline' ? 1 : 0}
-        />
-      </mesh>
+          anchorX="center"
+        >
+          {`${student.mastery}% • Lv.${student.level}`}
+        </Text>
+      </Suspense>
     </group>
   );
 }
 
 // ─── SpeechBubble3D ───────────────────────────────────────────────────────────
 
-function SpeechBubble3D({ text, xbotPos }: { text: string; xbotPos: THREE.Vector3 }) {
-  const ref = useRef<THREE.Group>(null!);
+function SpeechBubble3D({ text, teacherRef }: { text: string; teacherRef: React.RefObject<THREE.Group | null> }) {
+  const groupRef = useRef<THREE.Group>(null!);
 
-  useFrame(({ clock }) => {
-    if (ref.current) {
-      ref.current.position.set(xbotPos.x, xbotPos.y + 3.2, xbotPos.z);
-      ref.current.position.y += Math.sin(clock.elapsedTime * 1.5) * 0.05;
-    }
+  useFrame(({ camera, clock }) => {
+    if (!groupRef.current) return;
+    const src = teacherRef.current?.position ?? new THREE.Vector3(0, -1.35, -4.5);
+    groupRef.current.position.set(src.x, src.y + 4.2, src.z + 0.5);
+    groupRef.current.position.y += Math.sin(clock.elapsedTime * 1.5) * 0.06;
+    groupRef.current.lookAt(camera.position);
   });
 
   return (
-    <group ref={ref}>
-      {/* Border (rendered behind) */}
-      <mesh position={[0, 0, -0.01]}>
-        <planeGeometry args={[2.3, 1.2]} />
-        <meshBasicMaterial color="#7C3AED" transparent opacity={0.9} />
+    <group ref={groupRef}>
+      {/* Border */}
+      <mesh position={[0, 0, -0.02]}>
+        <planeGeometry args={[3.2, 1.5]} />
+        <meshBasicMaterial color="#7C3AED" transparent opacity={0.95} />
       </mesh>
-      {/* Bubble background */}
+      {/* White background */}
       <mesh>
-        <planeGeometry args={[2.2, 1.1]} />
-        <meshBasicMaterial color="white" transparent opacity={0.92} />
+        <planeGeometry args={[3.0, 1.35]} />
+        <meshBasicMaterial color="white" transparent opacity={0.96} />
       </mesh>
       {/* Text */}
       <Text
         position={[0, 0.02, 0.01]}
-        fontSize={0.19}
-        color="#1E293B"
+        fontSize={0.22}
+        color="#1E1040"
         anchorX="center"
         anchorY="middle"
-        maxWidth={2.0}
+        maxWidth={2.7}
         textAlign="center"
       >
         {text}
       </Text>
-      {/* Tail */}
-      <mesh position={[0, -0.65, 0]} rotation={[0, 0, Math.PI]}>
-        <coneGeometry args={[0.12, 0.3, 4]} />
+      {/* Tail pointing down */}
+      <mesh position={[0, -0.82, 0]} rotation={[0, 0, Math.PI]}>
+        <coneGeometry args={[0.15, 0.35, 4]} />
         <meshBasicMaterial color="white" />
       </mesh>
     </group>
@@ -224,7 +254,7 @@ function ClassroomTeacher({
   const groupRef = useRef<THREE.Group>(cloned);
   const { actions } = useAnimations(animations, groupRef);
   const prevAnim = useRef('');
-  const targetPos = useRef(new THREE.Vector3(0, 0, -3.5));
+  const targetPos = useRef(new THREE.Vector3(0, 0, -4.5));
   const targetRotY = useRef(0);
 
   const phase = phases[phaseIdx];
@@ -232,12 +262,12 @@ function ClassroomTeacher({
   useEffect(() => {
     const directed = phase.directed ? students.find(s => s.id === phase.directed) : null;
     if (directed) {
-      targetPos.current.set(directed.pos[0] * 0.4, 0, directed.pos[2] * 0.3 - 2);
+      targetPos.current.set(directed.pos[0] * 0.4, 0, directed.pos[2] * 0.3 - 2.5);
       const dx = directed.pos[0] - targetPos.current.x;
       const dz = directed.pos[2] - targetPos.current.z;
       targetRotY.current = Math.atan2(dx, dz);
     } else {
-      targetPos.current.set(0, 0, -3.5);
+      targetPos.current.set(0, 0, -4.5);
       targetRotY.current = Math.PI;
     }
 
@@ -258,7 +288,7 @@ function ClassroomTeacher({
     if (!groupRef.current) return;
     void delta;
     groupRef.current.position.lerp(
-      new THREE.Vector3(targetPos.current.x, -1.3, targetPos.current.z),
+      new THREE.Vector3(targetPos.current.x, -1.35, targetPos.current.z),
       0.04,
     );
     let dy = targetRotY.current - groupRef.current.rotation.y;
@@ -269,11 +299,11 @@ function ClassroomTeacher({
 
   return (
     <>
-      <primitive ref={groupRef} object={cloned} scale={1.3} position={[0, -1.3, -3.5]} dispose={null} />
+      <primitive ref={groupRef} object={cloned} scale={1.5} position={[0, -1.35, -4.5]} dispose={null} />
       <Suspense fallback={null}>
         <SpeechBubble3D
           text={phase.bubble}
-          xbotPos={groupRef.current?.position ?? new THREE.Vector3(0, -1.3, -3.5)}
+          teacherRef={groupRef}
         />
       </Suspense>
     </>
@@ -295,114 +325,139 @@ function ClassroomScene({
 }) {
   return (
     <>
-      <color attach="background" args={['#0F0C22']} />
-      <fog attach="fog" args={['#0F0C22', 20, 40]} />
-      <ambientLight intensity={0.6} color="#C4B5FD" />
-      <directionalLight position={[0, 8, 4]} intensity={1.2} color="#FFF9E6" />
-      <pointLight position={[0, 4, 0]} intensity={0.5} color="#7C3AED" />
+      <color attach="background" args={['#0A0918']} />
+      <fog attach="fog" args={['#0A0918', 25, 50]} />
 
-      {/* Floor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
-        <planeGeometry args={[14, 12]} />
-        <meshStandardMaterial color="#1C1A2E" roughness={0.9} />
-      </mesh>
-      {/* Floor grid */}
-      <gridHelper args={[14, 14, '#2D1B69', '#1A0F3C']} position={[0, -1.34, 0]} />
+      {/* Lighting */}
+      <ambientLight intensity={0.35} color="#8B9FCC" />
+      <directionalLight position={[0, 10, 3]} intensity={0.8} color="#FFF5E0" castShadow />
 
-      {/* Back wall — DoubleSide so it's visible from inside and outside */}
-      <mesh position={[0, 1, 5.8]}>
-        <planeGeometry args={[14, 6]} />
-        <meshStandardMaterial color="#16142A" roughness={1} side={2} />
-      </mesh>
-      {/* Left wall */}
-      <mesh rotation={[0, Math.PI / 2, 0]} position={[-6.8, 1, 0]}>
-        <planeGeometry args={[12, 6]} />
-        <meshStandardMaterial color="#14122A" roughness={1} />
-      </mesh>
-      {/* Right wall */}
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[6.8, 1, 0]}>
-        <planeGeometry args={[12, 6]} />
-        <meshStandardMaterial color="#14122A" roughness={1} />
-      </mesh>
-      {/* Front wall */}
-      <mesh position={[0, 1, -5.8]}>
-        <planeGeometry args={[14, 6]} />
-        <meshStandardMaterial color="#16142A" roughness={1} />
-      </mesh>
-      {/* Ceiling */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 3.5, 0]}>
-        <planeGeometry args={[14, 12]} />
-        <meshStandardMaterial color="#0F0D20" roughness={1} />
-      </mesh>
-
-      {/* Ceiling lights */}
-      {([ [-3.5, 0], [-3.5, 2], [3.5, 0], [3.5, 2] ] as [number, number][]).map(([x, z], i) => (
-        <group key={i}>
-          <mesh position={[x, 3.4, z]}>
-            <boxGeometry args={[0.6, 0.08, 0.6]} />
-            <meshStandardMaterial color="#FFF9E6" emissive="#FFF9E6" emissiveIntensity={1} />
+      {/* Ceiling strip lights */}
+      {([-5, 0, 5] as number[]).map((x, i) => (
+        <group key={i} position={[x, 4.8, -0.5]}>
+          <mesh>
+            <boxGeometry args={[1.2, 0.06, 6]} />
+            <meshStandardMaterial color="#FFFAF0" emissive="#FFFAF0" emissiveIntensity={0.9} />
           </mesh>
-          <pointLight position={[x, 3.2, z]} intensity={1.2} color="#FFF9E6" distance={6} />
+          <pointLight intensity={1.5} color="#FFF5E0" distance={8} position={[0, -0.5, 0]} />
         </group>
       ))}
 
+      {/* Desk accent lights */}
+      {students.map(s => (
+        <pointLight key={s.id} position={[s.pos[0], 1.5, s.pos[2]]} intensity={0.3} color="#4A90D9" distance={3} />
+      ))}
+
+      {/* Dramatic purple accent */}
+      <pointLight position={[0, 5, -6]} intensity={2} color="#7C3AED" distance={12} />
+
+      {/* Floor */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
+        <planeGeometry args={[22, 18]} />
+        <meshStandardMaterial color="#12102A" roughness={0.8} metalness={0.1} />
+      </mesh>
+      <gridHelper args={[22, 22, '#252040', '#1A1830']} position={[0, -1.34, 0]} />
+
+      {/* Ceiling */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 5, 0]}>
+        <planeGeometry args={[22, 18]} />
+        <meshStandardMaterial color="#0D0B1E" roughness={1} />
+      </mesh>
+
+      {/* Front wall (behind blackboard) */}
+      <mesh position={[0, 1.8, -8]}>
+        <planeGeometry args={[22, 8]} />
+        <meshStandardMaterial color="#14122A" roughness={0.9} />
+      </mesh>
+
+      {/* Back wall */}
+      <mesh position={[0, 1.8, 7]}>
+        <planeGeometry args={[22, 8]} />
+        <meshStandardMaterial color="#14122A" roughness={0.9} side={2} />
+      </mesh>
+
+      {/* Left wall */}
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[-11, 1.8, -0.5]}>
+        <planeGeometry args={[18, 8]} />
+        <meshStandardMaterial color="#12102A" roughness={0.9} />
+      </mesh>
+
+      {/* Windows on left wall */}
+      {([-4, 2] as number[]).map((z, i) => (
+        <group key={i} position={[-10.9, 2.5, z]}>
+          {/* Window frame background */}
+          <mesh rotation={[0, Math.PI / 2, 0]} position={[0, 0, 0.01]}>
+            <planeGeometry args={[3.1, 2.6]} />
+            <meshStandardMaterial color="#2A2448" />
+          </mesh>
+          {/* Window glass */}
+          <mesh rotation={[0, Math.PI / 2, 0]}>
+            <planeGeometry args={[3, 2.5]} />
+            <meshStandardMaterial color="#1A3A6A" emissive="#0A2040" emissiveIntensity={0.5} transparent opacity={0.85} />
+          </mesh>
+          <pointLight position={[0.5, 0, 0]} intensity={0.4} color="#4A7FC1" distance={5} />
+        </group>
+      ))}
+
+      {/* Right wall */}
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[11, 1.8, -0.5]}>
+        <planeGeometry args={[18, 8]} />
+        <meshStandardMaterial color="#12102A" roughness={0.9} />
+      </mesh>
+
       {/* Blackboard */}
-      <group position={[0, 1.2, -5.5]}>
-        {/* Frame */}
+      <group position={[0, 2.2, -7.8]}>
+        {/* Board border */}
         <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[6.2, 2.7]} />
-          <meshStandardMaterial color="#2D1B0E" roughness={1} />
+          <planeGeometry args={[10.3, 3.8]} />
+          <meshStandardMaterial color="#2A1A10" roughness={1} />
         </mesh>
         {/* Board surface */}
         <mesh>
-          <planeGeometry args={[6, 2.5]} />
-          <meshStandardMaterial color="#0F3D2E" roughness={0.95} />
+          <planeGeometry args={[10, 3.5]} />
+          <meshStandardMaterial color="#1A3D28" roughness={0.95} />
         </mesh>
+        {/* Overhead board light */}
+        <pointLight position={[0, 3, 1]} intensity={2.5} color="#FFFAF0" distance={8} />
+        {/* Chalk text */}
         <Suspense fallback={null}>
-          <Text position={[0, 0.4, 0.02]} fontSize={0.28} color="#E2F5DC" anchorX="center" maxWidth={5.5}>
+          <Text position={[0, 0.8, 0.02]} fontSize={0.38} color="#C8F5D0" anchorX="center" maxWidth={9}>
             {'درس الحلقات (Loops)'}
           </Text>
-          <Text position={[0, -0.1, 0.02]} fontSize={0.18} color="#A7D9B0" anchorX="center" maxWidth={5.5}>
-            {'for i in range(n): ...'}
+          <Text position={[0, 0.1, 0.02]} fontSize={0.24} color="#9BE3B0" anchorX="center" maxWidth={9}>
+            {'for i in range(n):    print(i)'}
           </Text>
-          <Text position={[0, -0.5, 0.02]} fontSize={0.16} color="#A7D9B0" anchorX="center" maxWidth={5.5}>
-            {'while condition: ...'}
+          <Text position={[0, -0.55, 0.02]} fontSize={0.22} color="#9BE3B0" anchorX="center" maxWidth={9}>
+            {'while condition:    # keep looping'}
           </Text>
         </Suspense>
         {/* Chalk tray */}
-        <mesh position={[0, -1.37, 0.06]}>
-          <boxGeometry args={[6, 0.08, 0.15]} />
-          <meshStandardMaterial color="#2D1B0E" roughness={1} />
+        <mesh position={[0, -1.9, 0.08]}>
+          <boxGeometry args={[10, 0.1, 0.2]} />
+          <meshStandardMaterial color="#2A1A10" roughness={1} />
         </mesh>
       </group>
 
-      {/* Teacher's desk */}
-      <group position={[0, -1.35, -4.5]}>
-        {/* Tabletop */}
+      {/* Teacher's desk (moved slightly forward from z=-4.5 teacher position) */}
+      <group position={[0, -1.35, -3.2]}>
         <mesh position={[0, 0.35, 0]}>
           <boxGeometry args={[2, 0.06, 0.9]} />
-          <meshStandardMaterial color="#7C5D3A" roughness={0.8} />
+          <meshStandardMaterial color="#1E1A3A" roughness={0.7} metalness={0.2} />
         </mesh>
-        {/* Legs */}
         {([ [-0.9, -0.4], [0.9, -0.4], [-0.9, 0.4], [0.9, 0.4] ] as [number, number][]).map(([dx, dz], i) => (
           <mesh key={i} position={[dx, 0.15, dz]}>
             <cylinderGeometry args={[0.04, 0.04, 0.68, 6]} />
-            <meshStandardMaterial color="#5D3A1A" roughness={1} />
+            <meshStandardMaterial color="#2A2040" roughness={1} />
           </mesh>
         ))}
         {/* Laptop screen */}
         <mesh position={[0.3, 0.42, -0.1]} rotation={[-0.3, 0, 0]}>
           <boxGeometry args={[0.5, 0.35, 0.02]} />
-          <meshStandardMaterial color="#1F2937" roughness={0.5} metalness={0.3} />
-        </mesh>
-        {/* Laptop base */}
-        <mesh position={[0.3, 0.39, 0.07]}>
-          <boxGeometry args={[0.5, 0.02, 0.35]} />
-          <meshStandardMaterial color="#374151" roughness={0.5} />
+          <meshStandardMaterial color="#6366F1" emissive="#6366F1" emissiveIntensity={0.5} roughness={0.3} metalness={0.5} />
         </mesh>
       </group>
 
-      {/* Student avatars — each in its own Suspense so Text font-load doesn't block the room */}
+      {/* Student avatars */}
       {students.map(s => (
         <Suspense key={s.id} fallback={null}>
           <StudentAvatar student={s} isDirected={s.id === directedId} />
@@ -415,7 +470,7 @@ function ClassroomScene({
       </Suspense>
 
       {/* Background stars */}
-      <Stars radius={30} depth={15} count={200} factor={2} fade speed={0.2} />
+      <Stars radius={40} depth={20} count={200} factor={2} fade speed={0.2} />
     </>
   );
 }
@@ -435,16 +490,16 @@ export default function ClassroomClient({ locale }: { locale: string }) {
   const directedId = phase.directed;
 
   const actionLabel: Record<string, string> = {
-    explaining:     'Xbot يشرح للجميع',
-    questioning:    'Xbot يسأل طالباً',
-    praising:       'Xbot يشجع',
+    explaining:      'Xbot يشرح للجميع',
+    questioning:     'Xbot يسأل طالباً',
+    praising:        'Xbot يشجع',
     'peer-teaching': 'تعليم الأقران',
   };
 
   const actionIcon: Record<string, React.ReactNode> = {
-    explaining:     <BookOpen size={14} />,
-    questioning:    <MessageSquare size={14} />,
-    praising:       <Award size={14} />,
+    explaining:      <BookOpen size={14} />,
+    questioning:     <MessageSquare size={14} />,
+    praising:        <Award size={14} />,
     'peer-teaching': <Users size={14} />,
   };
 
@@ -452,11 +507,12 @@ export default function ClassroomClient({ locale }: { locale: string }) {
     <div style={{ position: 'fixed', inset: 0 }} dir={isRtl ? 'rtl' : 'ltr'}>
       {/* 3D Canvas */}
       <Canvas
-        camera={{ position: [0, 3.5, 5.5], fov: 58 }}
+        camera={{ position: [0, 8, 10], fov: 55 }}
         style={{ width: '100%', height: '100%' }}
         gl={{ antialias: true }}
       >
         <Suspense fallback={null}>
+          <CameraSetup />
           <ClassroomScene
             phaseIdx={phaseIdx}
             phases={PHASES}

@@ -12,12 +12,7 @@ import { SelectionTooltip } from '@/components/selection-tooltip';
 import { APP_URL } from '@/lib/utils';
 import '../globals.css';
 import { TLocale } from '@/Shared/Types/Common.Types';
-import dynamic from 'next/dynamic';
-
-const DevSidebar = dynamic(
-  () => import('@/components/dev/DevSidebar'),
-  { ssr: false }
-);
+import DevSidebarLoader from '@/components/dev/DevSidebarLoader';
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -129,7 +124,7 @@ export default async function LocaleLayout({
           <PwaInstallBanner />
           <Mascot />
           <SelectionTooltip />
-          {process.env.NODE_ENV === 'development' && <DevSidebar />}
+          {process.env.NODE_ENV === 'development' && <DevSidebarLoader />}
         </Providers>
       </body>
     </html>

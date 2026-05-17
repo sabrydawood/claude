@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import AdventureClient from './adventure-client';
+import AdventureLoader from './adventure-loader';
 
 export default async function AdventurePage({
   params,
@@ -8,5 +8,5 @@ export default async function AdventurePage({
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const { locale } = await params;
-  return <AdventureClient locale={locale} />;
+  return <AdventureLoader locale={locale} />;
 }

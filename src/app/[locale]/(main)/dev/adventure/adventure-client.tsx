@@ -1,441 +1,288 @@
 'use client';
-
-import { Suspense, useRef, useMemo, useState, useEffect, useCallback } from 'react';
+import { Suspense, useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, Text, Line, useGLTF, useAnimations } from '@react-three/drei';
+import { OrbitControls, Stars, Text, useGLTF, useAnimations } from '@react-three/drei';
 import { SkeletonUtils } from 'three-stdlib';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Trophy, Target, Lightbulb, CheckCircle2, ChevronRight } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import type { RobotMood } from '@/components/mascot-gltf';
 
-const XbotExpressive = dynamic(
-  () => import('@/components/mascot-gltf').then(m => ({ default: m.XbotExpressive })),
-  { ssr: false, loading: () => <div style={{ width: 160, height: 220 }} /> }
-);
+type GameStage = 'island' | 'dungeon' | 'battle' | 'victory';
+const MOVE_KEYS = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','W','a','A','s','S','d','D'];
 
-type Stage = 'map' | 'entry' | 'lesson' | 'challenge' | 'victory' | 'map-complete';
-type IslandStatus = 'done' | 'current' | 'unlocked' | 'locked';
-interface IslandNode { id: string; pos: [number, number, number]; color: string; status: IslandStatus; label: string; }
+interface Question { text: string; options: string[]; correct: number; }
+interface Monster { id: string; type: 'slime' | 'ghost' | 'rock' | 'boss'; name: string; color: string; maxHp: number; pos: [number,number,number]; question: Question; }
 
-const ISLAND_NODES: IslandNode[] = [
-  { id: '1', pos: [-7, 0.5, 0],  color: '#10B981', status: 'done',    label: 'البرمجة' },
-  { id: '2', pos: [-4, 1.5, -3], color: '#10B981', status: 'done',    label: 'المتغيرات' },
-  { id: '3', pos: [-1, 0, 2],    color: '#F59E0B', status: 'current', label: 'الحلقات' },
-  { id: '4', pos: [3,  1.5, -2], color: '#7C3AED', status: 'locked',  label: 'الدوال' },
-  { id: '5', pos: [6,  0, 1],    color: '#374151', status: 'locked',  label: 'القوائم' },
-  { id: '6', pos: [9,  2, -1],   color: '#1F2937', status: 'locked',  label: 'المشاريع' },
+const MONSTERS: Monster[] = [
+  { id:'m1', type:'slime', name:'Slime الحلقة',   color:'#10B981', maxHp:1, pos:[0,0,-4],
+    question:{ text:'ما أول رقم يطبعه range(3)؟', options:['0','1','3'], correct:0 } },
+  { id:'m2', type:'ghost', name:'Ghost المتغير',   color:'#818CF8', maxHp:1, pos:[0,0,-9],
+    question:{ text:'كم مرة تتكرر: for i in range(5)', options:['3 مرات','5 مرات','7 مرات'], correct:1 } },
+  { id:'m3', type:'rock',  name:'Rock الشرط',      color:'#9CA3AF', maxHp:1, pos:[0,0,-14],
+    question:{ text:'ناتج: for i in range(3): print(i*2)', options:['0 2 4','0 1 2','2 4 6'], correct:0 } },
+  { id:'boss', type:'boss', name:'🐉 Dragon Boss', color:'#EF4444', maxHp:3, pos:[0,0,-20],
+    question:{ text:'لطباعة 1 2 3 4 5 أكمل: for i in range(__, __):\nprint(i)', options:['range(1, 6)','range(0, 5)','range(1, 5)'], correct:0 } },
 ];
-const EDGES: [string, string][] = [['1','2'],['2','3'],['3','4'],['4','5'],['5','6']];
-const MATCH_PAIRS = [
-  { id: '1', question: 'حلقة for',   answer: 'تتكرر عدداً محدداً' },
-  { id: '2', question: 'حلقة while', answer: 'تتكرر حتى يتغير الشرط' },
-  { id: '3', question: 'break',      answer: 'تخرج من الحلقة فوراً' },
-];
-const REWARD_STARS = Array.from({ length: 12 }, (_, i) => {
-  const r = 60 + (i % 3) * 15; const rad = (i / 12) * 2 * Math.PI;
-  return { x: 80 + Math.cos(rad) * r, y: 80 + Math.sin(rad) * r, large: i % 3 === 0, delay: i * 0.05 };
-});
 
-// ─── 3D Components ─────────────────────────────────────────────────────────────
+// ─── 3D Monster Components ──────────────────────────────────────────────────────
 
-function IslandSphere({ island, onIslandClick }: { island: IslandNode; onIslandClick: (id: string) => void }) {
-  const meshRef = useRef<THREE.Mesh>(null!);
-  const [hovered, setHovered] = useState(false);
-  const isActive  = island.status !== 'locked';
-  const isPulsing = island.status === 'current' || island.status === 'unlocked';
-  const color     = isActive ? island.color : '#374151';
-  const emInt     = island.status === 'done' ? 0.5 : isPulsing ? 0.7 : 0.05;
-  useFrame(({ clock }) => {
-    if (!meshRef.current) return;
-    const base = isPulsing ? 1 + Math.sin(clock.elapsedTime * 2) * 0.06 : 1;
-    meshRef.current.scale.setScalar(base + (hovered ? 0.08 : 0));
-  });
+function SlimeMonster({ color, defeated }: { color:string; defeated:boolean }) {
+  const ref = useRef<THREE.Mesh>(null!);
+  useFrame(({ clock }) => { if (ref.current) ref.current.position.y = Math.abs(Math.sin(clock.elapsedTime * 2)) * 0.3; });
+  if (defeated) return null;
   return (
-    <group position={island.pos}>
-      <mesh ref={meshRef}
-        onClick={() => { if (isPulsing || island.status === 'current') onIslandClick(island.id); }}
-        onPointerOver={() => { if (isActive) { setHovered(true); document.body.style.cursor = 'pointer'; } }}
-        onPointerOut={() => { setHovered(false); document.body.style.cursor = 'default'; }}>
-        <sphereGeometry args={[0.5, 32, 32]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={emInt} roughness={0.2} metalness={0.7} />
-      </mesh>
-      {isActive && <mesh><sphereGeometry args={[0.8, 16, 16]} /><meshStandardMaterial color={color} transparent opacity={0.06} side={THREE.BackSide} /></mesh>}
-      <Text position={[0, 1.0, 0]} fontSize={0.22} color="rgba(255,255,255,0.85)" anchorX="center">{island.label}</Text>
+    <group>
+      <mesh ref={ref}><sphereGeometry args={[0.6,16,16]} /><meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.3} /></mesh>
+      {[-0.2,0.2].map((x,i) => <mesh key={i} position={[x,0.2,0.5]}><sphereGeometry args={[0.1,8,8]} /><meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.5} /></mesh>)}
     </group>
   );
 }
 
-function XbotCharacter({ stage }: { stage: Stage }) {
-  const { scene, animations } = useGLTF('/models/Xbot.glb');
-  const cloned   = useMemo(() => SkeletonUtils.clone(scene) as THREE.Group, [scene]);
-  const groupRef = useRef<THREE.Group>(cloned);
-  const { actions } = useAnimations(animations, groupRef);
-  useEffect(() => {
-    const c = new THREE.Color('#7C3AED');
-    cloned.traverse(child => {
-      if (!(child as THREE.Mesh).isMesh) return;
-      const mats = Array.isArray((child as THREE.Mesh).material) ? (child as THREE.Mesh).material as THREE.Material[] : [(child as THREE.Mesh).material as THREE.Material];
-      mats.forEach(m => { const sm = m as THREE.MeshStandardMaterial; if (sm.color) sm.color.set(c); sm.metalness = 0.3; sm.roughness = 0.5; sm.needsUpdate = true; });
-    });
-  }, [cloned]);
-  useEffect(() => {
-    const name = stage === 'victory' ? 'agree' : 'idle';
-    Object.values(actions).forEach(a => a?.fadeOut(0.3));
-    (actions[name] ?? actions['idle'])?.reset().fadeIn(0.3).play();
-  }, [stage, actions]);
-  const targetPos = useMemo<THREE.Vector3>(() => new THREE.Vector3(...(stage === 'map-complete' ? [3, -0.25, -2] : [-1, -1.75, 2]) as [number,number,number]), [stage]);
-  useFrame(() => { groupRef.current?.position.lerp(targetPos, 0.03); });
-  return <primitive ref={groupRef} object={cloned} scale={2.2} position={[-1, -1.75, 2]} dispose={null} />;
-}
-
-function VictoryParticles({ active }: { active: boolean }) {
-  const PARTICLES = useMemo(() => Array.from({ length: 20 }, (_, i) => {
-    const a = (i / 20) * Math.PI * 2, r = 3 + (i % 3);
-    return { x: Math.cos(a) * r, y: 1 + (i % 4) * 0.5, z: Math.sin(a) * r };
-  }), []);
-  const refs  = useRef<(THREE.Mesh | null)[]>([]);
-  const start = useRef(0);
-  useEffect(() => { if (active) start.current = Date.now(); }, [active]);
-  useFrame(() => {
-    if (!active) return;
-    const t = (Date.now() - start.current) / 1000;
-    refs.current.forEach((mesh, i) => {
-      if (!mesh) return;
-      const p = PARTICLES[i], prog = Math.min(t * 2, 1);
-      mesh.position.set(-1 + p.x * prog, p.y * prog, 2 + p.z * prog);
-      mesh.scale.setScalar(1 - prog * 0.8);
-    });
-  });
-  if (!active) return null;
+function GhostMonster({ color, defeated }: { color:string; defeated:boolean }) {
+  const ref = useRef<THREE.Group>(null!);
+  useFrame(({ clock }) => { if (ref.current) ref.current.position.y = Math.sin(clock.elapsedTime * 1.5) * 0.2 + 0.5; });
+  if (defeated) return null;
   return (
-    <>{PARTICLES.map((_, i) => (
-      <mesh key={i} ref={el => { refs.current[i] = el; }} position={[-1, 0, 2]}>
-        <sphereGeometry args={[0.12, 8, 8]} />
-        <meshStandardMaterial color={i%3===0?'#F59E0B':i%3===1?'#7C3AED':'#10B981'} emissive={i%3===0?'#F59E0B':'#7C3AED'} emissiveIntensity={1} />
-      </mesh>
-    ))}</>
+    <group ref={ref}>
+      <mesh><sphereGeometry args={[0.5,16,16]} /><meshStandardMaterial color={color} transparent opacity={0.7} emissive={color} emissiveIntensity={0.4} /></mesh>
+      {[-0.15,0.15].map((x,i) => <mesh key={i} position={[x,0.1,0.45]}><sphereGeometry args={[0.08,8,8]} /><meshStandardMaterial color="#1E1B4B" /></mesh>)}
+      <mesh position={[0,-0.5,0]} rotation={[Math.PI,0,0]}><coneGeometry args={[0.5,0.6,8]} /><meshStandardMaterial color={color} transparent opacity={0.5} /></mesh>
+    </group>
   );
 }
 
-function CameraRig({ stage }: { stage: Stage }) {
-  const t = useMemo<[number,number,number]>(() => {
-    if (stage === 'entry' || stage === 'victory') return [-1, 3, 8];
-    if (stage === 'lesson' || stage === 'challenge') return [-1, 2, 7];
-    if (stage === 'map-complete') return [1, 4, 16];
-    return [0, 4, 16];
-  }, [stage]);
-  useFrame(({ camera }) => { camera.position.lerp(new THREE.Vector3(...t), 0.04); camera.lookAt(0, 0, 0); });
-  return null;
+function RockMonster({ color, defeated }: { color:string; defeated:boolean }) {
+  if (defeated) return null;
+  return (
+    <group>
+      <mesh position={[0,0.5,0]}><boxGeometry args={[0.8,1,0.6]} /><meshStandardMaterial color={color} roughness={0.9} metalness={0.1} /></mesh>
+      <mesh position={[0,1.2,0]}><boxGeometry args={[0.6,0.6,0.5]} /><meshStandardMaterial color={color} roughness={0.9} /></mesh>
+      {[-0.15,0.15].map((x,i) => <mesh key={i} position={[x,1.2,0.28]}><sphereGeometry args={[0.08,8,8]} /><meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={1} /></mesh>)}
+      {[-0.7,0.7].map((x,i) => <mesh key={i} position={[x,0.5,0]}><boxGeometry args={[0.3,0.8,0.3]} /><meshStandardMaterial color={color} roughness={0.9} /></mesh>)}
+    </group>
+  );
 }
 
-function AdventureScene({ stage, onIslandClick, islandsData }: { stage: Stage; onIslandClick: (id: string) => void; islandsData: IslandNode[] }) {
-  const mapStage = stage === 'map' || stage === 'map-complete';
+function BossMonster({ hp, maxHp, defeated }: { hp:number; maxHp:number; defeated:boolean }) {
+  const ref = useRef<THREE.Group>(null!);
+  useFrame(({ clock }) => { if (ref.current) { ref.current.rotation.y = Math.sin(clock.elapsedTime * 0.5) * 0.3; ref.current.position.y = Math.sin(clock.elapsedTime) * 0.1; } });
+  if (defeated) return null;
+  const scale = 0.5 + (hp / maxHp) * 0.5;
+  return (
+    <group ref={ref} scale={scale}>
+      <mesh position={[0,0.8,0]}><boxGeometry args={[1.2,1.6,0.8]} /><meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={0.2} roughness={0.3} metalness={0.5} /></mesh>
+      <mesh position={[0,2.0,0.3]}><boxGeometry args={[1,0.8,1]} /><meshStandardMaterial color="#DC2626" roughness={0.3} metalness={0.5} /></mesh>
+      {[-0.25,0.25].map((x,i) => <mesh key={i} position={[x,2.1,0.85]}><sphereGeometry args={[0.12,8,8]} /><meshStandardMaterial color="#FDE047" emissive="#FDE047" emissiveIntensity={2} /></mesh>)}
+      {[-1,1].map((side,i) => <mesh key={i} position={[side*1.2,1.2,-0.2]} rotation={[0,0,side*Math.PI/6]}><boxGeometry args={[1.2,0.1,1.2]} /><meshStandardMaterial color="#991B1B" transparent opacity={0.8} /></mesh>)}
+      <mesh position={[0,0.2,-0.9]} rotation={[Math.PI/4,0,0]}><coneGeometry args={[0.3,1.5,6]} /><meshStandardMaterial color="#B91C1C" /></mesh>
+    </group>
+  );
+}
+
+// ─── Island Scene ────────────────────────────────────────────────────────────────
+
+function XbotOnIsland() {
+  const { scene, animations } = useGLTF('/models/Xbot.glb');
+  const cloned = useMemo(() => {
+    const c = SkeletonUtils.clone(scene) as THREE.Group;
+    c.traverse(child => { if ((child as THREE.Mesh).isMesh) { const mats = Array.isArray((child as THREE.Mesh).material) ? (child as THREE.Mesh).material as THREE.Material[] : [(child as THREE.Mesh).material as THREE.Material]; mats.forEach(m => { const sm = m as THREE.MeshStandardMaterial; if (sm.color) sm.color.set('#7C3AED'); sm.metalness=0.3; sm.roughness=0.5; sm.needsUpdate=true; }); } });
+    return c;
+  }, [scene]);
+  const groupRef = useRef<THREE.Group>(cloned);
+  const { actions } = useAnimations(animations, groupRef);
+  useEffect(() => { actions['idle']?.reset().play(); }, [actions]);
+  return <primitive ref={groupRef} object={cloned} scale={2.2} position={[0,-1.75,-3.5]} rotation={[0,0,0]} dispose={null} />;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function IslandScene({ onEnterDungeon: _onEnterDungeon }: { onEnterDungeon: () => void }) {
   return (
     <>
-      <color attach="background" args={['#020617']} />
-      <fog attach="fog" args={['#020617', 20, 45]} />
-      <Stars radius={60} depth={30} count={800} factor={3} fade speed={0.3} />
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 10, 5]} intensity={1} color="#C4B5FD" />
-      <pointLight position={[0, 8, 0]} intensity={0.8} color="#7C3AED" distance={20} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}><circleGeometry args={[18, 64]} /><meshStandardMaterial color="#0A0520" transparent opacity={0.8} /></mesh>
-      <gridHelper args={[32, 32, '#2D1B69', '#1A0F3C']} position={[0, -0.09, 0]} />
-      {EDGES.map(([a, b]) => {
-        const na = islandsData.find(n => n.id === a)!, nb = islandsData.find(n => n.id === b)!;
-        const ok = na.status !== 'locked' && nb.status !== 'locked';
-        return <Line key={`${a}-${b}`} points={[new THREE.Vector3(...na.pos), new THREE.Vector3(...nb.pos)]} color={ok ? '#5B21B6' : '#1F2937'} lineWidth={ok ? 1.5 : 0.6} transparent opacity={ok ? 0.7 : 0.2} />;
-      })}
-      {islandsData.map(island => <IslandSphere key={island.id} island={island} onIslandClick={onIslandClick} />)}
-      <Suspense fallback={null}><XbotCharacter stage={stage} /></Suspense>
-      <VictoryParticles active={stage === 'victory'} />
-      <CameraRig stage={stage} />
-      <OrbitControls enablePan={false} enableZoom={false} enableRotate={mapStage} maxPolarAngle={Math.PI / 2.2} autoRotate={mapStage} autoRotateSpeed={0.3} />
+      <color attach="background" args={['#0C1445']} />
+      <fog attach="fog" args={['#0C1445',25,50]} />
+      <Stars radius={80} depth={40} count={600} factor={3} fade speed={0.2} />
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[5,10,5]} intensity={1.2} color="#FFF9E6" />
+      <pointLight position={[0,5,0]} intensity={0.6} color="#7C3AED" />
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1.5,0]}><planeGeometry args={[60,60]} /><meshStandardMaterial color="#1E3A5F" roughness={0.1} metalness={0.3} /></mesh>
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.5,0]}><circleGeometry args={[8,64]} /><meshStandardMaterial color="#2D5A27" roughness={0.9} /></mesh>
+      <mesh position={[0,-0.2,0]}><sphereGeometry args={[5,32,16,0,Math.PI*2,0,Math.PI/2.5]} /><meshStandardMaterial color="#3A7A33" roughness={0.9} /></mesh>
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.49,0]}><ringGeometry args={[6.5,8.5,64]} /><meshStandardMaterial color="#C8A96E" roughness={1} /></mesh>
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.45,-2]}><planeGeometry args={[1.5,8]} /><meshStandardMaterial color="#8B7355" roughness={1} /></mesh>
+      {[[-3,0,2],[3,0,1],[-2,0,-1],[3,0,-3],[-4,0,-2]].map(([x,y,z],i) => (
+        <group key={i} position={[x as number, (y as number)-0.5, z as number]}>
+          <mesh position={[0,0.5,0]}><cylinderGeometry args={[0.12,0.2,1,8]} /><meshStandardMaterial color="#5D3A1A" roughness={1} /></mesh>
+          <mesh position={[0,1.5,0]}><coneGeometry args={[0.7,1.4,8]} /><meshStandardMaterial color="#1B5E20" roughness={0.9} /></mesh>
+        </group>
+      ))}
+      <group position={[0,0,-5.5]}>
+        <mesh position={[-0.8,0.5,0]}><boxGeometry args={[0.4,3,0.4]} /><meshStandardMaterial color="#4A4A4A" roughness={0.9} /></mesh>
+        <mesh position={[0.8,0.5,0]}><boxGeometry args={[0.4,3,0.4]} /><meshStandardMaterial color="#4A4A4A" roughness={0.9} /></mesh>
+        <mesh position={[0,2.1,0]}><boxGeometry args={[2.2,0.5,0.4]} /><meshStandardMaterial color="#3A3A3A" roughness={0.9} /></mesh>
+        <mesh position={[0,0.5,0]}><planeGeometry args={[1.4,2.6]} /><meshStandardMaterial color="#7C3AED" emissive="#7C3AED" emissiveIntensity={0.8} transparent opacity={0.85} /></mesh>
+        <pointLight position={[0,1,0.3]} intensity={2} color="#7C3AED" distance={4} />
+        <mesh position={[0,3,0]}><boxGeometry args={[1.8,0.5,0.1]} /><meshStandardMaterial color="#5D3A1A" roughness={1} /></mesh>
+      </group>
+      <Suspense fallback={null}><XbotOnIsland /></Suspense>
+      <OrbitControls target={[0,0,-2]} maxPolarAngle={Math.PI/2.3} minDistance={8} maxDistance={22} autoRotate autoRotateSpeed={0.4} enablePan={false} />
     </>
   );
 }
 
-// ─── HTML Overlay Components ────────────────────────────────────────────────────
+// ─── Dungeon Scene ────────────────────────────────────────────────────────────────
 
-function SpeechBubble({ text }: { text: string }) {
+function PlayerController({ playerPosRef, keysRef, monsters, defeated, onEncounter, encounterCooldownRef, onExit }: {
+  playerPosRef: React.MutableRefObject<THREE.Vector3>; keysRef: React.MutableRefObject<Set<string>>;
+  monsters: Monster[]; defeated: Set<string>; onEncounter: (m:Monster) => void;
+  encounterCooldownRef: React.MutableRefObject<boolean>; onExit: () => void;
+}) {
+  const { scene, animations } = useGLTF('/models/Xbot.glb');
+  const cloned = useMemo(() => {
+    const c = SkeletonUtils.clone(scene) as THREE.Group;
+    c.traverse(child => { if ((child as THREE.Mesh).isMesh) { const mats = Array.isArray((child as THREE.Mesh).material) ? (child as THREE.Mesh).material as THREE.Material[] : [(child as THREE.Mesh).material as THREE.Material]; mats.forEach(m => { const sm = m as THREE.MeshStandardMaterial; if (sm.color) sm.color.set('#7C3AED'); sm.metalness=0.3; sm.roughness=0.5; sm.needsUpdate=true; }); } });
+    return c;
+  }, [scene]);
+  const groupRef = useRef<THREE.Group>(cloned);
+  const { actions } = useAnimations(animations, groupRef);
+  const isWalkingRef = useRef(false);
+  useEffect(() => { actions['idle']?.reset().play(); }, [actions]);
+  useFrame(({ camera }, delta) => {
+    const speed = 5; let moved = false; const pos = playerPosRef.current;
+    if (keysRef.current.has('ArrowUp')   || keysRef.current.has('w') || keysRef.current.has('W')) { pos.z = Math.max(pos.z - speed*delta, -22); moved=true; }
+    if (keysRef.current.has('ArrowDown') || keysRef.current.has('s') || keysRef.current.has('S')) { pos.z = Math.min(pos.z + speed*delta,   3); moved=true; }
+    if (keysRef.current.has('ArrowLeft') || keysRef.current.has('a') || keysRef.current.has('A')) { pos.x = Math.max(pos.x - speed*delta*0.5, -1.5); moved=true; }
+    if (keysRef.current.has('ArrowRight')|| keysRef.current.has('d') || keysRef.current.has('D')) { pos.x = Math.min(pos.x + speed*delta*0.5,  1.5); moved=true; }
+    if (pos.z > 2.5) { onExit(); return; }
+    if (moved !== isWalkingRef.current) {
+      isWalkingRef.current = moved;
+      Object.values(actions).forEach(a => a?.fadeOut(0.2));
+      (moved ? actions['walk'] : actions['idle'])?.reset().fadeIn(0.2).play();
+    }
+    if (groupRef.current) { groupRef.current.position.set(pos.x, pos.y-1.75, pos.z); if (moved) groupRef.current.rotation.y = 0; }
+    camera.position.lerp(new THREE.Vector3(pos.x, pos.y+3, pos.z+6), 0.1);
+    camera.lookAt(pos.x, pos.y, pos.z-2);
+    if (!encounterCooldownRef.current) {
+      for (const m of monsters) {
+        if (defeated.has(m.id)) continue;
+        if (pos.distanceTo(new THREE.Vector3(...m.pos)) < 2) { encounterCooldownRef.current=true; onEncounter(m); return; }
+      }
+    }
+  });
+  return <primitive ref={groupRef} object={cloned} scale={2.2} position={[0,-1.75,2]} dispose={null} />;
+}
+
+function DungeonScene({ monsters, defeated, onMonsterEncounter, onExit, encounterCooldown }: {
+  monsters: Monster[]; defeated: Set<string>; onMonsterEncounter: (m:Monster) => void; onExit: () => void;
+  encounterCooldown: React.MutableRefObject<boolean>;
+}) {
+  const playerPosRef = useRef(new THREE.Vector3(0,0,2));
+  const keysRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const down = (e:KeyboardEvent) => { if (MOVE_KEYS.includes(e.key)) e.preventDefault(); keysRef.current.add(e.key); };
+    const up   = (e:KeyboardEvent) => keysRef.current.delete(e.key);
+    window.addEventListener('keydown', down); window.addEventListener('keyup', up);
+    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
+  }, []);
   return (
-    <div className="relative bg-white rounded-2xl px-4 py-3 text-sm font-semibold leading-relaxed max-w-[220px] shadow-lg" style={{ color: '#1E293B' }}>
-      {text.split('\n').map((line, i) => <div key={i}>{line}</div>)}
-      <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-0 h-0"
-        style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '10px solid white' }} />
-    </div>
+    <>
+      <color attach="background" args={['#0A0A0A']} />
+      <fog attach="fog" args={['#0A0A0A',10,28]} />
+      <ambientLight intensity={0.25} />
+      <pointLight position={[0,3,2]}   intensity={1.2} color="#A78BFA" distance={8} />
+      <pointLight position={[0,3,-8]}  intensity={0.8} color="#F59E0B" distance={8} />
+      <pointLight position={[0,3,-14]} intensity={0.8} color="#EF4444" distance={8} />
+      <pointLight position={[0,3,-20]} intensity={2}   color="#EF4444" distance={12} />
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1,-10]}><planeGeometry args={[5,28]} /><meshStandardMaterial color="#1C1C2E" roughness={1} /></mesh>
+      <mesh rotation={[Math.PI/2,0,0]}  position={[0,3,-10]}><planeGeometry args={[5,28]}  /><meshStandardMaterial color="#111118" roughness={1} /></mesh>
+      <mesh rotation={[0,Math.PI/2,0]}  position={[-2.5,1,-10]}><planeGeometry args={[28,4]} /><meshStandardMaterial color="#16162A" roughness={1} /></mesh>
+      <mesh rotation={[0,-Math.PI/2,0]} position={[2.5,1,-10]}><planeGeometry args={[28,4]}  /><meshStandardMaterial color="#16162A" roughness={1} /></mesh>
+      {[-8,-14,-20].map((z,i) => (
+        <group key={i}>
+          <pointLight position={[-2.2,1.8,z]} intensity={1.5} color="#F59E0B" distance={4} />
+          <pointLight position={[2.2,1.8,z]}  intensity={1.5} color="#F59E0B" distance={4} />
+          <mesh position={[-2.2,1.5,z]}><boxGeometry args={[0.1,0.4,0.1]} /><meshStandardMaterial color="#5D3A1A" /></mesh>
+          <mesh position={[2.2,1.5,z]}><boxGeometry args={[0.1,0.4,0.1]} /><meshStandardMaterial color="#5D3A1A" /></mesh>
+        </group>
+      ))}
+      {monsters.map(monster => (
+        <group key={monster.id} position={monster.pos}>
+          {monster.type==='slime' && <SlimeMonster color={monster.color} defeated={defeated.has(monster.id)} />}
+          {monster.type==='ghost' && <GhostMonster color={monster.color} defeated={defeated.has(monster.id)} />}
+          {monster.type==='rock'  && <RockMonster  color={monster.color} defeated={defeated.has(monster.id)} />}
+          {monster.type==='boss'  && <BossMonster  hp={3} maxHp={3} defeated={defeated.has(monster.id)} />}
+          {!defeated.has(monster.id) && <Text position={[0,2.5,0]} fontSize={0.3} color={monster.color} anchorX="center">{monster.name}</Text>}
+        </group>
+      ))}
+      <PlayerController playerPosRef={playerPosRef} keysRef={keysRef} monsters={monsters} defeated={defeated} onEncounter={onMonsterEncounter} encounterCooldownRef={encounterCooldown} onExit={onExit} />
+    </>
   );
 }
 
-function MiniMatch({ onComplete, setMood }: { onComplete: () => void; setMood: (m: RobotMood) => void }) {
-  const [selQ, setSelQ] = useState<string | null>(null);
-  const [matched, setMatched] = useState<Set<string>>(new Set());
-  const [wrongA, setWrongA] = useState<string | null>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const answers  = useMemo(() => [MATCH_PAIRS[2], MATCH_PAIRS[0], MATCH_PAIRS[1]], []);
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
-  function pickQ(id: string) { if (!matched.has(id)) setSelQ(prev => prev === id ? null : id); }
-  function pickA(id: string) {
-    if (!selQ || matched.has(selQ)) return;
-    if (selQ === id) {
-      const next = new Set(matched).add(selQ); setMatched(next); setSelQ(null); setMood('happy');
-      if (next.size === MATCH_PAIRS.length) timerRef.current = setTimeout(onComplete, 600);
-    } else { setWrongA(id); setMood('thinking'); timerRef.current = setTimeout(() => { setWrongA(null); setSelQ(null); setMood('idle'); }, 600); }
+// ─── Battle Screen (HTML overlay) ────────────────────────────────────────────────
+
+function BattleScreen({ monster, monsterHp, playerHp, onAnswer }: {
+  monster: Monster; monsterHp: number; playerHp: number; onAnswer: (correct:boolean) => void;
+}) {
+  const [answered, setAnswered] = useState<number|null>(null);
+  const [shake, setShake] = useState(false);
+  function handleAnswer(idx:number) {
+    if (answered !== null) return;
+    setAnswered(idx);
+    const correct = idx === monster.question.correct;
+    if (!correct) { setShake(true); setTimeout(() => setShake(false), 500); }
+    setTimeout(() => { onAnswer(correct); setAnswered(null); }, 900);
   }
-  const qCls = (p: typeof MATCH_PAIRS[0]) => matched.has(p.id) ? 'bg-emerald-600/20 border-emerald-500 text-emerald-300 cursor-not-allowed' : selQ === p.id ? 'bg-purple-600 border-purple-400 text-white' : 'bg-white/5 border-white/15 text-white/80 hover:bg-white/10';
-  const aCls = (p: typeof MATCH_PAIRS[0]) => matched.has(p.id) ? 'bg-emerald-600/20 border-emerald-500 text-emerald-300 cursor-not-allowed' : wrongA === p.id ? 'bg-red-600/20 border-red-500 text-red-300' : selQ ? 'bg-white/5 border-white/15 text-white/80 hover:bg-amber-500/10 hover:border-amber-500/40 cursor-pointer' : 'bg-white/5 border-white/10 text-white/40 cursor-not-allowed';
-  return (
-    <div className="flex flex-col gap-3">
-      <p className="text-xs text-white/50 text-center">{matched.size}/3 مكتملة</p>
-      <div className="grid grid-cols-2 gap-2" dir="rtl">
-        <div className="flex flex-col gap-1.5">
-          <p className="text-[10px] text-white/40 text-center font-bold">المفهوم</p>
-          {MATCH_PAIRS.map(p => <button key={p.id} onClick={() => pickQ(p.id)} disabled={matched.has(p.id)} className={`px-3 py-2 rounded-xl border text-xs font-semibold text-center transition-all ${qCls(p)}`}>{p.question}</button>)}
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <p className="text-[10px] text-white/40 text-center font-bold">التعريف</p>
-          {answers.map(p => <button key={p.id} onClick={() => pickA(p.id)} disabled={matched.has(p.id) || !selQ} className={`px-3 py-2 rounded-xl border text-xs text-center transition-all ${aCls(p)}`}>{p.answer}</button>)}
-        </div>
-      </div>
+  const monsterVisual = (
+    <div className="flex items-end justify-center h-40">
+      {monster.type==='slime' && <motion.div animate={{ y:[0,-10,0] }} transition={{ repeat:Infinity, duration:0.8 }} className="w-20 h-20 rounded-full flex items-center justify-center shadow-2xl" style={{ background:monster.color, boxShadow:`0 0 30px ${monster.color}` }}><div className="flex gap-2"><div className="w-3 h-3 bg-white rounded-full" /><div className="w-3 h-3 bg-white rounded-full" /></div></motion.div>}
+      {monster.type==='ghost' && <motion.div animate={{ y:[0,-8,0], opacity:[0.7,1,0.7] }} transition={{ repeat:Infinity, duration:1.2 }} className="w-20 h-24 rounded-t-full flex items-center justify-center" style={{ background:`${monster.color}CC`, boxShadow:`0 0 25px ${monster.color}` }}><div className="flex gap-2 mb-2"><div className="w-3 h-3 bg-slate-900 rounded-full" /><div className="w-3 h-3 bg-slate-900 rounded-full" /></div></motion.div>}
+      {monster.type==='rock'  && <div className="w-20 h-24 rounded-md flex flex-col items-center justify-center gap-1" style={{ background:monster.color, boxShadow:`0 0 15px ${monster.color}66` }}><div className="w-16 h-8 rounded-sm" style={{ background:'#6B7280' }} /><div className="flex gap-1"><div className="w-3 h-3 rounded-full bg-red-500" /><div className="w-3 h-3 rounded-full bg-red-500" /></div></div>}
+      {monster.type==='boss'  && <motion.div animate={{ scale:[1,1.05,1], rotate:[-2,2,-2] }} transition={{ repeat:Infinity, duration:0.8 }} style={{ filter:`drop-shadow(0 0 20px #EF4444)` }} className="w-32 h-36 relative"><div className="w-28 h-28 rounded-lg mx-auto" style={{ background:'linear-gradient(135deg, #DC2626, #991B1B)', boxShadow:'0 0 30px #EF4444' }}><div className="flex justify-center gap-4 pt-4"><div className="w-5 h-5 rounded-full bg-yellow-300" style={{ boxShadow:'0 0 10px #FDE047' }} /><div className="w-5 h-5 rounded-full bg-yellow-300" style={{ boxShadow:'0 0 10px #FDE047' }} /></div></div></motion.div>}
     </div>
   );
-}
-
-function PlayerHUD({ xp }: { xp: number }) {
   return (
-    <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 10 }} className="bg-black/50 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 flex items-center gap-3">
-      <div className="text-right"><p className="text-white font-bold text-sm">أحمد</p><p className="text-white/50 text-xs">المستوى 4</p></div>
-      <div className="w-20">
-        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-purple-500 to-amber-400 rounded-full" style={{ width: `${Math.round((xp/400)*100)}%` }} /></div>
-        <p className="text-amber-400 text-xs mt-0.5">{xp}/400 XP</p>
+    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} className="fixed inset-0 z-50 flex flex-col" style={{ background:'linear-gradient(180deg, #0F0A30 0%, #1A0A3A 50%, #0F0A30 100%)' }}>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {Array.from({ length:30 }, (_,i) => (
+          <motion.div key={i} className="absolute rounded-full bg-white" style={{ width:i%4===0?3:1.5, height:i%4===0?3:1.5, top:`${(i*37+13)%97}%`, left:`${(i*53+7)%97}%` }} animate={{ opacity:[0.2,0.8,0.2] }} transition={{ delay:i*0.15, duration:2+i%3, repeat:Infinity }} />
+        ))}
       </div>
-    </div>
-  );
-}
-
-function MapOverlay({ onEnter }: { onEnter: () => void }) {
-  return (
-    <motion.div style={{ position: 'fixed', bottom: 40, left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}
-      className="flex flex-col items-center gap-3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
-      <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 text-center"><p className="text-white/60 text-sm">اضغط على الجزيرة أو</p></div>
-      <button onClick={onEnter} className="px-8 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-base flex items-center gap-2 shadow-lg shadow-amber-500/30 transition-colors">
-        <ChevronRight size={18} />ادخل جزيرة الحلقات
-      </button>
-    </motion.div>
-  );
-}
-
-function EntryOverlay({ onStart, mood }: { onStart: () => void; mood: RobotMood }) {
-  return (
-    <motion.div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 20 }}
-      initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent pt-12 pb-8 px-6">
-      <div className="max-w-lg mx-auto flex flex-col items-center gap-4 text-center" dir="rtl">
-        <p className="text-2xl font-black text-amber-400">جزيرة الحلقات</p>
-        <SpeechBubble text={"مرحباً يا بطل\nمهمتك اليوم:\nأنقذ جزيرة الحلقات\nمن فوضى الكود!"} />
-        <XbotExpressive mood={mood} width={160} height={220} />
-        <div className="flex flex-col gap-2 w-full max-w-xs">
-          {['فهم الحلقة for', 'تعلم break', 'اجتاز التحدي'].map((obj, i) => (
-            <motion.div key={i} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.15 + 0.3 }}
-              className="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-2.5 border border-white/10">
-              <CheckCircle2 size={16} className="text-white/30 shrink-0" /><span className="text-white/70 text-sm">{obj}</span>
-            </motion.div>
-          ))}
-        </div>
-        <button onClick={onStart} className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-500 text-white font-black text-base shadow-lg hover:from-purple-500 hover:to-purple-400 transition-colors">
-          ابدأ المهمة!
-        </button>
+      <div className="text-center pt-6 pb-2 relative z-10">
+        <motion.h1 initial={{ scale:0 }} animate={{ scale:1 }} transition={{ type:'spring', stiffness:400 }} className="text-3xl font-black tracking-widest" style={{ color:monster.type==='boss'?'#EF4444':'#F59E0B', textShadow:'0 0 20px currentColor' }}>
+          {monster.type==='boss'?'⚔️ BOSS BATTLE!':'⚔️ BATTLE!'}
+        </motion.h1>
       </div>
-    </motion.div>
-  );
-}
-
-function LessonOverlay({ onComplete, mood, onMoodChange }: { onComplete: () => void; mood: RobotMood; onMoodChange: (m: RobotMood) => void }) {
-  const [lineIdx, setLineIdx]     = useState(0);
-  const [quizAns, setQuizAns]     = useState<number | null>(null);
-  const [quizDone, setQuizDone]   = useState(false);
-  useEffect(() => { const t = setInterval(() => setLineIdx(v => v < 2 ? v+1 : v), 1200); return () => clearInterval(t); }, []);
-  const CODE = [{ text: 'for i in range(10):', color: '#60A5FA' }, { text: '    print("سلام!")', color: '#A78BFA' }, { text: '# يطبع 10 مرات', color: '#10B981' }];
-  const OPTS = ['5 مرات', '10 مرات', '1 مرة'];
-  return (
-    <motion.div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 20, maxHeight: '70vh' }}
-      initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="bg-slate-950/95 backdrop-blur-xl pt-8 pb-8 px-6 rounded-t-3xl border-t border-white/10 overflow-y-auto">
-      <div className="max-w-lg mx-auto" dir="rtl">
-        <div className="grid grid-cols-[auto_1fr] gap-4 items-start">
-          <div className="flex flex-col items-center gap-3">
-            <SpeechBubble text={"الحلقة for تقول:\nكرّر هذا 10 مرات"} />
-            <XbotExpressive mood={mood} width={120} height={170} />
-          </div>
-          <div className="flex flex-col gap-4">
-            <div className="bg-purple-500/15 border border-purple-500/30 rounded-xl p-4">
-              <p className="text-purple-300 font-bold text-sm mb-1.5 flex items-center gap-1.5"><Lightbulb size={15} />الحلقة for — المفهوم</p>
-              <p className="text-white/75 text-xs leading-relaxed">الحلقة تكرر كوداً عدة مرات بدون كتابته مراراً.</p>
-            </div>
-            <div className="bg-slate-900 rounded-xl p-3 border border-white/[0.07] font-mono" dir="ltr">
-              <div className="flex items-center gap-1.5 mb-2"><div className="w-2 h-2 rounded-full bg-[#FF5F57]" /><div className="w-2 h-2 rounded-full bg-[#FFBD2E]" /><div className="w-2 h-2 rounded-full bg-[#28CA41]" /><span className="text-white/30 text-[10px] ml-auto">Python</span></div>
-              {CODE.map((line, i) => (
-                <AnimatePresence key={i}>{i <= lineIdx && (
-                  <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} style={{ color: line.color }} className="text-xs leading-loose">
-                    {line.text}{i === lineIdx && <motion.span animate={{ opacity: [1,0] }} transition={{ repeat: Infinity, duration: 0.55 }} style={{ background: line.color }} className="inline-block w-0.5 h-[1em] ml-0.5 align-middle" />}
-                  </motion.div>
-                )}</AnimatePresence>
-              ))}
-            </div>
-          </div>
+      <div className="flex-1 flex items-center justify-around px-8 relative z-10">
+        <div className="flex flex-col items-center gap-3">
+          <div className="text-xs text-white/50 font-bold">أحمد</div>
+          <div className="flex gap-1.5">{Array.from({ length:3 }, (_,i) => <motion.div key={i} animate={i>=playerHp?{ scale:[1,1.3,1] }:{}} className={`w-7 h-7 rounded-full flex items-center justify-center text-sm ${i<playerHp?'bg-red-500 shadow-[0_0_10px_#EF4444]':'bg-slate-700'}`}>{i<playerHp?'❤':'🖤'}</motion.div>)}</div>
+          <div className="w-20 h-28 rounded-xl bg-purple-900/50 border border-purple-500/30 flex items-center justify-center text-4xl">🤖</div>
         </div>
-        <AnimatePresence>
-          {lineIdx >= 2 && !quizDone && (
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mt-4 bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-3">
-              <p className="text-white font-bold text-sm">كم مرة سيطبع الكود كلمة "سلام!"؟</p>
-              <div className="flex flex-col gap-2">
-                {OPTS.map((opt, i) => {
-                  const chosen = quizAns === i, correct = i === 1;
-                  return <button key={i} onClick={() => { if (quizAns !== null) return; setQuizAns(i); onMoodChange(correct ? 'happy' : 'thinking'); }}
-                    className={`px-4 py-2.5 rounded-xl border text-sm font-semibold text-right transition-all ${chosen && correct ? 'bg-emerald-600/30 border-emerald-500 text-emerald-300' : chosen && !correct ? 'bg-red-600/20 border-red-500 text-red-300' : 'bg-white/5 border-white/15 text-white/80 hover:bg-white/10'}`}>{opt}</button>;
-                })}
-              </div>
-              {quizAns === 1 && <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setQuizDone(true)} className="mt-1 px-6 py-2 rounded-xl bg-emerald-600 text-white font-bold text-sm self-start">ممتاز! متابعة</motion.button>}
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {quizDone && <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={onComplete} className="mt-4 w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-base shadow-[0_0_20px_#F59E0B44]">متابعة للتحدي</motion.button>}
-      </div>
-    </motion.div>
-  );
-}
-
-function ChallengeOverlay({ onComplete, mood, onMoodChange }: { onComplete: () => void; mood: RobotMood; onMoodChange: (m: RobotMood) => void }) {
-  const [step, setStep]           = useState(0);
-  const [matchDone, setMatchDone] = useState(false);
-  const [mcAns, setMcAns]         = useState<number | null>(null);
-  const [fill, setFill]           = useState('');
-  const [fillOk, setFillOk]       = useState<boolean | null>(null);
-  const STEPS = ['١/٣','٢/٣','٣/٣'];
-  return (
-    <motion.div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 20, maxHeight: '65vh' }}
-      initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="bg-slate-950/95 backdrop-blur-xl pt-6 pb-8 px-6 rounded-t-3xl border-t border-white/10 overflow-y-auto">
-      <div className="max-w-lg mx-auto" dir="rtl">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-white font-black text-base flex items-center gap-2"><Target size={16} className="text-amber-400" />تحدي جزيرة الحلقات</p>
-          <span className="text-amber-400 font-bold text-sm">{STEPS[step]}</span>
+        <div className="flex flex-col items-center gap-2">
+          <div className="text-2xl font-black text-white/20">VS</div>
+          {answered !== null && <motion.div initial={{ scale:0 }} animate={{ scale:1 }} className={`text-lg font-black ${answered===monster.question.correct?'text-emerald-400':'text-red-400'}`}>{answered===monster.question.correct?'💥 Hit!':'💔 Miss!'}</motion.div>}
         </div>
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-4">
-          <motion.div animate={{ width: `${((step+1)/3)*100}%` }} className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full" />
-        </div>
-        <div className="grid grid-cols-[1fr_auto] gap-3 items-start">
-          <div className="flex flex-col gap-4">
-            {step === 0 && (
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-3">
-                <p className="text-white font-bold text-sm">صل المفهوم بتعريفه</p>
-                <MiniMatch onComplete={() => { setMatchDone(true); setTimeout(() => setStep(1), 500); }} setMood={onMoodChange} />
-                {matchDone && <p className="text-emerald-400 text-xs font-bold text-center">ممتاز! الانتقال للتحدي التالي...</p>}
-              </div>
-            )}
-            {step === 1 && (
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-3">
-                <p className="text-white font-bold text-sm">ما ناتج هذا الكود؟</p>
-                <div className="bg-slate-900 rounded-xl p-3 font-mono text-xs border border-white/[0.07]" dir="ltr">
-                  <span style={{ color: '#60A5FA' }}>for i in range(3):</span><br />
-                  <span style={{ color: '#A78BFA' }}>{'    '}print(i)</span>
-                </div>
-                {['0 1 2','1 2 3','3 مرات'].map((opt, i) => {
-                  const isCor = i === 0, isChos = mcAns === i, answered = mcAns !== null;
-                  return <button key={i} disabled={answered && mcAns === 0} onClick={() => { setMcAns(i); onMoodChange(isCor ? 'happy' : 'thinking'); }}
-                    className={`px-4 py-2.5 rounded-xl border text-sm font-semibold text-right transition-all ${isChos && isCor ? 'bg-emerald-600/30 border-emerald-500 text-emerald-300' : isChos && !isCor ? 'bg-red-600/20 border-red-500 text-red-300' : 'bg-white/5 border-white/15 text-white/80 hover:bg-white/10'}`}>{opt}</button>;
-                })}
-                {mcAns === 0 && <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setStep(2)} className="px-6 py-2 rounded-xl bg-emerald-600 text-white font-bold text-sm self-start">التحدي التالي</motion.button>}
-                {mcAns !== null && mcAns !== 0 && <p className="text-red-400 text-xs">حاول مجدداً</p>}
-              </div>
-            )}
-            {step === 2 && (
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-3">
-                <p className="text-white font-bold text-sm">أكمل الكود</p>
-                <div className="bg-slate-900 rounded-xl p-3 font-mono text-xs border border-white/[0.07] flex items-center gap-1" dir="ltr">
-                  <span style={{ color: '#60A5FA' }}>for i in range(</span>
-                  <input value={fill} onChange={e => setFill(e.target.value)} placeholder="?" className="w-10 bg-purple-900/50 border border-purple-500/50 rounded px-1 py-0.5 text-purple-300 text-center outline-none" />
-                  <span style={{ color: '#60A5FA' }}>): print(i)</span>
-                </div>
-                <button onClick={() => { const ok = fill.trim()==='5'; setFillOk(ok); onMoodChange(ok?'happy':'thinking'); if (ok) setTimeout(onComplete, 700); }}
-                  className="px-6 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm self-start transition-colors">تحقق</button>
-                {fillOk === true  && <p className="text-emerald-400 text-xs font-bold">ممتاز! الانتقال للنصر...</p>}
-                {fillOk === false && <p className="text-red-400 text-xs">تلميح: اكتب 5</p>}
-              </div>
-            )}
-          </div>
-          <div className="shrink-0"><XbotExpressive mood={mood} width={100} height={140} /></div>
+        <div className="flex flex-col items-center gap-3">
+          <div className="text-xs font-bold" style={{ color:monster.color }}>{monster.name}</div>
+          {monster.type==='boss'
+            ? <div className="flex gap-1.5">{Array.from({ length:monster.maxHp }, (_,i) => <div key={i} className={`w-5 h-5 rounded-full ${i<monsterHp?'bg-red-500':'bg-slate-700'}`} />)}</div>
+            : <div className="w-20 h-2 bg-slate-700 rounded-full overflow-hidden"><motion.div animate={{ width:monsterHp>0?'100%':'0%' }} className="h-full bg-red-500 rounded-full" transition={{ duration:0.5 }} /></div>
+          }
+          <motion.div animate={shake?{ x:[-6,6,-6,6,0] }:{}} transition={{ duration:0.4 }}>{monsterVisual}</motion.div>
         </div>
       </div>
-    </motion.div>
-  );
-}
-
-function VictoryOverlay({ xp, onReturn }: { xp: number; onReturn: () => void }) {
-  const [countdown, setCountdown] = useState(3);
-  useEffect(() => { if (countdown<=0) return; const t = setTimeout(() => setCountdown(c=>c-1), 1000); return () => clearTimeout(t); }, [countdown]);
-  return (
-    <motion.div style={{ position: 'fixed', inset: 0, zIndex: 30 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring', stiffness: 250 }}
-        className="bg-slate-900/95 rounded-3xl p-8 border border-white/10 max-w-sm w-full mx-4 text-center" dir="rtl">
-        <div className="relative w-40 h-40 mx-auto mb-4">
-          {REWARD_STARS.map((s, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0, x: 80, y: 80 }} animate={{ opacity: 1, scale: 1, x: s.x, y: s.y }} transition={{ delay: s.delay, type: 'spring', stiffness: 220 }} className="absolute top-0 left-0">
-              <Star size={s.large ? 22 : 14} className={s.large ? 'text-amber-400 fill-amber-400' : 'text-purple-400 fill-purple-400'} />
-            </motion.div>
-          ))}
-          <motion.div initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-[0_0_40px_#F59E0B] flex items-center justify-center">
-            <Trophy size={36} className="text-white" />
-          </motion.div>
-        </div>
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-          <p className="text-2xl font-black text-amber-400">أحسنت يا بطل!</p>
-          <p className="text-white/70 text-sm mt-1">أنقذت جزيرة الحلقات!</p>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.65 }}
-          className="mt-3 bg-white/10 border border-white/20 rounded-2xl px-4 py-2.5 flex items-center justify-center gap-2">
-          <Star size={20} className="text-amber-400 fill-amber-400" /><span className="text-white font-bold text-sm">وسام خبير الحلقات</span>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="mt-3 flex gap-3 justify-center">
-          {[{label:'+85 XP',sub:'نقاط'},{label:'3/3',sub:'تحديات'},{label:'90%',sub:'دقة'}].map(s => (
-            <div key={s.label} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-center">
-              <p className="text-white font-black text-base">{s.label}</p><p className="text-white/50 text-xs">{s.sub}</p>
-            </div>
-          ))}
-        </motion.div>
-        <div className="mt-4 w-full max-w-xs mx-auto">
-          <div className="flex justify-between text-xs text-white/50 mb-1"><span>المستوى 4</span><span>{xp} / 400 XP</span></div>
-          <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-            <motion.div initial={{ width: '50%' }} animate={{ width: '71%' }} transition={{ delay: 1, duration: 1.2, ease: 'easeOut' }} className="h-full bg-gradient-to-r from-purple-600 to-amber-400 rounded-full" />
+      <motion.div initial={{ y:100 }} animate={{ y:0 }} transition={{ delay:0.3, type:'spring' }} className="mx-4 mb-4 rounded-2xl border border-white/10 overflow-hidden relative z-10" style={{ background:'rgba(15,10,48,0.95)', backdropFilter:'blur(16px)' }}>
+        <div className="px-5 py-4">
+          <p className="text-white font-bold text-base text-center leading-relaxed mb-4 whitespace-pre-line">{monster.question.text}</p>
+          <div className="grid grid-cols-1 gap-2">
+            {monster.question.options.map((opt,i) => {
+              let cls = 'bg-white/5 border-white/15 text-white/90 hover:bg-white/10';
+              if (answered !== null) { if (i===monster.question.correct) cls='bg-emerald-600/30 border-emerald-500 text-emerald-300'; else if (i===answered) cls='bg-red-600/30 border-red-500 text-red-300'; else cls='bg-white/5 border-white/10 text-white/30'; }
+              return <button key={i} onClick={() => handleAnswer(i)} disabled={answered!==null} className={`px-4 py-3 rounded-xl border text-sm font-semibold text-right transition-all ${cls}`}>{opt}</button>;
+            })}
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <XbotExpressive mood="happy" width={100} height={140} />
-          <div><p className="text-white/50 text-sm">جزيرة الدوال تفتح في...</p><p className="text-4xl font-black text-amber-400">{countdown}</p></div>
-        </div>
-        <AnimatePresence>
-          {countdown <= 0 && (
-            <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} onClick={onReturn}
-              className="mt-4 w-full px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-500 text-white font-black text-base shadow-lg">
-              العودة للخريطة
-            </motion.button>
-          )}
-        </AnimatePresence>
       </motion.div>
-    </motion.div>
-  );
-}
-
-function MapCompleteOverlay() {
-  return (
-    <motion.div style={{ position: 'fixed', top: 80, left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}
-      initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-      className="bg-purple-600/90 backdrop-blur-md px-5 py-2.5 rounded-xl border border-purple-400/50 text-white font-semibold text-sm flex items-center gap-2">
-      <Star size={14} className="fill-amber-400 text-amber-400" />
-      جزيرة الدوال مفتوحة الآن!
     </motion.div>
   );
 }
@@ -443,45 +290,89 @@ function MapCompleteOverlay() {
 // ─── Main Export ────────────────────────────────────────────────────────────────
 
 export default function AdventureClient({ locale }: { locale: string }) {
-  const [stage, setStage]           = useState<Stage>('map');
-  const [xp, setXp]                 = useState(200);
-  const [xbotMood, setXbotMood]     = useState<RobotMood>('idle');
-  const [islandsData, setIslandsData] = useState<IslandNode[]>(ISLAND_NODES);
-  const moodTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isRtl = locale === 'ar';
+  const [stage, setStage]             = useState<GameStage>('island');
+  const [defeated, setDefeated]       = useState<Set<string>>(new Set());
+  const [playerHp, setPlayerHp]       = useState(3);
+  const [currentMonster, setMonster]  = useState<Monster|null>(null);
+  const [monsterHp, setMonsterHp]     = useState(1);
+  const encounterCooldown             = useRef(false);
+  const [showVictory, setVictory]     = useState(false);
 
-  const triggerMood = useCallback((mood: RobotMood) => {
-    if (moodTimer.current) clearTimeout(moodTimer.current);
-    setXbotMood(mood);
-    moodTimer.current = setTimeout(() => setXbotMood('idle'), 1800);
-  }, []);
-  useEffect(() => () => { if (moodTimer.current) clearTimeout(moodTimer.current); }, []);
+  // suppress unused type import warning
+  void (null as unknown as RobotMood);
 
-  function handleIslandClick(id: string) { if (id === '3') setStage('entry'); }
-  function handleVictory() { setXp(285); setStage('victory'); }
-  function handleMapComplete() {
-    setIslandsData(prev => prev.map(isl =>
-      isl.id === '3' ? { ...isl, status: 'done' as IslandStatus }
-      : isl.id === '4' ? { ...isl, color: '#7C3AED', status: 'unlocked' as IslandStatus }
-      : isl
-    ));
-    setStage('map-complete');
+  function handleEncounter(m:Monster) { setMonster(m); setMonsterHp(m.maxHp); setStage('battle'); }
+
+  function handleBattleAnswer(correct:boolean) {
+    if (!currentMonster) return;
+    if (correct) {
+      const newHp = monsterHp - 1;
+      if (newHp <= 0) {
+        const newDefeated = new Set(defeated).add(currentMonster.id);
+        setDefeated(newDefeated); setStage('dungeon'); setMonster(null);
+        setTimeout(() => { encounterCooldown.current = false; }, 1500);
+        if (newDefeated.size === MONSTERS.length) setVictory(true);
+      } else { setMonsterHp(newHp); }
+    } else {
+      const newHp = Math.max(0, playerHp-1);
+      setPlayerHp(newHp);
+      if (newHp <= 0) {
+        setTimeout(() => { setPlayerHp(3); setDefeated(new Set()); setMonster(null); setStage('dungeon'); encounterCooldown.current=false; }, 1500);
+      }
+    }
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0 }} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <Canvas camera={{ position: [0, 4, 16], fov: 45 }} style={{ width: '100%', height: '100%' }} gl={{ antialias: true }}>
+    <div style={{ position:'fixed', inset:0 }} dir={isRtl?'rtl':'ltr'}>
+      <Canvas camera={{ position:[0,8,14], fov:50 }} style={{ width:'100%', height:'100%' }} gl={{ antialias:true }}>
         <Suspense fallback={null}>
-          <AdventureScene stage={stage} onIslandClick={handleIslandClick} islandsData={islandsData} />
+          {(stage==='island' || stage==='battle') && <IslandScene onEnterDungeon={() => setStage('dungeon')} />}
+          {stage==='dungeon' && <DungeonScene monsters={MONSTERS} defeated={defeated} onMonsterEncounter={handleEncounter} onExit={() => setStage('island')} encounterCooldown={encounterCooldown} />}
         </Suspense>
       </Canvas>
-      <PlayerHUD xp={xp} />
-      <AnimatePresence mode="wait">
-        {stage === 'map'          && <MapOverlay       key="map" onEnter={() => setStage('entry')} />}
-        {stage === 'entry'        && <EntryOverlay     key="entry" onStart={() => setStage('lesson')} mood={xbotMood} />}
-        {stage === 'lesson'       && <LessonOverlay    key="lesson" onComplete={() => setStage('challenge')} mood={xbotMood} onMoodChange={triggerMood} />}
-        {stage === 'challenge'    && <ChallengeOverlay key="challenge" onComplete={handleVictory} mood={xbotMood} onMoodChange={triggerMood} />}
-        {stage === 'victory'      && <VictoryOverlay   key="victory" xp={xp} onReturn={handleMapComplete} />}
-        {stage === 'map-complete' && <MapCompleteOverlay key="mc" />}
+
+      {/* HUD */}
+      <div style={{ position:'fixed', top:16, right:16, zIndex:20 }} className="bg-black/50 backdrop-blur-md rounded-xl px-4 py-2.5 border border-white/10 flex items-center gap-3">
+        <span className="text-white font-bold text-sm">أحمد</span>
+        <div className="flex gap-1">{Array.from({ length:3 }, (_,i) => <span key={i} className={`text-base ${i<playerHp?'text-red-500':'text-slate-600'}`}>{i<playerHp?'❤':'♡'}</span>)}</div>
+        <span className="text-xs text-white/40">{defeated.size}/4 وحوش</span>
+      </div>
+
+      {/* Island enter button */}
+      {stage==='island' && (
+        <motion.div initial={{ y:80, opacity:0 }} animate={{ y:0, opacity:1 }} style={{ position:'fixed', bottom:32, left:'50%', transform:'translateX(-50%)', zIndex:20 }} className="flex flex-col items-center gap-3">
+          <div className="bg-black/60 backdrop-blur-md px-5 py-2 rounded-xl border border-white/10 text-center"><p className="text-white/60 text-sm">جزيرة الحلقات — اضغط للدخول</p></div>
+          <button onClick={() => setStage('dungeon')} className="px-8 py-4 rounded-xl text-white font-black text-lg transition-all hover:scale-105 active:scale-95" style={{ background:'linear-gradient(135deg, #7C3AED, #4F46E5)', boxShadow:'0 0 30px #7C3AED88' }}>ادخل المغارة</button>
+        </motion.div>
+      )}
+
+      {/* Dungeon hint */}
+      {stage==='dungeon' && (
+        <div style={{ position:'fixed', bottom:16, left:'50%', transform:'translateX(-50%)', zIndex:20 }} className="bg-black/50 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-center">
+          <p className="text-white/50 text-xs">WASD / ↑↓←→ للتحرك • اقترب من الوحوش للمعركة • ارجع للخلف للخروج</p>
+        </div>
+      )}
+
+      {/* Battle screen */}
+      <AnimatePresence>
+        {stage==='battle' && currentMonster && (
+          <BattleScreen key={currentMonster.id} monster={currentMonster} monsterHp={monsterHp} playerHp={playerHp} onAnswer={handleBattleAnswer} />
+        )}
+      </AnimatePresence>
+
+      {/* Victory overlay */}
+      <AnimatePresence>
+        {showVictory && (
+          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <motion.div initial={{ scale:0, rotate:-10 }} animate={{ scale:1, rotate:0 }} transition={{ type:'spring', stiffness:200 }} className="bg-slate-900/95 rounded-3xl p-10 border border-amber-500/30 text-center max-w-sm mx-4" style={{ boxShadow:'0 0 60px #F59E0B44' }}>
+              <div className="text-6xl mb-4">🏆</div>
+              <h2 className="text-3xl font-black text-amber-400 mb-2">أحسنت يا بطل!</h2>
+              <p className="text-white/70 mb-6">هزمت كل الوحوش وأنقذت الجزيرة!</p>
+              <button onClick={() => { setVictory(false); setStage('island'); setDefeated(new Set()); setPlayerHp(3); }} className="px-6 py-3 rounded-xl bg-amber-500 text-white font-bold text-base hover:bg-amber-400 transition-colors">العب مرة ثانية</button>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );

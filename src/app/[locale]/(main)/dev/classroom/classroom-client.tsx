@@ -65,7 +65,15 @@ const PHASES = [
 
 type Phase = typeof PHASES[number];
 
-// ─── StudentAvatar — Xbot with unique color + sitting pose ──────────────────────
+// ─── StudentAvatar — Xbot with unique color, sitting illusion via desk occlusion ─
+//
+// Layout (group-local z, camera is at world z=+12):
+//   z = -0.2  → Xbot feet (facing board)      — furthest from camera
+//   z =  0.75 → desk surface                   — between Xbot and camera
+//   z =  1.3  → desk front panel (hides legs)  — closest to camera
+//
+// The front panel covers y=[-1.35 … +0.09], so only the Xbot's torso/head
+// (y > 0.09) is visible — creates a convincing seated appearance.
 
 function StudentAvatar({ student, isDirected, idx }: {
   student: Student;
@@ -75,24 +83,24 @@ function StudentAvatar({ student, isDirected, idx }: {
   const { scene, animations } = useGLTF('/models/Xbot.glb');
   const style = STUDENT_STYLES[idx % STUDENT_STYLES.length];
 
-  // Clone scene AND clone each material independently so colors don't bleed
+  // MUST clone each material independently — SkeletonUtils.clone() shares materials
   const cloned = useMemo(() => {
     const c = SkeletonUtils.clone(scene) as THREE.Group;
     c.traverse(child => {
       if (!(child as THREE.Mesh).isMesh) return;
       const mesh = child as THREE.Mesh;
-      const applyColor = (m: THREE.Material): THREE.Material => {
+      const tint = (m: THREE.Material): THREE.Material => {
         const nm = (m as THREE.MeshStandardMaterial).clone();
         (nm as THREE.MeshStandardMaterial).color.set(style.shirt);
         (nm as THREE.MeshStandardMaterial).emissive.set(style.shirt);
-        (nm as THREE.MeshStandardMaterial).emissiveIntensity = 0.14;
-        (nm as THREE.MeshStandardMaterial).metalness  = 0.4;
-        (nm as THREE.MeshStandardMaterial).roughness  = 0.42;
+        (nm as THREE.MeshStandardMaterial).emissiveIntensity = 0.15;
+        (nm as THREE.MeshStandardMaterial).metalness = 0.4;
+        (nm as THREE.MeshStandardMaterial).roughness = 0.42;
         return nm;
       };
       mesh.material = Array.isArray(mesh.material)
-        ? (mesh.material as THREE.Material[]).map(applyColor)
-        : applyColor(mesh.material as THREE.Material);
+        ? (mesh.material as THREE.Material[]).map(tint)
+        : tint(mesh.material as THREE.Material);
     });
     return c;
   }, [scene, style.shirt]);
@@ -100,25 +108,8 @@ function StudentAvatar({ student, isDirected, idx }: {
   const groupRef = useRef<THREE.Group>(cloned);
   const glowRef  = useRef<THREE.PointLight>(null!);
   const { actions } = useAnimations(animations, groupRef);
-  const prevAnim = useRef('idle');
+  const prevAnim = useRef('');   // '' = nothing playing yet → first render always starts idle
   const [showResp, setShowResp] = useState(false);
-
-  // Cache leg bone refs once after clone is ready
-  const bones = useRef<{
-    lUp: THREE.Object3D | null; rUp: THREE.Object3D | null;
-    lLo: THREE.Object3D | null; rLo: THREE.Object3D | null;
-  }>({ lUp: null, rUp: null, lLo: null, rLo: null });
-
-  useEffect(() => {
-    const b = bones.current;
-    cloned.traverse(o => {
-      const n = o.name;
-      if (n.includes('LeftUpLeg'))                              b.lUp = o;
-      if (n.includes('RightUpLeg'))                             b.rUp = o;
-      if (n.includes('LeftLeg')  && !n.includes('Up') && !n.includes('Foot') && !n.includes('Toe')) b.lLo = o;
-      if (n.includes('RightLeg') && !n.includes('Up') && !n.includes('Foot') && !n.includes('Toe')) b.rLo = o;
-    });
-  }, [cloned]);
 
   useEffect(() => {
     const delay = isDirected ? 1200 : 0;
@@ -126,6 +117,7 @@ function StudentAvatar({ student, isDirected, idx }: {
     return () => clearTimeout(t);
   }, [isDirected]);
 
+  // Start/switch animation: idle (slow, unique speed per student) ↔ agree when directed
   useEffect(() => {
     const target = isDirected ? 'agree' : 'idle';
     if (target === prevAnim.current) return;
@@ -134,23 +126,14 @@ function StudentAvatar({ student, isDirected, idx }: {
     const anim = actions[target] ?? actions['idle'];
     if (anim) {
       anim.reset()
-        .setEffectiveTimeScale(isDirected ? 2.5 : 0.4 + idx * 0.04)
+        .setEffectiveTimeScale(isDirected ? 2.5 : 0.45 + idx * 0.06)
         .fadeIn(0.3)
         .play();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDirected, idx]);
 
-  // Sitting pose: override leg bones — useAnimations subscribes its useFrame first,
-  // so at priority 0 this runs after the mixer update (same priority = subscription order)
   useFrame(({ clock }) => {
-    const b = bones.current;
-    const SIT = Math.PI / 2.1; // ~86°
-    if (b.lUp) b.lUp.rotation.x = -SIT;
-    if (b.rUp) b.rUp.rotation.x = -SIT;
-    if (b.lLo) b.lLo.rotation.x =  SIT * 0.9;
-    if (b.rLo) b.rLo.rotation.x =  SIT * 0.9;
-
     if (glowRef.current) {
       glowRef.current.intensity = isDirected
         ? 2.0 + Math.sin(clock.elapsedTime * 5) * 0.5 : 0;
@@ -164,72 +147,82 @@ function StudentAvatar({ student, isDirected, idx }: {
 
   return (
     <group position={student.pos}>
-      {/* ── Desk surface ── */}
-      <mesh position={[0, 0.06, 0.2]}>
-        <boxGeometry args={[1.8, 0.06, 1.0]} />
-        <meshStandardMaterial color="#1E1838" roughness={0.5} metalness={0.5} />
+
+      {/* ── Desk surface (z=0.75, between camera and Xbot) ── */}
+      <mesh position={[0, 0.06, 0.75]}>
+        <boxGeometry args={[1.85, 0.07, 1.1]} />
+        <meshStandardMaterial color="#1C1736" roughness={0.55} metalness={0.5} />
       </mesh>
-      {/* Desk glow edge */}
-      <mesh position={[0, 0.09, 0.2]}>
-        <boxGeometry args={[1.82, 0.02, 1.02]} />
-        <meshStandardMaterial color={style.shirt} emissive={style.shirt} emissiveIntensity={0.25} roughness={0.3} metalness={0.8} />
+      {/* Desk colour strip */}
+      <mesh position={[0, 0.10, 0.75]}>
+        <boxGeometry args={[1.87, 0.022, 1.12]} />
+        <meshStandardMaterial color={style.shirt} emissive={style.shirt}
+          emissiveIntensity={0.22} roughness={0.3} metalness={0.8} />
       </mesh>
       {/* Desk legs */}
-      {([[-0.82,-0.25],[0.82,-0.25],[-0.82,0.85],[0.82,0.85]] as [number,number][]).map(([dx,dz],i) => (
-        <mesh key={i} position={[dx, -0.65, dz]}>
-          <cylinderGeometry args={[0.032, 0.032, 1.4, 6]} />
-          <meshStandardMaterial color="#120F28" metalness={0.8} roughness={0.2} />
+      {([[-0.85, 0.22], [0.85, 0.22], [-0.85, 1.28], [0.85, 1.28]] as [number,number][]).map(([dx, dz], i) => (
+        <mesh key={i} position={[dx, -0.62, dz]}>
+          <cylinderGeometry args={[0.03, 0.03, 1.35, 6]} />
+          <meshStandardMaterial color="#110E26" metalness={0.85} roughness={0.15} />
         </mesh>
       ))}
-      {/* Glowing tablet on desk */}
-      <mesh position={[0, 0.13, 0.55]} rotation={[-0.18, 0, 0]}>
-        <boxGeometry args={[0.62, 0.4, 0.012]} />
+      {/* Glowing tablet — on camera side of desk */}
+      <mesh position={[0, 0.15, 1.15]} rotation={[-0.2, 0, 0]}>
+        <boxGeometry args={[0.62, 0.40, 0.012]} />
         <meshStandardMaterial color={style.shirt} emissive={style.shirt}
-          emissiveIntensity={isDirected ? 1.4 : 0.5} roughness={0.04} metalness={0.9} />
+          emissiveIntensity={isDirected ? 1.5 : 0.5} roughness={0.04} metalness={0.9} />
       </mesh>
 
-      {/* ── Chair (behind student) ── */}
-      <mesh position={[0, -0.42, 1.4]}>
-        <boxGeometry args={[1.05, 0.055, 0.85]} />
-        <meshBasicMaterial color="#150F25" />
+      {/* ── Front panel — hides Xbot lower body from camera (y < 0.09) ── */}
+      <mesh position={[0, -0.63, 1.33]}>
+        <boxGeometry args={[1.85, 1.44, 0.055]} />
+        <meshStandardMaterial color="#18132E" roughness={0.7} metalness={0.45} />
       </mesh>
-      <mesh position={[0, 0.06, 1.85]}>
-        <boxGeometry args={[1.05, 0.88, 0.055]} />
-        <meshBasicMaterial color="#150F25" />
+      {/* Glow strip on panel top */}
+      <mesh position={[0, 0.09, 1.33]}>
+        <boxGeometry args={[1.85, 0.018, 0.06]} />
+        <meshStandardMaterial color={style.shirt} emissive={style.shirt} emissiveIntensity={0.3} roughness={0.3} metalness={0.9} />
       </mesh>
 
-      {/* ── Xbot student: raised so upper body clears desk ── */}
+      {/* ── Chair back (visible above desk, behind Xbot) ── */}
+      <mesh position={[0, 0.45, -0.7]}>
+        <boxGeometry args={[1.0, 0.85, 0.055]} />
+        <meshBasicMaterial color="#130E22" />
+      </mesh>
+
+      {/* ── Xbot student — feet at floor, facing board, behind desk ── */}
       <primitive
         ref={groupRef}
         object={cloned}
-        scale={1.1}
-        position={[0, -0.78, 0.9]}
+        scale={1.12}
+        position={[0, -1.35, -0.2]}
         rotation={[0, Math.PI, 0]}
         dispose={null}
       />
 
       {/* ── Status dot ── */}
-      <mesh position={[-0.82, 0.12, 0.2]}>
+      <mesh position={[-0.85, 0.12, 0.75]}>
         <sphereGeometry args={[0.055, 10, 10]} />
         <meshStandardMaterial color={statusColor} emissive={statusColor} emissiveIntensity={1.5} />
       </mesh>
 
-      {/* ── Golden ring when directed ── */}
-      <pointLight ref={glowRef} color={style.shirt} intensity={0} distance={5} position={[0, 2, 1]} />
+      {/* ── Glow ring when directed ── */}
+      <pointLight ref={glowRef} color={style.shirt} intensity={0} distance={5} position={[0, 2, 0]} />
       {isDirected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.77, 0.7]}>
-          <ringGeometry args={[0.55, 0.68, 48]} />
-          <meshStandardMaterial color="#F59E0B" emissive="#F59E0B" emissiveIntensity={2.5} transparent opacity={0.9} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.34, -0.2]}>
+          <ringGeometry args={[0.5, 0.65, 48]} />
+          <meshStandardMaterial color="#F59E0B" emissive="#F59E0B"
+            emissiveIntensity={2.5} transparent opacity={0.9} />
         </mesh>
       )}
 
       {/* ── Name label ── */}
       <Suspense fallback={null}>
-        <Text position={[0, 1.1, 0.9]} fontSize={0.24} color="white" anchorX="center"
+        <Text position={[0, 1.0, -0.2]} fontSize={0.24} color="white" anchorX="center"
           outlineWidth={0.03} outlineColor="#09081A">
           {student.name}
         </Text>
-        <Text position={[0, 0.82, 0.9]} fontSize={0.14} color={statusColor} anchorX="center"
+        <Text position={[0, 0.73, -0.2]} fontSize={0.14} color={statusColor} anchorX="center"
           outlineWidth={0.018} outlineColor="#09081A">
           {`${student.mastery}% • Lv.${student.level}`}
         </Text>
@@ -237,13 +230,13 @@ function StudentAvatar({ student, isDirected, idx }: {
 
       {/* ── Response bubble ── */}
       {showResp && (
-        <group position={[1.1, 1.9, 0.9]}>
+        <group position={[1.1, 1.7, -0.2]}>
           <mesh position={[0, 0, -0.014]}>
             <planeGeometry args={[2.7, 0.82]} />
             <meshBasicMaterial color={style.shirt} transparent opacity={0.95} />
           </mesh>
           <mesh>
-            <planeGeometry args={[2.5, 0.7]} />
+            <planeGeometry args={[2.5, 0.70]} />
             <meshBasicMaterial color="white" transparent opacity={0.97} />
           </mesh>
           <mesh position={[-1.35, -0.48, 0]} rotation={[0, 0, -Math.PI / 5]}>

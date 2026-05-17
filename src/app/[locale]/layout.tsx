@@ -119,7 +119,7 @@ export default async function LocaleLayout({
         }}
       >
         <Providers messages={messages} locale={locale}>
-          <PwaRegister />
+          {/* <PwaRegister /> */}
           {children}
           <PwaInstallBanner />
           {/* <Mascot /> */}

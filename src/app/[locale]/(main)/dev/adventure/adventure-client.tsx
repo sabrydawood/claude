@@ -95,7 +95,7 @@ function XbotOnIsland() {
     if (idle) idle.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(0.1).play();
   }, [actions]);
   // scale=1.5 → feet at ~Y=-1.2, positioned in front of portal facing it (rotation π = faces camera)
-  return <primitive ref={groupRef} object={cloned} scale={1.5} position={[0, -1.2, -2.5]} rotation={[0, Math.PI, 0]} dispose={null} />;
+  return <primitive ref={groupRef} object={cloned} scale={1} position={[0, -.5, -3.5]} rotation={[0, Math.PI, 0]} dispose={null} />;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -270,10 +270,12 @@ function ClassroomTeacher({
   return (
     <>
       <primitive ref={groupRef} object={cloned} scale={1.3} position={[0, -1.3, -3.5]} dispose={null} />
-      <SpeechBubble3D
-        text={phase.bubble}
-        xbotPos={groupRef.current?.position ?? new THREE.Vector3(0, -1.3, -3.5)}
-      />
+      <Suspense fallback={null}>
+        <SpeechBubble3D
+          text={phase.bubble}
+          xbotPos={groupRef.current?.position ?? new THREE.Vector3(0, -1.3, -3.5)}
+        />
+      </Suspense>
     </>
   );
 }
@@ -356,15 +358,17 @@ function ClassroomScene({
           <planeGeometry args={[6, 2.5]} />
           <meshStandardMaterial color="#0F3D2E" roughness={0.95} />
         </mesh>
-        <Text position={[0, 0.4, 0.02]} fontSize={0.28} color="#E2F5DC" anchorX="center" maxWidth={5.5}>
-          {'درس الحلقات (Loops)'}
-        </Text>
-        <Text position={[0, -0.1, 0.02]} fontSize={0.18} color="#A7D9B0" anchorX="center" maxWidth={5.5}>
-          {'for i in range(n): ...'}
-        </Text>
-        <Text position={[0, -0.5, 0.02]} fontSize={0.16} color="#A7D9B0" anchorX="center" maxWidth={5.5}>
-          {'while condition: ...'}
-        </Text>
+        <Suspense fallback={null}>
+          <Text position={[0, 0.4, 0.02]} fontSize={0.28} color="#E2F5DC" anchorX="center" maxWidth={5.5}>
+            {'درس الحلقات (Loops)'}
+          </Text>
+          <Text position={[0, -0.1, 0.02]} fontSize={0.18} color="#A7D9B0" anchorX="center" maxWidth={5.5}>
+            {'for i in range(n): ...'}
+          </Text>
+          <Text position={[0, -0.5, 0.02]} fontSize={0.16} color="#A7D9B0" anchorX="center" maxWidth={5.5}>
+            {'while condition: ...'}
+          </Text>
+        </Suspense>
         {/* Chalk tray */}
         <mesh position={[0, -1.37, 0.06]}>
           <boxGeometry args={[6, 0.08, 0.15]} />
@@ -398,9 +402,11 @@ function ClassroomScene({
         </mesh>
       </group>
 
-      {/* Student avatars */}
+      {/* Student avatars — each in its own Suspense so Text font-load doesn't block the room */}
       {students.map(s => (
-        <StudentAvatar key={s.id} student={s} isDirected={s.id === directedId} />
+        <Suspense key={s.id} fallback={null}>
+          <StudentAvatar student={s} isDirected={s.id === directedId} />
+        </Suspense>
       ))}
 
       {/* Xbot teacher */}

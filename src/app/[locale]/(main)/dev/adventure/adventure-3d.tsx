@@ -455,7 +455,7 @@ function DungeonPlayerController({ playerPosRef, keysRef, monsters, defeated, on
       (moved ? actions['walk'] : actions['idle'])?.reset().fadeIn(0.2).play();
     }
     if (groupRef.current) {
-      groupRef.current.position.set(pos.x, pos.y-0.5, pos.z);
+      groupRef.current.position.set(pos.x, pos.y - 0.5, pos.z);
       const movingBack = keys.has('ArrowDown') || keys.has('s') || keys.has('S');
       groupRef.current.rotation.y = movingBack ? 0 : Math.PI;
     }

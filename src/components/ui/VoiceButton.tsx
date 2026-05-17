@@ -1,9 +1,10 @@
 'use client';
 import { useVoice } from '@/hooks/useVoice';
+import { TLocale } from '@/Shared/Types/Common.Types';
 
 interface VoiceButtonProps {
   text: string;
-  lang?: 'ar' | 'en';
+  lang?: TLocale;
   className?: string;
   children?: React.ReactNode;
 }

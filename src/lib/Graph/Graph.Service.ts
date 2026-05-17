@@ -9,6 +9,7 @@ import { db } from '@/lib/db/Index';
 import { Concepts, ConceptEdges, StudentMastery } from '@/lib/db/Schema';
 import { and, eq, inArray, or, ilike } from 'drizzle-orm';
 import type { IConceptNode, IConceptEdge, IGraphState, IStudentGraphState } from './Graph.Types';
+import { TLocale } from '@/Shared/Types/Common.Types';
 
 // ─── Internal helpers ──────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ export async function GetUnlocks(ConceptId: string): Promise<IConceptNode[]> {
  * Locale is accepted for future use (e.g. locale-filtered chunks) but
  * concept nodes currently include both NameAr and NameEn.
  */
-export async function GetFullGraph(_Locale: 'ar' | 'en'): Promise<IGraphState> {
+export async function GetFullGraph(_Locale: TLocale): Promise<IGraphState> {
   const [ConceptRows, EdgeRows] = await Promise.all([
     db.select().from(Concepts).where(eq(Concepts.IsDeleted, false)),
     db.select({
@@ -120,7 +121,7 @@ export async function GetFullGraph(_Locale: 'ar' | 'en'): Promise<IGraphState> {
  */
 export async function GetStudentGraphState(
   UserId: string,
-  Locale: 'ar' | 'en',
+  Locale: TLocale,
 ): Promise<IStudentGraphState> {
   const [BaseGraph, MasteryRows] = await Promise.all([
     GetFullGraph(Locale),
@@ -152,7 +153,7 @@ export async function GetStudentGraphState(
  * Search concepts by name in the requested locale.
  * Performs a case-insensitive partial match on NameAr or NameEn.
  */
-export async function SearchConcepts(Query: string, Locale: 'ar' | 'en'): Promise<IConceptNode[]> {
+export async function SearchConcepts(Query: string, Locale: TLocale): Promise<IConceptNode[]> {
   const Pattern = `%${Query}%`;
 
   const Rows = await db

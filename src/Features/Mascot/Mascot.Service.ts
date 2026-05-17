@@ -40,7 +40,7 @@ export async function BuildMascotSystemPromptCached(Pathname: string, Locale: st
  * Builds the system prompt for the mascot based on current page context.
  * Loads base prompt from DB (SystemPrompts table), falls back to hardcoded default.
  * @param Pathname - Current page URL path
- * @param Locale - User's locale ('ar' | 'en')
+ * @param Locale - User's locale (keyof TLocale )
  */
 export async function BuildMascotSystemPrompt(Pathname: string, Locale: string): Promise<string> {
   const PageLabel = (() => {

@@ -11,6 +11,13 @@ import { Mascot } from '@/components/mascot';
 import { SelectionTooltip } from '@/components/selection-tooltip';
 import { APP_URL } from '@/lib/utils';
 import '../globals.css';
+import { TLocale } from '@/Shared/Types/Common.Types';
+import dynamic from 'next/dynamic';
+
+const DevSidebar = dynamic(
+  () => import('@/components/dev/DevSidebar'),
+  { ssr: false }
+);
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -92,7 +99,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  if (!routing.locales.includes(locale as 'ar' | 'en')) {
+  if (!routing.locales.includes(locale as TLocale)) {
     notFound();
   }
 
@@ -122,6 +129,7 @@ export default async function LocaleLayout({
           <PwaInstallBanner />
           <Mascot />
           <SelectionTooltip />
+          {process.env.NODE_ENV === 'development' && <DevSidebar />}
         </Providers>
       </body>
     </html>

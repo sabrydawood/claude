@@ -1,6 +1,6 @@
 import { getRequestConfig } from 'next-intl/server';
 import { routing } from './routing';
-
+import { TLocale } from '@/Shared/Types/Common.Types';
 const LocalsMap = {
   ar: 'Ar',
   en: 'En',
@@ -8,7 +8,7 @@ const LocalsMap = {
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;
   // Ensure that a valid locale is used
-  if (!locale || !routing.locales.includes(locale as 'ar' | 'en')) {
+  if (!locale || !routing.locales.includes(locale as TLocale)) {
     locale = routing.defaultLocale;
   }
   return {

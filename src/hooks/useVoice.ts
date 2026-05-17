@@ -1,8 +1,9 @@
 'use client';
+import { TLocale } from '@/Shared/Types/Common.Types';
 import { useCallback, useRef } from 'react';
 
 export interface VoiceOptions {
-  lang?: 'ar' | 'en';
+  lang?: TLocale;
   rate?: number;   // 0.5-2.0, default 0.9 for children
   pitch?: number;  // 0.5-2.0, default 1.1 (slightly higher for children)
 }

@@ -12,10 +12,11 @@ import {
   GetFullGraph,
   GetStudentGraphState,
 } from '@/lib/Graph/Graph.Service';
+import { TLocale } from '@/Shared/Types/Common.Types';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function GetLocale(Req: NextRequest): 'ar' | 'en' {
+function GetLocale(Req: NextRequest): TLocale {
   const Raw = new URL(Req.url).searchParams.get('locale');
   return Raw === 'en' ? 'en' : 'ar';
 }

@@ -202,10 +202,11 @@ export default function AdventureClient({ locale }: { locale: string }) {
   const [nearGateId, setNearGateId]     = useState<string | null>(null);
 
   // Shared refs for Canvas
-  const islandPlayerPos  = useRef(new THREE.Vector3(0, 0, 0));
-  const islandKeys       = useRef<Set<string>>(new Set());
-  const dungeonKeys      = useRef<Set<string>>(new Set());
+  const islandPlayerPos   = useRef(new THREE.Vector3(0, 0, 0));
+  const islandKeys        = useRef<Set<string>>(new Set());
+  const dungeonKeys       = useRef<Set<string>>(new Set());
   const encounterCooldown = useRef(false);
+  const returnCooldown    = useRef(false); // prevents re-entering gate right after exit
 
   const MOVE_KEYS_LIST = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','W','a','A','s','S','d','D'];
 
@@ -277,8 +278,22 @@ export default function AdventureClient({ locale }: { locale: string }) {
   }
 
   function handleReturnToIsland() {
+    islandPlayerPos.current.set(0, 0, 0);
+    islandKeys.current.clear();
+    dungeonKeys.current.clear();
+    returnCooldown.current = true;
+    setTimeout(() => { returnCooldown.current = false; }, 2000);
     setVictory(false);
     setDungeon(null);
+    setStage('island');
+  }
+
+  function handleExitDungeon() {
+    islandPlayerPos.current.set(0, 0, 0);
+    returnCooldown.current = true;
+    islandKeys.current.clear();   // clear any held keys so character doesn't auto-move
+    dungeonKeys.current.clear();
+    setTimeout(() => { returnCooldown.current = false; }, 2000);
     setStage('island');
   }
 
@@ -297,6 +312,7 @@ export default function AdventureClient({ locale }: { locale: string }) {
               keysRef={islandKeys}
               onEnterDungeon={handleEnterDungeon}
               onNearGateChange={setNearGateId}
+              returnCooldownRef={returnCooldown}
             />
           )}
           {stage === 'dungeon' && currentDungeon && (
@@ -305,7 +321,7 @@ export default function AdventureClient({ locale }: { locale: string }) {
                 monsters={monstersInDungeon}
                 defeated={defeatedInDungeon}
                 onMonsterEncounter={handleEncounter}
-                onExit={() => setStage('island')}
+                onExit={handleExitDungeon}
                 encounterCooldown={encounterCooldown}
                 keysRef={dungeonKeys}
               />

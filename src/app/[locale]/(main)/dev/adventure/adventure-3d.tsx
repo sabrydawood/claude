@@ -226,7 +226,7 @@ export function IslandGate({
 
 export function IslandPlayerController({
   playerPosRef, keysRef, islandRadius, dungeons, completedIds,
-  onEnterDungeon, onNearGateChange,
+  onEnterDungeon, onNearGateChange, returnCooldownRef,
 }: {
   playerPosRef: RefObject<THREE.Vector3>;
   keysRef: RefObject<Set<string>>;
@@ -235,6 +235,7 @@ export function IslandPlayerController({
   completedIds: Set<string>;
   onEnterDungeon: (dungeon: DungeonDef) => void;
   onNearGateChange: (id: string | null) => void;
+  returnCooldownRef: React.MutableRefObject<boolean>;
 }) {
   const { scene, animations } = useGLTF('/models/Xbot.glb');
   const cloned = useMemo(() => { const c = SkeletonUtils.clone(scene) as THREE.Group; applyPurpleTint(c); return c; }, [scene]);
@@ -243,8 +244,24 @@ export function IslandPlayerController({
   const isWalking = useRef(false);
   const enterCooldown = useRef(false);
   const lastNearId = useRef<string | null>(null);
+  const cameraAngle = useRef(0);
+  const isDragging = useRef(false);
+  const lastMouseX = useRef(0);
 
   useEffect(() => { actions['idle']?.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(0.1).play(); }, [actions]);
+
+  // Right-click drag = orbit camera
+  useEffect(() => {
+    const onDown  = (e: MouseEvent) => { if (e.button === 2) { isDragging.current = true; lastMouseX.current = e.clientX; } };
+    const onMove  = (e: MouseEvent) => { if (isDragging.current) { cameraAngle.current -= (e.clientX - lastMouseX.current) * 0.008; lastMouseX.current = e.clientX; } };
+    const onUp    = (e: MouseEvent) => { if (e.button === 2) isDragging.current = false; };
+    const onCtx   = (e: Event) => e.preventDefault();
+    window.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('contextmenu', onCtx);
+    return () => { window.removeEventListener('mousedown', onDown); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); window.removeEventListener('contextmenu', onCtx); };
+  }, []);
 
   useFrame(({ camera }, delta) => {
     const speed = 5;
@@ -279,19 +296,21 @@ export function IslandPlayerController({
       const dz = keys.has('ArrowDown')  || keys.has('s') || keys.has('S') ? 1
                : keys.has('ArrowUp')    || keys.has('w') || keys.has('W') ? -1 : 0;
       if (dx !== 0 || dz !== 0) {
-        groupRef.current.rotation.y = Math.atan2(dx, dz) + Math.PI;
+        groupRef.current.rotation.y = Math.atan2(dx, dz);
       }
     }
 
     // Update mesh position
     if (groupRef.current) groupRef.current.position.set(pos.x, pos.y - 1.2, pos.z);
 
-    // Top-down camera follows player
-    const camTarget = new THREE.Vector3(pos.x, pos.y + 10, pos.z + 6);
-    camera.position.lerp(camTarget, 0.08);
+    // Orbit camera — right-click rotates horizontally around player
+    const camDist = 14, camHeight = 11;
+    const cx = pos.x + Math.sin(cameraAngle.current) * camDist;
+    const cz = pos.z + Math.cos(cameraAngle.current) * camDist;
+    camera.position.lerp(new THREE.Vector3(cx, pos.y + camHeight, cz), 0.08);
     camera.lookAt(pos.x, pos.y, pos.z);
 
-    // Gate proximity — only update state on transitions
+    // Gate proximity — only trigger entry if not in return cooldown
     let newNearId: string | null = null;
     for (const d of dungeons) {
       const gx = d.gatePos[0], gz = d.gatePos[1];
@@ -300,7 +319,7 @@ export function IslandPlayerController({
         newNearId = d.id;
         const idx = dungeons.indexOf(d);
         const prevCompleted = idx === 0 || completedIds.has(dungeons[idx - 1].id);
-        if (prevCompleted && !completedIds.has(d.id) && !enterCooldown.current) {
+        if (prevCompleted && !completedIds.has(d.id) && !enterCooldown.current && !returnCooldownRef.current) {
           enterCooldown.current = true;
           onEnterDungeon(d);
           setTimeout(() => { enterCooldown.current = false; }, 2000);
@@ -322,7 +341,7 @@ export function IslandPlayerController({
 
 export function IslandScene({
   dungeons, completedIds, nearGateId,
-  playerPosRef, keysRef, onEnterDungeon, onNearGateChange,
+  playerPosRef, keysRef, onEnterDungeon, onNearGateChange, returnCooldownRef,
 }: {
   dungeons: DungeonDef[];
   completedIds: Set<string>;
@@ -331,8 +350,9 @@ export function IslandScene({
   keysRef: RefObject<Set<string>>;
   onEnterDungeon: (d: DungeonDef) => void;
   onNearGateChange: (id: string | null) => void;
+  returnCooldownRef: React.MutableRefObject<boolean>;
 }) {
-  const radius = Math.max(10, dungeons.length * 3 + 6);
+  const radius = Math.max(20, dungeons.length * 6 + 12);
 
   return (
     <>
@@ -393,6 +413,7 @@ export function IslandScene({
         completedIds={completedIds}
         onEnterDungeon={onEnterDungeon}
         onNearGateChange={onNearGateChange}
+        returnCooldownRef={returnCooldownRef}
       />
     </>
   );
@@ -410,6 +431,7 @@ function DungeonPlayerController({ playerPosRef, keysRef, monsters, defeated, on
   const groupRef = useRef<THREE.Group>(cloned);
   const { actions } = useAnimations(animations, groupRef);
   const isWalkingRef = useRef(false);
+  const isExitingRef = useRef(false); // prevent repeated onExit calls per frame
   useEffect(() => { actions['idle']?.reset().play(); }, [actions]);
   useFrame(({ camera }, delta) => {
     const speed = 5; let moved = false; const pos = playerPosRef.current!;
@@ -418,14 +440,14 @@ function DungeonPlayerController({ playerPosRef, keysRef, monsters, defeated, on
     if (keys.has('ArrowDown') || keys.has('s') || keys.has('S')) { pos.z = Math.min(pos.z + speed*delta,   3); moved=true; }
     if (keys.has('ArrowLeft') || keys.has('a') || keys.has('A')) { pos.x = Math.max(pos.x - speed*delta*0.5, -1.5); moved=true; }
     if (keys.has('ArrowRight')|| keys.has('d') || keys.has('D')) { pos.x = Math.min(pos.x + speed*delta*0.5,  1.5); moved=true; }
-    if (pos.z > 2.5) { onExit(); return; }
+    if (pos.z > 2.5 && !isExitingRef.current) { isExitingRef.current = true; onExit(); return; }
     if (moved !== isWalkingRef.current) {
       isWalkingRef.current = moved;
       Object.values(actions).forEach(a => a?.fadeOut(0.2));
       (moved ? actions['walk'] : actions['idle'])?.reset().fadeIn(0.2).play();
     }
     if (groupRef.current) {
-      groupRef.current.position.set(pos.x, pos.y-1.75, pos.z);
+      groupRef.current.position.set(pos.x, pos.y-0.5, pos.z);
       const movingBack = keys.has('ArrowDown') || keys.has('s') || keys.has('S');
       groupRef.current.rotation.y = movingBack ? 0 : Math.PI;
     }
@@ -438,7 +460,7 @@ function DungeonPlayerController({ playerPosRef, keysRef, monsters, defeated, on
       }
     }
   });
-  return <primitive ref={groupRef} object={cloned} scale={1.3} position={[0,-1.3,2]} rotation={[0,Math.PI,0]} dispose={null} />;
+  return <primitive ref={groupRef} object={cloned} scale={1} position={[0,-0.5,2]} rotation={[0,Math.PI,0]} dispose={null} />;
 }
 
 export function DungeonScene({ monsters, defeated, onMonsterEncounter, onExit, encounterCooldown, keysRef }: {
@@ -523,7 +545,7 @@ export function BattleArenaXbot({ attacking }: { attacking: boolean }) {
     const targetX = attacking ? -0.5 : -2.2;
     groupRef.current.position.x += (targetX - groupRef.current.position.x) * 0.2;
   });
-  return <primitive ref={groupRef} object={cloned} scale={1.3} position={[-2.2,-1.3,0]} rotation={[0,Math.PI/2,0]} dispose={null} />;
+  return <primitive ref={groupRef} object={cloned} scale={1} position={[-2.2,-0.5,0]} rotation={[0,Math.PI/2,0]} dispose={null} />;
 }
 
 // ── BattleArenaScene ──────────────────────────────────────────────────────────

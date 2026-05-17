@@ -65,24 +65,41 @@ const PHASES = [
 
 type Phase = typeof PHASES[number];
 
-// ─── StudentAvatar ──────────────────────────────────────────────────────────────
+// ─── StudentAvatar — Xbot model with unique color per student ───────────────────
 
 function StudentAvatar({ student, isDirected, idx }: {
   student: Student;
   isDirected: boolean;
   idx: number;
 }) {
-  const groupRef   = useRef<THREE.Group>(null!);
-  const headRef    = useRef<THREE.Group>(null!);
-  const bodyRef    = useRef<THREE.Group>(null!);
-  const glowRef    = useRef<THREE.PointLight>(null!);
-  const [showResp, setShowResp] = useState(false);
-
+  const { scene, animations } = useGLTF('/models/Xbot.glb');
   const style = STUDENT_STYLES[idx % STUDENT_STYLES.length];
-  const statusColor =
-    student.status === 'active'     ? '#10B981' :
-    student.status === 'thinking'   ? '#F59E0B' :
-    student.status === 'struggling' ? '#EF4444' : '#6B7280';
+
+  const cloned = useMemo(() => {
+    const c = SkeletonUtils.clone(scene) as THREE.Group;
+    c.traverse(child => {
+      if (!(child as THREE.Mesh).isMesh) return;
+      const mats = Array.isArray((child as THREE.Mesh).material)
+        ? ((child as THREE.Mesh).material as THREE.Material[])
+        : [(child as THREE.Mesh).material as THREE.Material];
+      mats.forEach(m => {
+        const sm = m as THREE.MeshStandardMaterial;
+        if (sm.color) sm.color.set(style.shirt);
+        sm.emissive    = new THREE.Color(style.shirt);
+        sm.emissiveIntensity = 0.12;
+        sm.metalness   = 0.4;
+        sm.roughness   = 0.45;
+        sm.needsUpdate = true;
+      });
+    });
+    return c;
+  }, [scene, style.shirt]);
+
+  const groupRef = useRef<THREE.Group>(cloned);
+  const glowRef  = useRef<THREE.PointLight>(null!);
+  const { actions } = useAnimations(animations, groupRef);
+  const prevAnim = useRef('idle');
+  const [showResp, setShowResp] = useState(false);
 
   useEffect(() => {
     if (isDirected) {
@@ -92,203 +109,108 @@ function StudentAvatar({ student, isDirected, idx }: {
     setShowResp(false);
   }, [isDirected]);
 
+  // Switch animation: idle (slow, desync'd) ↔ agree (excited) when directed
+  useEffect(() => {
+    const target = isDirected ? 'agree' : 'idle';
+    if (target === prevAnim.current) return;
+    prevAnim.current = target;
+    Object.values(actions).forEach(a => a?.fadeOut(0.3));
+    const anim = actions[target] ?? actions['idle'];
+    if (anim) {
+      anim.reset()
+        .setEffectiveTimeScale(isDirected ? 2.5 : 0.45 + idx * 0.04)
+        .fadeIn(0.3)
+        .play();
+      if (!isDirected) anim.time = idx * 0.65; // desynchronize idle
+    }
+  }, [isDirected, actions, idx]);
+
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
-    if (headRef.current) {
-      if (isDirected) {
-        headRef.current.position.y = Math.abs(Math.sin(t * 4)) * 0.07;
-        headRef.current.rotation.z = Math.sin(t * 3) * 0.05;
-      } else {
-        headRef.current.position.y = Math.sin(t * 0.9 + idx * 0.7) * 0.015;
-        headRef.current.rotation.z = 0;
-      }
-    }
-    if (bodyRef.current) {
-      bodyRef.current.rotation.y = isDirected
-        ? Math.sin(t * 2) * 0.04
-        : Math.sin(t * 0.5 + idx) * 0.01;
-    }
     if (glowRef.current) {
-      glowRef.current.intensity = isDirected ? 1.8 + Math.sin(t * 5) * 0.6 : 0;
+      glowRef.current.intensity = isDirected ? 2.0 + Math.sin(t * 5) * 0.6 : 0;
     }
   });
 
+  const statusColor =
+    student.status === 'active'     ? '#10B981' :
+    student.status === 'thinking'   ? '#F59E0B' :
+    student.status === 'struggling' ? '#EF4444' : '#6B7280';
+
   return (
-    <group ref={groupRef} position={student.pos}>
-      {/* ── Desk surface ── */}
-      <mesh position={[0, -0.05, 0.35]}>
+    <group position={student.pos}>
+      {/* ── Desk ── */}
+      <mesh position={[0, 0.1, 0.3]}>
         <boxGeometry args={[1.8, 0.06, 1.0]} />
         <meshStandardMaterial color="#221A40" roughness={0.6} metalness={0.4} />
       </mesh>
-      {/* Desk edge trim */}
-      <mesh position={[0, -0.03, 0.35]}>
-        <boxGeometry args={[1.82, 0.025, 1.02]} />
-        <meshStandardMaterial color={style.shirt} emissive={style.shirt} emissiveIntensity={0.15} roughness={0.5} metalness={0.6} />
+      <mesh position={[0, 0.13, 0.3]}>
+        <boxGeometry args={[1.82, 0.022, 1.02]} />
+        <meshStandardMaterial color={style.shirt} emissive={style.shirt} emissiveIntensity={0.2} roughness={0.4} metalness={0.7} />
       </mesh>
-      {/* Desk legs */}
-      {([ [-0.82, 0.0], [-0.82, 1.1], [0.82, 0.0], [0.82, 1.1] ] as [number,number][]).map(([dx, dz], i) => (
-        <mesh key={i} position={[dx, -0.57, dz]}>
-          <cylinderGeometry args={[0.035, 0.035, 1.0, 6]} />
+      {([[-0.82, -0.15], [-0.82, 1.0], [0.82, -0.15], [0.82, 1.0]] as [number,number][]).map(([dx, dz], i) => (
+        <mesh key={i} position={[dx, -0.62, dz]}>
+          <cylinderGeometry args={[0.035, 0.035, 1.45, 6]} />
           <meshStandardMaterial color="#1A1330" metalness={0.7} roughness={0.3} />
         </mesh>
       ))}
-      {/* Glowing tablet/screen */}
-      <mesh position={[0, 0.01, 0.6]} rotation={[-0.3, 0, 0]}>
-        <boxGeometry args={[0.7, 0.45, 0.012]} />
-        <meshStandardMaterial
-          color={style.shirt}
-          emissive={style.shirt}
-          emissiveIntensity={isDirected ? 1.0 : 0.4}
-          roughness={0.05}
-          metalness={0.8}
-        />
-      </mesh>
-      {/* Screen frame */}
-      <mesh position={[0, 0.01, 0.599]} rotation={[-0.3, 0, 0]}>
-        <boxGeometry args={[0.74, 0.49, 0.01]} />
-        <meshStandardMaterial color="#111111" roughness={0.3} metalness={0.9} />
+      {/* Glowing tablet */}
+      <mesh position={[0, 0.17, 0.65]} rotation={[-0.22, 0, 0]}>
+        <boxGeometry args={[0.65, 0.42, 0.012]} />
+        <meshStandardMaterial color={style.shirt} emissive={style.shirt}
+          emissiveIntensity={isDirected ? 1.2 : 0.45} roughness={0.05} metalness={0.85} />
       </mesh>
 
       {/* ── Chair ── */}
-      <mesh position={[0, -0.52, 1.2]}>
+      <mesh position={[0, -0.38, 1.25]}>
         <boxGeometry args={[1.1, 0.06, 0.9]} />
-        <meshStandardMaterial color="#1A102E" roughness={0.8} />
+        <meshBasicMaterial color="#18102C" />
       </mesh>
-      <mesh position={[0, -0.05, 1.65]}>
-        <boxGeometry args={[1.1, 0.92, 0.06]} />
-        <meshStandardMaterial color="#1A102E" roughness={0.8} />
-      </mesh>
-      {/* Chair legs */}
-      {([ [-0.48, 0.85], [0.48, 0.85], [-0.48, 1.55], [0.48, 1.55] ] as [number,number][]).map(([cx, cz], i) => (
-        <mesh key={i} position={[cx, -0.78, cz]}>
-          <cylinderGeometry args={[0.025, 0.025, 0.54, 6]} />
-          <meshStandardMaterial color="#0F0B20" metalness={0.8} roughness={0.2} />
-        </mesh>
-      ))}
-
-      {/* ── Body (cartoon proportions) ── */}
-      <group ref={bodyRef} position={[0, 0, 1.0]}>
-        {/* Torso */}
-        <mesh position={[0, 0.6, 0]}>
-          <boxGeometry args={[0.75, 0.9, 0.42]} />
-          <meshStandardMaterial color={style.shirt} roughness={0.4} />
-        </mesh>
-        {/* Shirt front detail */}
-        <mesh position={[0, 0.75, 0.22]}>
-          <boxGeometry args={[0.28, 0.32, 0.01]} />
-          <meshStandardMaterial color="white" roughness={0.8} />
-        </mesh>
-        {/* Arms */}
-        {[-0.48, 0.48].map((x, i) => (
-          <group key={i}>
-            <mesh position={[x, 0.52, 0]} rotation={[0, 0, i === 0 ? 0.18 : -0.18]}>
-              <boxGeometry args={[0.22, 0.72, 0.24]} />
-              <meshStandardMaterial color={style.shirt} roughness={0.4} />
-            </mesh>
-            {/* Hand */}
-            <mesh position={[x, 0.13, 0]}>
-              <sphereGeometry args={[0.12, 10, 10]} />
-              <meshStandardMaterial color={style.skin} roughness={0.55} />
-            </mesh>
-          </group>
-        ))}
-        {/* Legs (visible above desk edge) */}
-        {[-0.2, 0.2].map((x, i) => (
-          <mesh key={i} position={[x, -0.12, 0]}>
-            <boxGeometry args={[0.28, 0.44, 0.3]} />
-            <meshStandardMaterial color="#1E1A3A" roughness={0.7} />
-          </mesh>
-        ))}
-      </group>
-
-      {/* ── Neck ── */}
-      <mesh position={[0, 1.2, 1.0]}>
-        <cylinderGeometry args={[0.12, 0.15, 0.2, 10]} />
-        <meshStandardMaterial color={style.skin} roughness={0.55} />
+      <mesh position={[0, 0.08, 1.7]}>
+        <boxGeometry args={[1.1, 0.9, 0.06]} />
+        <meshBasicMaterial color="#18102C" />
       </mesh>
 
-      {/* ── Head (big cartoon head!) ── */}
-      <group ref={headRef} position={[0, 1.58, 1.0]}>
-        {/* Head sphere */}
-        <mesh>
-          <sphereGeometry args={[0.44, 22, 22]} />
-          <meshStandardMaterial color={style.skin} roughness={0.45} />
-        </mesh>
-        {/* Hair cap */}
-        <mesh position={[0, 0.28, -0.08]} rotation={[0.25, 0, 0]}>
-          <sphereGeometry args={[0.4, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2.1]} />
-          <meshStandardMaterial color={style.hair} roughness={0.9} />
-        </mesh>
-        {/* Eyes */}
-        {[-0.15, 0.15].map((ex, i) => (
-          <group key={i} position={[ex, 0.06, 0.4]}>
-            <mesh><sphereGeometry args={[0.1, 14, 14]} />
-              <meshStandardMaterial color="white" roughness={0.2} />
-            </mesh>
-            <mesh position={[0, 0, 0.075]}>
-              <sphereGeometry args={[0.062, 10, 10]} />
-              <meshStandardMaterial color="#0D0626" />
-            </mesh>
-            <mesh position={[0.026, 0.026, 0.128]}>
-              <sphereGeometry args={[0.022, 6, 6]} />
-              <meshStandardMaterial color="white" emissive="white" emissiveIntensity={1} />
-            </mesh>
-          </group>
-        ))}
-        {/* Brows */}
-        {[-0.15, 0.15].map((ex, i) => (
-          <mesh key={i} position={[ex, 0.19, 0.41]}
-            rotation={[0, 0, isDirected ? (i === 0 ? 0.28 : -0.28) : 0]}>
-            <boxGeometry args={[0.13, 0.024, 0.01]} />
-            <meshStandardMaterial color={style.hair} roughness={0.95} />
-          </mesh>
-        ))}
-        {/* Smile */}
-        {(student.status === 'active' || isDirected) && (
-          <mesh position={[0, -0.12, 0.4]} rotation={[0.15, 0, 0]}>
-            <torusGeometry args={[0.1, 0.022, 6, 14, Math.PI]} />
-            <meshStandardMaterial color="#CC6A50" roughness={0.5} />
-          </mesh>
-        )}
-        {/* Worried mouth for struggling */}
-        {student.status === 'struggling' && !isDirected && (
-          <mesh position={[0, -0.14, 0.4]} rotation={[-0.4, 0, Math.PI]}>
-            <torusGeometry args={[0.08, 0.018, 6, 10, Math.PI * 0.7]} />
-            <meshStandardMaterial color="#CC6A50" roughness={0.5} />
-          </mesh>
-        )}
-      </group>
+      {/* ── Xbot student (scaled, facing board) ── */}
+      <primitive
+        ref={groupRef}
+        object={cloned}
+        scale={1.08}
+        position={[0, -1.35, 1.0]}
+        rotation={[0, Math.PI, 0]}
+        dispose={null}
+      />
 
       {/* ── Status dot ── */}
-      <mesh position={[-0.75, -0.02, 0.35]}>
+      <mesh position={[-0.82, 0.16, 0.3]}>
         <sphereGeometry args={[0.058, 10, 10]} />
         <meshStandardMaterial color={statusColor} emissive={statusColor} emissiveIntensity={1.5} />
       </mesh>
 
-      {/* ── Spotlight glow when directed ── */}
-      <pointLight ref={glowRef} color={style.shirt} intensity={0} distance={5} position={[0, 3.0, 1.2]} />
+      {/* ── Glow when directed ── */}
+      <pointLight ref={glowRef} color={style.shirt} intensity={0} distance={5} position={[0, 2.5, 1.2]} />
       {isDirected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.08, 0.5]}>
-          <ringGeometry args={[0.85, 1.0, 48]} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.33, 0.6]}>
+          <ringGeometry args={[0.6, 0.75, 48]} />
           <meshStandardMaterial color="#F59E0B" emissive="#F59E0B" emissiveIntensity={2.5} transparent opacity={0.9} />
         </mesh>
       )}
 
       {/* ── Name label ── */}
       <Suspense fallback={null}>
-        <Text position={[0, 2.35, 1.0]} fontSize={0.26} color="white" anchorX="center"
-          outlineWidth={0.035} outlineColor="#0A0918">
+        <Text position={[0, 1.25, 1.0]} fontSize={0.25} color="white" anchorX="center"
+          outlineWidth={0.032} outlineColor="#09081A">
           {student.name}
         </Text>
-        <Text position={[0, 2.02, 1.0]} fontSize={0.16} color={statusColor} anchorX="center"
-          outlineWidth={0.02} outlineColor="#0A0918">
+        <Text position={[0, 0.94, 1.0]} fontSize={0.15} color={statusColor} anchorX="center"
+          outlineWidth={0.02} outlineColor="#09081A">
           {`${student.mastery}% • Lv.${student.level}`}
         </Text>
       </Suspense>
 
       {/* ── Response bubble ── */}
       {showResp && (
-        <group position={[1.1, 3.0, 1.0]}>
+        <group position={[1.1, 2.2, 1.0]}>
           <mesh position={[0, 0, -0.015]}>
             <planeGeometry args={[2.7, 0.85]} />
             <meshBasicMaterial color={style.shirt} transparent opacity={0.95} />
@@ -297,12 +219,12 @@ function StudentAvatar({ student, isDirected, idx }: {
             <planeGeometry args={[2.5, 0.72]} />
             <meshBasicMaterial color="white" transparent opacity={0.97} />
           </mesh>
-          <mesh position={[-1.35, -0.55, 0]} rotation={[0, 0, -Math.PI / 5]}>
-            <coneGeometry args={[0.1, 0.28, 4]} />
+          <mesh position={[-1.35, -0.5, 0]} rotation={[0, 0, -Math.PI / 5]}>
+            <coneGeometry args={[0.1, 0.26, 4]} />
             <meshBasicMaterial color="white" />
           </mesh>
           <Suspense fallback={null}>
-            <Text position={[0, 0, 0.01]} fontSize={0.18} color="#1E1040"
+            <Text position={[0, 0, 0.01]} fontSize={0.17} color="#1E1040"
               anchorX="center" anchorY="middle" maxWidth={2.3} textAlign="center">
               {STUDENT_RESPONSES[idx % STUDENT_RESPONSES.length]}
             </Text>
@@ -448,7 +370,14 @@ function ClassroomScene({ phaseIdx, phases, students, directedId }: {
       <color attach="background" args={['#09081A']} />
       <fog attach="fog" args={['#09081A', 28, 55]} />
 
-      <OrbitControls target={[0, 0.5, -1]} enablePan={false} enableZoom minDistance={5} maxDistance={25} />
+      <OrbitControls
+        target={[0, 0.5, -1]}
+        enablePan={false}
+        enableZoom
+        minDistance={5}
+        maxDistance={25}
+        mouseButtons={{ LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }}
+      />
 
       {/* ── Ambient + fill (lower so walls stay dark) ── */}
       <ambientLight intensity={0.6} />

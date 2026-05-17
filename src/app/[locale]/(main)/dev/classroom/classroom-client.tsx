@@ -309,10 +309,10 @@ function ClassroomScene({
       {/* Floor grid */}
       <gridHelper args={[14, 14, '#2D1B69', '#1A0F3C']} position={[0, -1.34, 0]} />
 
-      {/* Back wall */}
+      {/* Back wall — DoubleSide so it's visible from inside and outside */}
       <mesh position={[0, 1, 5.8]}>
         <planeGeometry args={[14, 6]} />
-        <meshStandardMaterial color="#16142A" roughness={1} />
+        <meshStandardMaterial color="#16142A" roughness={1} side={2} />
       </mesh>
       {/* Left wall */}
       <mesh rotation={[0, Math.PI / 2, 0]} position={[-6.8, 1, 0]}>
@@ -452,7 +452,7 @@ export default function ClassroomClient({ locale }: { locale: string }) {
     <div style={{ position: 'fixed', inset: 0 }} dir={isRtl ? 'rtl' : 'ltr'}>
       {/* 3D Canvas */}
       <Canvas
-        camera={{ position: [0, 4, 9], fov: 52 }}
+        camera={{ position: [0, 3.5, 5.5], fov: 58 }}
         style={{ width: '100%', height: '100%' }}
         gl={{ antialias: true }}
       >

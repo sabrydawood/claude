@@ -301,7 +301,7 @@ export function IslandPlayerController({
     }
 
     // Update mesh position
-    if (groupRef.current) groupRef.current.position.set(pos.x, pos.y - 1.2, pos.z);
+    if (groupRef.current) groupRef.current.position.set(pos.x, pos.y - 0.5, pos.z);
 
     // Orbit camera — right-click rotates horizontally around player
     const camDist = 14, camHeight = 11;
@@ -334,7 +334,7 @@ export function IslandPlayerController({
     }
   });
 
-  return <primitive ref={groupRef} object={cloned} scale={1.5} position={[0, -1.2, 0]} dispose={null} />;
+  return <primitive ref={groupRef} object={cloned} scale={1.5} position={[0, -0.5, 0]} dispose={null} />;
 }
 
 // ── IslandScene ───────────────────────────────────────────────────────────────

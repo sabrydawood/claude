@@ -122,7 +122,7 @@ export default async function LocaleLayout({
           <PwaRegister />
           {children}
           <PwaInstallBanner />
-          <Mascot />
+          {/* <Mascot /> */}
           <SelectionTooltip />
           {process.env.NODE_ENV === 'development' && <DevSidebarLoader />}
         </Providers>

@@ -269,10 +269,23 @@ export function IslandPlayerController({
     let moved = false;
     const keys = keysRef.current!;
 
-    if (keys.has('ArrowUp')    || keys.has('w') || keys.has('W')) { pos.z -= speed * delta; moved = true; }
-    if (keys.has('ArrowDown')  || keys.has('s') || keys.has('S')) { pos.z += speed * delta; moved = true; }
-    if (keys.has('ArrowLeft')  || keys.has('a') || keys.has('A')) { pos.x -= speed * delta; moved = true; }
-    if (keys.has('ArrowRight') || keys.has('d') || keys.has('D')) { pos.x += speed * delta; moved = true; }
+    // Camera-relative movement directions
+    const fwdX = -Math.sin(cameraAngle.current);
+    const fwdZ = -Math.cos(cameraAngle.current);
+    const rgtX =  Math.cos(cameraAngle.current);
+    const rgtZ = -Math.sin(cameraAngle.current);
+
+    let moveX = 0, moveZ = 0;
+    if (keys.has('ArrowUp')    || keys.has('w') || keys.has('W')) { moveX += fwdX; moveZ += fwdZ; moved = true; }
+    if (keys.has('ArrowDown')  || keys.has('s') || keys.has('S')) { moveX -= fwdX; moveZ -= fwdZ; moved = true; }
+    if (keys.has('ArrowLeft')  || keys.has('a') || keys.has('A')) { moveX -= rgtX; moveZ -= rgtZ; moved = true; }
+    if (keys.has('ArrowRight') || keys.has('d') || keys.has('D')) { moveX += rgtX; moveZ += rgtZ; moved = true; }
+
+    if (moved) {
+      const len = Math.sqrt(moveX * moveX + moveZ * moveZ) || 1;
+      pos.x += (moveX / len) * speed * delta;
+      pos.z += (moveZ / len) * speed * delta;
+    }
 
     // Clamp to island
     const dist = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
@@ -289,15 +302,10 @@ export function IslandPlayerController({
       (moved ? actions['walk'] : actions['idle'])?.reset().setEffectiveTimeScale(1).fadeIn(0.2).play();
     }
 
-    // Face movement direction
+    // Face the direction of actual movement (camera-relative)
     if (moved && groupRef.current) {
-      const dx = keys.has('ArrowRight') || keys.has('d') || keys.has('D') ? 1
-               : keys.has('ArrowLeft')  || keys.has('a') || keys.has('A') ? -1 : 0;
-      const dz = keys.has('ArrowDown')  || keys.has('s') || keys.has('S') ? 1
-               : keys.has('ArrowUp')    || keys.has('w') || keys.has('W') ? -1 : 0;
-      if (dx !== 0 || dz !== 0) {
-        groupRef.current.rotation.y = Math.atan2(dx, dz);
-      }
+      const len = Math.sqrt(moveX * moveX + moveZ * moveZ) || 1;
+      groupRef.current.rotation.y = Math.atan2(moveX / len, moveZ / len);
     }
 
     // Update mesh position

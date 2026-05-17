@@ -141,7 +141,8 @@ function StudentAvatar({ student, isDirected, idx }: {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDirected, idx]);
 
-  // Sitting pose: override leg bones AFTER animation mixer (priority 1)
+  // Sitting pose: override leg bones — useAnimations subscribes its useFrame first,
+  // so at priority 0 this runs after the mixer update (same priority = subscription order)
   useFrame(({ clock }) => {
     const b = bones.current;
     const SIT = Math.PI / 2.1; // ~86°
@@ -154,7 +155,7 @@ function StudentAvatar({ student, isDirected, idx }: {
       glowRef.current.intensity = isDirected
         ? 2.0 + Math.sin(clock.elapsedTime * 5) * 0.5 : 0;
     }
-  }, 1);
+  });
 
   const statusColor =
     student.status === 'active'     ? '#10B981' :

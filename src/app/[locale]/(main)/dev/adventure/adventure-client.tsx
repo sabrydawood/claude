@@ -91,7 +91,7 @@ function XbotOnIsland() {
   const groupRef = useRef<THREE.Group>(cloned);
   const { actions } = useAnimations(animations, groupRef);
   useEffect(() => { actions['idle']?.reset().play(); }, [actions]);
-  return <primitive ref={groupRef} object={cloned} scale={2.2} position={[0,-1.75,-3.5]} rotation={[0,0,0]} dispose={null} />;
+  return <primitive ref={groupRef} object={cloned} scale={1.5} position={[0,-1.75,-3.5]} rotation={[0,0,0]} dispose={null} />;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -158,7 +158,12 @@ function PlayerController({ playerPosRef, keysRef, monsters, defeated, onEncount
       Object.values(actions).forEach(a => a?.fadeOut(0.2));
       (moved ? actions['walk'] : actions['idle'])?.reset().fadeIn(0.2).play();
     }
-    if (groupRef.current) { groupRef.current.position.set(pos.x, pos.y-1.75, pos.z); if (moved) groupRef.current.rotation.y = 0; }
+    if (groupRef.current) {
+      groupRef.current.position.set(pos.x, pos.y-1.75, pos.z);
+      // Face forward into dungeon (toward -Z). Xbot.glb default faces +Z, so Math.PI to flip.
+      const movingBack = keysRef.current.has('ArrowDown') || keysRef.current.has('s') || keysRef.current.has('S');
+      groupRef.current.rotation.y = movingBack ? 0 : Math.PI;
+    }
     camera.position.lerp(new THREE.Vector3(pos.x, pos.y+3, pos.z+6), 0.1);
     camera.lookAt(pos.x, pos.y, pos.z-2);
     if (!encounterCooldownRef.current) {
@@ -168,7 +173,7 @@ function PlayerController({ playerPosRef, keysRef, monsters, defeated, onEncount
       }
     }
   });
-  return <primitive ref={groupRef} object={cloned} scale={2.2} position={[0,-1.75,2]} dispose={null} />;
+  return <primitive ref={groupRef} object={cloned} scale={1.3} position={[0,-1.3,2]} rotation={[0,Math.PI,0]} dispose={null} />;
 }
 
 function DungeonScene({ monsters, defeated, onMonsterEncounter, onExit, encounterCooldown }: {
@@ -185,21 +190,21 @@ function DungeonScene({ monsters, defeated, onMonsterEncounter, onExit, encounte
   }, []);
   return (
     <>
-      <color attach="background" args={['#0A0A0A']} />
-      <fog attach="fog" args={['#0A0A0A',10,28]} />
-      <ambientLight intensity={0.25} />
-      <pointLight position={[0,3,2]}   intensity={1.2} color="#A78BFA" distance={8} />
-      <pointLight position={[0,3,-8]}  intensity={0.8} color="#F59E0B" distance={8} />
-      <pointLight position={[0,3,-14]} intensity={0.8} color="#EF4444" distance={8} />
-      <pointLight position={[0,3,-20]} intensity={2}   color="#EF4444" distance={12} />
-      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1,-10]}><planeGeometry args={[5,28]} /><meshStandardMaterial color="#1C1C2E" roughness={1} /></mesh>
-      <mesh rotation={[Math.PI/2,0,0]}  position={[0,3,-10]}><planeGeometry args={[5,28]}  /><meshStandardMaterial color="#111118" roughness={1} /></mesh>
-      <mesh rotation={[0,Math.PI/2,0]}  position={[-2.5,1,-10]}><planeGeometry args={[28,4]} /><meshStandardMaterial color="#16162A" roughness={1} /></mesh>
-      <mesh rotation={[0,-Math.PI/2,0]} position={[2.5,1,-10]}><planeGeometry args={[28,4]}  /><meshStandardMaterial color="#16162A" roughness={1} /></mesh>
+      <color attach="background" args={['#0D0B1E']} />
+      <fog attach="fog" args={['#0D0B1E', 18, 38]} />
+      <ambientLight intensity={0.45} color="#9DA8FF" />
+      <pointLight position={[0,2.5,2]}   intensity={0.5} color="#A78BFA" distance={10} />
+      <pointLight position={[0,2.5,-8]}  intensity={0.4} color="#818CF8" distance={10} />
+      <pointLight position={[0,2.5,-14]} intensity={0.4} color="#C084FC" distance={10} />
+      <pointLight position={[0,2.5,-20]} intensity={1.0} color="#EF4444" distance={14} />
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-1,-10]}><planeGeometry args={[5,28]} /><meshStandardMaterial color="#13102A" roughness={1} /></mesh>
+      <mesh rotation={[Math.PI/2,0,0]}  position={[0,3,-10]}><planeGeometry args={[5,28]}  /><meshStandardMaterial color="#0F0D20" roughness={1} /></mesh>
+      <mesh rotation={[0,Math.PI/2,0]}  position={[-2.5,1,-10]}><planeGeometry args={[28,4]} /><meshStandardMaterial color="#14122A" roughness={1} /></mesh>
+      <mesh rotation={[0,-Math.PI/2,0]} position={[2.5,1,-10]}><planeGeometry args={[28,4]}  /><meshStandardMaterial color="#14122A" roughness={1} /></mesh>
       {[-8,-14,-20].map((z,i) => (
         <group key={i}>
-          <pointLight position={[-2.2,1.8,z]} intensity={1.5} color="#F59E0B" distance={4} />
-          <pointLight position={[2.2,1.8,z]}  intensity={1.5} color="#F59E0B" distance={4} />
+          <pointLight position={[-2.2,1.8,z]} intensity={0.6} color="#F59E0B" distance={5} />
+          <pointLight position={[2.2,1.8,z]}  intensity={0.6} color="#F59E0B" distance={5} />
           <mesh position={[-2.2,1.5,z]}><boxGeometry args={[0.1,0.4,0.1]} /><meshStandardMaterial color="#5D3A1A" /></mesh>
           <mesh position={[2.2,1.5,z]}><boxGeometry args={[0.1,0.4,0.1]} /><meshStandardMaterial color="#5D3A1A" /></mesh>
         </group>
@@ -218,72 +223,242 @@ function DungeonScene({ monsters, defeated, onMonsterEncounter, onExit, encounte
   );
 }
 
+// ─── Camera Controller ────────────────────────────────────────────────────────────
+
+function CameraController({ stage }: { stage: GameStage }) {
+  const target = stage === 'battle'
+    ? new THREE.Vector3(0, 3.5, 8)
+    : new THREE.Vector3(0, 8, 14);
+  useFrame(({ camera }) => {
+    camera.position.lerp(target, 0.05);
+    if (stage === 'battle') camera.lookAt(0, 0.5, 0);
+  });
+  return null;
+}
+
+// ─── Battle Arena ─────────────────────────────────────────────────────────────────
+
+function BattleArenaXbot({ attacking }: { attacking: boolean }) {
+  const { scene, animations } = useGLTF('/models/Xbot.glb');
+  const cloned = useMemo(() => {
+    const c = SkeletonUtils.clone(scene) as THREE.Group;
+    c.traverse(child => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mats = Array.isArray((child as THREE.Mesh).material)
+          ? (child as THREE.Mesh).material as THREE.Material[]
+          : [(child as THREE.Mesh).material as THREE.Material];
+        mats.forEach(m => {
+          const sm = m as THREE.MeshStandardMaterial;
+          if (sm.color) sm.color.set('#7C3AED');
+          sm.metalness = 0.4; sm.roughness = 0.4; sm.needsUpdate = true;
+        });
+      }
+    });
+    return c;
+  }, [scene]);
+  const groupRef = useRef<THREE.Group>(cloned);
+  const { actions } = useAnimations(animations, groupRef);
+  const baseX = useRef(-2.2);
+  useEffect(() => { actions['idle']?.reset().play(); }, [actions]);
+  useFrame(() => {
+    if (!groupRef.current) return;
+    const targetX = attacking ? 0.2 : baseX.current;
+    groupRef.current.position.x += (targetX - groupRef.current.position.x) * 0.15;
+  });
+  return (
+    <primitive
+      ref={groupRef}
+      object={cloned}
+      scale={1.3}
+      position={[-2.2, -1.3, 0]}
+      rotation={[0, Math.PI / 2, 0]}
+      dispose={null}
+    />
+  );
+}
+
+function BattleArenaScene({ monster, monsterHp, xbotAttacking, monsterAttacking }: {
+  monster: Monster; monsterHp: number; xbotAttacking: boolean; monsterAttacking: boolean;
+}) {
+  const monsterGroupRef = useRef<THREE.Group>(null!);
+  const baseMonsterX = useRef(2.5);
+
+  useFrame(() => {
+    if (!monsterGroupRef.current) return;
+    const targetX = monsterAttacking ? -0.2 : baseMonsterX.current;
+    monsterGroupRef.current.position.x += (targetX - monsterGroupRef.current.position.x) * 0.15;
+  });
+
+  const isBoss = monster.type === 'boss';
+
+  return (
+    <>
+      <color attach="background" args={[isBoss ? '#1A0505' : '#0A0520']} />
+      <fog attach="fog" args={[isBoss ? '#1A0505' : '#0A0520', 12, 30]} />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[0, 8, 4]} intensity={0.6} color="#C4B5FD" />
+      {/* Arena platform */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
+        <circleGeometry args={[5, 64]} />
+        <meshStandardMaterial color={isBoss ? '#1C0A0A' : '#0F0A30'} roughness={0.8} />
+      </mesh>
+      {/* Glowing ring edge */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.33, 0]}>
+        <ringGeometry args={[4.7, 5.0, 64]} />
+        <meshStandardMaterial
+          color={isBoss ? '#EF4444' : '#7C3AED'}
+          emissive={isBoss ? '#EF4444' : '#7C3AED'}
+          emissiveIntensity={0.8}
+        />
+      </mesh>
+      {/* Arena lights */}
+      <pointLight position={[-3, 3, 0]} intensity={1.5} color="#7C3AED" distance={8} />
+      <pointLight position={[3, 3, 0]} intensity={1.5} color={monster.color} distance={8} />
+      <pointLight position={[0, 5, 0]} intensity={0.8} color={isBoss ? '#EF4444' : '#C4B5FD'} distance={12} />
+      {/* Stars */}
+      <Stars radius={40} depth={20} count={400} factor={2} fade speed={0.3} />
+      {/* Player side pillar light */}
+      <mesh position={[-4, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 3, 8]} />
+        <meshStandardMaterial color="#2D1B69" />
+      </mesh>
+      <pointLight position={[-4, 2, 0]} intensity={0.6} color="#7C3AED" distance={3} />
+      {/* Monster side pillar */}
+      <mesh position={[4, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 3, 8]} />
+        <meshStandardMaterial color={isBoss ? '#7F1D1D' : '#374151'} />
+      </mesh>
+      <pointLight position={[4, 2, 0]} intensity={0.6} color={monster.color} distance={3} />
+      {/* Xbot (player) */}
+      <Suspense fallback={null}>
+        <BattleArenaXbot attacking={xbotAttacking} />
+      </Suspense>
+      {/* Monster */}
+      <group ref={monsterGroupRef} position={[2.5, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        {monster.type === 'slime' && <SlimeMonster color={monster.color} defeated={false} />}
+        {monster.type === 'ghost' && <GhostMonster color={monster.color} defeated={false} />}
+        {monster.type === 'rock'  && <RockMonster  color={monster.color} defeated={false} />}
+        {monster.type === 'boss'  && <BossMonster  hp={monsterHp} maxHp={monster.maxHp} defeated={false} />}
+      </group>
+      {/* VS text */}
+      <Text position={[0, 0.5, 0]} fontSize={0.5} color="rgba(255,255,255,0.15)" anchorX="center">VS</Text>
+    </>
+  );
+}
+
 // ─── Battle Screen (HTML overlay) ────────────────────────────────────────────────
 
 function BattleScreen({ monster, monsterHp, playerHp, onAnswer }: {
-  monster: Monster; monsterHp: number; playerHp: number; onAnswer: (correct:boolean) => void;
+  monster: Monster; monsterHp: number; playerHp: number; onAnswer: (correct: boolean) => void;
 }) {
-  const [answered, setAnswered] = useState<number|null>(null);
-  const [shake, setShake] = useState(false);
-  function handleAnswer(idx:number) {
+  const [answered, setAnswered] = useState<number | null>(null);
+
+  function handleAnswer(idx: number) {
     if (answered !== null) return;
     setAnswered(idx);
     const correct = idx === monster.question.correct;
-    if (!correct) { setShake(true); setTimeout(() => setShake(false), 500); }
-    setTimeout(() => { onAnswer(correct); setAnswered(null); }, 900);
+    setTimeout(() => { onAnswer(correct); setAnswered(null); }, 800);
   }
-  const monsterVisual = (
-    <div className="flex items-end justify-center h-40">
-      {monster.type==='slime' && <motion.div animate={{ y:[0,-10,0] }} transition={{ repeat:Infinity, duration:0.8 }} className="w-20 h-20 rounded-full flex items-center justify-center shadow-2xl" style={{ background:monster.color, boxShadow:`0 0 30px ${monster.color}` }}><div className="flex gap-2"><div className="w-3 h-3 bg-white rounded-full" /><div className="w-3 h-3 bg-white rounded-full" /></div></motion.div>}
-      {monster.type==='ghost' && <motion.div animate={{ y:[0,-8,0], opacity:[0.7,1,0.7] }} transition={{ repeat:Infinity, duration:1.2 }} className="w-20 h-24 rounded-t-full flex items-center justify-center" style={{ background:`${monster.color}CC`, boxShadow:`0 0 25px ${monster.color}` }}><div className="flex gap-2 mb-2"><div className="w-3 h-3 bg-slate-900 rounded-full" /><div className="w-3 h-3 bg-slate-900 rounded-full" /></div></motion.div>}
-      {monster.type==='rock'  && <div className="w-20 h-24 rounded-md flex flex-col items-center justify-center gap-1" style={{ background:monster.color, boxShadow:`0 0 15px ${monster.color}66` }}><div className="w-16 h-8 rounded-sm" style={{ background:'#6B7280' }} /><div className="flex gap-1"><div className="w-3 h-3 rounded-full bg-red-500" /><div className="w-3 h-3 rounded-full bg-red-500" /></div></div>}
-      {monster.type==='boss'  && <motion.div animate={{ scale:[1,1.05,1], rotate:[-2,2,-2] }} transition={{ repeat:Infinity, duration:0.8 }} style={{ filter:`drop-shadow(0 0 20px #EF4444)` }} className="w-32 h-36 relative"><div className="w-28 h-28 rounded-lg mx-auto" style={{ background:'linear-gradient(135deg, #DC2626, #991B1B)', boxShadow:'0 0 30px #EF4444' }}><div className="flex justify-center gap-4 pt-4"><div className="w-5 h-5 rounded-full bg-yellow-300" style={{ boxShadow:'0 0 10px #FDE047' }} /><div className="w-5 h-5 rounded-full bg-yellow-300" style={{ boxShadow:'0 0 10px #FDE047' }} /></div></div></motion.div>}
-    </div>
-  );
+
+  const isBoss = monster.type === 'boss';
+
   return (
-    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} className="fixed inset-0 z-50 flex flex-col" style={{ background:'linear-gradient(180deg, #0F0A30 0%, #1A0A3A 50%, #0F0A30 100%)' }}>
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length:30 }, (_,i) => (
-          <motion.div key={i} className="absolute rounded-full bg-white" style={{ width:i%4===0?3:1.5, height:i%4===0?3:1.5, top:`${(i*37+13)%97}%`, left:`${(i*53+7)%97}%` }} animate={{ opacity:[0.2,0.8,0.2] }} transition={{ delay:i*0.15, duration:2+i%3, repeat:Infinity }} />
-        ))}
-      </div>
-      <div className="text-center pt-6 pb-2 relative z-10">
-        <motion.h1 initial={{ scale:0 }} animate={{ scale:1 }} transition={{ type:'spring', stiffness:400 }} className="text-3xl font-black tracking-widest" style={{ color:monster.type==='boss'?'#EF4444':'#F59E0B', textShadow:'0 0 20px currentColor' }}>
-          {monster.type==='boss'?'⚔️ BOSS BATTLE!':'⚔️ BATTLE!'}
-        </motion.h1>
-      </div>
-      <div className="flex-1 flex items-center justify-around px-8 relative z-10">
-        <div className="flex flex-col items-center gap-3">
-          <div className="text-xs text-white/50 font-bold">أحمد</div>
-          <div className="flex gap-1.5">{Array.from({ length:3 }, (_,i) => <motion.div key={i} animate={i>=playerHp?{ scale:[1,1.3,1] }:{}} className={`w-7 h-7 rounded-full flex items-center justify-center text-sm ${i<playerHp?'bg-red-500 shadow-[0_0_10px_#EF4444]':'bg-slate-700'}`}>{i<playerHp?'❤':'🖤'}</motion.div>)}</div>
-          <div className="w-20 h-28 rounded-xl bg-purple-900/50 border border-purple-500/30 flex items-center justify-center text-4xl">🤖</div>
+    <>
+      {/* Top HUD bar for battle */}
+      <div style={{ position:'fixed', top:0, left:0, right:0, zIndex:50, background:'linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)', padding:'12px 24px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        {/* Player HP */}
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-white/50 font-bold">أحمد</span>
+          <div className="flex gap-1.5">
+            {Array.from({ length: 3 }, (_, i) => (
+              <motion.div key={i}
+                animate={i === playerHp ? { scale: [1.5, 1] } : {}}
+                className="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                style={{ background: i < playerHp ? '#EF4444' : '#1F2937', boxShadow: i < playerHp ? '0 0 8px #EF4444' : 'none' }}>
+                {i < playerHp ? '♥' : '♡'}
+              </motion.div>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col items-center gap-2">
-          <div className="text-2xl font-black text-white/20">VS</div>
-          {answered !== null && <motion.div initial={{ scale:0 }} animate={{ scale:1 }} className={`text-lg font-black ${answered===monster.question.correct?'text-emerald-400':'text-red-400'}`}>{answered===monster.question.correct?'💥 Hit!':'💔 Miss!'}</motion.div>}
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <div className="text-xs font-bold" style={{ color:monster.color }}>{monster.name}</div>
-          {monster.type==='boss'
-            ? <div className="flex gap-1.5">{Array.from({ length:monster.maxHp }, (_,i) => <div key={i} className={`w-5 h-5 rounded-full ${i<monsterHp?'bg-red-500':'bg-slate-700'}`} />)}</div>
-            : <div className="w-20 h-2 bg-slate-700 rounded-full overflow-hidden"><motion.div animate={{ width:monsterHp>0?'100%':'0%' }} className="h-full bg-red-500 rounded-full" transition={{ duration:0.5 }} /></div>
-          }
-          <motion.div animate={shake?{ x:[-6,6,-6,6,0] }:{}} transition={{ duration:0.4 }}>{monsterVisual}</motion.div>
+
+        {/* Battle title */}
+        <motion.div
+          initial={{ scale: 0 }} animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+          className="text-center">
+          <p className={`font-black text-xl tracking-widest ${isBoss ? 'text-red-500' : 'text-amber-400'}`}
+            style={{ textShadow: `0 0 20px ${isBoss ? '#EF4444' : '#F59E0B'}` }}>
+            {isBoss ? 'BOSS BATTLE' : 'BATTLE'}
+          </p>
+          <p className="text-xs text-white/40">{monster.name}</p>
+        </motion.div>
+
+        {/* Monster HP */}
+        <div className="flex flex-col items-end gap-1">
+          <span className="text-xs font-bold" style={{ color: monster.color }}>{monster.name}</span>
+          {monster.type === 'boss' ? (
+            <div className="flex gap-1">
+              {Array.from({ length: monster.maxHp }, (_, i) => (
+                <motion.div key={i}
+                  animate={i === monsterHp ? { scale: [1.5, 1] } : {}}
+                  className="w-5 h-5 rounded-full"
+                  style={{ background: i < monsterHp ? '#EF4444' : '#1F2937', boxShadow: i < monsterHp ? '0 0 6px #EF4444' : 'none' }} />
+              ))}
+            </div>
+          ) : (
+            <div className="w-24 h-3 bg-slate-800 rounded-full overflow-hidden border border-white/10">
+              <motion.div
+                animate={{ width: `${(monsterHp / monster.maxHp) * 100}%` }}
+                transition={{ duration: 0.4 }}
+                className="h-full rounded-full"
+                style={{ background: `linear-gradient(90deg, ${monster.color}, ${monster.color}88)` }}
+              />
+            </div>
+          )}
         </div>
       </div>
-      <motion.div initial={{ y:100 }} animate={{ y:0 }} transition={{ delay:0.3, type:'spring' }} className="mx-4 mb-4 rounded-2xl border border-white/10 overflow-hidden relative z-10" style={{ background:'rgba(15,10,48,0.95)', backdropFilter:'blur(16px)' }}>
-        <div className="px-5 py-4">
-          <p className="text-white font-bold text-base text-center leading-relaxed mb-4 whitespace-pre-line">{monster.question.text}</p>
+
+      {/* Question panel - bottom */}
+      <motion.div
+        initial={{ y: '100%' }} animate={{ y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        style={{ position:'fixed', bottom:0, left:0, right:0, zIndex:50, background:'linear-gradient(to top, rgba(5,3,20,0.97) 65%, transparent)', padding:'16px 16px 28px' }}>
+        {/* Question text */}
+        <div className="max-w-lg mx-auto">
+          <div className="mb-4 px-4 py-3 rounded-2xl text-center"
+            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)' }}>
+            <p className="text-white font-bold text-base leading-relaxed whitespace-pre-line">
+              {monster.question.text}
+            </p>
+          </div>
+          {/* Options */}
           <div className="grid grid-cols-1 gap-2">
-            {monster.question.options.map((opt,i) => {
-              let cls = 'bg-white/5 border-white/15 text-white/90 hover:bg-white/10';
-              if (answered !== null) { if (i===monster.question.correct) cls='bg-emerald-600/30 border-emerald-500 text-emerald-300'; else if (i===answered) cls='bg-red-600/30 border-red-500 text-red-300'; else cls='bg-white/5 border-white/10 text-white/30'; }
-              return <button key={i} onClick={() => handleAnswer(i)} disabled={answered!==null} className={`px-4 py-3 rounded-xl border text-sm font-semibold text-right transition-all ${cls}`}>{opt}</button>;
+            {monster.question.options.map((opt, i) => {
+              let bg = 'rgba(255,255,255,0.06)';
+              let border = 'rgba(255,255,255,0.12)';
+              let color = 'rgba(255,255,255,0.9)';
+              if (answered !== null) {
+                if (i === monster.question.correct) { bg = 'rgba(16,185,129,0.2)'; border = '#10B981'; color = '#6EE7B7'; }
+                else if (i === answered) { bg = 'rgba(239,68,68,0.2)'; border = '#EF4444'; color = '#FCA5A5'; }
+                else { color = 'rgba(255,255,255,0.2)'; }
+              }
+              return (
+                <motion.button
+                  key={i}
+                  onClick={() => handleAnswer(i)}
+                  disabled={answered !== null}
+                  whileHover={answered === null ? { scale: 1.02, x: -4 } : {}}
+                  whileTap={answered === null ? { scale: 0.98 } : {}}
+                  className="px-5 py-3 rounded-xl text-sm font-bold text-right transition-colors"
+                  style={{ background: bg, border: `1px solid ${border}`, color }}>
+                  {opt}
+                </motion.button>
+              );
             })}
           </div>
         </div>
       </motion.div>
-    </motion.div>
+    </>
   );
 }
 
@@ -298,28 +473,38 @@ export default function AdventureClient({ locale }: { locale: string }) {
   const [monsterHp, setMonsterHp]     = useState(1);
   const encounterCooldown             = useRef(false);
   const [showVictory, setVictory]     = useState(false);
+  const [xbotAttacking, setXbotAttacking]     = useState(false);
+  const [monsterAttacking, setMonsterAttacking] = useState(false);
 
   // suppress unused type import warning
   void (null as unknown as RobotMood);
 
   function handleEncounter(m:Monster) { setMonster(m); setMonsterHp(m.maxHp); setStage('battle'); }
 
-  function handleBattleAnswer(correct:boolean) {
+  function handleBattleAnswer(correct: boolean) {
     if (!currentMonster) return;
     if (correct) {
-      const newHp = monsterHp - 1;
-      if (newHp <= 0) {
-        const newDefeated = new Set(defeated).add(currentMonster.id);
-        setDefeated(newDefeated); setStage('dungeon'); setMonster(null);
-        setTimeout(() => { encounterCooldown.current = false; }, 1500);
-        if (newDefeated.size === MONSTERS.length) setVictory(true);
-      } else { setMonsterHp(newHp); }
+      setXbotAttacking(true);
+      setTimeout(() => setXbotAttacking(false), 700);
+      setTimeout(() => {
+        const newHp = monsterHp - 1;
+        if (newHp <= 0) {
+          const newDefeated = new Set(defeated).add(currentMonster.id);
+          setDefeated(newDefeated); setStage('dungeon'); setMonster(null);
+          setTimeout(() => { encounterCooldown.current = false; }, 1500);
+          if (newDefeated.size === MONSTERS.length) setVictory(true);
+        } else { setMonsterHp(newHp); }
+      }, 500);
     } else {
-      const newHp = Math.max(0, playerHp-1);
-      setPlayerHp(newHp);
-      if (newHp <= 0) {
-        setTimeout(() => { setPlayerHp(3); setDefeated(new Set()); setMonster(null); setStage('dungeon'); encounterCooldown.current=false; }, 1500);
-      }
+      setMonsterAttacking(true);
+      setTimeout(() => setMonsterAttacking(false), 700);
+      setTimeout(() => {
+        const newHp = Math.max(0, playerHp - 1);
+        setPlayerHp(newHp);
+        if (newHp <= 0) {
+          setTimeout(() => { setPlayerHp(3); setDefeated(new Set()); setMonster(null); setStage('dungeon'); encounterCooldown.current = false; }, 1500);
+        }
+      }, 500);
     }
   }
 
@@ -327,8 +512,17 @@ export default function AdventureClient({ locale }: { locale: string }) {
     <div style={{ position:'fixed', inset:0 }} dir={isRtl?'rtl':'ltr'}>
       <Canvas camera={{ position:[0,8,14], fov:50 }} style={{ width:'100%', height:'100%' }} gl={{ antialias:true }}>
         <Suspense fallback={null}>
-          {(stage==='island' || stage==='battle') && <IslandScene onEnterDungeon={() => setStage('dungeon')} />}
+          {stage==='island' && <IslandScene onEnterDungeon={() => setStage('dungeon')} />}
+          {stage==='battle' && currentMonster && (
+            <BattleArenaScene
+              monster={currentMonster}
+              monsterHp={monsterHp}
+              xbotAttacking={xbotAttacking}
+              monsterAttacking={monsterAttacking}
+            />
+          )}
           {stage==='dungeon' && <DungeonScene monsters={MONSTERS} defeated={defeated} onMonsterEncounter={handleEncounter} onExit={() => setStage('island')} encounterCooldown={encounterCooldown} />}
+          {stage !== 'dungeon' && <CameraController stage={stage} />}
         </Suspense>
       </Canvas>
 
@@ -354,12 +548,16 @@ export default function AdventureClient({ locale }: { locale: string }) {
         </div>
       )}
 
-      {/* Battle screen */}
-      <AnimatePresence>
-        {stage==='battle' && currentMonster && (
-          <BattleScreen key={currentMonster.id} monster={currentMonster} monsterHp={monsterHp} playerHp={playerHp} onAnswer={handleBattleAnswer} />
-        )}
-      </AnimatePresence>
+      {/* Battle UI overlays (3D scene is in Canvas) */}
+      {stage === 'battle' && currentMonster && (
+        <BattleScreen
+          key={currentMonster.id}
+          monster={currentMonster}
+          monsterHp={monsterHp}
+          playerHp={playerHp}
+          onAnswer={handleBattleAnswer}
+        />
+      )}
 
       {/* Victory overlay */}
       <AnimatePresence>

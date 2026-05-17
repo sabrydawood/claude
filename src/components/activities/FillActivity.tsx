@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { Lightbulb } from 'lucide-react';
 
 export interface FillItem {
   id: string;
@@ -80,9 +81,10 @@ export default function FillActivity({ item, locale, onAnswer }: FillActivityPro
             <button
               type="button"
               onClick={() => { setShowHint(true); setHintsUsed(h => h + 1); }}
-              className="text-xs text-gray-400 underline"
+              className="text-xs text-gray-400 underline inline-flex items-center gap-1"
             >
-              {isRtl ? `💡 تلميح (${xpPercent}% XP)` : `💡 Hint (${xpPercent}% XP)`}
+              <Lightbulb size={14} />
+              {isRtl ? `تلميح (${xpPercent}% XP)` : `Hint (${xpPercent}% XP)`}
             </button>
           ) : (
             <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">{hint}</p>

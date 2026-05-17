@@ -4,9 +4,28 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  Wrench, X, Bot, Home, BarChart3, Globe, Rocket,
+  Sparkles, BookOpen, FlaskConical, Trophy, Users, Settings,
+} from 'lucide-react';
 
 const PURPLE = '#7C3AED';
 const GOLD = '#F59E0B';
+
+const ICON_MAP: Record<string, React.ReactNode> = {
+  home:      <Home size={16} />,
+  dashboard: <BarChart3 size={16} />,
+  dev:       <Globe size={16} />,
+  journey:   <Rocket size={16} />,
+  onboarding:<Sparkles size={16} />,
+  agents:    <Bot size={16} />,
+  tracks:    <BookOpen size={16} />,
+  sandbox:   <FlaskConical size={16} />,
+  leaderboard:<Trophy size={16} />,
+  parent:    <Users size={16} />,
+  admin:     <Settings size={16} />,
+  classroom: <Users size={16} />,
+};
 
 interface NavItem {
   href: string;
@@ -16,17 +35,18 @@ interface NavItem {
 }
 
 const PAGES: NavItem[] = [
-  { href: '/', label: 'Home', icon: '🏠', tag: 'home' },
-  { href: '/ar/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/ar/dev', label: 'Dev Preview (3D Map)', icon: '🌐', tag: 'dev' },
-  { href: '/ar/dev/child-journey', label: 'Child Journey Demo', icon: '🚀', tag: 'dev' },
-  { href: '/ar/onboarding', label: 'Onboarding', icon: '👋' },
-  { href: '/ar/agents', label: 'AI Agents', icon: '🤖' },
-  { href: '/ar/tracks', label: 'Tracks', icon: '📚' },
-  { href: '/ar/sandbox', label: 'Sandbox', icon: '🧪' },
-  { href: '/ar/leaderboard', label: 'Leaderboard', icon: '🏆' },
-  { href: '/ar/parent', label: 'Parent Portal', icon: '👨‍👩‍👧' },
-  { href: '/ar/admin', label: 'Admin', icon: '⚙️' },
+  { href: '/', label: 'Home', icon: 'home', tag: 'home' },
+  { href: '/ar/dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { href: '/ar/dev', label: 'Dev Preview (3D Map)', icon: 'dev', tag: 'dev' },
+  { href: '/ar/dev/child-journey', label: 'Child Journey Demo', icon: 'journey', tag: 'dev' },
+  { href: '/ar/dev/classroom', label: 'Classroom Demo', icon: 'classroom', tag: 'dev' },
+  { href: '/ar/onboarding', label: 'Onboarding', icon: 'onboarding' },
+  { href: '/ar/agents', label: 'AI Agents', icon: 'agents' },
+  { href: '/ar/tracks', label: 'Tracks', icon: 'tracks' },
+  { href: '/ar/sandbox', label: 'Sandbox', icon: 'sandbox' },
+  { href: '/ar/leaderboard', label: 'Leaderboard', icon: 'leaderboard' },
+  { href: '/ar/parent', label: 'Parent Portal', icon: 'parent' },
+  { href: '/ar/admin', label: 'Admin', icon: 'admin' },
 ];
 
 export default function DevSidebar() {
@@ -75,7 +95,7 @@ export default function DevSidebar() {
         }}
         title="DEV Sidebar (Ctrl+Shift+D)"
       >
-        {open ? '✕' : '🛠️'}
+        {open ? <X size={18} color="white" /> : <Wrench size={18} color="white" />}
       </motion.button>
 
       {/* Sidebar panel */}
@@ -131,9 +151,8 @@ export default function DevSidebar() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 18,
                   }}>
-                    🤖
+                    <Bot size={18} color="white" />
                   </div>
                   <div>
                     <div style={{ color: '#A78BFA', fontWeight: 800, fontSize: 16, lineHeight: 1 }}>ذكاوي</div>
@@ -162,7 +181,7 @@ export default function DevSidebar() {
                 {/* Dev pages */}
                 <div style={{ marginBottom: 4 }}>
                   <div style={{ padding: '6px 8px', color: GOLD, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                    🎮 Dev Demos
+                    Dev Demos
                   </div>
                   {PAGES.filter(p => p.tag === 'dev').map(p => (
                     <NavLink key={p.href} item={p} currentPath={pathname} />
@@ -172,7 +191,7 @@ export default function DevSidebar() {
                 {/* Main app pages */}
                 <div style={{ marginTop: 12 }}>
                   <div style={{ padding: '6px 8px', color: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                    📱 App Pages
+                    App Pages
                   </div>
                   {PAGES.filter(p => p.tag !== 'dev').map(p => (
                     <NavLink key={p.href} item={p} currentPath={pathname} />
@@ -234,7 +253,9 @@ function NavLink({ item, currentPath }: { item: NavItem; currentPath: string }) 
         }
       }}
     >
-      <span style={{ fontSize: 16, width: 22, textAlign: 'center' }}>{item.icon}</span>
+      <span style={{ width: 22, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {ICON_MAP[item.icon] ?? null}
+      </span>
       <span style={{ flex: 1 }}>{item.label}</span>
       {isActive && (
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#A78BFA' }} />

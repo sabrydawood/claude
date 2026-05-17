@@ -1,5 +1,7 @@
 'use client';
 
+import { Bot, Globe, Star, CheckCircle2, Lock } from 'lucide-react';
+
 export type AgeGroup = 'spark' | 'explorer' | 'builder';
 
 export function GetAgeGroup(birthdate: Date | string | null): AgeGroup {
@@ -39,7 +41,7 @@ function SparkNavigation({ items, isRtl }: { items: NavigationItem[]; isRtl: boo
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'} className="flex flex-col gap-4 px-4 py-6">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-3xl">🤖</span>
+        <Bot size={20} className="text-purple-500" />
         <p className="text-sm font-medium text-gray-600">
           {isRtl ? 'Xbot يقودك خطوة بخطوة' : 'Xbot guides you step by step'}
         </p>
@@ -56,8 +58,12 @@ function SparkNavigation({ items, isRtl }: { items: NavigationItem[]; isRtl: boo
               'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed opacity-60',
             ].join(' ')}
           >
-            <span className="text-2xl w-8 text-center">
-              {item.isCompleted ? '✅' : item.isUnlocked ? `${i + 1}` : '🔒'}
+            <span className="w-8 flex items-center justify-center">
+              {item.isCompleted
+                ? <CheckCircle2 size={24} className="text-green-600" />
+                : item.isUnlocked
+                  ? <span className="text-2xl font-bold">{i + 1}</span>
+                  : <Lock size={20} />}
             </span>
             <span className="font-semibold text-base flex-1">
               {isRtl ? item.titleAr : item.titleEn}
@@ -89,9 +95,15 @@ function ExplorerNavigation({ items, isRtl }: { items: NavigationItem[]; isRtl: 
             ].join(' ')}
           >
             {!item.isUnlocked && (
-              <span className="absolute top-2 end-2 text-lg">🔒</span>
+              <span className="absolute top-2 end-2">
+                <Lock size={14} />
+              </span>
             )}
-            <span className="text-2xl mb-1">{item.isCompleted ? '🌟' : '🏝️'}</span>
+            <span className="mb-1 flex items-center justify-center">
+              {item.isCompleted
+                ? <Star size={16} className="fill-current" />
+                : <Globe size={20} />}
+            </span>
             <span className="text-xs font-bold text-center leading-tight">
               {isRtl ? item.titleAr : item.titleEn}
             </span>

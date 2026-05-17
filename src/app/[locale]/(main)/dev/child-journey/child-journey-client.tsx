@@ -701,10 +701,11 @@ export default function ChildJourneyClient({ locale }: { locale: string }) {
                     </p>
                   </div>
                   <div style={{
-                    background: 'rgba(255,255,255,0.05)',
+                    background: 'white',
                     borderRadius: 20,
                     padding: 20,
                     border: '1px solid rgba(255,255,255,0.08)',
+                    color: '#1F2937',
                   }}>
                     {activityDone ? (
                       <motion.div

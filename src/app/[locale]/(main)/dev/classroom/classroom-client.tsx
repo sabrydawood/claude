@@ -1,13 +1,16 @@
 'use client';
 import { Suspense, useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Stars, Text, useGLTF, useAnimations } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Stars, Text, OrbitControls, useGLTF, useAnimations } from '@react-three/drei';
 import { SkeletonUtils } from 'three-stdlib';
 import * as THREE from 'three';
-import { motion } from 'framer-motion';
-import { Users, Target, Zap, BookOpen, Award, MessageSquare } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Users, Target, Zap, BookOpen, Award, MessageSquare, Brain, TrendingUp } from 'lucide-react';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Preload at module level so GLTF is ready before first render
+useGLTF.preload('/models/Xbot.glb');
+
+// ─── Types ─────────────────────────────────────────────────────────────────────
 
 type StudentStatus = 'active' | 'thinking' | 'struggling' | 'offline';
 
@@ -22,217 +25,340 @@ interface Student {
   pos: [number, number, number];
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+// ─── Data ──────────────────────────────────────────────────────────────────────
 
 const STUDENTS: Student[] = [
-  { id: '1', name: 'أحمد',  mastery: 92, xp: 1240, level: 8, status: 'active',     streak: 5, pos: [-5, 0, -1] },
-  { id: '2', name: 'سارة',  mastery: 78, xp: 890,  level: 6, status: 'thinking',   streak: 3, pos: [0,  0, -1] },
-  { id: '3', name: 'محمد',  mastery: 61, xp: 650,  level: 5, status: 'struggling', streak: 1, pos: [5,  0, -1] },
-  { id: '4', name: 'ليلى',  mastery: 85, xp: 1050, level: 7, status: 'active',     streak: 7, pos: [-5, 0,  3] },
-  { id: '5', name: 'يوسف',  mastery: 45, xp: 420,  level: 4, status: 'offline',    streak: 0, pos: [0,  0,  3] },
-  { id: '6', name: 'نور',   mastery: 73, xp: 780,  level: 6, status: 'thinking',   streak: 4, pos: [5,  0,  3] },
+  { id: '1', name: 'أحمد',  mastery: 92, xp: 1240, level: 8, status: 'active',     streak: 5, pos: [-4.5, 0,  0.0] },
+  { id: '2', name: 'سارة',  mastery: 78, xp: 890,  level: 6, status: 'thinking',   streak: 3, pos: [0,    0,  0.0] },
+  { id: '3', name: 'محمد',  mastery: 61, xp: 650,  level: 5, status: 'struggling', streak: 1, pos: [4.5,  0,  0.0] },
+  { id: '4', name: 'ليلى',  mastery: 85, xp: 1050, level: 7, status: 'active',     streak: 7, pos: [-4.5, 0,  3.2] },
+  { id: '5', name: 'يوسف',  mastery: 45, xp: 420,  level: 4, status: 'offline',    streak: 0, pos: [0,    0,  3.2] },
+  { id: '6', name: 'نور',   mastery: 73, xp: 780,  level: 6, status: 'thinking',   streak: 4, pos: [4.5,  0,  3.2] },
+];
+
+const STUDENT_STYLES = [
+  { hair: '#1C1C1C', shirt: '#6366F1', skin: '#F2C18A' },
+  { hair: '#8B4513', shirt: '#EC4899', skin: '#F5C5A3' },
+  { hair: '#2C2C2C', shirt: '#0EA5E9', skin: '#E8B48A' },
+  { hair: '#8B0000', shirt: '#10B981', skin: '#F0C090' },
+  { hair: '#4A3728', shirt: '#F59E0B', skin: '#E0A070' },
+  { hair: '#1A1A2E', shirt: '#A855F7', skin: '#F5D0A9' },
+];
+
+const STUDENT_RESPONSES = [
+  'for يتكرر عدداً محدداً من المرات!',
+  'while يتكرر حتى الشرط يصبح false!',
+  'break تخرج من الحلقة فوراً!',
+  'أفهم الآن! شكراً يا معلم!',
+  'هل يمكنك الشرح مرة أخرى؟',
+  'أعتقد while أكثر مرونة!',
 ];
 
 const PHASES = [
-  { id: 0, bubble: 'اليوم نتعلم الحلقات!\nالحلقة تكرر كوداً عدة مرات.',  directed: null, action: 'explaining'    },
-  { id: 1, bubble: 'أحمد — ما الفرق بين\nfor و while؟',                   directed: '1',  action: 'questioning'   },
-  { id: 2, bubble: 'إجابة ممتازة يا أحمد!\n+5 نقاط لك.',                  directed: '1',  action: 'praising'      },
-  { id: 3, bubble: 'الآن — متى نستخدم break؟\nمن يعرف؟',                  directed: null, action: 'explaining'    },
-  { id: 4, bubble: 'سارة — ساعدي محمد\nفي فهم break',                     directed: '2',  action: 'peer-teaching' },
-  { id: 5, bubble: 'رائع! كلاهما يفهم الآن.\n+10 XP لسارة.',              directed: '2',  action: 'praising'      },
+  { id: 0, bubble: 'اليوم نتعلم الحلقات!\nالحلقة تكرر كوداً عدة مرات.',   directed: null, action: 'explaining'    },
+  { id: 1, bubble: 'أحمد — ما الفرق بين\nfor و while؟',                    directed: '1',  action: 'questioning'   },
+  { id: 2, bubble: 'إجابة ممتازة يا أحمد!\n+5 نقاط لك.',                   directed: '1',  action: 'praising'      },
+  { id: 3, bubble: 'الآن — متى نستخدم break؟\nمن يعرف؟',                   directed: null, action: 'explaining'    },
+  { id: 4, bubble: 'سارة — ساعدي محمد\nفي فهم break',                      directed: '2',  action: 'peer-teaching' },
+  { id: 5, bubble: 'رائع! كلاهما يفهم الآن.\n+10 XP لسارة.',               directed: '2',  action: 'praising'      },
 ] as const;
 
 type Phase = typeof PHASES[number];
 
-// ─── CameraSetup ──────────────────────────────────────────────────────────────
+// ─── StudentAvatar ──────────────────────────────────────────────────────────────
 
-function CameraSetup() {
-  const { camera } = useThree();
+function StudentAvatar({ student, isDirected, idx }: {
+  student: Student;
+  isDirected: boolean;
+  idx: number;
+}) {
+  const groupRef   = useRef<THREE.Group>(null!);
+  const headRef    = useRef<THREE.Group>(null!);
+  const bodyRef    = useRef<THREE.Group>(null!);
+  const glowRef    = useRef<THREE.PointLight>(null!);
+  const [showResp, setShowResp] = useState(false);
+
+  const style = STUDENT_STYLES[idx % STUDENT_STYLES.length];
+  const statusColor =
+    student.status === 'active'     ? '#10B981' :
+    student.status === 'thinking'   ? '#F59E0B' :
+    student.status === 'struggling' ? '#EF4444' : '#6B7280';
+
   useEffect(() => {
-    camera.lookAt(0, 1, -1);
-    camera.updateProjectionMatrix();
-  }, [camera]);
-  return null;
-}
-
-// ─── StudentAvatar ────────────────────────────────────────────────────────────
-
-function StudentAvatar({ student, isDirected }: { student: Student; isDirected: boolean }) {
-  const headRef = useRef<THREE.Mesh>(null!);
-  const glowRef = useRef<THREE.PointLight>(null!);
-  const tabletRef = useRef<THREE.Mesh>(null!);
-
-  const bodyColor =
-    student.status === 'active'     ? '#6366F1' :
-    student.status === 'thinking'   ? '#D97706' :
-    student.status === 'struggling' ? '#DC2626' :
-    '#4B5563';
+    if (isDirected) {
+      const t = setTimeout(() => setShowResp(true), 1200);
+      return () => clearTimeout(t);
+    }
+    setShowResp(false);
+  }, [isDirected]);
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
-    if (headRef.current && student.status !== 'offline') {
-      headRef.current.position.y = 1.35 + Math.sin(t * 1.2 + parseFloat(student.id)) * 0.025;
+    if (headRef.current) {
+      if (isDirected) {
+        headRef.current.position.y = Math.abs(Math.sin(t * 4)) * 0.07;
+        headRef.current.rotation.z = Math.sin(t * 3) * 0.05;
+      } else {
+        headRef.current.position.y = Math.sin(t * 0.9 + idx * 0.7) * 0.015;
+        headRef.current.rotation.z = 0;
+      }
+    }
+    if (bodyRef.current) {
+      bodyRef.current.rotation.y = isDirected
+        ? Math.sin(t * 2) * 0.04
+        : Math.sin(t * 0.5 + idx) * 0.01;
     }
     if (glowRef.current) {
-      glowRef.current.intensity = isDirected ? 3 + Math.sin(t * 5) * 1 : 0;
-    }
-    if (tabletRef.current) {
-      const mat = tabletRef.current.material as THREE.MeshStandardMaterial;
-      mat.emissiveIntensity = 0.4 + Math.sin(t * 0.8 + parseFloat(student.id)) * 0.1;
+      glowRef.current.intensity = isDirected ? 1.8 + Math.sin(t * 5) * 0.6 : 0;
     }
   });
 
   return (
-    <group position={student.pos}>
-      {/* Desk surface */}
-      <mesh position={[0, -0.15, 0.2]}>
+    <group ref={groupRef} position={student.pos}>
+      {/* ── Desk surface ── */}
+      <mesh position={[0, -0.05, 0.35]}>
         <boxGeometry args={[1.8, 0.06, 1.0]} />
-        <meshStandardMaterial color="#1E1A3A" roughness={0.7} metalness={0.2} />
+        <meshStandardMaterial color="#221A40" roughness={0.6} metalness={0.4} />
+      </mesh>
+      {/* Desk edge trim */}
+      <mesh position={[0, -0.03, 0.35]}>
+        <boxGeometry args={[1.82, 0.025, 1.02]} />
+        <meshStandardMaterial color={style.shirt} emissive={style.shirt} emissiveIntensity={0.15} roughness={0.5} metalness={0.6} />
       </mesh>
       {/* Desk legs */}
-      {([ [-0.8, -0.1], [-0.8, 1.1], [0.8, -0.1], [0.8, 1.1] ] as [number, number][]).map(([dx, dz], i) => (
-        <mesh key={i} position={[dx, -0.65, dz]}>
-          <cylinderGeometry args={[0.04, 0.04, 1, 6]} />
-          <meshStandardMaterial color="#2A2040" roughness={0.8} />
+      {([ [-0.82, 0.0], [-0.82, 1.1], [0.82, 0.0], [0.82, 1.1] ] as [number,number][]).map(([dx, dz], i) => (
+        <mesh key={i} position={[dx, -0.57, dz]}>
+          <cylinderGeometry args={[0.035, 0.035, 1.0, 6]} />
+          <meshStandardMaterial color="#1A1330" metalness={0.7} roughness={0.3} />
         </mesh>
       ))}
-      {/* Glowing tablet on desk */}
-      <mesh ref={tabletRef} position={[0.3, -0.1, 0.5]} rotation={[-0.3, 0, 0]}>
-        <boxGeometry args={[0.7, 0.45, 0.02]} />
+      {/* Glowing tablet/screen */}
+      <mesh position={[0, 0.01, 0.6]} rotation={[-0.3, 0, 0]}>
+        <boxGeometry args={[0.7, 0.45, 0.012]} />
         <meshStandardMaterial
-          color={bodyColor}
-          emissive={bodyColor}
-          emissiveIntensity={0.4}
-          roughness={0.2}
-          metalness={0.6}
+          color={style.shirt}
+          emissive={style.shirt}
+          emissiveIntensity={isDirected ? 1.0 : 0.4}
+          roughness={0.05}
+          metalness={0.8}
         />
       </mesh>
-      {/* Chair seat */}
-      <mesh position={[0, -0.6, 1.1]}>
-        <boxGeometry args={[1.1, 0.06, 0.9]} />
-        <meshStandardMaterial color="#1A1630" roughness={0.8} />
-      </mesh>
-      {/* Chair back */}
-      <mesh position={[0, -0.15, 1.55]}>
-        <boxGeometry args={[1.1, 0.9, 0.06]} />
-        <meshStandardMaterial color="#1A1630" roughness={0.8} />
+      {/* Screen frame */}
+      <mesh position={[0, 0.01, 0.599]} rotation={[-0.3, 0, 0]}>
+        <boxGeometry args={[0.74, 0.49, 0.01]} />
+        <meshStandardMaterial color="#111111" roughness={0.3} metalness={0.9} />
       </mesh>
 
-      {/* Student body */}
-      <mesh position={[0, 0.55, 1.0]}>
-        <boxGeometry args={[0.65, 0.9, 0.35]} />
-        <meshStandardMaterial color={bodyColor} roughness={0.5} metalness={0.1} />
+      {/* ── Chair ── */}
+      <mesh position={[0, -0.52, 1.2]}>
+        <boxGeometry args={[1.1, 0.06, 0.9]} />
+        <meshStandardMaterial color="#1A102E" roughness={0.8} />
       </mesh>
-      {/* Neck */}
-      <mesh position={[0, 1.1, 0.98]}>
-        <cylinderGeometry args={[0.1, 0.12, 0.2, 8]} />
-        <meshStandardMaterial color="#E8C09A" roughness={0.7} />
+      <mesh position={[0, -0.05, 1.65]}>
+        <boxGeometry args={[1.1, 0.92, 0.06]} />
+        <meshStandardMaterial color="#1A102E" roughness={0.8} />
       </mesh>
-      {/* Head */}
-      <mesh ref={headRef} position={[0, 1.35, 0.97]}>
-        <sphereGeometry args={[0.26, 16, 16]} />
-        <meshStandardMaterial color="#F0C090" roughness={0.6} />
-      </mesh>
-      {/* Eyes */}
-      {([-0.09, 0.09] as number[]).map((ex, i) => (
-        <mesh key={i} position={[ex, 1.37, 1.22]}>
-          <sphereGeometry args={[0.05, 8, 8]} />
-          <meshStandardMaterial color="#1A1040" />
+      {/* Chair legs */}
+      {([ [-0.48, 0.85], [0.48, 0.85], [-0.48, 1.55], [0.48, 1.55] ] as [number,number][]).map(([cx, cz], i) => (
+        <mesh key={i} position={[cx, -0.78, cz]}>
+          <cylinderGeometry args={[0.025, 0.025, 0.54, 6]} />
+          <meshStandardMaterial color="#0F0B20" metalness={0.8} roughness={0.2} />
         </mesh>
       ))}
 
-      {/* Directed highlight ring */}
+      {/* ── Body (cartoon proportions) ── */}
+      <group ref={bodyRef} position={[0, 0, 1.0]}>
+        {/* Torso */}
+        <mesh position={[0, 0.6, 0]}>
+          <boxGeometry args={[0.75, 0.9, 0.42]} />
+          <meshStandardMaterial color={style.shirt} roughness={0.4} />
+        </mesh>
+        {/* Shirt front detail */}
+        <mesh position={[0, 0.75, 0.22]}>
+          <boxGeometry args={[0.28, 0.32, 0.01]} />
+          <meshStandardMaterial color="white" roughness={0.8} />
+        </mesh>
+        {/* Arms */}
+        {[-0.48, 0.48].map((x, i) => (
+          <group key={i}>
+            <mesh position={[x, 0.52, 0]} rotation={[0, 0, i === 0 ? 0.18 : -0.18]}>
+              <boxGeometry args={[0.22, 0.72, 0.24]} />
+              <meshStandardMaterial color={style.shirt} roughness={0.4} />
+            </mesh>
+            {/* Hand */}
+            <mesh position={[x, 0.13, 0]}>
+              <sphereGeometry args={[0.12, 10, 10]} />
+              <meshStandardMaterial color={style.skin} roughness={0.55} />
+            </mesh>
+          </group>
+        ))}
+        {/* Legs (visible above desk edge) */}
+        {[-0.2, 0.2].map((x, i) => (
+          <mesh key={i} position={[x, -0.12, 0]}>
+            <boxGeometry args={[0.28, 0.44, 0.3]} />
+            <meshStandardMaterial color="#1E1A3A" roughness={0.7} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* ── Neck ── */}
+      <mesh position={[0, 1.2, 1.0]}>
+        <cylinderGeometry args={[0.12, 0.15, 0.2, 10]} />
+        <meshStandardMaterial color={style.skin} roughness={0.55} />
+      </mesh>
+
+      {/* ── Head (big cartoon head!) ── */}
+      <group ref={headRef} position={[0, 1.58, 1.0]}>
+        {/* Head sphere */}
+        <mesh>
+          <sphereGeometry args={[0.44, 22, 22]} />
+          <meshStandardMaterial color={style.skin} roughness={0.45} />
+        </mesh>
+        {/* Hair cap */}
+        <mesh position={[0, 0.28, -0.08]} rotation={[0.25, 0, 0]}>
+          <sphereGeometry args={[0.4, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2.1]} />
+          <meshStandardMaterial color={style.hair} roughness={0.9} />
+        </mesh>
+        {/* Eyes */}
+        {[-0.15, 0.15].map((ex, i) => (
+          <group key={i} position={[ex, 0.06, 0.4]}>
+            <mesh><sphereGeometry args={[0.1, 14, 14]} />
+              <meshStandardMaterial color="white" roughness={0.2} />
+            </mesh>
+            <mesh position={[0, 0, 0.075]}>
+              <sphereGeometry args={[0.062, 10, 10]} />
+              <meshStandardMaterial color="#0D0626" />
+            </mesh>
+            <mesh position={[0.026, 0.026, 0.128]}>
+              <sphereGeometry args={[0.022, 6, 6]} />
+              <meshStandardMaterial color="white" emissive="white" emissiveIntensity={1} />
+            </mesh>
+          </group>
+        ))}
+        {/* Brows */}
+        {[-0.15, 0.15].map((ex, i) => (
+          <mesh key={i} position={[ex, 0.19, 0.41]}
+            rotation={[0, 0, isDirected ? (i === 0 ? 0.28 : -0.28) : 0]}>
+            <boxGeometry args={[0.13, 0.024, 0.01]} />
+            <meshStandardMaterial color={style.hair} roughness={0.95} />
+          </mesh>
+        ))}
+        {/* Smile */}
+        {(student.status === 'active' || isDirected) && (
+          <mesh position={[0, -0.12, 0.4]} rotation={[0.15, 0, 0]}>
+            <torusGeometry args={[0.1, 0.022, 6, 14, Math.PI]} />
+            <meshStandardMaterial color="#CC6A50" roughness={0.5} />
+          </mesh>
+        )}
+        {/* Worried mouth for struggling */}
+        {student.status === 'struggling' && !isDirected && (
+          <mesh position={[0, -0.14, 0.4]} rotation={[-0.4, 0, Math.PI]}>
+            <torusGeometry args={[0.08, 0.018, 6, 10, Math.PI * 0.7]} />
+            <meshStandardMaterial color="#CC6A50" roughness={0.5} />
+          </mesh>
+        )}
+      </group>
+
+      {/* ── Status dot ── */}
+      <mesh position={[-0.75, -0.02, 0.35]}>
+        <sphereGeometry args={[0.058, 10, 10]} />
+        <meshStandardMaterial color={statusColor} emissive={statusColor} emissiveIntensity={1.5} />
+      </mesh>
+
+      {/* ── Spotlight glow when directed ── */}
+      <pointLight ref={glowRef} color={style.shirt} intensity={0} distance={5} position={[0, 3.0, 1.2]} />
       {isDirected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.13, 0.2]}>
-          <ringGeometry args={[0.85, 0.95, 40]} />
-          <meshStandardMaterial color="#F59E0B" emissive="#F59E0B" emissiveIntensity={1.5} transparent opacity={0.9} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.08, 0.5]}>
+          <ringGeometry args={[0.85, 1.0, 48]} />
+          <meshStandardMaterial color="#F59E0B" emissive="#F59E0B" emissiveIntensity={2.5} transparent opacity={0.9} />
         </mesh>
       )}
-      <pointLight ref={glowRef} color="#F59E0B" intensity={0} distance={4} position={[0, 2, 1]} />
 
-      {/* Name label */}
+      {/* ── Name label ── */}
       <Suspense fallback={null}>
-        <Text
-          position={[0, 2.0, 0.97]}
-          fontSize={0.22}
-          color="white"
-          anchorX="center"
-          outlineWidth={0.025}
-          outlineColor="#000000"
-        >
+        <Text position={[0, 2.35, 1.0]} fontSize={0.26} color="white" anchorX="center"
+          outlineWidth={0.035} outlineColor="#0A0918">
           {student.name}
         </Text>
-        <Text
-          position={[0, 1.73, 0.97]}
-          fontSize={0.14}
-          color={bodyColor}
-          anchorX="center"
-        >
+        <Text position={[0, 2.02, 1.0]} fontSize={0.16} color={statusColor} anchorX="center"
+          outlineWidth={0.02} outlineColor="#0A0918">
           {`${student.mastery}% • Lv.${student.level}`}
+        </Text>
+      </Suspense>
+
+      {/* ── Response bubble ── */}
+      {showResp && (
+        <group position={[1.1, 3.0, 1.0]}>
+          <mesh position={[0, 0, -0.015]}>
+            <planeGeometry args={[2.7, 0.85]} />
+            <meshBasicMaterial color={style.shirt} transparent opacity={0.95} />
+          </mesh>
+          <mesh>
+            <planeGeometry args={[2.5, 0.72]} />
+            <meshBasicMaterial color="white" transparent opacity={0.97} />
+          </mesh>
+          <mesh position={[-1.35, -0.55, 0]} rotation={[0, 0, -Math.PI / 5]}>
+            <coneGeometry args={[0.1, 0.28, 4]} />
+            <meshBasicMaterial color="white" />
+          </mesh>
+          <Suspense fallback={null}>
+            <Text position={[0, 0, 0.01]} fontSize={0.18} color="#1E1040"
+              anchorX="center" anchorY="middle" maxWidth={2.3} textAlign="center">
+              {STUDENT_RESPONSES[idx % STUDENT_RESPONSES.length]}
+            </Text>
+          </Suspense>
+        </group>
+      )}
+    </group>
+  );
+}
+
+// ─── SpeechBubble3D ────────────────────────────────────────────────────────────
+
+function SpeechBubble3D({ text, teacherPos }: { text: string; teacherPos: React.RefObject<THREE.Vector3> }) {
+  const groupRef = useRef<THREE.Group>(null!);
+
+  useFrame(({ camera, clock }) => {
+    if (!groupRef.current) return;
+    const src = teacherPos.current ?? new THREE.Vector3(0, 0, -4.5);
+    groupRef.current.position.set(src.x + 0.5, src.y + 4.5, src.z + 0.4);
+    groupRef.current.position.y += Math.sin(clock.elapsedTime * 1.4) * 0.05;
+    groupRef.current.lookAt(camera.position);
+  });
+
+  return (
+    <group ref={groupRef}>
+      <mesh position={[0, 0, -0.02]}>
+        <planeGeometry args={[3.4, 1.6]} />
+        <meshBasicMaterial color="#5B21B6" transparent opacity={0.97} />
+      </mesh>
+      <mesh>
+        <planeGeometry args={[3.2, 1.45]} />
+        <meshBasicMaterial color="white" transparent opacity={0.97} />
+      </mesh>
+      <mesh position={[0, -0.88, 0]} rotation={[0, 0, Math.PI]}>
+        <coneGeometry args={[0.16, 0.38, 4]} />
+        <meshBasicMaterial color="white" />
+      </mesh>
+      <Suspense fallback={null}>
+        <Text position={[0, 0.03, 0.01]} fontSize={0.23} color="#1E1040"
+          anchorX="center" anchorY="middle" maxWidth={2.9} textAlign="center">
+          {text}
         </Text>
       </Suspense>
     </group>
   );
 }
 
-// ─── SpeechBubble3D ───────────────────────────────────────────────────────────
+// ─── ClassroomTeacher ──────────────────────────────────────────────────────────
 
-function SpeechBubble3D({ text, teacherRef }: { text: string; teacherRef: React.RefObject<THREE.Group | null> }) {
-  const groupRef = useRef<THREE.Group>(null!);
-
-  useFrame(({ camera, clock }) => {
-    if (!groupRef.current) return;
-    const src = teacherRef.current?.position ?? new THREE.Vector3(0, -1.35, -4.5);
-    groupRef.current.position.set(src.x, src.y + 4.2, src.z + 0.5);
-    groupRef.current.position.y += Math.sin(clock.elapsedTime * 1.5) * 0.06;
-    groupRef.current.lookAt(camera.position);
-  });
-
-  return (
-    <group ref={groupRef}>
-      {/* Border */}
-      <mesh position={[0, 0, -0.02]}>
-        <planeGeometry args={[3.2, 1.5]} />
-        <meshBasicMaterial color="#7C3AED" transparent opacity={0.95} />
-      </mesh>
-      {/* White background */}
-      <mesh>
-        <planeGeometry args={[3.0, 1.35]} />
-        <meshBasicMaterial color="white" transparent opacity={0.96} />
-      </mesh>
-      {/* Text */}
-      <Text
-        position={[0, 0.02, 0.01]}
-        fontSize={0.22}
-        color="#1E1040"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={2.7}
-        textAlign="center"
-      >
-        {text}
-      </Text>
-      {/* Tail pointing down */}
-      <mesh position={[0, -0.82, 0]} rotation={[0, 0, Math.PI]}>
-        <coneGeometry args={[0.15, 0.35, 4]} />
-        <meshBasicMaterial color="white" />
-      </mesh>
-    </group>
-  );
-}
-
-// ─── ClassroomTeacher (Xbot) ──────────────────────────────────────────────────
-
-function ClassroomTeacher({
-  phaseIdx,
-  phases,
-  students,
-}: {
+function ClassroomTeacher({ phaseIdx, phases, students }: {
   phaseIdx: number;
   phases: typeof PHASES;
   students: Student[];
 }) {
   const { scene, animations } = useGLTF('/models/Xbot.glb');
+
   const cloned = useMemo(() => {
     const c = SkeletonUtils.clone(scene) as THREE.Group;
     c.traverse(child => {
@@ -243,26 +369,29 @@ function ClassroomTeacher({
       mats.forEach(m => {
         const sm = m as THREE.MeshStandardMaterial;
         if (sm.color) sm.color.set('#7C3AED');
-        sm.metalness = 0.4;
-        sm.roughness = 0.4;
+        sm.emissive = new THREE.Color('#2D1080');
+        sm.emissiveIntensity = 0.25;
+        sm.metalness = 0.45;
+        sm.roughness  = 0.38;
         sm.needsUpdate = true;
       });
     });
     return c;
   }, [scene]);
 
-  const groupRef = useRef<THREE.Group>(cloned);
-  const { actions } = useAnimations(animations, groupRef);
-  const prevAnim = useRef('');
-  const targetPos = useRef(new THREE.Vector3(0, 0, -4.5));
-  const targetRotY = useRef(0);
+  const groupRef     = useRef<THREE.Group>(null!);
+  const { actions }  = useAnimations(animations, groupRef);
+  const prevAnim     = useRef('');
+  const targetPos    = useRef(new THREE.Vector3(0, 0, -4.5));
+  const targetRotY   = useRef(Math.PI);
+  const teacherPosRef = useRef(new THREE.Vector3(0, 0, -4.5));
 
   const phase = phases[phaseIdx];
 
   useEffect(() => {
     const directed = phase.directed ? students.find(s => s.id === phase.directed) : null;
     if (directed) {
-      targetPos.current.set(directed.pos[0] * 0.4, 0, directed.pos[2] * 0.3 - 2.5);
+      targetPos.current.set(directed.pos[0] * 0.45, 0, directed.pos[2] * 0.35 - 2.2);
       const dx = directed.pos[0] - targetPos.current.x;
       const dz = directed.pos[2] - targetPos.current.z;
       targetRotY.current = Math.atan2(dx, dz);
@@ -280,7 +409,7 @@ function ClassroomTeacher({
       prevAnim.current = anim;
       Object.values(actions).forEach(a => a?.fadeOut(0.3));
       const tgt = actions[anim] ?? actions['idle'];
-      if (tgt) tgt.reset().setEffectiveTimeScale(1).fadeIn(0.3).play();
+      if (tgt) tgt.reset().setEffectiveTimeScale(anim === 'agree' ? 1.8 : 1).fadeIn(0.3).play();
     }
   }, [phaseIdx, phase, students, actions]);
 
@@ -289,35 +418,26 @@ function ClassroomTeacher({
     void delta;
     groupRef.current.position.lerp(
       new THREE.Vector3(targetPos.current.x, -1.35, targetPos.current.z),
-      0.04,
+      0.035,
     );
+    teacherPosRef.current.copy(groupRef.current.position);
     let dy = targetRotY.current - groupRef.current.rotation.y;
     while (dy >  Math.PI) dy -= 2 * Math.PI;
     while (dy < -Math.PI) dy += 2 * Math.PI;
-    groupRef.current.rotation.y += dy * 0.06;
+    groupRef.current.rotation.y += dy * 0.065;
   });
 
   return (
     <>
-      <primitive ref={groupRef} object={cloned} scale={1.5} position={[0, -1.35, -4.5]} dispose={null} />
-      <Suspense fallback={null}>
-        <SpeechBubble3D
-          text={phase.bubble}
-          teacherRef={groupRef}
-        />
-      </Suspense>
+      <primitive ref={groupRef} object={cloned} scale={1.55} position={[0, -1.35, -4.5]} dispose={null} />
+      <SpeechBubble3D text={phase.bubble} teacherPos={teacherPosRef} />
     </>
   );
 }
 
-// ─── ClassroomScene ───────────────────────────────────────────────────────────
+// ─── ClassroomScene ────────────────────────────────────────────────────────────
 
-function ClassroomScene({
-  phaseIdx,
-  phases,
-  students,
-  directedId,
-}: {
+function ClassroomScene({ phaseIdx, phases, students, directedId }: {
   phaseIdx: number;
   phases: typeof PHASES;
   students: Student[];
@@ -325,174 +445,238 @@ function ClassroomScene({
 }) {
   return (
     <>
-      <color attach="background" args={['#0A0918']} />
-      <fog attach="fog" args={['#0A0918', 25, 50]} />
+      <color attach="background" args={['#09081A']} />
+      <fog attach="fog" args={['#09081A', 28, 55]} />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.35} color="#8B9FCC" />
-      <directionalLight position={[0, 10, 3]} intensity={0.8} color="#FFF5E0" castShadow />
+      <OrbitControls target={[0, 0.5, -1]} enablePan={false} enableZoom minDistance={5} maxDistance={25} />
+
+      {/* ── Ambient + fill (lower so walls stay dark) ── */}
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[0, 10, 5]} intensity={1.4} color="#FFFFFF" castShadow />
+      <directionalLight position={[-6, 4, -3]} intensity={0.7} color="#C4B5FD" />
+      <directionalLight position={[6, 4, -3]} intensity={0.7} color="#A5B4FC" />
 
       {/* Ceiling strip lights */}
-      {([-5, 0, 5] as number[]).map((x, i) => (
-        <group key={i} position={[x, 4.8, -0.5]}>
-          <mesh>
-            <boxGeometry args={[1.2, 0.06, 6]} />
-            <meshStandardMaterial color="#FFFAF0" emissive="#FFFAF0" emissiveIntensity={0.9} />
-          </mesh>
-          <pointLight intensity={1.5} color="#FFF5E0" distance={8} position={[0, -0.5, 0]} />
-        </group>
-      ))}
+      <pointLight position={[-5.5, 4.2, -2]} intensity={1.4} color="#FFF8F0" distance={10} />
+      <pointLight position={[0,    4.2, -2]} intensity={1.6} color="#FFF8F0" distance={12} />
+      <pointLight position={[5.5,  4.2, -2]} intensity={1.4} color="#FFF8F0" distance={10} />
+      <pointLight position={[-5.5, 4.2,  3]} intensity={1.2} color="#FFF8F0" distance={10} />
+      <pointLight position={[5.5,  4.2,  3]} intensity={1.2} color="#FFF8F0" distance={10} />
 
-      {/* Desk accent lights */}
+      {/* Teacher spotlight */}
+      <pointLight position={[0, 6, -5]} intensity={3.5} color="#7C3AED" distance={12} />
+
+      {/* Per-desk soft lights */}
       {students.map(s => (
-        <pointLight key={s.id} position={[s.pos[0], 1.5, s.pos[2]]} intensity={0.3} color="#4A90D9" distance={3} />
+        <pointLight key={s.id}
+          position={[s.pos[0], 2.0, s.pos[2]]}
+          intensity={0.5} color="#5B8DEA" distance={4.5} />
       ))}
 
-      {/* Dramatic purple accent */}
-      <pointLight position={[0, 5, -6]} intensity={2} color="#7C3AED" distance={12} />
-
-      {/* Floor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
-        <planeGeometry args={[22, 18]} />
-        <meshStandardMaterial color="#12102A" roughness={0.8} metalness={0.1} />
+      {/* ── Floor ── */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.36, 0]} receiveShadow>
+        <planeGeometry args={[24, 20]} />
+        <meshStandardMaterial color="#13112A" roughness={0.65} metalness={0.2} />
       </mesh>
-      <gridHelper args={[22, 22, '#252040', '#1A1830']} position={[0, -1.34, 0]} />
+      <gridHelper args={[24, 24, '#3A2D70', '#221A50']} position={[0, -1.35, 0]} />
 
-      {/* Ceiling */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 5, 0]}>
-        <planeGeometry args={[22, 18]} />
-        <meshStandardMaterial color="#0D0B1E" roughness={1} />
-      </mesh>
+      {/* Floor glow strips near front */}
+      {[-4, 0, 4].map((x, i) => (
+        <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, -1.34, -5]}>
+          <planeGeometry args={[0.06, 5]} />
+          <meshBasicMaterial color="#7C3AED" transparent opacity={0.6} />
+        </mesh>
+      ))}
 
-      {/* Front wall (behind blackboard) */}
-      <mesh position={[0, 1.8, -8]}>
-        <planeGeometry args={[22, 8]} />
-        <meshStandardMaterial color="#14122A" roughness={0.9} />
-      </mesh>
+      {/* ── Ceiling strips only (no surface mesh) ── */}
+      {[-5.5, 0, 5.5].map((x, i) => (
+        <mesh key={i} position={[x, 5.4, -1.5]}>
+          <boxGeometry args={[0.8, 0.06, 0.15]} />
+          <meshBasicMaterial color="#332A50" />
+        </mesh>
+      ))}
 
-      {/* Back wall */}
-      <mesh position={[0, 1.8, 7]}>
-        <planeGeometry args={[22, 8]} />
-        <meshStandardMaterial color="#14122A" roughness={0.9} side={2} />
-      </mesh>
 
-      {/* Left wall */}
-      <mesh rotation={[0, Math.PI / 2, 0]} position={[-11, 1.8, -0.5]}>
-        <planeGeometry args={[18, 8]} />
-        <meshStandardMaterial color="#12102A" roughness={0.9} />
+      {/* ── Front wall (basic — always dark) ── */}
+      <mesh position={[0, 2.0, -9.5]}>
+        <planeGeometry args={[24, 9]} />
+        <meshBasicMaterial color="#110E22" />
       </mesh>
 
-      {/* Windows on left wall */}
-      {([-4, 2] as number[]).map((z, i) => (
-        <group key={i} position={[-10.9, 2.5, z]}>
-          {/* Window frame background */}
-          <mesh rotation={[0, Math.PI / 2, 0]} position={[0, 0, 0.01]}>
-            <planeGeometry args={[3.1, 2.6]} />
-            <meshStandardMaterial color="#2A2448" />
-          </mesh>
-          {/* Window glass */}
+      {/* ── Back wall ── */}
+      <mesh position={[0, 2.0, 8]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[24, 9]} />
+        <meshBasicMaterial color="#0F0D20" />
+      </mesh>
+
+      {/* ── Left wall ── */}
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[-12, 2.0, -0.75]}>
+        <planeGeometry args={[20, 9]} />
+        <meshBasicMaterial color="#0E0C1E" />
+      </mesh>
+
+      {/* Left wall windows */}
+      {([-3.5, 2.5] as number[]).map((z, i) => (
+        <group key={i} position={[-11.95, 2.8, z]}>
           <mesh rotation={[0, Math.PI / 2, 0]}>
-            <planeGeometry args={[3, 2.5]} />
-            <meshStandardMaterial color="#1A3A6A" emissive="#0A2040" emissiveIntensity={0.5} transparent opacity={0.85} />
+            <planeGeometry args={[3.2, 2.8]} />
+            <meshStandardMaterial color="#1A3A6A" emissive="#0A2040" emissiveIntensity={0.6} transparent opacity={0.9} />
           </mesh>
-          <pointLight position={[0.5, 0, 0]} intensity={0.4} color="#4A7FC1" distance={5} />
+          {/* Window frame */}
+          {[[-1.5,0],[1.5,0],[0,-1.3],[0,1.3]].map(([wz, wy], j) => (
+            <mesh key={j} rotation={[0, Math.PI / 2, 0]} position={[0, wy * 0.5, wz * 0.12]}>
+              <planeGeometry args={[j < 2 ? 0.06 : 3.2, j < 2 ? 2.8 : 0.06]} />
+              <meshBasicMaterial color="#2A4A8A" />
+            </mesh>
+          ))}
+          <pointLight position={[0.6, 0, 0]} intensity={0.5} color="#4A7FC1" distance={6} />
         </group>
       ))}
 
-      {/* Right wall */}
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[11, 1.8, -0.5]}>
-        <planeGeometry args={[18, 8]} />
-        <meshStandardMaterial color="#12102A" roughness={0.9} />
+      {/* ── Right wall ── */}
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[12, 2.0, -0.75]}>
+        <planeGeometry args={[20, 9]} />
+        <meshBasicMaterial color="#0E0C1E" />
       </mesh>
 
-      {/* Blackboard */}
-      <group position={[0, 2.2, -7.8]}>
-        {/* Board border */}
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[10.3, 3.8]} />
-          <meshStandardMaterial color="#2A1A10" roughness={1} />
+      {/* ── Blackboard ── */}
+      <group position={[0, 2.8, -8.8]}>
+        {/* Outer frame */}
+        <mesh position={[0, 0, -0.04]}>
+          <planeGeometry args={[11.4, 4.4]} />
+          <meshBasicMaterial color="#2A1A10" />
         </mesh>
         {/* Board surface */}
-        <mesh>
-          <planeGeometry args={[10, 3.5]} />
-          <meshStandardMaterial color="#1A3D28" roughness={0.95} />
+        <mesh position={[0, 0, -0.01]}>
+          <planeGeometry args={[11, 4.0]} />
+          <meshBasicMaterial color="#0E2A1A" />
         </mesh>
-        {/* Overhead board light */}
-        <pointLight position={[0, 3, 1]} intensity={2.5} color="#FFFAF0" distance={8} />
+        {/* Board active surface */}
+        <mesh>
+          <planeGeometry args={[10.8, 3.8]} />
+          <meshBasicMaterial color="#173222" />
+        </mesh>
+        {/* Overhead light strip (thin, dim) */}
+        <mesh position={[0, 2.4, 0.2]}>
+          <boxGeometry args={[10, 0.04, 0.1]} />
+          <meshBasicMaterial color="#504030" />
+        </mesh>
+        <pointLight position={[0, 3.5, 1.2]} intensity={3.0} color="#FFFAF0" distance={10} />
+        {/* Chalk lines decorative */}
+        {[-1.6, 1.3].map((y, i) => (
+          <mesh key={i} position={[0, y, 0.005]} rotation={[0, 0, 0]}>
+            <planeGeometry args={[10.2, 0.012]} />
+            <meshBasicMaterial color="#3D6040" transparent opacity={0.7} />
+          </mesh>
+        ))}
         {/* Chalk text */}
         <Suspense fallback={null}>
-          <Text position={[0, 0.8, 0.02]} fontSize={0.38} color="#C8F5D0" anchorX="center" maxWidth={9}>
+          <Text position={[0, 1.0, 0.02]} fontSize={0.42} color="#C8F5D0"
+            anchorX="center" outlineWidth={0.01} outlineColor="#0A1A10">
             {'درس الحلقات (Loops)'}
           </Text>
-          <Text position={[0, 0.1, 0.02]} fontSize={0.24} color="#9BE3B0" anchorX="center" maxWidth={9}>
-            {'for i in range(n):    print(i)'}
+          <Text position={[-1.5, 0.22, 0.02]} fontSize={0.26} color="#9BE3B0" anchorX="center">
+            {'for i in range(n):'}
           </Text>
-          <Text position={[0, -0.55, 0.02]} fontSize={0.22} color="#9BE3B0" anchorX="center" maxWidth={9}>
-            {'while condition:    # keep looping'}
+          <Text position={[2.5, 0.22, 0.02]} fontSize={0.26} color="#9BE3B0" anchorX="center">
+            {'while condition:'}
+          </Text>
+          <Text position={[-1.5, -0.28, 0.02]} fontSize={0.22} color="#78C896" anchorX="center">
+            {'    print(i)'}
+          </Text>
+          <Text position={[2.5, -0.28, 0.02]} fontSize={0.22} color="#78C896" anchorX="center">
+            {'    # keep looping'}
+          </Text>
+          <Text position={[0, -0.95, 0.02]} fontSize={0.2} color="#5DAE78" anchorX="center">
+            {'break  →  خروج فوري    continue  →  تخطي التكرار'}
           </Text>
         </Suspense>
         {/* Chalk tray */}
-        <mesh position={[0, -1.9, 0.08]}>
-          <boxGeometry args={[10, 0.1, 0.2]} />
-          <meshStandardMaterial color="#2A1A10" roughness={1} />
+        <mesh position={[0, -2.12, 0.12]}>
+          <boxGeometry args={[11, 0.09, 0.22]} />
+          <meshStandardMaterial color="#241810" roughness={1} />
         </mesh>
-      </group>
-
-      {/* Teacher's desk (moved slightly forward from z=-4.5 teacher position) */}
-      <group position={[0, -1.35, -3.2]}>
-        <mesh position={[0, 0.35, 0]}>
-          <boxGeometry args={[2, 0.06, 0.9]} />
-          <meshStandardMaterial color="#1E1A3A" roughness={0.7} metalness={0.2} />
-        </mesh>
-        {([ [-0.9, -0.4], [0.9, -0.4], [-0.9, 0.4], [0.9, 0.4] ] as [number, number][]).map(([dx, dz], i) => (
-          <mesh key={i} position={[dx, 0.15, dz]}>
-            <cylinderGeometry args={[0.04, 0.04, 0.68, 6]} />
-            <meshStandardMaterial color="#2A2040" roughness={1} />
+        {/* Chalk pieces */}
+        {[-2, 0, 2].map((cx, i) => (
+          <mesh key={i} position={[cx, -2.1, 0.18]} rotation={[0, i * 0.5, Math.PI / 2]}>
+            <cylinderGeometry args={[0.04, 0.04, 0.35, 8]} />
+            <meshStandardMaterial color={['#FFFFFF', '#FFF5E0', '#FFDFD0'][i]} roughness={0.9} />
           </mesh>
         ))}
-        {/* Laptop screen */}
-        <mesh position={[0.3, 0.42, -0.1]} rotation={[-0.3, 0, 0]}>
-          <boxGeometry args={[0.5, 0.35, 0.02]} />
-          <meshStandardMaterial color="#6366F1" emissive="#6366F1" emissiveIntensity={0.5} roughness={0.3} metalness={0.5} />
-        </mesh>
       </group>
 
-      {/* Student avatars */}
-      {students.map(s => (
-        <Suspense key={s.id} fallback={null}>
-          <StudentAvatar student={s} isDirected={s.id === directedId} />
-        </Suspense>
+      {/* ── Teacher desk ── */}
+      <group position={[0, -1.36, -3.0]}>
+        <mesh position={[0, 0.38, 0]}>
+          <boxGeometry args={[2.2, 0.06, 1.0]} />
+          <meshStandardMaterial color="#1E1A38" roughness={0.6} metalness={0.35} />
+        </mesh>
+        {/* Desk edge glow */}
+        <mesh position={[0, 0.41, 0]}>
+          <boxGeometry args={[2.22, 0.022, 1.02]} />
+          <meshStandardMaterial color="#7C3AED" emissive="#7C3AED" emissiveIntensity={0.5} roughness={0.3} metalness={0.7} />
+        </mesh>
+        {([ [-1.0, -0.45], [1.0, -0.45], [-1.0, 0.45], [1.0, 0.45] ] as [number, number][]).map(([dx, dz], i) => (
+          <mesh key={i} position={[dx, 0.17, dz]}>
+            <cylinderGeometry args={[0.04, 0.04, 0.7, 6]} />
+            <meshStandardMaterial color="#1A1530" metalness={0.8} roughness={0.2} />
+          </mesh>
+        ))}
+        {/* Laptop */}
+        <mesh position={[0.4, 0.44, -0.15]} rotation={[-0.28, 0, 0]}>
+          <boxGeometry args={[0.55, 0.38, 0.018]} />
+          <meshStandardMaterial color="#6366F1" emissive="#6366F1" emissiveIntensity={0.6} roughness={0.2} metalness={0.6} />
+        </mesh>
+        {/* Laptop base */}
+        <mesh position={[0.4, 0.412, 0.08]}>
+          <boxGeometry args={[0.55, 0.012, 0.35]} />
+          <meshStandardMaterial color="#111122" roughness={0.3} metalness={0.8} />
+        </mesh>
+        <pointLight position={[0, 1.5, 0]} intensity={0.8} color="#7C3AED" distance={3.5} />
+      </group>
+
+      {/* ── Students ── */}
+      {students.map((s, idx) => (
+        <StudentAvatar key={s.id} student={s} isDirected={s.id === directedId} idx={idx} />
       ))}
 
-      {/* Xbot teacher */}
+      {/* ── Xbot teacher (inner Suspense catches GLTF suspension) ── */}
       <Suspense fallback={null}>
         <ClassroomTeacher phaseIdx={phaseIdx} phases={phases} students={students} />
       </Suspense>
 
-      {/* Background stars */}
-      <Stars radius={40} depth={20} count={200} factor={2} fade speed={0.2} />
+      {/* ── Stars (inner Suspense prevents blocking scene) ── */}
+      <Suspense fallback={null}>
+        <Stars radius={45} depth={25} count={300} factor={2.5} fade speed={0.15} />
+      </Suspense>
     </>
   );
 }
 
-// ─── Main ClassroomClient ─────────────────────────────────────────────────────
+// ─── Main export ──────────────────────────────────────────────────────────────
 
 export default function ClassroomClient({ locale }: { locale: string }) {
   const isRtl = locale === 'ar';
   const [phaseIdx, setPhaseIdx] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setPhaseIdx(p => (p + 1) % PHASES.length), 4000);
-    return () => clearInterval(t);
+    const t = setInterval(() => {
+      setPhaseIdx(p => (p + 1) % PHASES.length);
+      setElapsed(0);
+    }, 5000);
+    const e = setInterval(() => setElapsed(p => p + 1), 1000);
+    return () => { clearInterval(t); clearInterval(e); };
   }, []);
 
   const phase: Phase = PHASES[phaseIdx];
   const directedId = phase.directed;
+  const directedStudent = directedId ? STUDENTS.find(s => s.id === directedId) : null;
 
   const actionLabel: Record<string, string> = {
     explaining:      'Xbot يشرح للجميع',
     questioning:     'Xbot يسأل طالباً',
-    praising:        'Xbot يشجع',
+    praising:        'Xbot يشجع الطالب',
     'peer-teaching': 'تعليم الأقران',
   };
 
@@ -503,94 +687,142 @@ export default function ClassroomClient({ locale }: { locale: string }) {
     'peer-teaching': <Users size={14} />,
   };
 
+  const statusItems = [
+    { icon: <Users size={14} className="text-purple-400" />, label: '6 طلاب متصلون' },
+    { icon: <Target size={14} className="text-amber-400" />, label: '78% متوسط الإتقان' },
+    { icon: <Zap size={14} className="text-blue-400" />, label: 'درس: الحلقات' },
+    { icon: <TrendingUp size={14} className="text-green-400" />, label: 'الجلسة 3/5' },
+  ];
+
   return (
     <div style={{ position: 'fixed', inset: 0 }} dir={isRtl ? 'rtl' : 'ltr'}>
-      {/* 3D Canvas */}
+      {/* ── 3D Canvas — NO outer Suspense; each child manages its own ── */}
       <Canvas
-        camera={{ position: [0, 8, 10], fov: 55 }}
+        camera={{ position: [0, 3.5, 12], fov: 72 }}
         style={{ width: '100%', height: '100%' }}
-        gl={{ antialias: true }}
-      >
-        <Suspense fallback={null}>
-          <CameraSetup />
-          <ClassroomScene
-            phaseIdx={phaseIdx}
-            phases={PHASES}
-            students={STUDENTS}
-            directedId={directedId}
-          />
-        </Suspense>
-      </Canvas>
-
-      {/* Top stats bar */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 20,
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)',
-          padding: '12px 24px',
+        gl={{ antialias: true, alpha: false }}
+        shadows
+        onCreated={({ gl, camera }) => {
+          gl.setClearColor(0x09081A, 1);
+          gl.shadowMap.enabled = true;
+          camera.lookAt(0, 0.5, -1);
         }}
       >
-        <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2 text-sm text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
-            <Users size={14} className="text-purple-400" />
-            <span>6 طلاب متصلون</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
-            <Target size={14} className="text-amber-400" />
-            <span>78% متوسط الإتقان</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
-            <Zap size={14} className="text-blue-400" />
-            <span>الحلقات — الدرس الحالي</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 mr-auto">
-            <BookOpen size={14} className="text-green-400" />
-            <span>الجلسة 3/5</span>
-          </div>
+        <ClassroomScene
+          phaseIdx={phaseIdx}
+          phases={PHASES}
+          students={STUDENTS}
+          directedId={directedId}
+        />
+      </Canvas>
+
+      {/* ── Top stats bar ── */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 20,
+        background: 'linear-gradient(to bottom, rgba(9,8,26,0.95) 0%, transparent 100%)',
+        padding: '12px 20px',
+      }}>
+        <div className="flex items-center gap-3 flex-wrap">
+          {statusItems.map((item, i) => (
+            <div key={i} className="flex items-center gap-2 text-sm text-white/75
+              bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-sm">
+              {item.icon}
+              <span>{item.label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Bottom action bar */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 20,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)',
-          padding: '16px 24px',
-        }}
-      >
+      {/* ── Side panel: student list ── */}
+      <div style={{
+        position: 'fixed', top: 64, right: isRtl ? 'auto' : 16, left: isRtl ? 16 : 'auto',
+        zIndex: 20, width: 200,
+      }}>
+        <div className="bg-black/60 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden">
+          <div className="px-3 py-2 border-b border-white/10 flex items-center gap-2">
+            <Brain size={13} className="text-purple-400" />
+            <span className="text-xs font-semibold text-white/80">مستوى الطلاب</span>
+          </div>
+          {STUDENTS.map((s, i) => {
+            const style = STUDENT_STYLES[i];
+            const statusColor =
+              s.status === 'active'     ? '#10B981' :
+              s.status === 'thinking'   ? '#F59E0B' :
+              s.status === 'struggling' ? '#EF4444' : '#6B7280';
+            return (
+              <motion.div
+                key={s.id}
+                animate={{ backgroundColor: s.id === directedId ? 'rgba(124,58,237,0.25)' : 'rgba(0,0,0,0)' }}
+                className="px-3 py-2 flex items-center gap-2 border-b border-white/5 last:border-0">
+                <div className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{ background: statusColor, boxShadow: `0 0 6px ${statusColor}` }} />
+                <span className="text-xs text-white/80 flex-1">{s.name}</span>
+                <div className="flex items-center gap-1">
+                  <div className="h-1 rounded-full overflow-hidden" style={{ width: 36, background: '#ffffff15' }}>
+                    <div className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${s.mastery}%`, background: style.shirt }} />
+                  </div>
+                  <span className="text-[10px] text-white/40">{s.mastery}%</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Bottom bar ── */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 20,
+        background: 'linear-gradient(to top, rgba(9,8,26,0.95) 0%, transparent 100%)',
+        padding: '16px 24px',
+      }}>
         <div className="flex items-center justify-between">
-          {/* Action type */}
-          <div className="flex items-center gap-2 text-sm font-semibold text-white bg-purple-600/30 px-4 py-2 rounded-xl border border-purple-500/30">
+          {/* Action badge */}
+          <motion.div
+            key={phase.action}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 text-sm font-semibold text-white
+              bg-purple-600/30 px-4 py-2.5 rounded-xl border border-purple-500/40 backdrop-blur-sm">
             {actionIcon[phase.action]}
             <span>{actionLabel[phase.action]}</span>
-          </div>
+            {directedStudent && (
+              <span className="text-purple-300 font-normal">— {directedStudent.name}</span>
+            )}
+          </motion.div>
 
-          {/* Phase dots */}
+          {/* Phase indicator dots */}
           <div className="flex items-center gap-2">
             {PHASES.map((_, i) => (
-              <motion.div
-                key={i}
-                animate={{ scale: i === phaseIdx ? 1 : 0.7 }}
-                className={`rounded-full transition-colors ${
-                  i === phaseIdx ? 'w-6 h-2.5 bg-amber-400' : 'w-2.5 h-2.5 bg-white/20'
+              <motion.div key={i}
+                animate={{
+                  width: i === phaseIdx ? 24 : 8,
+                  opacity: i === phaseIdx ? 1 : 0.35,
+                }}
+                className={`h-2 rounded-full transition-colors ${
+                  i === phaseIdx ? 'bg-amber-400' : 'bg-white/30'
                 }`}
               />
             ))}
           </div>
 
-          {/* Progress label */}
-          <div className="text-xs text-white/40">
-            {phaseIdx + 1}/{PHASES.length} مراحل الدرس
+          {/* Countdown */}
+          <div className="text-xs text-white/50 min-w-[80px] text-end">
+            {phaseIdx + 1}/{PHASES.length} مراحل
           </div>
         </div>
+
+        {/* Teacher bubble text reflected in HUD */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={phaseIdx}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            className="mt-2 text-center text-sm text-white/70 max-w-md mx-auto">
+            {phase.bubble.replace(/\n/g, ' ')}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

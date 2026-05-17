@@ -1,34 +1,15 @@
 'use client';
-
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import dynamic from 'next/dynamic';
-import {
-  Users,
-  User,
-  Bot,
-  Star,
-  Zap,
-  CheckCircle2,
-  MessageSquare,
-  Trophy,
-  BookOpen,
-  Target,
-  Award,
-} from 'lucide-react';
-import type { RobotMood } from '@/components/mascot-gltf';
-
-// ─── Dynamic import (Canvas = client-only) ────────────────────────────────────
-
-const XbotExpressive = dynamic(
-  () => import('@/components/mascot-gltf').then(m => ({ default: m.XbotExpressive })),
-  { ssr: false, loading: () => <div style={{ width: 220, height: 300 }} /> }
-);
+import { Suspense, useRef, useMemo, useState, useEffect } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Stars, Text, useGLTF, useAnimations } from '@react-three/drei';
+import { SkeletonUtils } from 'three-stdlib';
+import * as THREE from 'three';
+import { motion } from 'framer-motion';
+import { Users, Target, Zap, BookOpen, Award, MessageSquare } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type StudentStatus = 'active' | 'thinking' | 'struggling' | 'offline';
-type ActionType = 'explaining' | 'questioning' | 'praising' | 'peer-teaching';
 
 interface Student {
   id: string;
@@ -38,397 +19,514 @@ interface Student {
   level: number;
   status: StudentStatus;
   streak: number;
-}
-
-interface Phase {
-  id: number;
-  mood: RobotMood;
-  bubble: string;
-  directed: string | null;
-  action: ActionType;
+  pos: [number, number, number];
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const STUDENTS: Student[] = [
-  { id: '1', name: 'أحمد',  mastery: 92, xp: 1240, level: 8, status: 'active',     streak: 5 },
-  { id: '2', name: 'سارة',  mastery: 78, xp: 890,  level: 6, status: 'thinking',   streak: 3 },
-  { id: '3', name: 'محمد',  mastery: 61, xp: 650,  level: 5, status: 'struggling', streak: 1 },
-  { id: '4', name: 'ليلى',  mastery: 85, xp: 1050, level: 7, status: 'active',     streak: 7 },
-  { id: '5', name: 'يوسف',  mastery: 45, xp: 420,  level: 4, status: 'offline',    streak: 0 },
-  { id: '6', name: 'نور',   mastery: 73, xp: 780,  level: 6, status: 'thinking',   streak: 4 },
+  { id: '1', name: 'أحمد',  mastery: 92, xp: 1240, level: 8, status: 'active',     streak: 5, pos: [-3.5, 0, -1] },
+  { id: '2', name: 'سارة',  mastery: 78, xp: 890,  level: 6, status: 'thinking',   streak: 3, pos: [0,    0, -1] },
+  { id: '3', name: 'محمد',  mastery: 61, xp: 650,  level: 5, status: 'struggling', streak: 1, pos: [3.5,  0, -1] },
+  { id: '4', name: 'ليلى',  mastery: 85, xp: 1050, level: 7, status: 'active',     streak: 7, pos: [-3.5, 0,  2] },
+  { id: '5', name: 'يوسف',  mastery: 45, xp: 420,  level: 4, status: 'offline',    streak: 0, pos: [0,    0,  2] },
+  { id: '6', name: 'نور',   mastery: 73, xp: 780,  level: 6, status: 'thinking',   streak: 4, pos: [3.5,  0,  2] },
 ];
 
-const PHASES: Phase[] = [
-  {
-    id: 0,
-    mood: 'talking',
-    bubble: 'اليوم نتعلم الحلقات معاً!\nالحلقة تكرر كوداً عدة مرات.',
-    directed: null,
-    action: 'explaining',
-  },
-  {
-    id: 1,
-    mood: 'happy',
-    bubble: 'أحمد — ما الفرق بين for و while؟',
-    directed: '1',
-    action: 'questioning',
-  },
-  {
-    id: 2,
-    mood: 'happy',
-    bubble: 'إجابة ممتازة يا أحمد! 5 نقاط لك.',
-    directed: '1',
-    action: 'praising',
-  },
-  {
-    id: 3,
-    mood: 'talking',
-    bubble: 'الآن — متى نستخدم break؟',
-    directed: null,
-    action: 'explaining',
-  },
-  {
-    id: 4,
-    mood: 'thinking',
-    bubble: 'سارة — هل يمكنك مساعدة محمد في فهم break؟',
-    directed: '2',
-    action: 'peer-teaching',
-  },
-  {
-    id: 5,
-    mood: 'happy',
-    bubble: 'رائع! كلاهما يفهم الآن. +10 XP لسارة.',
-    directed: '2',
-    action: 'praising',
-  },
-];
+const PHASES = [
+  { id: 0, bubble: 'اليوم نتعلم الحلقات!\nالحلقة تكرر كوداً عدة مرات.',  directed: null, action: 'explaining'    },
+  { id: 1, bubble: 'أحمد — ما الفرق بين\nfor و while؟',                   directed: '1',  action: 'questioning'   },
+  { id: 2, bubble: 'إجابة ممتازة يا أحمد!\n+5 نقاط لك.',                  directed: '1',  action: 'praising'      },
+  { id: 3, bubble: 'الآن — متى نستخدم break؟\nمن يعرف؟',                  directed: null, action: 'explaining'    },
+  { id: 4, bubble: 'سارة — ساعدي محمد\nفي فهم break',                     directed: '2',  action: 'peer-teaching' },
+  { id: 5, bubble: 'رائع! كلاهما يفهم الآن.\n+10 XP لسارة.',              directed: '2',  action: 'praising'      },
+] as const;
 
-// ─── Action metadata ──────────────────────────────────────────────────────────
+type Phase = typeof PHASES[number];
 
-const ACTION_META: Record<ActionType, { icon: React.ReactNode; label: string }> = {
-  explaining:    { icon: <BookOpen size={14} />,    label: 'Xbot يشرح للجميع' },
-  questioning:   { icon: <MessageSquare size={14} />, label: 'Xbot يسأل طالباً' },
-  praising:      { icon: <Award size={14} />,       label: 'Xbot يشجع' },
-  'peer-teaching': { icon: <Users size={14} />,      label: 'تعليم الأقران' },
-};
+// ─── StudentAvatar ────────────────────────────────────────────────────────────
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+function StudentAvatar({ student, isDirected }: { student: Student; isDirected: boolean }) {
+  const headRef = useRef<THREE.Mesh>(null!);
+  const glowRef = useRef<THREE.PointLight>(null!);
 
-function getLevelColor(level: number): string {
-  if (level >= 7) return '#7C3AED';  // purple — high
-  if (level >= 5) return '#3B82F6';  // blue — mid
-  return '#6B7280';                   // gray — struggling
-}
+  const bodyColor =
+    student.status === 'active'     ? '#818CF8' :
+    student.status === 'thinking'   ? '#F59E0B' :
+    student.status === 'struggling' ? '#EF4444' :
+    '#374151';
 
-function getMasteryBarColor(mastery: number): string {
-  if (mastery >= 80) return '#10B981';
-  if (mastery >= 60) return '#F59E0B';
-  return '#EF4444';
-}
-
-// ─── Status indicator ─────────────────────────────────────────────────────────
-
-function StatusDot({ status }: { status: StudentStatus }) {
-  const configs: Record<StudentStatus, { dotClass: string; pulse: boolean; label: string }> = {
-    active:     { dotClass: 'bg-emerald-400', pulse: true,  label: 'يتعلم' },
-    thinking:   { dotClass: 'bg-amber-400',   pulse: true,  label: 'يفكر' },
-    struggling: { dotClass: 'bg-red-400',     pulse: false, label: 'يحتاج مساعدة' },
-    offline:    { dotClass: 'bg-slate-500',   pulse: false, label: 'غير متصل' },
-  };
-  const cfg = configs[status];
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="relative flex h-2 w-2">
-        {cfg.pulse && (
-          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${cfg.dotClass}`} />
-        )}
-        <span className={`relative inline-flex rounded-full h-2 w-2 ${cfg.dotClass}`} />
-      </span>
-      <span className="text-xs text-white/50">{cfg.label}</span>
-    </div>
-  );
-}
-
-// ─── Student Card ─────────────────────────────────────────────────────────────
-
-function StudentCard({ student, isDirected }: { student: Student; isDirected: boolean }) {
-  const levelColor = getLevelColor(student.level);
-  const masteryColor = getMasteryBarColor(student.mastery);
+  useFrame(({ clock }) => {
+    if (headRef.current && student.status !== 'offline') {
+      headRef.current.position.y = 1.15 + Math.sin(clock.elapsedTime * 1.2 + parseFloat(student.id)) * 0.02;
+    }
+    if (glowRef.current) {
+      glowRef.current.intensity = isDirected
+        ? 2 + Math.sin(clock.elapsedTime * 4) * 0.8
+        : 0;
+    }
+  });
 
   return (
-    <motion.div
-      animate={isDirected ? { scale: 1.03 } : { scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className={[
-        'bg-white/5 border border-white/10 rounded-2xl p-4 transition-all duration-500 flex flex-col gap-3',
-        isDirected ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30 border-amber-400/40' : '',
-      ].join(' ')}
-    >
-      {/* Avatar + name row */}
-      <div className="flex items-center gap-2.5">
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-          style={{ background: `${levelColor}33`, border: `2px solid ${levelColor}66` }}
-        >
-          <User size={20} style={{ color: levelColor }} />
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="text-sm font-bold text-white leading-none">{student.name}</span>
-          <span className="text-xs text-purple-400 mt-0.5">Lv.{student.level}</span>
-        </div>
-        {isDirected && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="ms-auto"
-          >
-            <Star size={14} className="text-amber-400 fill-amber-400" />
-          </motion.div>
-        )}
-      </div>
+    <group position={student.pos}>
+      {/* Desk surface */}
+      <mesh position={[0, -0.2, 0.3]}>
+        <boxGeometry args={[1.2, 0.05, 0.7]} />
+        <meshStandardMaterial color="#8B7355" roughness={0.9} />
+      </mesh>
+      {/* Desk legs */}
+      {([ [-0.55, -0.1], [-0.55, 0.65], [0.55, -0.1], [0.55, 0.65] ] as [number, number][]).map(([dx, dz], i) => (
+        <mesh key={i} position={[dx, -0.55, dz]}>
+          <cylinderGeometry args={[0.03, 0.03, 0.7, 6]} />
+          <meshStandardMaterial color="#5D3A1A" roughness={1} />
+        </mesh>
+      ))}
+      {/* Chair seat */}
+      <mesh position={[0, -0.55, 0.9]}>
+        <boxGeometry args={[0.8, 0.05, 0.7]} />
+        <meshStandardMaterial color="#374151" roughness={0.8} />
+      </mesh>
+      {/* Chair back */}
+      <mesh position={[0, -0.15, 1.25]}>
+        <boxGeometry args={[0.8, 0.8, 0.05]} />
+        <meshStandardMaterial color="#374151" roughness={0.8} />
+      </mesh>
 
-      {/* Mastery bar */}
-      <div className="flex flex-col gap-1">
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-white/40">إتقان</span>
-          <span className="text-xs text-white/50">{student.mastery}%</span>
-        </div>
-        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${student.mastery}%` }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="h-full rounded-full"
-            style={{ background: masteryColor }}
-          />
-        </div>
-      </div>
+      {/* Student body */}
+      <mesh position={[0, 0.4, 0.7]}>
+        <boxGeometry args={[0.5, 0.7, 0.3]} />
+        <meshStandardMaterial color={bodyColor} roughness={0.5} />
+      </mesh>
+      {/* Head */}
+      <mesh ref={headRef} position={[0, 1.15, 0.7]}>
+        <sphereGeometry args={[0.22, 12, 12]} />
+        <meshStandardMaterial color="#F5C5A3" roughness={0.6} />
+      </mesh>
+      {/* Eyes */}
+      {([-0.08, 0.08] as number[]).map((ex, i) => (
+        <mesh key={i} position={[ex, 1.17, 0.91]}>
+          <sphereGeometry args={[0.04, 6, 6]} />
+          <meshStandardMaterial color="#1E1B4B" />
+        </mesh>
+      ))}
 
-      {/* Status + XP row */}
-      <div className="flex items-center justify-between">
-        <StatusDot status={student.status} />
-        <span className="text-xs text-amber-400 font-semibold">{student.xp.toLocaleString()} XP</span>
-      </div>
+      {/* Glow when directed */}
+      <pointLight ref={glowRef} color="#F59E0B" intensity={0} distance={3} position={[0, 1.5, 0.7]} />
 
-      {/* Streak */}
-      {student.streak > 0 && (
-        <div className="flex items-center gap-1 text-xs text-orange-400">
-          <Zap size={11} />
-          <span>{student.streak} يوم متواصل</span>
-        </div>
+      {/* Highlight ring on desk */}
+      {isDirected && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.17, 0.3]}>
+          <ringGeometry args={[0.55, 0.65, 32]} />
+          <meshBasicMaterial color="#F59E0B" transparent opacity={0.8} />
+        </mesh>
       )}
-    </motion.div>
+
+      {/* Name label */}
+      <Text
+        position={[0, 1.65, 0.7]}
+        fontSize={0.2}
+        color="white"
+        anchorX="center"
+        outlineWidth={0.02}
+        outlineColor="#000000"
+      >
+        {student.name}
+      </Text>
+
+      {/* Status dot */}
+      <mesh position={[0.3, 1.15, 0.92]}>
+        <sphereGeometry args={[0.05, 6, 6]} />
+        <meshStandardMaterial
+          color={bodyColor}
+          emissive={student.status !== 'offline' ? bodyColor : '#374151'}
+          emissiveIntensity={student.status !== 'offline' ? 1 : 0}
+        />
+      </mesh>
+    </group>
   );
 }
 
-// ─── Speech Bubble ────────────────────────────────────────────────────────────
+// ─── SpeechBubble3D ───────────────────────────────────────────────────────────
 
-function SpeechBubble({ text }: { text: string }) {
+function SpeechBubble3D({ text, xbotPos }: { text: string; xbotPos: THREE.Vector3 }) {
+  const ref = useRef<THREE.Group>(null!);
+
+  useFrame(({ clock }) => {
+    if (ref.current) {
+      ref.current.position.set(xbotPos.x, xbotPos.y + 3.2, xbotPos.z);
+      ref.current.position.y += Math.sin(clock.elapsedTime * 1.5) * 0.05;
+    }
+  });
+
   return (
-    <motion.div
-      key={text}
-      initial={{ opacity: 0, scale: 0.85, y: 8 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.85 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className="relative bg-white rounded-2xl p-3 shadow-2xl max-w-[240px] text-center"
-    >
-      <p className="text-sm font-semibold leading-relaxed whitespace-pre-line m-0" style={{ color: '#1E293B' }}>
+    <group ref={ref}>
+      {/* Border (rendered behind) */}
+      <mesh position={[0, 0, -0.01]}>
+        <planeGeometry args={[2.3, 1.2]} />
+        <meshBasicMaterial color="#7C3AED" transparent opacity={0.9} />
+      </mesh>
+      {/* Bubble background */}
+      <mesh>
+        <planeGeometry args={[2.2, 1.1]} />
+        <meshBasicMaterial color="white" transparent opacity={0.92} />
+      </mesh>
+      {/* Text */}
+      <Text
+        position={[0, 0.02, 0.01]}
+        fontSize={0.19}
+        color="#1E293B"
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={2.0}
+        textAlign="center"
+      >
         {text}
-      </p>
-      {/* Bubble tail */}
-      <div
-        className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0"
-        style={{
-          borderLeft: '10px solid transparent',
-          borderRight: '10px solid transparent',
-          borderTop: '14px solid white',
-        }}
-      />
-    </motion.div>
+      </Text>
+      {/* Tail */}
+      <mesh position={[0, -0.65, 0]} rotation={[0, 0, Math.PI]}>
+        <coneGeometry args={[0.12, 0.3, 4]} />
+        <meshBasicMaterial color="white" />
+      </mesh>
+    </group>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── ClassroomTeacher (Xbot) ──────────────────────────────────────────────────
+
+function ClassroomTeacher({
+  phaseIdx,
+  phases,
+  students,
+}: {
+  phaseIdx: number;
+  phases: typeof PHASES;
+  students: Student[];
+}) {
+  const { scene, animations } = useGLTF('/models/Xbot.glb');
+  const cloned = useMemo(() => {
+    const c = SkeletonUtils.clone(scene) as THREE.Group;
+    c.traverse(child => {
+      if (!(child as THREE.Mesh).isMesh) return;
+      const mats = Array.isArray((child as THREE.Mesh).material)
+        ? ((child as THREE.Mesh).material as THREE.Material[])
+        : [(child as THREE.Mesh).material as THREE.Material];
+      mats.forEach(m => {
+        const sm = m as THREE.MeshStandardMaterial;
+        if (sm.color) sm.color.set('#7C3AED');
+        sm.metalness = 0.4;
+        sm.roughness = 0.4;
+        sm.needsUpdate = true;
+      });
+    });
+    return c;
+  }, [scene]);
+
+  const groupRef = useRef<THREE.Group>(cloned);
+  const { actions } = useAnimations(animations, groupRef);
+  const prevAnim = useRef('');
+  const targetPos = useRef(new THREE.Vector3(0, 0, -3.5));
+  const targetRotY = useRef(0);
+
+  const phase = phases[phaseIdx];
+
+  useEffect(() => {
+    const directed = phase.directed ? students.find(s => s.id === phase.directed) : null;
+    if (directed) {
+      targetPos.current.set(directed.pos[0] * 0.4, 0, directed.pos[2] * 0.3 - 2);
+      const dx = directed.pos[0] - targetPos.current.x;
+      const dz = directed.pos[2] - targetPos.current.z;
+      targetRotY.current = Math.atan2(dx, dz);
+    } else {
+      targetPos.current.set(0, 0, -3.5);
+      targetRotY.current = Math.PI;
+    }
+
+    const anim =
+      phase.action === 'praising'    ? 'agree' :
+      phase.action === 'questioning' ? 'headshake' :
+      'idle';
+
+    if (anim !== prevAnim.current) {
+      prevAnim.current = anim;
+      Object.values(actions).forEach(a => a?.fadeOut(0.3));
+      const tgt = actions[anim] ?? actions['idle'];
+      if (tgt) tgt.reset().setEffectiveTimeScale(1).fadeIn(0.3).play();
+    }
+  }, [phaseIdx, phase, students, actions]);
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return;
+    void delta;
+    groupRef.current.position.lerp(
+      new THREE.Vector3(targetPos.current.x, -1.3, targetPos.current.z),
+      0.04,
+    );
+    let dy = targetRotY.current - groupRef.current.rotation.y;
+    while (dy >  Math.PI) dy -= 2 * Math.PI;
+    while (dy < -Math.PI) dy += 2 * Math.PI;
+    groupRef.current.rotation.y += dy * 0.06;
+  });
+
+  return (
+    <>
+      <primitive ref={groupRef} object={cloned} scale={1.3} position={[0, -1.3, -3.5]} dispose={null} />
+      <SpeechBubble3D
+        text={phase.bubble}
+        xbotPos={groupRef.current?.position ?? new THREE.Vector3(0, -1.3, -3.5)}
+      />
+    </>
+  );
+}
+
+// ─── ClassroomScene ───────────────────────────────────────────────────────────
+
+function ClassroomScene({
+  phaseIdx,
+  phases,
+  students,
+  directedId,
+}: {
+  phaseIdx: number;
+  phases: typeof PHASES;
+  students: Student[];
+  directedId: string | null;
+}) {
+  return (
+    <>
+      <color attach="background" args={['#0F0C22']} />
+      <fog attach="fog" args={['#0F0C22', 20, 40]} />
+      <ambientLight intensity={0.6} color="#C4B5FD" />
+      <directionalLight position={[0, 8, 4]} intensity={1.2} color="#FFF9E6" />
+      <pointLight position={[0, 4, 0]} intensity={0.5} color="#7C3AED" />
+
+      {/* Floor */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.35, 0]}>
+        <planeGeometry args={[14, 12]} />
+        <meshStandardMaterial color="#1C1A2E" roughness={0.9} />
+      </mesh>
+      {/* Floor grid */}
+      <gridHelper args={[14, 14, '#2D1B69', '#1A0F3C']} position={[0, -1.34, 0]} />
+
+      {/* Back wall */}
+      <mesh position={[0, 1, 5.8]}>
+        <planeGeometry args={[14, 6]} />
+        <meshStandardMaterial color="#16142A" roughness={1} />
+      </mesh>
+      {/* Left wall */}
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[-6.8, 1, 0]}>
+        <planeGeometry args={[12, 6]} />
+        <meshStandardMaterial color="#14122A" roughness={1} />
+      </mesh>
+      {/* Right wall */}
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[6.8, 1, 0]}>
+        <planeGeometry args={[12, 6]} />
+        <meshStandardMaterial color="#14122A" roughness={1} />
+      </mesh>
+      {/* Front wall */}
+      <mesh position={[0, 1, -5.8]}>
+        <planeGeometry args={[14, 6]} />
+        <meshStandardMaterial color="#16142A" roughness={1} />
+      </mesh>
+      {/* Ceiling */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 3.5, 0]}>
+        <planeGeometry args={[14, 12]} />
+        <meshStandardMaterial color="#0F0D20" roughness={1} />
+      </mesh>
+
+      {/* Ceiling lights */}
+      {([ [-3.5, 0], [-3.5, 2], [3.5, 0], [3.5, 2] ] as [number, number][]).map(([x, z], i) => (
+        <group key={i}>
+          <mesh position={[x, 3.4, z]}>
+            <boxGeometry args={[0.6, 0.08, 0.6]} />
+            <meshStandardMaterial color="#FFF9E6" emissive="#FFF9E6" emissiveIntensity={1} />
+          </mesh>
+          <pointLight position={[x, 3.2, z]} intensity={1.2} color="#FFF9E6" distance={6} />
+        </group>
+      ))}
+
+      {/* Blackboard */}
+      <group position={[0, 1.2, -5.5]}>
+        {/* Frame */}
+        <mesh position={[0, 0, -0.01]}>
+          <planeGeometry args={[6.2, 2.7]} />
+          <meshStandardMaterial color="#2D1B0E" roughness={1} />
+        </mesh>
+        {/* Board surface */}
+        <mesh>
+          <planeGeometry args={[6, 2.5]} />
+          <meshStandardMaterial color="#0F3D2E" roughness={0.95} />
+        </mesh>
+        <Text position={[0, 0.4, 0.02]} fontSize={0.28} color="#E2F5DC" anchorX="center" maxWidth={5.5}>
+          {'درس الحلقات (Loops)'}
+        </Text>
+        <Text position={[0, -0.1, 0.02]} fontSize={0.18} color="#A7D9B0" anchorX="center" maxWidth={5.5}>
+          {'for i in range(n): ...'}
+        </Text>
+        <Text position={[0, -0.5, 0.02]} fontSize={0.16} color="#A7D9B0" anchorX="center" maxWidth={5.5}>
+          {'while condition: ...'}
+        </Text>
+        {/* Chalk tray */}
+        <mesh position={[0, -1.37, 0.06]}>
+          <boxGeometry args={[6, 0.08, 0.15]} />
+          <meshStandardMaterial color="#2D1B0E" roughness={1} />
+        </mesh>
+      </group>
+
+      {/* Teacher's desk */}
+      <group position={[0, -1.35, -4.5]}>
+        {/* Tabletop */}
+        <mesh position={[0, 0.35, 0]}>
+          <boxGeometry args={[2, 0.06, 0.9]} />
+          <meshStandardMaterial color="#7C5D3A" roughness={0.8} />
+        </mesh>
+        {/* Legs */}
+        {([ [-0.9, -0.4], [0.9, -0.4], [-0.9, 0.4], [0.9, 0.4] ] as [number, number][]).map(([dx, dz], i) => (
+          <mesh key={i} position={[dx, 0.15, dz]}>
+            <cylinderGeometry args={[0.04, 0.04, 0.68, 6]} />
+            <meshStandardMaterial color="#5D3A1A" roughness={1} />
+          </mesh>
+        ))}
+        {/* Laptop screen */}
+        <mesh position={[0.3, 0.42, -0.1]} rotation={[-0.3, 0, 0]}>
+          <boxGeometry args={[0.5, 0.35, 0.02]} />
+          <meshStandardMaterial color="#1F2937" roughness={0.5} metalness={0.3} />
+        </mesh>
+        {/* Laptop base */}
+        <mesh position={[0.3, 0.39, 0.07]}>
+          <boxGeometry args={[0.5, 0.02, 0.35]} />
+          <meshStandardMaterial color="#374151" roughness={0.5} />
+        </mesh>
+      </group>
+
+      {/* Student avatars */}
+      {students.map(s => (
+        <StudentAvatar key={s.id} student={s} isDirected={s.id === directedId} />
+      ))}
+
+      {/* Xbot teacher */}
+      <Suspense fallback={null}>
+        <ClassroomTeacher phaseIdx={phaseIdx} phases={phases} students={students} />
+      </Suspense>
+
+      {/* Background stars */}
+      <Stars radius={30} depth={15} count={200} factor={2} fade speed={0.2} />
+    </>
+  );
+}
+
+// ─── Main ClassroomClient ─────────────────────────────────────────────────────
 
 export default function ClassroomClient({ locale }: { locale: string }) {
   const isRtl = locale === 'ar';
   const [phaseIdx, setPhaseIdx] = useState(0);
 
-  // Auto-advance every 4 seconds
   useEffect(() => {
-    const t = setInterval(() => setPhaseIdx(i => (i + 1) % PHASES.length), 4000);
+    const t = setInterval(() => setPhaseIdx(p => (p + 1) % PHASES.length), 4000);
     return () => clearInterval(t);
   }, []);
 
-  const phase = PHASES[phaseIdx];
-  const xbotMood = phase.mood;
-  const action = ACTION_META[phase.action];
+  const phase: Phase = PHASES[phaseIdx];
+  const directedId = phase.directed;
 
-  // Split students: left column = first 3, right column = last 3
-  const leftStudents = STUDENTS.slice(0, 3);
-  const rightStudents = STUDENTS.slice(3, 6);
+  const actionLabel: Record<string, string> = {
+    explaining:     'Xbot يشرح للجميع',
+    questioning:    'Xbot يسأل طالباً',
+    praising:       'Xbot يشجع',
+    'peer-teaching': 'تعليم الأقران',
+  };
+
+  const actionIcon: Record<string, React.ReactNode> = {
+    explaining:     <BookOpen size={14} />,
+    questioning:    <MessageSquare size={14} />,
+    praising:       <Award size={14} />,
+    'peer-teaching': <Users size={14} />,
+  };
 
   return (
-    <div
-      dir={isRtl ? 'rtl' : 'ltr'}
-      className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white"
-    >
-      {/* ── Header ────────────────────────────────────────────────────────────── */}
-      <div className="px-6 pt-6 pb-4 flex items-center gap-3 border-b border-white/[0.06]">
-        <div className="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center shrink-0">
-          <Bot size={18} />
-        </div>
-        <div>
-          <h1 className="text-lg font-black text-white leading-none">فصل الحلقات — درس تفاعلي ذكي</h1>
-          <p className="text-xs text-white/40 mt-0.5">Classroom AI — نظام إدارة الفصل الذكي</p>
-        </div>
-        <div className="ms-auto flex items-center gap-2">
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-400/15 text-amber-400 border border-amber-400/30">
-            DEV
-          </span>
-          <span className="text-xs text-white/30 hidden sm:inline">Ctrl+Shift+D للقائمة</span>
+    <div style={{ position: 'fixed', inset: 0 }} dir={isRtl ? 'rtl' : 'ltr'}>
+      {/* 3D Canvas */}
+      <Canvas
+        camera={{ position: [0, 4, 9], fov: 52 }}
+        style={{ width: '100%', height: '100%' }}
+        gl={{ antialias: true }}
+      >
+        <Suspense fallback={null}>
+          <ClassroomScene
+            phaseIdx={phaseIdx}
+            phases={PHASES}
+            students={STUDENTS}
+            directedId={directedId}
+          />
+        </Suspense>
+      </Canvas>
+
+      {/* Top stats bar */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 20,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)',
+          padding: '12px 24px',
+        }}
+      >
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2 text-sm text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+            <Users size={14} className="text-purple-400" />
+            <span>6 طلاب متصلون</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+            <Target size={14} className="text-amber-400" />
+            <span>78% متوسط الإتقان</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+            <Zap size={14} className="text-blue-400" />
+            <span>الحلقات — الدرس الحالي</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 mr-auto">
+            <BookOpen size={14} className="text-green-400" />
+            <span>الجلسة 3/5</span>
+          </div>
         </div>
       </div>
 
-      <div className="px-4 py-4 flex flex-col gap-4">
-        {/* ── Stats bar ─────────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {[
-            { icon: <Users size={14} />,    text: '6 طلاب متصلون' },
-            { icon: <Target size={14} />,   text: '78% متوسط الإتقان' },
-            { icon: <Zap size={14} />,      text: 'الحلقات — الدرس الحالي' },
-            { icon: <Trophy size={14} />,   text: 'الجلسة 3/5' },
-          ].map((stat, i) => (
-            <div
-              key={i}
-              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm text-white/70"
-            >
-              <span className="text-purple-400 shrink-0">{stat.icon}</span>
-              <span className="truncate">{stat.text}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* ── 3-column grid ─────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-          {/* Left column: first 3 students */}
-          <div className="flex flex-col gap-3">
-            <p className="text-xs text-white/30 font-semibold uppercase tracking-widest flex items-center gap-1.5">
-              <CheckCircle2 size={11} />
-              المجموعة أ
-            </p>
-            {leftStudents.map(s => (
-              <StudentCard key={s.id} student={s} isDirected={phase.directed === s.id} />
-            ))}
-          </div>
-
-          {/* Center: Xbot + lesson info */}
-          <div className="flex flex-col items-center gap-4">
-            {/* Xbot + speech bubble */}
-            <div className="flex flex-col items-center gap-0 w-full">
-              {/* Speech bubble */}
-              <AnimatePresence mode="wait">
-                <SpeechBubble key={phaseIdx} text={phase.bubble} />
-              </AnimatePresence>
-
-              {/* Xbot 3D */}
-              <motion.div
-                animate={xbotMood === 'happy' ? { y: [0, -6, 0] } : {}}
-                transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-                className="mt-4 drop-shadow-[0_0_30px_#7C3AED55]"
-              >
-                <XbotExpressive mood={xbotMood} width={220} height={300} />
-              </motion.div>
-
-              {/* Mood label */}
-              <div className="flex items-center gap-1.5 mt-1 text-xs text-white/30 bg-white/5 px-3 py-1 rounded-full">
-                <Bot size={10} />
-                Xbot — {xbotMood}
-              </div>
-            </div>
-
-            {/* Lesson progress */}
-            <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-white/50 font-semibold">تقدم الدرس</span>
-                <span className="text-xs text-purple-400">{phaseIdx + 1}/{PHASES.length}</span>
-              </div>
-              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                <motion.div
-                  animate={{ width: `${((phaseIdx + 1) / PHASES.length) * 100}%` }}
-                  transition={{ duration: 0.5 }}
-                  className="h-full bg-gradient-to-r from-purple-600 to-amber-400 rounded-full"
-                />
-              </div>
-              <div className="flex flex-wrap gap-1.5 justify-center">
-                {PHASES.map((p, i) => (
-                  <button
-                    key={p.id}
-                    onClick={() => setPhaseIdx(i)}
-                    className={[
-                      'w-2 h-2 rounded-full transition-all duration-300',
-                      i === phaseIdx ? 'bg-amber-400 scale-125' : 'bg-white/20 hover:bg-white/40',
-                    ].join(' ')}
-                    title={`المرحلة ${i + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right column: last 3 students */}
-          <div className="flex flex-col gap-3">
-            <p className="text-xs text-white/30 font-semibold uppercase tracking-widest flex items-center gap-1.5">
-              <CheckCircle2 size={11} />
-              المجموعة ب
-            </p>
-            {rightStudents.map(s => (
-              <StudentCard key={s.id} student={s} isDirected={phase.directed === s.id} />
-            ))}
-          </div>
-        </div>
-
-        {/* ── Bottom bar: Xbot status ────────────────────────────────────────── */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-purple-600/30 border border-purple-500/30 flex items-center justify-center shrink-0">
-              <Bot size={14} className="text-purple-400" />
-            </div>
-            <div className="flex items-center gap-1.5 text-sm text-white/70">
-              <span className="text-purple-400 flex items-center">{action.icon}</span>
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={phase.action}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="font-semibold"
-                >
-                  {action.label}
-                </motion.span>
-              </AnimatePresence>
-            </div>
+      {/* Bottom action bar */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 20,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)',
+          padding: '16px 24px',
+        }}
+      >
+        <div className="flex items-center justify-between">
+          {/* Action type */}
+          <div className="flex items-center gap-2 text-sm font-semibold text-white bg-purple-600/30 px-4 py-2 rounded-xl border border-purple-500/30">
+            {actionIcon[phase.action]}
+            <span>{actionLabel[phase.action]}</span>
           </div>
 
           {/* Phase dots */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {PHASES.map((_, i) => (
-              <span
+              <motion.div
                 key={i}
-                className={[
-                  'rounded-full transition-all duration-300',
-                  i === phaseIdx ? 'w-6 h-2 bg-amber-400' : 'w-2 h-2 bg-white/20',
-                ].join(' ')}
+                animate={{ scale: i === phaseIdx ? 1 : 0.7 }}
+                className={`rounded-full transition-colors ${
+                  i === phaseIdx ? 'w-6 h-2.5 bg-amber-400' : 'w-2.5 h-2.5 bg-white/20'
+                }`}
               />
             ))}
           </div>
 
-          {/* Student count */}
-          <div className="flex items-center gap-1.5 text-xs text-white/40">
-            <Users size={12} />
-            <span>{STUDENTS.filter(s => s.status !== 'offline').length} / {STUDENTS.length} متصل</span>
+          {/* Progress label */}
+          <div className="text-xs text-white/40">
+            {phaseIdx + 1}/{PHASES.length} مراحل الدرس
           </div>
         </div>
       </div>

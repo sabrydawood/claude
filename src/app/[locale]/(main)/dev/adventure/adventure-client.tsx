@@ -213,22 +213,37 @@ export default function AdventureClient({ locale }: { locale: string }) {
   // Island keyboard
   useEffect(() => {
     if (stage !== 'island') return;
-    const down = (e: KeyboardEvent) => { if (MOVE_KEYS_LIST.includes(e.key)) e.preventDefault(); islandKeys.current.add(e.key); };
-    const up   = (e: KeyboardEvent) => islandKeys.current.delete(e.key);
+    const down  = (e: KeyboardEvent) => { if (MOVE_KEYS_LIST.includes(e.key)) e.preventDefault(); islandKeys.current.add(e.key); };
+    const up    = (e: KeyboardEvent) => islandKeys.current.delete(e.key);
+    const clear = () => islandKeys.current.clear();
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
-    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
+    window.addEventListener('blur', clear);
+    return () => {
+      window.removeEventListener('keydown', down);
+      window.removeEventListener('keyup', up);
+      window.removeEventListener('blur', clear);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
 
   // Dungeon keyboard
   useEffect(() => {
     if (stage !== 'dungeon') return;
-    const down = (e: KeyboardEvent) => { if (MOVE_KEYS_LIST.includes(e.key)) e.preventDefault(); dungeonKeys.current.add(e.key); };
-    const up   = (e: KeyboardEvent) => dungeonKeys.current.delete(e.key);
+    const down  = (e: KeyboardEvent) => { if (MOVE_KEYS_LIST.includes(e.key)) e.preventDefault(); dungeonKeys.current.add(e.key); };
+    const up    = (e: KeyboardEvent) => dungeonKeys.current.delete(e.key);
+    const clear = () => dungeonKeys.current.clear(); // clears all keys on focus loss
+    const noCtx = (e: MouseEvent)   => { e.preventDefault(); dungeonKeys.current.clear(); }; // right-click = clear + no context menu
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
-    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
+    window.addEventListener('blur', clear);
+    window.addEventListener('contextmenu', noCtx);
+    return () => {
+      window.removeEventListener('keydown', down);
+      window.removeEventListener('keyup', up);
+      window.removeEventListener('blur', clear);
+      window.removeEventListener('contextmenu', noCtx);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
 

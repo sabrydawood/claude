@@ -234,7 +234,7 @@ function SpeechBubble({ text }: { text: string }) {
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className="relative bg-white rounded-2xl p-3 shadow-2xl max-w-[240px] text-center"
     >
-      <p className="text-slate-800 text-sm font-semibold leading-relaxed whitespace-pre-line m-0">
+      <p className="text-sm font-semibold leading-relaxed whitespace-pre-line m-0" style={{ color: '#1E293B' }}>
         {text}
       </p>
       {/* Bubble tail */}

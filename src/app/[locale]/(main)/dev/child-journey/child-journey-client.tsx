@@ -518,7 +518,7 @@ function SpeechBubble({ text, isRtl }: { text: string; isRtl: boolean }) {
       className="relative bg-white rounded-2xl p-3.5 shadow-2xl max-w-[220px]"
       style={{ direction: isRtl ? 'rtl' : 'ltr' }}
     >
-      <p className="text-slate-800 text-sm font-semibold leading-relaxed whitespace-pre-line m-0">
+      <p className="text-sm font-semibold leading-relaxed whitespace-pre-line m-0" style={{ color: '#1E293B' }}>
         {text}
       </p>
       {/* Bubble tail */}
